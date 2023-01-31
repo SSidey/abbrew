@@ -1,22 +1,22 @@
 {
-  "BOILERPLATE.AbilityStr": "Strength",
-  "BOILERPLATE.AbilityCon": "Constitution",
-  "BOILERPLATE.AbilityDex": "Dexterity",
-  "BOILERPLATE.AbilityInt": "Intelligence",
-  "BOILERPLATE.AbilityWis": "Wisdom",
-  "BOILERPLATE.AbilityCha": "Charisma",
+  "ABBREW.AbilityStr": "Strength",
+  "ABBREW.AbilityCon": "Constitution",
+  "ABBREW.AbilityDex": "Dexterity",
+  "ABBREW.AbilityInt": "Intelligence",
+  "ABBREW.AbilityWis": "Wisdom",
+  "ABBREW.AbilityCha": "Charisma",
 
-  "BOILERPLATE.AbilityStrAbbr": "str",
-  "BOILERPLATE.AbilityConAbbr": "con",
-  "BOILERPLATE.AbilityDexAbbr": "dex",
-  "BOILERPLATE.AbilityIntAbbr": "int",
-  "BOILERPLATE.AbilityWisAbbr": "wis",
-  "BOILERPLATE.AbilityChaAbbr": "cha",
+  "ABBREW.AbilityStrAbbr": "str",
+  "ABBREW.AbilityConAbbr": "con",
+  "ABBREW.AbilityDexAbbr": "dex",
+  "ABBREW.AbilityIntAbbr": "int",
+  "ABBREW.AbilityWisAbbr": "wis",
+  "ABBREW.AbilityChaAbbr": "cha",
 
-  "BOILERPLATE.EffectCreate": "Create Effect",
-  "BOILERPLATE.EffectToggle": "Toggle Effect",
-  "BOILERPLATE.EffectEdit": "Edit Effect",
-  "BOILERPLATE.EffectDelete": "Delete Effect",
+  "ABBREW.EffectCreate": "Create Effect",
+  "ABBREW.EffectToggle": "Toggle Effect",
+  "ABBREW.EffectEdit": "Edit Effect",
+  "ABBREW.EffectDelete": "Delete Effect",
 
-  "BOILERPLATE.Add": "Add"
+  "ABBREW.Add": "Add"
 }

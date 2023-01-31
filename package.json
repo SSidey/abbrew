@@ -1,7 +1,7 @@
 {
-  "name": "boilerplate",
+  "name": "abbrew",
   "version": "1.0.0",
-  "description": "CSS compiler for the Boilerplate system",
+  "description": "CSS compiler for the Abbrew system",
   "scripts": {
     "build": "gulp build",
     "compile": "gulp css",
