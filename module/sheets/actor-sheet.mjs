@@ -1,3 +1,4 @@
+import { ChatAbbrew } from "../helpers/chat.mjs";
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../helpers/effects.mjs";
 
 /**
@@ -228,7 +229,7 @@ export class AbbrewActorSheet extends ActorSheet {
     // Finally, create the item!
     return await Item.create(itemData, {parent: this.actor});
   }
-  
+
   /**
    * Handle clickable rolls.
    * @param {Event} event   The originating click event
@@ -238,8 +239,8 @@ export class AbbrewActorSheet extends ActorSheet {
     event.preventDefault();
     const element = event.currentTarget;
     const dataset = element.dataset;
-    const actor = this.actor;
-    // return await ChatAbbrew(dataset, element, actor);
+    const actor = this.actor;    
+    return await ChatAbbrew(dataset, element, actor);
   }
 
 }

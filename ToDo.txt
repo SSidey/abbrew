@@ -1,0 +1,3 @@
+Break out dice roll
+Add dialog for dice roll
+Add fields to item

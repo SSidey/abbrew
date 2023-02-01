@@ -7,6 +7,7 @@ import { AbbrewItemSheet } from "./sheets/item-sheet.mjs";
 // Import helper/utility classes and constants.
 import { preloadHandlebarsTemplates } from "./helpers/templates.mjs";
 import { ABBREW } from "./helpers/config.mjs";
+import AbbrewRoll from "./helpers/abbrew-roll.mjs";
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -33,6 +34,10 @@ Hooks.once('init', async function() {
     formula: "1d10 + @abilities.dexterity.mod + @abilities.agility.mod + @abilities.wits.mod",
     decimals: 2
   };
+
+  // Record Configuration Values
+  CONFIG.Dice.AbbrewRoll = AbbrewRoll;
+  CONFIG.Dice.rolls.push(AbbrewRoll);
 
   // Define custom Document classes
   CONFIG.Actor.documentClass = AbbrewActor;
@@ -136,7 +141,7 @@ function rollItemMacro(itemUuid) {
   });
 }
 
-// Hooks.on("renderChatLog", (app, html, data) => AbbrewItem.chatListeners(html));
+Hooks.on("renderChatLog", (app, html, data) => AbbrewItem.chatListeners(html));
 
 Hooks.on("abbrew.ability", function(ability) {
   console.log("Hooked on " + ability);
