@@ -1,7 +1,7 @@
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../helpers/effects.mjs";
 
 /**
- * Extend the basic ActorSheet with some very simple modifications
+ * Extend the basic ActorSheet
  * @extends {ActorSheet}
  */
 export class AbbrewActorSheet extends ActorSheet {
@@ -43,6 +43,9 @@ export class AbbrewActorSheet extends ActorSheet {
     if (actorData.type == 'character') {
       this._prepareItems(context);
       this._prepareCharacterData(context);
+      this._prepareArmour(actorData);
+      this._preparePower(actorData);
+      this._prepareActions(context);
     }
 
     // Prepare NPC data and items.
@@ -59,6 +62,12 @@ export class AbbrewActorSheet extends ActorSheet {
     return context;
   }
 
+  _sumValues(systemData) {  
+    return Object.values(systemData.abilities).reduce(function(sum, ability) {
+      return sum += ability.value;
+    }, 0);
+  }
+
   /**
    * Organize and classify Items for Character sheets.
    *
@@ -73,6 +82,26 @@ export class AbbrewActorSheet extends ActorSheet {
     }
   }
 
+  _prepareArmour(actorData) {
+    const systemData = actorData.system;
+    const constitutionModifier = systemData.abilities['constitution'].mod;
+    if(systemData.armour.max < constitutionModifier) {
+      systemData.armour.max = constitutionModifier;
+    }
+  }
+  
+  _preparePower(actorData) {
+    const systemData = actorData.system;
+    const result = this._sumValues(systemData);
+    systemData.attributes.power.value = result;
+  }
+  
+  _prepareActions(actorData) {
+    const systemData = actorData.system;
+    const actions = 3;
+    systemData.actions = { current: actions, maximum: actions };
+  }
+
   /**
    * Organize and classify Items for Character sheets.
    *
@@ -82,6 +111,7 @@ export class AbbrewActorSheet extends ActorSheet {
    */
   _prepareItems(context) {
     // Initialize containers.
+    const resources = [];
     const gear = [];
     const features = [];
     const spells = {
@@ -100,6 +130,10 @@ export class AbbrewActorSheet extends ActorSheet {
     // Iterate through items, allocating to containers
     for (let i of context.items) {
       i.img = i.img || DEFAULT_TOKEN;
+      // Append to resources.
+      if(i.type === 'resource') {
+        resources.push(i);
+      }
       // Append to gear.
       if (i.type === 'item') {
         gear.push(i);
@@ -117,6 +151,7 @@ export class AbbrewActorSheet extends ActorSheet {
     }
 
     // Assign and return
+    context.resource = resources;
     context.gear = gear;
     context.features = features;
     context.spells = spells;
@@ -155,7 +190,7 @@ export class AbbrewActorSheet extends ActorSheet {
 
     // Rollable abilities.
     html.find('.rollable').click(this._onRoll.bind(this));
-
+    
     // Drag events for macros.
     if (this.actor.isOwner) {
       let handler = ev => this._onDragStart(ev);
@@ -193,37 +228,18 @@ export class AbbrewActorSheet extends ActorSheet {
     // Finally, create the item!
     return await Item.create(itemData, {parent: this.actor});
   }
-
+  
   /**
    * Handle clickable rolls.
    * @param {Event} event   The originating click event
    * @private
    */
-  _onRoll(event) {
+  async _onRoll(event) {
     event.preventDefault();
     const element = event.currentTarget;
     const dataset = element.dataset;
-
-    // Handle item rolls.
-    if (dataset.rollType) {
-      if (dataset.rollType == 'item') {
-        const itemId = element.closest('.item').dataset.itemId;
-        const item = this.actor.items.get(itemId);
-        if (item) return item.roll();
-      }
-    }
-
-    // Handle rolls that supply the formula directly.
-    if (dataset.roll) {
-      let label = dataset.label ? `[ability] ${dataset.label}` : '';
-      let roll = new Roll(dataset.roll, this.actor.getRollData());
-      roll.toMessage({
-        speaker: ChatMessage.getSpeaker({ actor: this.actor }),
-        flavor: label,
-        rollMode: game.settings.get('core', 'rollMode'),
-      });
-      return roll;
-    }
+    const actor = this.actor;
+    // return await ChatAbbrew(dataset, element, actor);
   }
 
 }
