@@ -3,44 +3,59 @@
     "types": ["character", "npc"],
     "templates": {
       "base": {
-        "health": {
-          "value": 10,
+        "armour": {
+          "value": 0,
           "min": 0,
-          "max": 10
+          "max": 0
         },
-        "power": {
-          "value": 5,
-          "min": 0,
-          "max": 5
+        "biography": "",
+        "effects": {
+          "damage": {
+            "modifier": 0,
+            "multiplier": 1
+          }
         },
-        "biography": ""
+        "abilities": {
+          "strength": {
+            "value": 0
+          },
+          "dexterity": {
+            "value": 0
+          },
+          "constitution": {
+            "value": 0
+          },
+          "agility": {
+            "value": 0
+          },
+          "intelligence": {
+            "value": 0
+          },
+          "will": {
+            "value": 0
+          },
+          "wits": {
+            "value": 0
+          },
+          "visualisation": {
+            "value": 0
+          }
+        }
       }
     },
     "character": {
       "templates": ["base"],
-      "attributes": {
-        "level": {
-          "value": 1
-        }
+      "blood": {
+        "value": 100,
+        "min": 0,
+        "max": 100
       },
-      "abilities": {
-        "str": {
-          "value": 10
+      "attributes": {
+        "power": {
+          "value": 0
         },
-        "dex": {
-          "value": 10
-        },
-        "con": {
-          "value": 10
-        },
-        "int": {
-          "value": 10
-        },
-        "wis": {
-          "value": 10
-        },
-        "cha": {
-          "value": 10
+        "tier": {
+          "value": 1
         }
       }
     },
@@ -50,17 +65,26 @@
     }
   },
   "Item": {
-    "types": ["item", "feature", "spell"],
+    "types": ["item", "feature", "spell", "resource"],
     "templates": {
       "base": {
         "description": ""
+      },
+      "action": {
+        "actionType": "action"
+      },
+      "damage": {
+        "ability": "strength"
       }
     },
     "item": {
-      "templates": ["base"],
-      "quantity": 1,
+      "templates": ["action"],
+      "cost": 1,
       "weight": 0,
-      "formula": "d20 + @str.mod + ceil(@lvl / 2)"
+      "abilityBonus": {
+        "name": ""
+      }, 
+      "formula": "d10! + @mod"
     },
     "feature": {
       "templates": ["base"]
@@ -68,6 +92,11 @@
     "spell": {
       "templates": ["base"],
       "spellLevel": 1
+    },
+    "resource": {
+      "templates": ["base"],
+      "current": 0,
+      "maximum": 0
     }
   }
 }

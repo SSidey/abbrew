@@ -5,19 +5,23 @@ export const ABBREW = {};
  * @type {Object}
  */
  ABBREW.abilities = {
-  "str": "ABBREW.AbilityStr",
-  "dex": "ABBREW.AbilityDex",
-  "con": "ABBREW.AbilityCon",
-  "int": "ABBREW.AbilityInt",
-  "wis": "ABBREW.AbilityWis",
-  "cha": "ABBREW.AbilityCha"
+  "strength": "ABBREW.AbilityStrength",
+  "dexterity": "ABBREW.AbilityDexterity",
+  "constitution": "ABBREW.AbilityConstitution",
+  "agility": "ABBREW.AbilityAgility",
+  "intelligence": "ABBREW.AbilityIntelligence",
+  "will": "ABBREW.AbilityWill",
+  "wits": "ABBREW.AbilityWits",
+  "visualisation": "ABBREW.AbilityVisualisation"
 };
 
 ABBREW.abilityAbbreviations = {
-  "str": "ABBREW.AbilityStrAbbr",
-  "dex": "ABBREW.AbilityDexAbbr",
-  "con": "ABBREW.AbilityConAbbr",
-  "int": "ABBREW.AbilityIntAbbr",
-  "wis": "ABBREW.AbilityWisAbbr",
-  "cha": "ABBREW.AbilityChaAbbr"
+  "str": "ABBREW.AbilityStrengthAbbreviation",
+  "dex": "ABBREW.AbilityDexterityAbbreviation",
+  "con": "ABBREW.AbilityConstitutionAbbreviation",
+  "agi": "ABBREW.AbilityAgilityAbbreviation",
+  "int": "ABBREW.AbilityIntelligenceAbbreviation",
+  "wll": "ABBREW.AbilityWillAbbreviation",
+  "wts": "ABBREW.AbilityWitsAbbreviation",
+  "wis": "ABBREW.AbilityVisualisationAbbreviation"
 };
