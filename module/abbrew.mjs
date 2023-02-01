@@ -30,7 +30,7 @@ Hooks.once('init', async function() {
    * @type {String}
    */
   CONFIG.Combat.initiative = {
-    formula: "1d20 + @abilities.dex.mod",
+    formula: "1d10 + @abilities.dexterity.mod + @abilities.agility.mod + @abilities.wits.mod",
     decimals: 2
   };
 
@@ -135,3 +135,9 @@ function rollItemMacro(itemUuid) {
     item.roll();
   });
 }
+
+// Hooks.on("renderChatLog", (app, html, data) => AbbrewItem.chatListeners(html));
+
+Hooks.on("abbrew.ability", function(ability) {
+  console.log("Hooked on " + ability);
+});
