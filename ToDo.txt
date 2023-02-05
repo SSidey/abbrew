@@ -1,3 +1,1 @@
-Break out dice roll
-Add dialog for dice roll
-Add fields to item
+item.mjs l246 - pass rollConfig down, need to get the modifier in

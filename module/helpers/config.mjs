@@ -25,3 +25,7 @@ ABBREW.abilityAbbreviations = {
   "wts": "ABBREW.AbilityWitsAbbreviation",
   "wis": "ABBREW.AbilityVisualisationAbbreviation"
 };
+
+ABBREW.ActionTypes = {
+  "Damage": "damage"
+};

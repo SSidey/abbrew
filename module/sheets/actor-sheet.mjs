@@ -44,9 +44,6 @@ export class AbbrewActorSheet extends ActorSheet {
     if (actorData.type == 'character') {
       this._prepareItems(context);
       this._prepareCharacterData(context);
-      this._prepareArmour(actorData);
-      this._preparePower(actorData);
-      this._prepareActions(context);
     }
 
     // Prepare NPC data and items.
@@ -63,12 +60,6 @@ export class AbbrewActorSheet extends ActorSheet {
     return context;
   }
 
-  _sumValues(systemData) {  
-    return Object.values(systemData.abilities).reduce(function(sum, ability) {
-      return sum += ability.value;
-    }, 0);
-  }
-
   /**
    * Organize and classify Items for Character sheets.
    *
@@ -81,26 +72,6 @@ export class AbbrewActorSheet extends ActorSheet {
     for (let [k, v] of Object.entries(context.system.abilities)) {
       v.label = game.i18n.localize(CONFIG.ABBREW.abilities[k]) ?? k;
     }
-  }
-
-  _prepareArmour(actorData) {
-    const systemData = actorData.system;
-    const constitutionModifier = systemData.abilities['constitution'].mod;
-    if(systemData.armour.max < constitutionModifier) {
-      systemData.armour.max = constitutionModifier;
-    }
-  }
-  
-  _preparePower(actorData) {
-    const systemData = actorData.system;
-    const result = this._sumValues(systemData);
-    systemData.attributes.power.value = result;
-  }
-  
-  _prepareActions(actorData) {
-    const systemData = actorData.system;
-    const actions = 3;
-    systemData.actions = { current: actions, maximum: actions };
   }
 
   /**
@@ -190,7 +161,7 @@ export class AbbrewActorSheet extends ActorSheet {
     html.find(".effect-control").click(ev => onManageActiveEffect(ev, this.actor));
 
     // Rollable abilities.
-    html.find('.rollable').click(this._onRoll.bind(this));
+    html.find('.rollable .item-image').click(this._onItemUse.bind(this));
     
     // Drag events for macros.
     if (this.actor.isOwner) {
@@ -211,23 +182,22 @@ export class AbbrewActorSheet extends ActorSheet {
   async _onItemCreate(event) {
     event.preventDefault();
     const header = event.currentTarget;
-    // Get the type of item to create.
     const type = header.dataset.type;
-    // Grab any data associated with this control.
-    const data = duplicate(header.dataset);
-    // Initialize a default name.
-    const name = `New ${type.capitalize()}`;
-    // Prepare the item object.
-    const itemData = {
-      name: name,
-      type: type,
-      system: data
-    };
-    // Remove the type from the dataset since it's in the itemData.type prop.
-    delete itemData.system["type"];
 
-    // Finally, create the item!
-    return await Item.create(itemData, {parent: this.actor});
+    // Check to make sure the newly created class doesn't take player over level cap
+    if ( type === "ability" && (this.actor.system.IP.current + 1 > this.actor.system.IP.total) ) {
+      const err = game.i18n.format("ABBREW.InspirationPointsExceededWarn", {max: this.actor.system.IP.total});
+      return ui.notifications.error(err);
+    }
+
+    const itemData = {
+      name: game.i18n.format("ABBREW.ItemNew", {type: game.i18n.localize(`ITEM.Type${type.capitalize()}`)}),
+      type: type,
+      system: { ...header.dataset }
+    };
+    delete itemData.system.type;
+    
+    return this.actor.createEmbeddedDocuments("Item", [itemData]);
   }
 
   /**
@@ -235,12 +205,16 @@ export class AbbrewActorSheet extends ActorSheet {
    * @param {Event} event   The originating click event
    * @private
    */
-  async _onRoll(event) {
+  async _onItemUse(event) {
     event.preventDefault();
     const element = event.currentTarget;
     const dataset = element.dataset;
     const actor = this.actor;    
-    return await ChatAbbrew(dataset, element, actor);
+    ChatAbbrew(dataset, element, actor);
+    const itemId = event.currentTarget.closest(".item").dataset.itemId;
+    const item = this.actor.items.get(itemId);
+    // await this.displayCard(dataset, element, actor)
+    return item.use({}, {event});
   }
 
 }

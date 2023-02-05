@@ -1,4 +1,5 @@
 import AbbrewRoll from "../helpers/abbrew-roll.mjs";
+import { d10Roll } from "../helpers/dice.mjs";
 
 /**
  * Extend the basic Item with some very simple modifications.
@@ -68,6 +69,152 @@ export class AbbrewItem extends Item {
     }
   }
 
+  async use(config = {}, options = {}) {
+    let item = this;
+    const is = item.system;
+    const as = item.actor.system;
+
+    // Ensure the options object is ready
+    options = foundry.utils.mergeObject({
+      configureDialog: true,
+      createMessage: true,
+      "flags.abbrew.use": { type: this.type, itemId: this.id, itemUuid: this.uuid }
+    }, options);
+
+    const card = await this.displayCard(options);
+
+    return card;
+  }
+
+  async displayCard(options={}) {
+
+    // Render the chat card template
+    const token = this.actor.token;
+    const templateData = {
+      actor: this.actor,
+      tokenId: token?.uuid || null,
+      item: this,
+      data: await this.getChatData(),
+      labels: this.labels,
+      hasAttack: this.hasAttack,
+      isHealing: this.isHealing,
+      hasDamage: this.hasDamage,
+      isVersatile: this.isVersatile,
+      isSpell: this.type === "spell",
+      hasSave: this.hasSave,
+      hasAreaTarget: this.hasAreaTarget,
+      isTool: this.type === "tool",
+      hasAbilityCheck: this.hasAbilityCheck
+    };
+
+    const html = await renderTemplate("systems/abbrew/templates/chat/item-card.hbs", templateData);
+
+    // Create the ChatMessage data object
+    const chatData = {
+      user: game.user.id,
+      type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+      content: html,
+      flavor: this.name,
+      speaker: ChatMessage.getSpeaker({ actor: this.actor, token }),
+      flags: { "core.canPopout": true }
+    };
+
+    // If the Item was destroyed in the process of displaying its card - embed the item data in the chat message
+    //   if ( (this.type === "consumable") && !this.actor.items.has(this.id) ) {
+    //     chatData.flags["abbrew.itemData"] = templateData.item.toObject();
+    //   }
+
+    // Merge in the flags from options
+    chatData.flags = foundry.utils.mergeObject(chatData.flags, options.flags);
+
+    /**
+     * A hook event that fires before an item chat card is created.
+     * @function abbrew.preDisplayCard
+     * @memberof hookEvents
+     * @param {Item5e} item             Item for which the chat card is being displayed.
+     * @param {object} chatData         Data used to create the chat message.
+     * @param {ItemUseOptions} options  Options which configure the display of the item chat card.
+     */
+    Hooks.callAll("abbrew.preDisplayCard", this, chatData, options);
+
+    // Apply the roll mode to adjust message visibility
+    // ChatMessage.applyRollMode(chatData, options.rollMode ?? game.settings.get("core", "rollMode"));
+
+    // const options = { createMessage: true };
+
+    // Create the Chat Message or return its data
+    const card = (options.createMessage !== false) ? await ChatMessage.create(chatData) : chatData;
+
+    /**
+     * A hook event that fires after an item chat card is created.
+     * @function abbrew.displayCard
+     * @memberof hookEvents
+     * @param {Item5e} item              Item for which the chat card is being displayed.
+     * @param {ChatMessage|object} card  The created ChatMessage instance or ChatMessageData depending on whether
+     *                                   options.createMessage was set to `true`.
+     */
+    Hooks.callAll("abbrew.displayCard", this, card);
+
+    return card;
+  }
+
+  async getChatData(htmlOptions = {}) {
+    const data = this.toObject().system;
+    const labels = this.labels;
+
+    // Rich text description
+    data.description = await TextEditor.enrichHTML(data.description, {
+      async: true,
+      relativeTo: this,
+      rollData: this.getRollData(),
+      ...htmlOptions
+    });
+
+    // Item type specific properties
+    const props = [];
+    // switch ( this.type ) {
+    //   case "consumable":
+    //     this._consumableChatData(data, labels, props); break;
+    //   case "equipment":
+    //     this._equipmentChatData(data, labels, props); break;
+    //   case "feat":
+    //     this._featChatData(data, labels, props); break;
+    //   case "loot":
+    //     this._lootChatData(data, labels, props); break;
+    //   case "spell":
+    //     this._spellChatData(data, labels, props); break;
+    //   case "tool":
+    //     this._toolChatData(data, labels, props); break;
+    //   case "weapon":
+    //     this._weaponChatData(data, labels, props); break;
+    // }
+
+    // // Equipment properties
+    // if ( data.hasOwnProperty("equipped") && !["loot", "tool"].includes(this.type) ) {
+    //   if ( data.attunement === CONFIG.DND5E.attunementTypes.REQUIRED ) {
+    //     props.push(CONFIG.DND5E.attunements[CONFIG.DND5E.attunementTypes.REQUIRED]);
+    //   }
+    //   props.push(
+    //     game.i18n.localize(data.equipped ? "DND5E.Equipped" : "DND5E.Unequipped"),
+    //     game.i18n.localize(data.proficient ? "DND5E.Proficient" : "DND5E.NotProficient")
+    //   );
+    // }
+
+    // // Ability activation properties
+    // if ( data.hasOwnProperty("activation") ) {
+    //   props.push(
+    //     labels.activation + (data.activation?.condition ? ` (${data.activation.condition})` : ""),
+    //     labels.target,
+    //     labels.range,
+    //     labels.duration
+    //   );
+    // }
+
+    // Filter properties and return
+    data.properties = props.filter(p => !!p);
+    return data;
+  }
+
   /* -------------------------------------------- */
   /*  Chat Message Helpers                        */
   /* -------------------------------------------- */
@@ -86,7 +233,8 @@ export class AbbrewItem extends Item {
 
     // Extract card data
     const button = event.currentTarget;
-    // button.disabled = true;
+    // Disable Button
+    button.disabled = true;
     const card = button.closest(".chat-card");
     const messageId = card.closest(".message").dataset.messageId;
     const message = game.messages.get(messageId);
@@ -96,17 +244,68 @@ export class AbbrewItem extends Item {
     const actor = await this._getChatCardActor(card);
     if (!actor) return;
 
-    console.log("Wee");
+    // Validate permission to proceed with the roll
+    const isTargetted = action === "contest";
+    if (!(isTargetted || game.user.isGM || actor.isOwner)) {
+      return;
+    }
 
-    const roll = new AbbrewRoll();
+    // Get the Item from stored flag data or by the item ID on the Actor
+    const storedData = message.getFlag("abbrew", "itemData");
+    const item = storedData ? new this(storedData, { parent: actor }) : actor.items.get(card.dataset.itemId);
+    if (!item) {
+      const err = game.i18n.format("ABBREW.ActionWarningNoItem", { item: card.dataset.itemId, name: actor.name });
+      return ui.notifications.error(err);
+    }
 
-    const configured = await roll.configureDialog({title: "We did it"});
+    await item.rollAttack({event});
 
-    await roll.evaluate({async: true});
+    // Re-enable the button
+    button.disabled = false;
+  }
 
-    await roll.toMessage();
+  async rollAttack(options = {}) {
+
+    const { rollData, parts } = this.getAttack();
+
+    let title = `${this.name} - ${game.i18n.localize("ABBREW.AttackRoll")}`;
+
+    // HERE: Look at skill rolls in 5e
+    rollData.mod = 10;
+
+    // Compose roll options
+    const rollConfig = foundry.utils.mergeObject({
+      actor: this.actor,
+      data: rollData,
+      critical: this.getCriticalThreshold(),
+      title,
+      flavor: title,
+      dialogOptions: {
+        width: 400,
+        top: options.event ? options.event.clientY - 80 : null,
+        left: window.innerWidth - 710
+      },
+      messageData: {
+        "flags.abbrew.roll": { type: "attack", itemId: this.id, itemUuid: this.uuid },
+        speaker: ChatMessage.getSpeaker({ actor: this.actor })
+      }
+    }, options);
+    rollConfig.parts = parts.concat(options.parts ?? []);
+
+    const roll = await d10Roll(rollConfig);
 
     return roll;
+
+  }
+
+  getCriticalThreshold() {
+    return 10;
+  }
+
+  getAttack() {
+    const rollData = this.getRollData();
+    const parts = [];
+    return { rollData, parts };
   }
 
 

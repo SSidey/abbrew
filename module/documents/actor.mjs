@@ -1,3 +1,5 @@
+// Set Items here
+// Pull together in sheet
 /**
  * Extend the base Actor document by defining a custom roll data structure which is ideal for the Simple system.
  * @extends {Actor}
@@ -48,12 +50,60 @@ export class AbbrewActor extends Actor {
     // Make modifications to data here. For example:
     const systemData = actorData.system;
 
+    // Temporary
+    this._prepareLimbs(systemData);
+
+    // Prepare
+    this._prepareAbilityModifiers(systemData);
+    this._prepareMovement(systemData);
+    this._prepareArmour(systemData);
+    this._preparePower(systemData);
+    this._prepareActions(systemData);
+  }
+
+  _prepareLimbs(systemData) {
+    systemData.limbs = {"primary": [], "secondary": []};
+    systemData.limbs.primary.push({ "Name": "Leg", "Type": "primary"});
+    systemData.limbs.primary.push({ "Name": "Leg", "Type": "primary"})
+  }
+
+  _prepareAbilityModifiers(systemData) {   
     // Loop through ability scores, and add their modifiers to our sheet output.
     for (let [key, ability] of Object.entries(systemData.abilities)) {
       // Calculate the modifier using abbrew rules.
       ability.mod = Math.floor(ability.value / 2);
     }
+  }
 
+  _prepareMovement(systemData) {
+    const base = systemData.abilities.agility.mod;
+    // Make these an item?
+    const limbs = systemData.limbs.primary.length;    
+    systemData.movement.base = base * limbs;
+  }
+
+  _prepareArmour(systemData) {
+    const constitutionModifier = systemData.abilities['constitution'].mod;
+    if(systemData.armour.max < constitutionModifier) {
+      systemData.armour.max = constitutionModifier;
+    }
+  }
+  
+  _preparePower(systemData) {
+    const result = this._sumValues(systemData);
+    systemData.attributes.power.value = result;
+  }
+  
+  _prepareActions(systemData) {
+    const actions = 3;
+    systemData.actions = { current: actions, maximum: actions };
+  }
+
+  // TODO: Generalise or change
+  _sumValues(systemData) {  
+    return Object.values(systemData.abilities).reduce(function(sum, ability) {
+      return sum += ability.value;
+    }, 0);
   }
 
   /**

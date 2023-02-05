@@ -1,6 +1,5 @@
 export default class AbbrewRoll extends Roll {
     constructor(formula, data, options) {
-        formula = formula ?? 'd10!';
         super(formula, data, options);
         if (!this.options.configured) {
             this._configureModifiers();
@@ -13,13 +12,22 @@ export default class AbbrewRoll extends Roll {
         return newRoll;
     }
 
+    get validD10Roll() {
+        return (this.terms[0].rolls[0].terms[0] instanceof Die) && (this.terms[0].rolls[0].terms[0].faces === 10);
+    }
+
     static EVALUATION_TEMPLATE = "systems/abbrew/templates/chat/roll-dialog.hbs";
 
     /** @inheritdoc */
     async toMessage(messageData = {}, options = {}) {
+        
+        // return early for invalid roll formula
+        if(!this.validD10Roll) {
+            return;
+        }
 
         // Evaluate the roll now so we have the results available to determine whether reliable talent came into play
-        // if (!this._evaluated) await this.evaluate({ async: true });
+        if (!this._evaluated) await this.evaluate({ async: true });
 
         // Add appropriate advantage mode message flavor and dnd5e roll flags
         // messageData.flavor = messageData.flavor || this.options.flavor;
@@ -124,7 +132,7 @@ export default class AbbrewRoll extends Roll {
         // }
 
         if (form.weakOrStrong.value) {
-            const weakOrStrong = new Roll(form.weakOrStrong.value, this.data);
+            const weakOrStrong = form.weakOrStrong.value;
             if (weakOrStrong < 0) {
                 this.options.weak = true;
                 this.options.weakValue = Math.abs(weakOrStrong)
@@ -166,10 +174,7 @@ export default class AbbrewRoll extends Roll {
     }
 
     _configureModifiers() {
-        const d10 = this.terms[0];
-        d10.modifiers = [];
-
-        this._formula = this.constructor.getFormula(this.terms);
+        const d10 = this.terms[0];        
 
         if (this.options.weak) {
             this.terms.push(new OperatorTerm({ operator: "-" }));
@@ -177,9 +182,13 @@ export default class AbbrewRoll extends Roll {
         }
 
         if (this.options.strong) {
-            this.terms[0].number = this.options.strongValue + 1;
+            d10.number = this.options.strongValue + 1;
         }
 
-        this.options.configured = true;
+        // d10.number = 3;
+
+        this._formula = this.constructor.getFormula(this.terms);
+
+        this.options.configured = true;       
     }
 }

@@ -1,6 +1,9 @@
 {
   "Actor": {
-    "types": ["character", "npc"],
+    "types": [
+      "character",
+      "npc"
+    ],
     "templates": {
       "base": {
         "armour": {
@@ -40,11 +43,24 @@
           "visualisation": {
             "value": 0
           }
+        },
+        "XP": {
+          "Total": 0,
+          "Spent": 0
+        },
+        "IP": {
+          "Total": 0,
+          "Spent": 0
+        },
+        "movement": {
+          "base": 0
         }
       }
     },
     "character": {
-      "templates": ["base"],
+      "templates": [
+        "base"
+      ],
       "blood": {
         "value": 100,
         "min": 0,
@@ -60,12 +76,19 @@
       }
     },
     "npc": {
-      "templates": ["base"],
+      "templates": [
+        "base"
+      ],
       "cr": 0
     }
   },
   "Item": {
-    "types": ["item", "feature", "spell", "resource"],
+    "types": [
+      "item",
+      "feature",
+      "spell",
+      "resource"
+    ],
     "templates": {
       "base": {
         "description": ""
@@ -74,27 +97,37 @@
         "actionType": "action"
       },
       "damage": {
-        "ability": "strength"
+        "ability": "strength",
+        "criticalThreshold": 10
       }
     },
     "item": {
-      "templates": ["action"],
+      "templates": [
+        "base",
+        "action, damage"
+      ],
       "cost": 1,
       "weight": 0,
       "abilityBonus": {
         "name": ""
-      }, 
-      "formula": "d10! + @mod"
+      },
+      "formula": "@abilities.strength.mod"
     },
     "feature": {
-      "templates": ["base"]
+      "templates": [
+        "base"
+      ]
     },
     "spell": {
-      "templates": ["base"],
+      "templates": [
+        "base"
+      ],
       "spellLevel": 1
     },
     "resource": {
-      "templates": ["base"],
+      "templates": [
+        "base"
+      ],
       "current": 0,
       "maximum": 0
     }

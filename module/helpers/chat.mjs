@@ -1,6 +1,8 @@
 export async function ChatAbbrew(dataset, element, actor) {
+    return;
+
     const itemId = element.closest('.item').dataset.itemId;
-    const item = actor.items.get(itemId);    
+    const item = actor.items.get(itemId);
 
     const templateData = {
         actor,

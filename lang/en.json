@@ -26,5 +26,9 @@
 
   "ABBREW.ItemAbilityBonus": "Ability Bonus",
 
-  "ABBREW.NONE": "None"
+  "ABBREW.NONE": "None",
+
+  "ABBREW.ItemNew": "New {type}",
+
+  "ABBREW.AttackRoll": "Attack"
 }
