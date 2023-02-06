@@ -13,7 +13,7 @@ import AbbrewRoll from "./helpers/abbrew-roll.mjs";
 /*  Init Hook                                   */
 /* -------------------------------------------- */
 
-Hooks.once('init', async function() {
+Hooks.once('init', async function () {
 
   // Add utility classes to the global game object so that they're more easily
   // accessible in global contexts.
@@ -58,7 +58,7 @@ Hooks.once('init', async function() {
 /* -------------------------------------------- */
 
 // If you need to add Handlebars helpers, here are a few useful examples:
-Handlebars.registerHelper('concat', function() {
+Handlebars.registerHelper('concat', function () {
   var outStr = '';
   for (var arg in arguments) {
     if (typeof arguments[arg] != 'object') {
@@ -68,7 +68,7 @@ Handlebars.registerHelper('concat', function() {
   return outStr;
 });
 
-Handlebars.registerHelper('toLowerCase', function(str) {
+Handlebars.registerHelper('toLowerCase', function (str) {
   return str.toLowerCase();
 });
 
@@ -76,7 +76,7 @@ Handlebars.registerHelper('toLowerCase', function(str) {
 /*  Ready Hook                                  */
 /* -------------------------------------------- */
 
-Hooks.once("ready", async function() {
+Hooks.once("ready", async function () {
   // Wait to register hotbar drop hook on ready so that modules could register earlier if they want to
   Hooks.on("hotbarDrop", (bar, data, slot) => createItemMacro(data, slot));
 });
@@ -143,6 +143,33 @@ function rollItemMacro(itemUuid) {
 
 Hooks.on("renderChatLog", (app, html, data) => AbbrewItem.chatListeners(html));
 
-Hooks.on("abbrew.ability", function(ability) {
+Hooks.on("abbrew.ability", function (ability) {
   console.log("Hooked on " + ability);
 });
+
+Hooks.once("dragRuler.ready", (SpeedProvider) => {
+  class AbbrewSpeedProvider extends SpeedProvider {
+    get colors() {
+      return [
+        { id: "walk", default: 0x00FF00, name: "abbrew.speeds.walk" },
+        { id: "dash", default: 0xFFFF00, name: "abbrew.speeds.dash" },
+        { id: "run", default: 0xFF8000, name: "abbrew.speeds.run" }
+      ]
+    }
+
+    getRanges(token) {
+      const baseSpeed = token.actor.system.movement.base
+
+      // A character can always walk it's base speed and dash twice it's base speed
+      const ranges = [
+        { range: baseSpeed, color: "walk" },
+        { range: baseSpeed * 2, color: "dash" },
+        { range: baseSpeed * 3, color: "run" }
+      ]
+
+      return ranges
+    }
+  }
+
+  dragRuler.registerSystem("abbrew", AbbrewSpeedProvider)
+})

@@ -87,7 +87,8 @@
       "item",
       "feature",
       "spell",
-      "resource"
+      "resource",
+      "bodyPart"
     ],
     "templates": {
       "base": {
@@ -130,6 +131,11 @@
       ],
       "current": 0,
       "maximum": 0
+    },
+    "bodyPart": {
+      "templates": [
+        "base"
+      ]
     }
   }
 }
