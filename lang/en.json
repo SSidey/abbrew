@@ -30,5 +30,9 @@
 
   "ABBREW.ItemNew": "New {type}",
 
-  "ABBREW.AttackRoll": "Attack"
+  "ABBREW.AttackRoll": "Attack",
+  
+  "ABBREW.ActionWarningNoItem": "You do not have the required item in your equipment.",
+
+  "ITEM.TypeAnatomy": "Anatomy"
 }

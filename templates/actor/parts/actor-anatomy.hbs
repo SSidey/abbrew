@@ -3,10 +3,10 @@
     <div class="item-name">Name</div>
     <div class="item-formula">Roll Formula</div>
     <div class="item-controls">
-      <a class="item-control item-create" title="Create item" data-type="resource"><i class="fas fa-plus"></i> Add item</a>
+      <a class="item-control item-create" title="Create item" data-type="anatomy"><i class="fas fa-plus"></i> Add item</a>
     </div>
   </li>
-  {{#each resource as |item id|}}
+  {{#each anatomy as |item id|}}
     <li class="item flexrow" data-item-id="{{item._id}}">
       <div class="item-name">
         <div class="item-image">

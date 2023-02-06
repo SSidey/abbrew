@@ -88,7 +88,7 @@
       "feature",
       "spell",
       "resource",
-      "bodyPart"
+      "anatomy"
     ],
     "templates": {
       "base": {
@@ -132,10 +132,13 @@
       "current": 0,
       "maximum": 0
     },
-    "bodyPart": {
+    "anatomy": {
       "templates": [
         "base"
-      ]
+      ],
+      "tags": [],
+      "condition": "",
+      "armorBonus": 0
     }
   }
 }

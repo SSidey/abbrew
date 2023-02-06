@@ -83,6 +83,7 @@ export class AbbrewActorSheet extends ActorSheet {
    */
   _prepareItems(context) {
     // Initialize containers.
+    const anatomy = [];
     const resources = [];
     const gear = [];
     const features = [];
@@ -103,11 +104,15 @@ export class AbbrewActorSheet extends ActorSheet {
     for (let i of context.items) {
       i.img = i.img || DEFAULT_TOKEN;
       // Append to resources.
-      if(i.type === 'resource') {
+      if(i.type === 'anatomy') {
+        anatomy.push(i);
+      }
+      // Append to resources.
+      else if(i.type === 'resource') {
         resources.push(i);
       }
       // Append to gear.
-      if (i.type === 'item') {
+      else if (i.type === 'item') {
         gear.push(i);
       }
       // Append to features.
@@ -127,6 +132,7 @@ export class AbbrewActorSheet extends ActorSheet {
     context.gear = gear;
     context.features = features;
     context.spells = spells;
+    context.anatomy = anatomy;
   }
 
   /* -------------------------------------------- */

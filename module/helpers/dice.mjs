@@ -4,7 +4,7 @@ export async function d10Roll({
     fastForward, chooseModifier = false, template, title, dialogOptions,
     chatMessage = true, messageData = {}, rollMode, flavor
 }) {
-    const formula = '{1d10x>=10 + @mod - 0d10, 1}kh';
+    const formula = '{1d10x>=10 + @mod - 0d10, 0}kh';
 
     const defaultRollMode = rollMode || game.settings.get("core", "rollMode");
 
@@ -16,7 +16,7 @@ export async function d10Roll({
         fumble
     });
 
-    const configured = await roll.configureDialog({ title: "We did it" });
+    const configured = await roll.configureDialog({ title: "Additional Modifiers" });
 
     await roll.evaluate({ async: true });
 
