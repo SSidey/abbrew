@@ -7,7 +7,6 @@
   "ABBREW.AbilityWill": "Will",
   "ABBREW.AbilityWits": "Wits",
   "ABBREW.AbilityVisualisation": "Visualisation",
-
   "ABBREW.AbilityStrengthAbbreviation": "str",
   "ABBREW.AbilityConstitutionAbbreviation": "con",
   "ABBREW.AbilityDexterityAbbreviation": "dex",
@@ -16,23 +15,27 @@
   "ABBREW.AbilityWillAbbreviation": "wll",
   "ABBREW.AbilityWitsAbbreviation": "wts",
   "ABBREW.AbilityVisualisationAbbreviation": "vis",
-
   "ABBREW.EffectCreate": "Create Effect",
   "ABBREW.EffectToggle": "Toggle Effect",
   "ABBREW.EffectEdit": "Edit Effect",
   "ABBREW.EffectDelete": "Delete Effect",
-
   "ABBREW.Add": "Add",
-
   "ABBREW.ItemAbilityBonus": "Ability Bonus",
-
   "ABBREW.NONE": "None",
-
   "ABBREW.ItemNew": "New {type}",
-
   "ABBREW.AttackRoll": "Attack",
-  
   "ABBREW.ActionWarningNoItem": "You do not have the required item in your equipment.",
-
-  "ITEM.TypeAnatomy": "Anatomy"
+  "ITEM.TypeAnatomy": "Anatomy",
+  "ITEM.TypeItem": "Item",
+  "ITEM.TypeResource": "Resource",
+  "ITEM.TypeFeature": "Feature",
+  "ABBREW.SheetLabel": "{type} Sheet",
+  "ABBREW.SheetType.Anatomy": "Anatomy",
+  "Tags": {
+    "Anatomy": {
+      "healthy": "Healthy",
+      "injured": "Injured",
+      "broken": "Broken"
+    }
+  }
 }

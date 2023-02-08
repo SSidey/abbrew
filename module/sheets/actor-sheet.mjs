@@ -11,7 +11,7 @@ export class AbbrewActorSheet extends ActorSheet {
   static get defaultOptions() {
     return mergeObject(super.defaultOptions, {
       classes: ["abbrew", "sheet", "actor"],
-      template: "systems/abbrew/templates/actor/actor-sheet.html",
+      template: "systems/abbrew/templates/actor/actor-sheet.hbs",
       width: 600,
       height: 600,
       tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "features" }]
@@ -20,7 +20,7 @@ export class AbbrewActorSheet extends ActorSheet {
 
   /** @override */
   get template() {
-    return `systems/abbrew/templates/actor/actor-${this.actor.type}-sheet.html`;
+    return `systems/abbrew/templates/actor/actor-${this.actor.type}-sheet.hbs`;
   }
 
   /* -------------------------------------------- */

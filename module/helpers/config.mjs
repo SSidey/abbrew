@@ -4,7 +4,7 @@ export const ABBREW = {};
  * The set of Ability Scores used within the sytem.
  * @type {Object}
  */
- ABBREW.abilities = {
+ABBREW.abilities = {
   "strength": "ABBREW.AbilityStrength",
   "dexterity": "ABBREW.AbilityDexterity",
   "constitution": "ABBREW.AbilityConstitution",

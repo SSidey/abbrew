@@ -297,10 +297,12 @@ export class AbbrewItem extends Item {
 
   }
 
+  // TODO: Allow to change
   getCriticalThreshold() {
     return 10;
   }
 
+  // TODO: Check this is needed
   getAttack() {
     const rollData = this.getRollData();
     const parts = [];

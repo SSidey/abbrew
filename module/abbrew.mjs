@@ -4,6 +4,7 @@ import { AbbrewItem } from "./documents/item.mjs";
 // Import sheet classes.
 import { AbbrewActorSheet } from "./sheets/actor-sheet.mjs";
 import { AbbrewItemSheet } from "./sheets/item-sheet.mjs";
+import { AbbrewItemAnatomySheet } from "./sheets/item-anatomy-sheet.mjs";
 // Import helper/utility classes and constants.
 import { preloadHandlebarsTemplates } from "./helpers/templates.mjs";
 import { ABBREW } from "./helpers/config.mjs";
@@ -47,7 +48,21 @@ Hooks.once('init', async function () {
   Actors.unregisterSheet("core", ActorSheet);
   Actors.registerSheet("abbrew", AbbrewActorSheet, { makeDefault: true });
   Items.unregisterSheet("core", ItemSheet);
-  Items.registerSheet("abbrew", AbbrewItemSheet, { makeDefault: true });
+  // Items.registerSheet("abbrew", AbbrewItemSheet, { makeDefault: true });
+  const sheetEntries = [
+    ["anatomy", AbbrewItemAnatomySheet],
+    ["item", AbbrewItemSheet],
+    ["feature", AbbrewItemSheet],
+    ["spell", AbbrewItemSheet],
+    ["resource", AbbrewItemSheet],
+  ]
+  for (const [type, Sheet] of sheetEntries) {
+    Items.registerSheet("abbrew", Sheet, {
+      types: [type],
+      label: game.i18n.localize(ABBREW.SheetLabel, { type: type }),
+      makeDefault: true,
+    });
+  }
 
   // Preload Handlebars templates.
   return preloadHandlebarsTemplates();
