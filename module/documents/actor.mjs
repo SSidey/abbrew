@@ -49,22 +49,24 @@ export class AbbrewActor extends Actor {
 
     // Make modifications to data here. For example:
     const systemData = actorData.system;
-
-    // Temporary
-    this._prepareLimbs(systemData);
-
+    
     // Prepare
     this._prepareAbilityModifiers(systemData);
+    this._prepareAnatomy(systemData);
     this._prepareMovement(systemData);
     this._prepareArmour(systemData);
     this._preparePower(systemData);
     this._prepareActions(systemData);
   }
 
-  _prepareLimbs(systemData) {
-    systemData.limbs = {"primary": [], "secondary": []};
-    systemData.limbs.primary.push({ "Name": "Leg", "Type": "primary"});
-    systemData.limbs.primary.push({ "Name": "Leg", "Type": "primary"})
+  _prepareAnatomy(systemData) {
+    this.itemTypes.anatomy.forEach(
+      a => {
+        const tags = a.system.tags.replace(' ', '').split(',');
+        a.system.tagsArray = tags;
+      }
+    );
+    systemData.anatomy = this.itemTypes.anatomy;
   }
 
   _prepareAbilityModifiers(systemData) {   
@@ -77,8 +79,7 @@ export class AbbrewActor extends Actor {
 
   _prepareMovement(systemData) {
     const base = systemData.abilities.agility.mod;
-    // Make these an item?
-    const limbs = systemData.limbs.primary.length;    
+    const limbs = systemData.anatomy.filter(a => a.system.tagsArray.includes('primary')).length;    
     systemData.movement.base = base * limbs;
   }
 

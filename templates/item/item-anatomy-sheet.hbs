@@ -6,15 +6,19 @@
         <div class="grid grid-2col">
           <div class="anatomy">
             <label class="anatomy-label">Tags</label>
-            <input type="text" name="system.tags" value="{{system.current}}" data-dtype="Number"/>
+            <input type="text" name="system.tags" value="{{system.tags}}" data-dtype="text"/>
           </div>
           <div class="anatomy">
-            <label class="anatomy-label">Condtion</label>
-            <input type="text" name="system.condition" value="{{system.maximum}}" data-dtype="Number"/>
+            <label class="anatomy-label">Grapple Score</label>
+            <input type="text" name="system.grappleScore" value="{{system.grappleScore}}" data-dtype="Number" placeholder="0"/>
           </div>
           <div class="anatomy">
-            <label class="anatomy-label">Condtion</label>
-            <input type="text" name="system.armourBonus" value="{{system.maximum}}" data-dtype="Number"/>
+            <label class="anatomy-label">Hands</label>
+            <input type="text" name="system.hands" value="{{system.hands}}" data-dtype="Number" placeholder="0"/>
+          </div>
+          <div class="anatomy">
+            <label class="anatomy-label">Armour Bonus</label>
+            <input type="text" name="system.armourBonus" value="{{system.armourBonus}}" data-dtype="Number" placeholder="0"/>
           </div>
         </div>
       </div>

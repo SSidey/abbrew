@@ -54,26 +54,30 @@
         },
         "movement": {
           "base": 0
+        }, 
+        "blood": {
+          "value": 100,
+          "min": 0,
+          "max": 100
+        },
+        "attributes": {
+          "power": {
+            "value": 0
+          },
+          "tier": {
+            "value": 1
+          }
+        }, 
+        "wounds": {
+          "active": 0,
+          "healing": 0
         }
       }
     },
     "character": {
       "templates": [
         "base"
-      ],
-      "blood": {
-        "value": 100,
-        "min": 0,
-        "max": 100
-      },
-      "attributes": {
-        "power": {
-          "value": 0
-        },
-        "tier": {
-          "value": 1
-        }
-      }
+      ]
     },
     "npc": {
       "templates": [
@@ -136,9 +140,11 @@
       "templates": [
         "base"
       ],
-      "tags": [],
-      "condition": "",
-      "armorBonus": 0
+      "tags": "",
+      "tagsArray": [],
+      "grappleScore": "",
+      "armourBonus": 0,
+      "hands": 0
     }
   }
 }
