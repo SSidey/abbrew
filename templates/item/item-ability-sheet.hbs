@@ -1,0 +1,71 @@
+<form class="{{cssClass}}" autocomplete="off">
+  <header class="sheet-header">
+    <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" />
+    <div class="header-fields">
+      <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name" /></h1>
+    </div>
+    <div class="ability">
+      <label class="ability-label">Type</label>
+      <input type="text" name="system.type" value="{{system.type}}" data-dtype="text"
+        placeholder="action/reaction/passive" />
+    </div>
+    <div class="ability">
+      <label class="ability-label">Strong</label>
+      <input type="text" name="system.strong" value="{{system.strong}}" data-dtype="text"
+        placeholder="action/reaction/passive" />
+    </div>
+    <div class="ability">
+      <label class="ability-label">Weak</label>
+      <input type="text" name="system.weak" value="{{system.weak}}" data-dtype="text"
+        placeholder="action/reaction/passive" />
+    </div>
+    <div class="ability">
+      <label class="ability-label">Requirements</label>
+      <input type="text" name="system.requirements" value="{{system.requirements}}" data-dtype="text"
+        placeholder="action/reaction/passive" />
+    </div>
+    <div class="ability">
+      <label class="ability-label">Action Cost</label>
+      <input type="text" name="system.actionCost" value="{{system.actionCost}}" data-dtype="text"
+        placeholder="action/reaction/passive" />
+    </div>
+    <div class="ability">
+      <label class="ability-label">Trigger</label>
+      <input type="text" name="system.trigger" value="{{system.trigger}}" data-dtype="text"
+        placeholder="action/reaction/passive" />
+    </div>
+    <div class="ability">
+      <label class="ability-label">Modifies</label>
+      <input type="text" name="system.modifies" value="{{system.modifies}}" data-dtype="text"
+        placeholder="action/reaction/passive" />
+    </div>
+  </header>
+
+  {{!-- Sheet Tab Navigation --}}
+  <nav class="sheet-tabs tabs" data-group="primary">
+    <a class="item" data-tab="description">Description</a>
+    <a class="item" data-tab="attributes">Attributes</a>
+    <a class="item" data-tab="effects">Effects</a>
+  </nav>
+
+  {{!-- Sheet Body --}}
+  <section class="sheet-body">
+
+    {{!-- Description Tab --}}
+    <div class="tab" data-group="primary" data-tab="description">
+      {{editor system.description target="system.description" rollData=rollData button=true owner=owner
+      editable=editable}}
+    </div>
+
+    {{!-- Attributes Tab --}}
+    <div class="tab attributes" data-group="primary" data-tab="attributes">
+      {{!-- As you add new fields, add them in here! --}}
+    </div>
+
+    {{!-- Effects Tab --}}
+    <div class="tab effects" data-group="primary" data-tab="effects">
+      {{> "systems/abbrew/templates/parts/active-effects.hbs"}}
+    </div>
+  </section>
+
+</form>

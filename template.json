@@ -54,11 +54,16 @@
         },
         "movement": {
           "base": 0
-        }, 
+        },
         "blood": {
           "value": 100,
           "min": 0,
           "max": 100
+        },
+        "canBleed": true,
+        "healing": {
+          "factor": 1,
+          "bonus": 0
         },
         "attributes": {
           "power": {
@@ -67,7 +72,7 @@
           "tier": {
             "value": 1
           }
-        }, 
+        },
         "wounds": {
           "active": 0,
           "healing": 0
@@ -92,7 +97,8 @@
       "feature",
       "spell",
       "resource",
-      "anatomy"
+      "anatomy",
+      "ability"
     ],
     "templates": {
       "base": {
@@ -145,6 +151,18 @@
       "grappleScore": "",
       "armourBonus": 0,
       "hands": 0
+    },
+    "ability": {
+      "templates": [
+        "base"
+      ],
+      "type": "",
+      "strong": "",
+      "weak": "",
+      "requirements": "",
+      "actionCost": "",
+      "trigger": "",
+      "modifies": ""
     }
   }
 }

@@ -31,6 +31,10 @@
   "ITEM.TypeFeature": "Feature",
   "ABBREW.SheetLabel": "{type} Sheet",
   "ABBREW.SheetType.Anatomy": "Anatomy",
+  "ABBREW.EffectEnable": "Enable Effect",
+  "ABBREW.EffectDisable": "Disable Effect",
+  "ABBREW.Source": "Source",
+  "ABBREW.Duration": "Duration",
   "Tags": {
     "Anatomy": {
       "healthy": "Healthy",

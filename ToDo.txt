@@ -1,1 +1,24 @@
-item.mjs l246 - pass rollConfig down, need to get the modifier in
+ability
+    name
+    description
+    formula
+        active
+            strong
+            weak
+            requirements
+            action
+                action cost
+            reaction
+                trigger
+        passive
+            modifies
+
+            type
+            strong
+            weak
+            requirements
+            action cost
+            trigger
+            modifies
+
+Custom effects / icons

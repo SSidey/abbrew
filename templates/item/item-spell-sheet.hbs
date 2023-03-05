@@ -10,6 +10,7 @@
   <nav class="sheet-tabs tabs" data-group="primary">
     <a class="item" data-tab="description">Description</a>
     <a class="item" data-tab="attributes">Attributes</a>
+    <a class="item" data-tab="effects">Effects</a>
   </nav>
 
   {{!-- Sheet Body --}}
@@ -27,6 +28,11 @@
         <label class="resource-label">Spell Level</label>
         <input type="text" name="system.spellLevel" value="{{system.spellLevel}}" data-dtype="Number"/>
       </div>
+    </div>
+
+    {{!-- Effects Tab --}}
+    <div class="tab effects" data-group="primary" data-tab="effects">
+      {{> "systems/abbrew/templates/parts/active-effects.hbs"}}
     </div>
   </section>
 </form>

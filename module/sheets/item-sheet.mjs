@@ -1,3 +1,4 @@
+import {onManageActiveEffect, prepareActiveEffectCategories} from "../helpers/effects.mjs";
 /**
  * Extend the basic ItemSheet with some very simple modifications
  * @extends {ItemSheet}
@@ -42,6 +43,9 @@ export class AbbrewItemSheet extends ItemSheet {
       context.rollData = actor.getRollData();
     }
 
+    // Prepare active effects
+    context.effects = prepareActiveEffectCategories(this.item.effects);
+
     // Add the actor's data to context.data for easier access, as well as flags.
     context.system = itemData.system;
     context.flags = itemData.flags;
@@ -56,7 +60,12 @@ export class AbbrewItemSheet extends ItemSheet {
     super.activateListeners(html);
 
     // Everything below here is only needed if the sheet is editable
-    if (!this.isEditable) return;
+    if (!this.isEditable) {
+      return;
+    }
+    
+    // Active Effect management
+    html.find(".effect-control").click(ev => onManageActiveEffect(ev, this.item));  
 
     // Roll handlers, click handlers, etc. would go here.
   }

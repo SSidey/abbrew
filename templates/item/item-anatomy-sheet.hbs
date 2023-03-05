@@ -1,52 +1,61 @@
 <form class="{{cssClass}}" autocomplete="off">
-    <header class="sheet-header">
-      <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}"/>
-      <div class="header-fields">
-        <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name"/></h1>
-        <div class="grid grid-2col">
-          <div class="anatomy">
-            <label class="anatomy-label">Tags</label>
-            <input type="text" name="system.tags" value="{{system.tags}}" data-dtype="text"/>
-          </div>
-          <div class="anatomy">
-            <label class="anatomy-label">Grapple Score</label>
-            <input type="text" name="system.grappleScore" value="{{system.grappleScore}}" data-dtype="Number" placeholder="0"/>
-          </div>
-          <div class="anatomy">
-            <label class="anatomy-label">Hands</label>
-            <input type="text" name="system.hands" value="{{system.hands}}" data-dtype="Number" placeholder="0"/>
-          </div>
-          <div class="anatomy">
-            <label class="anatomy-label">Armour Bonus</label>
-            <input type="text" name="system.armourBonus" value="{{system.armourBonus}}" data-dtype="Number" placeholder="0"/>
-          </div>
-        </div>
-      </div>
-    </header>
-  
-    {{!-- Sheet Tab Navigation --}}
-    <nav class="sheet-tabs tabs" data-group="primary">
-      <a class="item" data-tab="description">Description</a>
-      <a class="item" data-tab="attributes">Attributes</a>
-    </nav>
-  
-    {{!-- Sheet Body --}}
-    <section class="sheet-body">
-  
-      {{!-- Description Tab --}}
-      <div class="tab" data-group="primary" data-tab="description">
-        {{!-- To render inline rolls in a TinyMCE editor, you need to pass the parent actor's (if any) roll data to the rollData prop. --}}
-        {{editor system.description target="system.description" rollData=rollData button=true owner=owner editable=editable}}
-      </div>
-  
-      {{!-- Attributes Tab --}}
-      <div class="tab attributes" data-group="primary" data-tab="attributes">
-        {{!-- As you add new fields, add them in here! --}}
+  <header class="sheet-header">
+    <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" />
+    <div class="header-fields">
+      <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name" /></h1>
+      <div class="grid grid-2col">
         <div class="anatomy">
-          <label class="anatomy-label">Roll Formula</label>
-          <input type="text" name="system.formula" value="{{system.formula}}" data-dtype="String"/>
+          <label class="anatomy-label">Tags</label>
+          <input type="text" name="system.tags" value="{{system.tags}}" data-dtype="text" />
+        </div>
+        <div class="anatomy">
+          <label class="anatomy-label">Grapple Score</label>
+          <input type="text" name="system.grappleScore" value="{{system.grappleScore}}" data-dtype="Number"
+            placeholder="0" />
+        </div>
+        <div class="anatomy">
+          <label class="anatomy-label">Hands</label>
+          <input type="text" name="system.hands" value="{{system.hands}}" data-dtype="Number" placeholder="0" />
+        </div>
+        <div class="anatomy">
+          <label class="anatomy-label">Armour Bonus</label>
+          <input type="text" name="system.armourBonus" value="{{system.armourBonus}}" data-dtype="Number"
+            placeholder="0" />
         </div>
       </div>
-    </section>
-  </form>
-  
+    </div>
+  </header>
+
+  {{!-- Sheet Tab Navigation --}}
+  <nav class="sheet-tabs tabs" data-group="primary">
+    <a class="item" data-tab="description">Description</a>
+    <a class="item" data-tab="attributes">Attributes</a>
+    <a class="item" data-tab="effects">Effects</a>
+  </nav>
+
+  {{!-- Sheet Body --}}
+  <section class="sheet-body">
+
+    {{!-- Description Tab --}}
+    <div class="tab" data-group="primary" data-tab="description">
+      {{!-- To render inline rolls in a TinyMCE editor, you need to pass the parent actor's (if any) roll data to the
+      rollData prop. --}}
+      {{editor system.description target="system.description" rollData=rollData button=true owner=owner
+      editable=editable}}
+    </div>
+
+    {{!-- Attributes Tab --}}
+    <div class="tab attributes" data-group="primary" data-tab="attributes">
+      {{!-- As you add new fields, add them in here! --}}
+      <div class="anatomy">
+        <label class="anatomy-label">Roll Formula</label>
+        <input type="text" name="system.formula" value="{{system.formula}}" data-dtype="String" />
+      </div>
+    </div>
+
+    {{!-- Effects Tab --}}
+    <div class="tab effects" data-group="primary" data-tab="effects">
+      {{> "systems/abbrew/templates/parts/active-effects.hbs"}}
+    </div>
+  </section>
+</form>
