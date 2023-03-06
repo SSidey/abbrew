@@ -122,7 +122,7 @@
       "abilityBonus": {
         "name": ""
       },
-      "formula": "@abilities.strength.mod"
+      "formula": "@armour.value"
     },
     "feature": {
       "templates": [

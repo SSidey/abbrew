@@ -270,6 +270,7 @@ export class AbbrewItem extends Item {
     let title = `${this.name} - ${game.i18n.localize("ABBREW.AttackRoll")}`;
 
     // HERE: Look at skill rolls in 5e
+    // TODO: FUCKER WAS COMING FROM HERE
     rollData.mod = 10;
 
     // Compose roll options

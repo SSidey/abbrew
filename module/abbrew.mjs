@@ -9,6 +9,7 @@ import { AbbrewItemAnatomySheet } from "./sheets/item-anatomy-sheet.mjs";
 import { preloadHandlebarsTemplates } from "./helpers/templates.mjs";
 import { ABBREW } from "./helpers/config.mjs";
 import AbbrewRoll from "./helpers/abbrew-roll.mjs";
+import { handleTurnStart } from "./helpers/turn-start.mjs";
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -187,4 +188,16 @@ Hooks.once("dragRuler.ready", (SpeedProvider) => {
   }
 
   dragRuler.registerSystem("abbrew", AbbrewSpeedProvider)
+})
+
+Hooks.on("combatStart", async(combat, updateData, updateOptions) => {
+  await handleTurnStart(combat, updateData, updateOptions);
+});
+
+Hooks.on("combatRound", async(combat, updateData, updateOptions) => {
+  await handleTurnStart(combat, updateData, updateOptions);
+}) 
+
+Hooks.on("combatTurn", async (combat, updateData, updateOptions) => {  
+  await handleTurnStart(combat, updateData, updateOptions);
 })

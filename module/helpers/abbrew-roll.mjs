@@ -174,15 +174,14 @@ export default class AbbrewRoll extends Roll {
     }
 
     _configureModifiers() {
-        const d10 = this.terms[0];        
+        const d10 = this.terms[0].rolls[0];       
 
         if (this.options.weak) {
-            this.terms.push(new OperatorTerm({ operator: "-" }));
-            this.terms.push(new NumericTerm({ number: this.options.weakValue }));
+            d10.terms[4].number +=  this.options.weakValue;
         }
 
         if (this.options.strong) {
-            d10.number = this.options.strongValue + 1;
+            d10.terms[0].number += this.options.strongValue;
         }
 
         // d10.number = 3;

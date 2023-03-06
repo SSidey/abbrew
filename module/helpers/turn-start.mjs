@@ -1,8 +1,12 @@
-turnStart();
+export async function handleTurnStart(combat, updateData, updateOptions) {    
+  if(updateData.round < combat.round || (updateData.round == combat.round && updateData.turn < combat.turn )) {
+    return;
+  }    
+  let nextActor = combat.nextCombatant.actor;    
+  await turnStart(nextActor);
+}
 
-async function turnStart() {
-
-    let actor = actor;
+async function turnStart(actor) {    
     ChatMessage.create({ content: `${actor.name} starts their turn`, speaker: ChatMessage.getSpeaker({ actor: actor }) });
 
     if (actor.system.canBleed) {
@@ -23,16 +27,16 @@ async function turnStart() {
     console.log('Armour: ', armour);
 
     if (armour.value < armour.max) {
-        getOut: if (_actor.effects.find(e => e.label === "Regenerating")) {
+        getOut: if (actor.effects.find(e => e.label === "Regenerating")) {
             console.log('Check for regain Armour');
             // TODO: Replace with Exposed
-            if (_actor.effects.find(e => e.label === "Weakened")) {
+            if (actor.effects.find(e => e.label === "Weakened")) {
                 console.log('Exposed so no armour regained');
                 break getOut;
             }
 
             let armourMultiplier = 1;
-            if (_actor.effects.find(e => e.label === "Cursed")) {
+            if (actor.effects.find(e => e.label === "Cursed")) {
                 armourMultiplier = 0.5;
             }
 
