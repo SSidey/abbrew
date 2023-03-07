@@ -110,19 +110,36 @@
       "damage": {
         "ability": "strength",
         "criticalThreshold": 10
+      }, "attack": {
+        "abilityModifier": "system.abilities.strength.mod",
+        "damageBase": 0,
+        "weapon": false,
+        "magic": false ,
+        "ranged": false
+      }, "weapon": {
+        "weight": 0,
+        "reach": 0,
+        "minimumEffectiveReach": 0,
+        "focused": false,
+        "weaponProfiles": [],
+        "penetration": 0,
+        "materialBonus": 0
       }
     },
     "item": {
       "templates": [
         "base",
-        "action, damage"
+        "action", 
+        "damage",
+         "weapon"
       ],
       "cost": 1,
       "weight": 0,
       "abilityBonus": {
         "name": ""
       },
-      "formula": "@armour.value"
+      "formula": "@armour.value",
+      "isWeapon": false
     },
     "feature": {
       "templates": [
@@ -154,15 +171,14 @@
     },
     "ability": {
       "templates": [
-        "base"
+        "base", "attack", "weapon"
       ],
       "type": "",
       "strong": "",
       "weak": "",
       "requirements": "",
       "actionCost": "",
-      "trigger": "",
-      "modifies": ""
+      "trigger": ""
     }
   }
 }

@@ -29,3 +29,21 @@ ABBREW.abilityAbbreviations = {
 ABBREW.ActionTypes = {
   "Damage": "damage"
 };
+
+ABBREW.Reach = {
+  "natural": "ABBREW.ReachNatural",
+  "short": "ABBREW.ReachShort",
+  "standard": "ABBREW.ReachStandard",
+  "long": "ABBREW.ReachLong"
+}
+
+ABBREW.DamageTypes = {
+  "crushing": "crushing",
+  "slashing": "slashing",
+  "piercing": "piercing"
+};
+
+ABBREW.DamageProjection = {
+  "arc": "ABBREW.Arc",
+  "thrust": "ABBREW.Thrust"
+}

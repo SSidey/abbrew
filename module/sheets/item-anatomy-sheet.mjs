@@ -5,7 +5,6 @@ export class AbbrewItemAnatomySheet extends AbbrewItemSheet {
     activateListeners(html) {
         super.activateListeners(html);
         const getInput = (name) => html.querySelector(`input[name="${name}"]`);
-        //CUNT(getInput("system.tags", { whitelist: ["healthy"], maxTags: 10 }));
     }
 
     /** @override */

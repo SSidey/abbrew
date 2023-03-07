@@ -1,5 +1,3 @@
-// Set Items here
-// Pull together in sheet
 /**
  * Extend the base Actor document by defining a custom roll data structure which is ideal for the Simple system.
  * @extends {Actor}

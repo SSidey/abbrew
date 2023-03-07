@@ -41,5 +41,9 @@
       "injured": "Injured",
       "broken": "Broken"
     }
-  }
+  },
+  "ABBREW.ReachNatural": "natural",
+  "ABBREW.ReachShort": "short",
+  "ABBREW.ReachStandard": "standard",
+  "ABBREW.ReachLong": "long"
 }

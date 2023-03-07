@@ -85,6 +85,7 @@ export class AbbrewActorSheet extends ActorSheet {
     // Initialize containers.
     const anatomy = [];
     const resources = [];
+    const abilities = [];
     const gear = [];
     const features = [];
     const spells = {
@@ -119,6 +120,10 @@ export class AbbrewActorSheet extends ActorSheet {
       else if (i.type === 'feature') {
         features.push(i);
       }
+      // Append to Abilities
+      else if (i.type=== 'ability') {
+        abilities.push(i);
+      }
       // Append to spells.
       else if (i.type === 'spell') {
         if (i.system.spellLevel != undefined) {
@@ -133,6 +138,7 @@ export class AbbrewActorSheet extends ActorSheet {
     context.features = features;
     context.spells = spells;
     context.anatomy = anatomy;
+    context.ability = abilities;
   }
 
   /* -------------------------------------------- */
