@@ -45,5 +45,11 @@
   "ABBREW.ReachNatural": "natural",
   "ABBREW.ReachShort": "short",
   "ABBREW.ReachStandard": "standard",
-  "ABBREW.ReachLong": "long"
+  "ABBREW.ReachLong": "long",
+  "ABBREW.DamageTypes": {
+    "ABBREW.physical": "physical",
+    "ABBREW.crushing": "crushing",
+    "ABBREW.slashing": "slashing",
+    "ABBREW.piercing": "piercing"
+  }
 }

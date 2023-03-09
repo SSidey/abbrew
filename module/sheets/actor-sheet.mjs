@@ -133,12 +133,13 @@ export class AbbrewActorSheet extends ActorSheet {
     }
 
     // Assign and return
+    // ABDOC: name here in context used in hbs to pull values
     context.resource = resources;
     context.gear = gear;
     context.features = features;
     context.spells = spells;
     context.anatomy = anatomy;
-    context.ability = abilities;
+    context.ability = abilities;    
   }
 
   /* -------------------------------------------- */

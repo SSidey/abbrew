@@ -38,9 +38,10 @@ ABBREW.Reach = {
 }
 
 ABBREW.DamageTypes = {
-  "crushing": "crushing",
-  "slashing": "slashing",
-  "piercing": "piercing"
+  "physical": "ABBREW.physical",
+  "crushing": "ABBREW.crushing",
+  "slashing": "ABBREW.slashing",
+  "piercing": "ABBREW.piercing"
 };
 
 ABBREW.DamageProjection = {

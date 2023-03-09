@@ -55,6 +55,7 @@ export class AbbrewActor extends Actor {
     this._prepareArmour(systemData);
     this._preparePower(systemData);
     this._prepareActions(systemData);
+    this._prepareAbilities(systemData);
   }
 
   _prepareAnatomy(systemData) {
@@ -65,6 +66,12 @@ export class AbbrewActor extends Actor {
       }
     );
     systemData.anatomy = this.itemTypes.anatomy;
+  }
+
+  _prepareAbilities(systemData) {
+    const weapons = this.itemTypes.item.filter(i => i.system.isWeapon).map(i => ({"weight": i.system.weight, "concepts": i.system.concepts, ...i.system.weapon}));  
+    // TODO: create weapon profile here and add back to systemData, use that to create new items of the Ability Type as Active
+    // weapons.map()
   }
 
   _prepareAbilityModifiers(systemData) {   

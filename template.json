@@ -110,28 +110,43 @@
       "damage": {
         "ability": "strength",
         "criticalThreshold": 10
-      }, "attack": {
+      },
+      "attack": {
         "abilityModifier": "system.abilities.strength.mod",
         "damageBase": 0,
         "weapon": false,
-        "magic": false ,
+        "magic": false,
         "ranged": false
-      }, "weapon": {
-        "weight": 0,
-        "reach": 0,
-        "minimumEffectiveReach": 0,
-        "focused": false,
-        "weaponProfiles": [],
-        "penetration": 0,
-        "materialBonus": 0
+      },
+      "material": {
+        "material": {
+          "name": "",
+          "tier": 1,
+          "structure": 0,
+          "concepts": [
+            "ABBREW.physical"
+          ],
+          "rarity": 0
+        }
+      },
+      "weapon": {
+        "weapon": {
+          "requirements": "",
+          "reach": 0,
+          "minimumEffectiveReach": 0,
+          "focused": false,
+          "weaponProfiles": [],
+          "penetration": 0
+        }
       }
     },
     "item": {
       "templates": [
         "base",
-        "action", 
+        "material",
+        "action",
         "damage",
-         "weapon"
+        "weapon"
       ],
       "cost": 1,
       "weight": 0,
@@ -171,7 +186,9 @@
     },
     "ability": {
       "templates": [
-        "base", "attack", "weapon"
+        "base",
+        "attack",
+        "weapon"
       ],
       "type": "",
       "strong": "",
