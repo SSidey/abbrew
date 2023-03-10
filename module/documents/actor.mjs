@@ -47,7 +47,7 @@ export class AbbrewActor extends Actor {
 
     // Make modifications to data here. For example:
     const systemData = actorData.system;
-    
+
     // Prepare
     this._prepareAbilityModifiers(systemData);
     this._prepareAnatomy(systemData);
@@ -69,12 +69,60 @@ export class AbbrewActor extends Actor {
   }
 
   _prepareAbilities(systemData) {
-    const weapons = this.itemTypes.item.filter(i => i.system.isWeapon).map(i => ({"weight": i.system.weight, "concepts": i.system.concepts, ...i.system.weapon}));  
+    const weapons = this.itemTypes.item.filter(i => i.system.isWeapon).map(i => ({ "weight": i.system.weight, "concepts": i.system.concepts, "material": i.system.material, ...i.system.weapon }));
     // TODO: create weapon profile here and add back to systemData, use that to create new items of the Ability Type as Active
-    // weapons.map()
+    const attacks = weapons.map(w => this._prepareWeaponAttack(w, systemData));
+    systemData.features = attacks;
   }
 
-  _prepareAbilityModifiers(systemData) {   
+  _prepareWeaponAttack(weapon) {
+    const results = weapon.weaponProfiles.split(',').map(wp => {
+      const profileParts = wp.split('-');
+      const damageType = profileParts[0];
+      const attackType = profileParts[1];
+      // Handle Penalty here, check requirements are met.
+      const requirements = JSON.parse(weapon.requirements);
+      let damageBase = 0;
+      switch (profileParts[1]) {
+        case "arc":
+          damageBase = weapon.material.structure + (requirements.strength.value * (1 + weapon.minimumEffectiveReach)) + (weapon.material.tier * 5);
+          break;
+        case "thrust":
+          damageBase = weapon.material.structure + (weapon.material.tier * 5);
+          weapon.penetration = weapon.material.tier * 5;
+          break;
+        default:
+          return;
+      }
+
+      return {
+        abilityModifier: "@system.abilities.strength.mod",
+        damageBase: damageBase,
+        isWeapon: true,
+        weapon: {
+          requirements: weapon.requirements,
+          reach: weapon.reach,
+          minimumEffectiveReach: weapon.minimumEffectiveReach,
+          focused: weapon.focused,
+          penetration: weapon.penetration,
+          traits: weapon.traits,
+          handsSupplied: weapon.handsSupplied,
+          handsRequired: weapon.handsRequired,
+          traitsArray: weapon.traitsArray,
+        },
+        isMagic: false,
+        magic: {
+          mentalRange: 0
+        },
+        damageType: damageType,
+        attackType: attackType
+      };
+    });
+
+    return results;
+  };
+
+  _prepareAbilityModifiers(systemData) {
     // Loop through ability scores, and add their modifiers to our sheet output.
     for (let [key, ability] of Object.entries(systemData.abilities)) {
       // Calculate the modifier using abbrew rules.
@@ -84,30 +132,30 @@ export class AbbrewActor extends Actor {
 
   _prepareMovement(systemData) {
     const base = systemData.abilities.agility.mod;
-    const limbs = systemData.anatomy.filter(a => a.system.tagsArray.includes('primary')).length;    
+    const limbs = systemData.anatomy.filter(a => a.system.tagsArray.includes('primary')).length;
     systemData.movement.base = base * limbs;
   }
 
   _prepareArmour(systemData) {
     const constitutionModifier = systemData.abilities['constitution'].mod;
-    if(systemData.armour.max < constitutionModifier) {
+    if (systemData.armour.max < constitutionModifier) {
       systemData.armour.max = constitutionModifier;
     }
   }
-  
+
   _preparePower(systemData) {
     const result = this._sumValues(systemData);
     systemData.attributes.power.value = result;
   }
-  
+
   _prepareActions(systemData) {
     const actions = 3;
     systemData.actions = { current: actions, maximum: actions };
   }
 
   // TODO: Generalise or change
-  _sumValues(systemData) {  
-    return Object.values(systemData.abilities).reduce(function(sum, ability) {
+  _sumValues(systemData) {
+    return Object.values(systemData.abilities).reduce(function (sum, ability) {
       return sum += ability.value;
     }, 0);
   }

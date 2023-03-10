@@ -76,7 +76,8 @@
         "wounds": {
           "active": 0,
           "healing": 0
-        }
+        },
+        "size": 1
       }
     },
     "character": {
@@ -114,9 +115,24 @@
       "attack": {
         "abilityModifier": "system.abilities.strength.mod",
         "damageBase": 0,
-        "weapon": false,
-        "magic": false,
-        "ranged": false
+        "isWeapon": false,
+        "weapon": {
+          "requirements": "",
+          "reach": 0,
+          "minimumEffectiveReach": 0,
+          "focused": false,
+          "penetration": 0,
+          "traits": "",
+          "handsSupplied": 0,
+          "handsRequired": 0,
+          "traitsArray": []
+        },
+        "isMagic": false,
+        "magic": {
+          "mentalRange": 0          
+        },
+        "damageType": "",
+        "attackType": ""
       },
       "material": {
         "material": {
@@ -135,8 +151,11 @@
           "reach": 0,
           "minimumEffectiveReach": 0,
           "focused": false,
-          "weaponProfiles": [],
-          "penetration": 0
+          "weaponProfiles": "",
+          "penetration": 0,
+          "traits": "",
+          "handsRequired": 0,
+          "traitsArray": []
         }
       }
     },
