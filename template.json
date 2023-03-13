@@ -77,7 +77,8 @@
           "active": 0,
           "healing": 0
         },
-        "size": 1
+        "size": 1,
+        "features": []
       }
     },
     "character": {
@@ -95,11 +96,11 @@
   "Item": {
     "types": [
       "item",
-      "feature",
       "spell",
+      "feature",
       "resource",
       "anatomy",
-      "ability"
+      "feature1"
     ],
     "templates": {
       "base": {
@@ -125,7 +126,8 @@
           "traits": "",
           "handsSupplied": 0,
           "handsRequired": 0,
-          "traitsArray": []
+          "traitsArray": [],
+          "isEquipped": false
         },
         "isMagic": false,
         "magic": {
@@ -155,6 +157,7 @@
           "penetration": 0,
           "traits": "",
           "handsRequired": 0,
+          "isEquipped": false,
           "traitsArray": []
         }
       }
@@ -203,7 +206,7 @@
       "armourBonus": 0,
       "hands": 0
     },
-    "ability": {
+    "feature1": {
       "templates": [
         "base",
         "attack",

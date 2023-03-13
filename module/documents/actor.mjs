@@ -55,7 +55,7 @@ export class AbbrewActor extends Actor {
     this._prepareArmour(systemData);
     this._preparePower(systemData);
     this._prepareActions(systemData);
-    this._prepareAbilities(systemData);
+    this._prepareFeatures(systemData);
   }
 
   _prepareAnatomy(systemData) {
@@ -68,15 +68,22 @@ export class AbbrewActor extends Actor {
     systemData.anatomy = this.itemTypes.anatomy;
   }
 
-  _prepareAbilities(systemData) {
-    const weapons = this.itemTypes.item.filter(i => i.system.isWeapon).map(i => ({ "weight": i.system.weight, "concepts": i.system.concepts, "material": i.system.material, ...i.system.weapon }));
-    // TODO: create weapon profile here and add back to systemData, use that to create new items of the Ability Type as Active
+  _prepareFeatures(systemData) {
+    const weapons = this._getWeapons();
     const attacks = weapons.map(w => this._prepareWeaponAttack(w, systemData));
-    systemData.features = attacks;
+    systemData.attacks = attacks.flat();
+  }
+
+  _getWeapons() {
+    return this._getItemWeapons().map(i => ({ "name": i.name, "img": i.img, "weaponId": i._id, "weight": i.system.weight, "concepts": i.system.concepts, "material": i.system.material, ...i.system.weapon }));
+  }
+
+  _getItemWeapons() {
+    return this.itemTypes.item.filter(i => i.system.isWeapon);
   }
 
   _prepareWeaponAttack(weapon) {
-    const results = weapon.weaponProfiles.split(',').map(wp => {
+    const results = weapon.weaponProfiles.split(',').map((wp, index) => {
       const profileParts = wp.split('-');
       const damageType = profileParts[0];
       const attackType = profileParts[1];
@@ -96,6 +103,7 @@ export class AbbrewActor extends Actor {
       }
 
       return {
+        id: index,
         abilityModifier: "@system.abilities.strength.mod",
         damageBase: damageBase,
         isWeapon: true,
@@ -109,17 +117,30 @@ export class AbbrewActor extends Actor {
           handsSupplied: weapon.handsSupplied,
           handsRequired: weapon.handsRequired,
           traitsArray: weapon.traitsArray,
+          damageType: damageType,
+          attackType: attackType
         },
         isMagic: false,
         magic: {
           mentalRange: 0
         },
-        damageType: damageType,
-        attackType: attackType
       };
     });
 
-    return results;
+    return {
+      id: weapon.weaponId,
+      name: weapon.name,
+      image: weapon.img || "icons/svg/sword.svg",
+      isWeapon: true,
+      isEquipped: weapon.isEquipped,
+      profiles: results
+    }
+  };
+
+  async equipWeapon(id, equip) {
+    const updates = [];
+    updates.push({ _id: id, system: { weapon: { isEquipped: equip } } });
+    await this.updateEmbeddedDocuments("Item", updates);
   };
 
   _prepareAbilityModifiers(systemData) {

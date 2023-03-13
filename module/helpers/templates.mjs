@@ -12,8 +12,8 @@
     "systems/abbrew/templates/actor/parts/actor-anatomy.hbs",
     "systems/abbrew/templates/actor/parts/actor-resources.hbs",
     "systems/abbrew/templates/actor/parts/actor-spells.hbs",
-    "systems/abbrew/templates/actor/parts/actor-effects.hbs",
-    "systems/abbrew/templates/actor/parts/actor-abilities.hbs",
+    "systems/abbrew/templates/actor/parts/actor-effects.hbs",    
+    "systems/abbrew/templates/actor/parts/actor-attacks.hbs",
     "systems/abbrew/templates/parts/active-effects.hbs"
   ]);
 };

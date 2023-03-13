@@ -17,6 +17,10 @@ import { handleTurnStart } from "./helpers/turn-start.mjs";
 
 Hooks.once('init', async function () {
 
+  Handlebars.registerHelper('json', function (context) {
+    return JSON.stringify(context);
+  });
+
   // Add utility classes to the global game object so that they're more easily
   // accessible in global contexts.
   game.abbrew = {
@@ -191,14 +195,14 @@ Hooks.once("dragRuler.ready", (SpeedProvider) => {
   dragRuler.registerSystem("abbrew", AbbrewSpeedProvider)
 })
 
-Hooks.on("combatStart", async(combat, updateData, updateOptions) => {
+Hooks.on("combatStart", async (combat, updateData, updateOptions) => {
   await handleTurnStart(combat, updateData, updateOptions);
 });
 
-Hooks.on("combatRound", async(combat, updateData, updateOptions) => {
+Hooks.on("combatRound", async (combat, updateData, updateOptions) => {
   await handleTurnStart(combat, updateData, updateOptions);
-}) 
+})
 
-Hooks.on("combatTurn", async (combat, updateData, updateOptions) => {  
+Hooks.on("combatTurn", async (combat, updateData, updateOptions) => {
   await handleTurnStart(combat, updateData, updateOptions);
 })

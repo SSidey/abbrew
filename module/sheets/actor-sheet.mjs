@@ -1,5 +1,5 @@
 import { ChatAbbrew } from "../helpers/chat.mjs";
-import {onManageActiveEffect, prepareActiveEffectCategories} from "../helpers/effects.mjs";
+import { onManageActiveEffect, prepareActiveEffectCategories } from "../helpers/effects.mjs";
 
 /**
  * Extend the basic ActorSheet
@@ -44,6 +44,7 @@ export class AbbrewActorSheet extends ActorSheet {
     if (actorData.type == 'character') {
       this._prepareItems(context);
       this._prepareCharacterData(context);
+      this._prepareAttacks(context);
     }
 
     // Prepare NPC data and items.
@@ -105,11 +106,11 @@ export class AbbrewActorSheet extends ActorSheet {
     for (let i of context.items) {
       i.img = i.img || DEFAULT_TOKEN;
       // Append to resources.
-      if(i.type === 'anatomy') {
+      if (i.type === 'anatomy') {
         anatomy.push(i);
       }
       // Append to resources.
-      else if(i.type === 'resource') {
+      else if (i.type === 'resource') {
         resources.push(i);
       }
       // Append to gear.
@@ -121,7 +122,7 @@ export class AbbrewActorSheet extends ActorSheet {
         features.push(i);
       }
       // Append to Abilities
-      else if (i.type=== 'ability') {
+      else if (i.type === 'ability') {
         abilities.push(i);
       }
       // Append to spells.
@@ -139,7 +140,13 @@ export class AbbrewActorSheet extends ActorSheet {
     context.features = features;
     context.spells = spells;
     context.anatomy = anatomy;
-    context.ability = abilities;    
+    context.ability = abilities;
+  }
+
+  /* -------------------------------------------- */
+
+  _prepareAttacks(context) {
+    context.attacks = context.system.attacks;
   }
 
   /* -------------------------------------------- */
@@ -175,7 +182,11 @@ export class AbbrewActorSheet extends ActorSheet {
 
     // Rollable abilities.
     html.find('.rollable .item-image').click(this._onItemUse.bind(this));
-    
+
+    // attacks
+    html.find('.equip-weapon').click(this._equipWeapon.bind(this));
+    html.find('.rollable.attack').click(this._onAttackUse.bind(this));
+
     // Drag events for macros.
     if (this.actor.isOwner) {
       let handler = ev => this._onDragStart(ev);
@@ -185,6 +196,14 @@ export class AbbrewActorSheet extends ActorSheet {
         li.addEventListener("dragstart", handler, false);
       });
     }
+  }
+
+  async _equipWeapon(event) {
+    event.preventDefault();
+    const dataSet = event.target.dataset
+    const weaponId = dataSet.weaponid;
+    const equip = dataSet.equip === "true";
+    await this.actor.equipWeapon(weaponId, equip)
   }
 
   /**
@@ -198,18 +217,18 @@ export class AbbrewActorSheet extends ActorSheet {
     const type = header.dataset.type;
 
     // Check to make sure the newly created class doesn't take player over level cap
-    if ( type === "ability" && (this.actor.system.IP.current + 1 > this.actor.system.IP.total) ) {
-      const err = game.i18n.format("ABBREW.InspirationPointsExceededWarn", {max: this.actor.system.IP.total});
+    if (type === "ability" && (this.actor.system.IP.current + 1 > this.actor.system.IP.total)) {
+      const err = game.i18n.format("ABBREW.InspirationPointsExceededWarn", { max: this.actor.system.IP.total });
       return ui.notifications.error(err);
     }
 
     const itemData = {
-      name: game.i18n.format("ABBREW.ItemNew", {type: game.i18n.localize(`ITEM.Type${type.capitalize()}`)}),
+      name: game.i18n.format("ABBREW.ItemNew", { type: game.i18n.localize(`ITEM.Type${type.capitalize()}`) }),
       type: type,
       system: { ...header.dataset }
     };
     delete itemData.system.type;
-    
+
     return this.actor.createEmbeddedDocuments("Item", [itemData]);
   }
 
@@ -222,12 +241,19 @@ export class AbbrewActorSheet extends ActorSheet {
     event.preventDefault();
     const element = event.currentTarget;
     const dataset = element.dataset;
-    const actor = this.actor;    
+    const actor = this.actor;
     ChatAbbrew(dataset, element, actor);
     const itemId = event.currentTarget.closest(".item").dataset.itemId;
     const item = this.actor.items.get(itemId);
     // await this.displayCard(dataset, element, actor)
-    return item.use({}, {event});
+    return item.use({}, { event });
+  }
+
+  _onAttackUse(event) {
+    event.preventDefault();
+    console.log(event); 
+    // Get Attack
+    // Use Attack
   }
 
 }
