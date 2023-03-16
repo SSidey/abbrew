@@ -9,6 +9,210 @@
         "armour": {
           "value": 0,
           "min": 0,
+          "max": 0,
+          "defenses": "crushing, slashing, piercing",
+          "defensesArray": []
+        },
+        "naturalArmour": "system.abilities.constitution.mod",
+        "defenses": {
+          "acid": {
+            "value": 0,
+            "min": 0,
+            "max": 0,
+            "block": 0,
+            "absorb": false,
+            "deflect": false,
+            "immune": false,
+            "resistance": 0,
+            "amplification": 0,
+            "negate": false,
+            "vulnerable": false
+          },
+          "cold": {
+            "value": 0,
+            "min": 0,
+            "max": 0,
+            "block": 0,
+            "absorb": false,
+            "deflect": false,
+            "immune": false,
+            "resistance": 0,
+            "amplification": 0,
+            "negate": false,
+            "vulnerable": false
+          },
+          "crushing": {
+            "value": 0,
+            "min": 0,
+            "max": 0,
+            "block": 0,
+            "absorb": false,
+            "deflect": false,
+            "immune": false,
+            "resistance": 0,
+            "amplification": 0,
+            "negate": false,
+            "vulnerable": false
+          },
+          "dark": {
+            "value": 0,
+            "min": 0,
+            "max": 0,
+            "block": 0,
+            "absorb": false,
+            "deflect": false,
+            "immune": false,
+            "resistance": 0,
+            "amplification": 0,
+            "negate": false,
+            "vulnerable": false
+          },
+          "electricity": {
+            "value": 0,
+            "min": 0,
+            "max": 0,
+            "block": 0,
+            "absorb": false,
+            "deflect": false,
+            "immune": false,
+            "resistance": 0,
+            "amplification": 0,
+            "negate": false,
+            "vulnerable": false
+          },
+          "energy": {
+            "value": 0,
+            "min": 0,
+            "max": 0,
+            "block": 0,
+            "absorb": false,
+            "deflect": false,
+            "immune": false,
+            "resistance": 0,
+            "amplification": 0,
+            "negate": false,
+            "vulnerable": false
+          },
+          "physical": {
+            "value": 0,
+            "min": 0,
+            "max": 0,
+            "block": 0,
+            "absorb": false,
+            "deflect": false,
+            "immune": false,
+            "resistance": 0,
+            "amplification": 0,
+            "negate": false,
+            "vulnerable": false
+          },
+          "heat": {
+            "value": 0,
+            "min": 0,
+            "max": 0,
+            "block": 0,
+            "absorb": false,
+            "deflect": false,
+            "immune": false,
+            "resistance": 0,
+            "amplification": 0,
+            "negate": false,
+            "vulnerable": false
+          },
+          "holy": {
+            "value": 0,
+            "min": 0,
+            "max": 0,
+            "block": 0,
+            "absorb": false,
+            "deflect": false,
+            "immune": false,
+            "resistance": 0,
+            "amplification": 0,
+            "negate": false,
+            "vulnerable": false
+          },
+          "light": {
+            "value": 0,
+            "min": 0,
+            "max": 0,
+            "block": 0,
+            "absorb": false,
+            "deflect": false,
+            "immune": false,
+            "resistance": 0,
+            "amplification": 0,
+            "negate": false,
+            "vulnerable": false
+          },
+          "necrotic": {
+            "value": 0,
+            "min": 0,
+            "max": 0,
+            "block": 0,
+            "absorb": false,
+            "deflect": false,
+            "immune": false,
+            "resistance": 0,
+            "amplification": 0,
+            "negate": false,
+            "vulnerable": false
+          },
+          "piercing": {
+            "value": 0,
+            "min": 0,
+            "max": 0,
+            "block": 0,
+            "absorb": false,
+            "deflect": false,
+            "immune": false,
+            "resistance": 0,
+            "amplification": 0,
+            "negate": false,
+            "vulnerable": false
+          },
+          "slashing": {
+            "value": 0,
+            "min": 0,
+            "max": 0,
+            "block": 0,
+            "absorb": false,
+            "deflect": false,
+            "immune": false,
+            "resistance": 0,
+            "amplification": 0,
+            "negate": false,
+            "vulnerable": false
+          },
+          "unholy": {
+            "value": 0,
+            "min": 0,
+            "max": 0,
+            "block": 0,
+            "absorb": false,
+            "deflect": false,
+            "immune": false,
+            "resistance": 0,
+            "amplification": 0,
+            "negate": false,
+            "vulnerable": false
+          }
+        },
+        "thermal": {
+          "state": 0,
+          "burn": 2,
+          "warm": 1,
+          "cool": -1,
+          "chilled": -2
+        },
+        "staminaPoints": {
+          "value": 0,
+          "min": 0,
+          "max": 0
+        },
+        "spellPoints": {
+          "value": 0,
+          "min": 0,
           "max": 0
         },
         "biography": "",
@@ -58,7 +262,10 @@
         "blood": {
           "value": 100,
           "min": 0,
-          "max": 100
+          "max": 100,
+          "nausea": 60,
+          "unconscious": 20,
+          "dead": 0
         },
         "canBleed": true,
         "healing": {
@@ -100,7 +307,8 @@
       "feature",
       "resource",
       "anatomy",
-      "feature1"
+      "attack",
+      "defense"
     ],
     "templates": {
       "base": {
@@ -113,7 +321,7 @@
         "ability": "strength",
         "criticalThreshold": 10
       },
-      "attack": {
+      "attackProfile": {
         "abilityModifier": "system.abilities.strength.mod",
         "damageBase": 0,
         "isWeapon": false,
@@ -127,14 +335,22 @@
           "handsSupplied": 0,
           "handsRequired": 0,
           "traitsArray": [],
-          "isEquipped": false
+          "isEquipped": false,
+          "criticalThreshold": 10
         },
         "isMagic": false,
         "magic": {
-          "mentalRange": 0          
+          "mentalRange": 0
         },
         "damageType": "",
         "attackType": ""
+      },
+      "attack": {
+        "weaponId": "",
+        "isWeapon": false,
+        "isMagic": false,
+        "isEquipped": false,
+        "profiles": []
       },
       "material": {
         "material": {
@@ -158,7 +374,8 @@
           "traits": "",
           "handsRequired": 0,
           "isEquipped": false,
-          "traitsArray": []
+          "traitsArray": [],
+          "criticalThreshold": 10
         }
       }
     },
@@ -203,14 +420,15 @@
       "tags": "",
       "tagsArray": [],
       "grappleScore": "",
-      "armourBonus": 0,
-      "hands": 0
+      "armourBonus": "",
+      "hands": 0,
+      "armourPoints": "",
+      "armourPointsArray": []
     },
-    "feature1": {
+    "attack": {
       "templates": [
         "base",
-        "attack",
-        "weapon"
+        "attack"
       ],
       "type": "",
       "strong": "",
@@ -218,6 +436,14 @@
       "requirements": "",
       "actionCost": "",
       "trigger": ""
+    },
+    "defense": {
+      "value": 0,
+      "min": 0,
+      "max": 0,
+      "block": 0,
+      "absorb": false,
+      "deflect": false
     }
   }
 }

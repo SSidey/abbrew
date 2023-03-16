@@ -1,3 +1,4 @@
+import { useAttack, onAttackCardAction } from "../documents/attackprofile.mjs";
 import { ChatAbbrew } from "../helpers/chat.mjs";
 import { onManageActiveEffect, prepareActiveEffectCategories } from "../helpers/effects.mjs";
 
@@ -225,7 +226,7 @@ export class AbbrewActorSheet extends ActorSheet {
     const itemData = {
       name: game.i18n.format("ABBREW.ItemNew", { type: game.i18n.localize(`ITEM.Type${type.capitalize()}`) }),
       type: type,
-      system: { ...header.dataset }
+      system: { ...header.dataset.type }
     };
     delete itemData.system.type;
 
@@ -249,11 +250,12 @@ export class AbbrewActorSheet extends ActorSheet {
     return item.use({}, { event });
   }
 
-  _onAttackUse(event) {
+  async _onAttackUse(event) {
     event.preventDefault();
-    console.log(event); 
-    // Get Attack
-    // Use Attack
+    console.log(event);
+    const data = event.target.dataset;
+    const attack = this.actor.system.attacks.filter(a => a.id === data.attack)[0];
+    const attackProfile = attack.profiles.flat().filter(ap => ap.id === + data.attackprofile)[0];
+    useAttack(attack, attackProfile, this.actor);
   }
-
 }

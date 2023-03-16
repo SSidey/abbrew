@@ -60,7 +60,7 @@ Hooks.once('init', async function () {
     ["feature", AbbrewItemSheet],
     ["spell", AbbrewItemSheet],
     ["resource", AbbrewItemSheet],
-    ["ability", AbbrewItemSheet]
+    ["attack", AbbrewItemSheet]
   ]
   for (const [type, Sheet] of sheetEntries) {
     Items.registerSheet("abbrew", Sheet, {
@@ -91,6 +91,10 @@ Handlebars.registerHelper('concat', function () {
 
 Handlebars.registerHelper('toLowerCase', function (str) {
   return str.toLowerCase();
+});
+
+Handlebars.registerHelper("isNumber", function(value) {
+  return typeof value === "number";
 });
 
 /* -------------------------------------------- */

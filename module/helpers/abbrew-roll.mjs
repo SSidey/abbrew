@@ -18,11 +18,19 @@ export default class AbbrewRoll extends Roll {
 
     static EVALUATION_TEMPLATE = "systems/abbrew/templates/chat/roll-dialog.hbs";
 
+    static CHAT_TEMPLATE = "systems/abbrew/templates/chat/damage-roll.hbs";
+
+    async render(flavor, template, isPrivate) {
+        template = this.CHAT_TEMPLATE;
+
+        return super.render(flavor, template, isPrivate);
+    }
+
     /** @inheritdoc */
     async toMessage(messageData = {}, options = {}) {
-        
+
         // return early for invalid roll formula
-        if(!this.validD10Roll) {
+        if (!this.validD10Roll) {
             return;
         }
 
@@ -44,6 +52,7 @@ export default class AbbrewRoll extends Roll {
 
         // Record the preferred rollMode
         options.rollMode = options.rollMode ?? this.options.rollMode;
+        // messageData.flags = { data: { foo: "bar", baz: "fuck" } };
         return super.toMessage(messageData, options);
     }
 
@@ -174,10 +183,10 @@ export default class AbbrewRoll extends Roll {
     }
 
     _configureModifiers() {
-        const d10 = this.terms[0].rolls[0];       
+        const d10 = this.terms[0].rolls[0];
 
         if (this.options.weak) {
-            d10.terms[4].number +=  this.options.weakValue;
+            d10.terms[4].number += this.options.weakValue;
         }
 
         if (this.options.strong) {
@@ -188,6 +197,6 @@ export default class AbbrewRoll extends Roll {
 
         this._formula = this.constructor.getFormula(this.terms);
 
-        this.options.configured = true;       
+        this.options.configured = true;
     }
 }

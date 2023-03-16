@@ -51,5 +51,6 @@
     "ABBREW.crushing": "crushing",
     "ABBREW.slashing": "slashing",
     "ABBREW.piercing": "piercing"
-  }
+  },
+  "ABBREW.DamageButton.FullShort": "Accept"
 }

@@ -66,6 +66,7 @@
   <nav class="sheet-tabs tabs" data-group="primary">
     {{!-- Default tab is specified in actor-sheet.mjs --}}
     <a class="item" data-tab="features">Features</a>
+    <a class="item" data-tab="defenses">Defenses</a>
     <a class="item" data-tab="description">Description</a>
     <a class="item" data-tab="items">Items</a>
     <a class="item" data-tab="spells">Spells</a>
@@ -105,6 +106,31 @@
         </section>
 
       </section>
+    </div>
+
+    <div class="tab defenses" data-group="primary" data-tab="defenses">
+      <div class="abilities flexcol">
+        <label for="system.defenses.{{key}}.block" class="resource-label">Block</label>
+        <input type="text" name="system.defense.{{key}}.max" value="{{defense.max}}" data-dtype="Number" />
+        <label for="system.naturalArmour" class="resource-label">Natural Armour</label>
+        <input type="text" name="system.naturalArmour" value="{{system.naturalArmour}}" data-dtype="text" />
+        {{#each system.defenses as |defense key|}}
+        <div class="defense flexrow flex-group-center">
+          <label for="system.defenses.{{key}}.value" class="resource-label">{{key}}</label>
+          <div class="resource-content flexrow flex-center flex-between">
+            <input type="text" name="system.defense.{{key}}.value" value="{{defense.value}}" data-dtype="Number" />
+            <span> / </span>
+            <input type="text" name="system.defense.{{key}}.max" value="{{defense.max}}" data-dtype="Number" />
+            <label for="system.defenses.{{key}}.block" class="resource-label">Block</label>
+            <input type="text" name="system.defense.{{key}}.block" value="{{defense.value}}" data-dtype="Number" />
+            <label for="system.defenses.{{key}}.absorb" class="resource-label">Absorb</label>
+            <input type="checkbox" name="system.defense.{{key}}.absorb" {{checked system.isWeapon}} />
+            <label for="system.defenses.{{key}}.deflect" class="resource-label">Deflect</label>
+            <input type="checkbox" name="system.defense.{{key}}.deflect" {{checked system.isWeapon}} />
+          </div>
+        </div>
+        {{/each}}
+      </div>
     </div>
 
     {{!-- Biography Tab --}}

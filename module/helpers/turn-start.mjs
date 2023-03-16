@@ -2,7 +2,7 @@ export async function handleTurnStart(combat, updateData, updateOptions) {
   if(updateData.round < combat.round || (updateData.round == combat.round && updateData.turn < combat.turn )) {
     return;
   }    
-  let nextActor = combat.nextCombatant.actor;    
+  let nextActor = combat.current.combatantId ? combat.nextCombatant.actor : combat.turns[0].actor;    
   await turnStart(nextActor);
 }
 

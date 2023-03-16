@@ -1,3 +1,5 @@
+import { AbbrewAttackProfile } from "./attackprofile.mjs";
+
 /**
  * Extend the base Actor document by defining a custom roll data structure which is ideal for the Simple system.
  * @extends {Actor}
@@ -52,7 +54,7 @@ export class AbbrewActor extends Actor {
     this._prepareAbilityModifiers(systemData);
     this._prepareAnatomy(systemData);
     this._prepareMovement(systemData);
-    this._prepareArmour(systemData);
+    this._prepareArmour(systemData);    
     this._preparePower(systemData);
     this._prepareActions(systemData);
     this._prepareFeatures(systemData);
@@ -63,6 +65,8 @@ export class AbbrewActor extends Actor {
       a => {
         const tags = a.system.tags.replace(' ', '').split(',');
         a.system.tagsArray = tags;
+        const armourPoints = a.system.armourPoints.replace(' ', '').split(',');
+        a.system.armourPointsArray = armourPoints;
       }
     );
     systemData.anatomy = this.itemTypes.anatomy;
@@ -92,22 +96,22 @@ export class AbbrewActor extends Actor {
       let damageBase = 0;
       switch (profileParts[1]) {
         case "arc":
-          damageBase = weapon.material.structure + (requirements.strength.value * (1 + weapon.minimumEffectiveReach)) + (weapon.material.tier * 5);
+          damageBase = + weapon.material.structure + (requirements.strength.value * (1 + weapon.minimumEffectiveReach)) + (weapon.material.tier * 5);
           break;
         case "thrust":
-          damageBase = weapon.material.structure + (weapon.material.tier * 5);
+          damageBase = + weapon.material.structure + (weapon.material.tier * 5);
           weapon.penetration = weapon.material.tier * 5;
           break;
         default:
           return;
       }
 
-      return {
-        id: index,
-        abilityModifier: "@system.abilities.strength.mod",
-        damageBase: damageBase,
-        isWeapon: true,
-        weapon: {
+      return new AbbrewAttackProfile(
+        index,
+        "@system.abilities.strength.mod",
+        damageBase,
+        true,
+        {
           requirements: weapon.requirements,
           reach: weapon.reach,
           minimumEffectiveReach: weapon.minimumEffectiveReach,
@@ -120,11 +124,9 @@ export class AbbrewActor extends Actor {
           damageType: damageType,
           attackType: attackType
         },
-        isMagic: false,
-        magic: {
-          mentalRange: 0
-        },
-      };
+        false,
+        {}
+      );
     });
 
     return {
@@ -159,9 +161,15 @@ export class AbbrewActor extends Actor {
 
   _prepareArmour(systemData) {
     const constitutionModifier = systemData.abilities['constitution'].mod;
-    if (systemData.armour.max < constitutionModifier) {
-      systemData.armour.max = constitutionModifier;
-    }
+    let naturalBonuses = this.itemTypes.anatomy.map(a => a.system.armourBonus);
+    const naturalValue = foundry.utils.getProperty(this, this.system.naturalArmour);
+    naturalBonuses = naturalBonuses.map(b => { if (b === 'natural') { b = naturalValue; } return b; });
+    const initialValue = 0;
+    const fullArmourMax = naturalBonuses.map(b => +b).reduce((accumulator, currentValue) => accumulator + currentValue, initialValue);
+    systemData.armour.max = fullArmourMax;
+
+    const defensesArray = systemData.armour.defenses.replace(' ', '').split(',');
+    systemData.armour.defensesArray = defensesArray;
   }
 
   _preparePower(systemData) {
@@ -232,6 +240,27 @@ export class AbbrewActor extends Actor {
     if (this.type !== 'npc') return;
 
     // Process additional NPC data here.
+  }
+
+  async acceptDamage(damage, attackData) {
+    const actor = this;
+    const systemData = this.system;
+    let currentArmour = systemData.armour.value;
+    let newArmour = currentArmour;
+
+    const damageType = attackData.attackProfile.weapon.damageType;
+    if (systemData.armour.defensesArray.includes(damageType)) {
+      newArmour = currentArmour - damage;
+      if (newArmour < 0) {
+        damage = Math.abs(newArmour);
+        newArmour = 0;
+      }
+    }
+
+    let activeWounds = systemData.wounds.active;
+    activeWounds += damage;
+
+    await actor.update({ "system.wounds.active": activeWounds, "system.armour.value": newArmour });
   }
 
 }
