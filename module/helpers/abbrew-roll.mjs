@@ -6,9 +6,9 @@ export default class AbbrewRoll extends Roll {
         }
     }
 
-    static fromRoll(roll) {
+    static async fromRoll(roll) {
         const newRoll = new this(roll.formula, roll.data, roll.options);
-        Object.assign(newRoll, roll);
+        await newRoll.evaluate({async: true});
         return newRoll;
     }
 

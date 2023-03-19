@@ -19,7 +19,7 @@ Hooks.once('init', async function () {
 
   Handlebars.registerHelper('json', function (context) {
     return JSON.stringify(context);
-  });
+  });  
 
   // Add utility classes to the global game object so that they're more easily
   // accessible in global contexts.
@@ -60,7 +60,8 @@ Hooks.once('init', async function () {
     ["feature", AbbrewItemSheet],
     ["spell", AbbrewItemSheet],
     ["resource", AbbrewItemSheet],
-    ["attack", AbbrewItemSheet]
+    ["attack", AbbrewItemSheet],    
+    ["defense", AbbrewItemSheet]
   ]
   for (const [type, Sheet] of sheetEntries) {
     Items.registerSheet("abbrew", Sheet, {

@@ -13,7 +13,8 @@
     "systems/abbrew/templates/actor/parts/actor-resources.hbs",
     "systems/abbrew/templates/actor/parts/actor-spells.hbs",
     "systems/abbrew/templates/actor/parts/actor-effects.hbs",    
-    "systems/abbrew/templates/actor/parts/actor-attacks.hbs",
+    "systems/abbrew/templates/actor/parts/actor-attacks.hbs", 
+    "systems/abbrew/templates/actor/parts/actor-defenses.hbs",
     "systems/abbrew/templates/parts/active-effects.hbs",
     "systems/abbrew/templates/chat/damage-roll.hbs"
   ]);

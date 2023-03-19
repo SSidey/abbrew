@@ -1,9 +1,5 @@
 import { d10Roll } from "../helpers/dice.mjs";
 
-// Hooks.on('init', () => {
-//   $(document).on('click', '.nigger-buttons button', onAttackCardAction);
-// });
-
 Hooks.on('init', () => {
   $(document).on('click', '.damage-application button', onDamageAccept);
 });
@@ -174,9 +170,8 @@ async function onDamageAccept(event) {
   const card = button.closest(".chat-message");
   const messageId = card.closest(".message").dataset.messageId;
   const message = game.messages.get(messageId);
-  const damage = message.rolls[0]._total;
   const tokens = canvas.tokens.controlled.filter((token) => token.actor);
-  await tokens[0].actor.acceptDamage(damage, message.flags.data);
+  await tokens[0].actor.acceptDamage(message.rolls, message.flags.data);
 }
 
 export async function onAttackCardAction(event) {
