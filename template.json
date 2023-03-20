@@ -14,6 +14,83 @@
           "defensesArray": []
         },
         "naturalArmour": "system.abilities.constitution.mod",
+        "concepts": {
+          "attack": {
+            "strength": 0,
+            "modifier": 0,
+            "criticalThreshold": 10
+          },
+          "acid": {
+            "strength": 0,
+            "modifier": 0,
+            "criticalThreshold": 10
+          },
+          "cold": {
+            "strength": 0,
+            "modifier": 0,
+            "criticalThreshold": 10
+          },
+          "crushing": {
+            "strength": 0,
+            "modifier": 0,
+            "criticalThreshold": 10
+          },
+          "dark": {
+            "strength": 0,
+            "modifier": 0,
+            "criticalThreshold": 10
+          },
+          "electricity": {
+            "strength": 0,
+            "modifier": 0,
+            "criticalThreshold": 10
+          },
+          "energy": {
+            "strength": 0,
+            "modifier": 0,
+            "criticalThreshold": 10
+          },
+          "heat": {
+            "strength": 0,
+            "modifier": 0,
+            "criticalThreshold": 10
+          },
+          "holy": {
+            "strength": 0,
+            "modifier": 0,
+            "criticalThreshold": 10
+          },
+          "light": {
+            "strength": 0,
+            "modifier": 0,
+            "criticalThreshold": 10
+          },
+          "necrotic": {
+            "strength": 0,
+            "modifier": 0,
+            "criticalThreshold": 10
+          },
+          "piercing": {
+            "strength": 0,
+            "modifier": 0,
+            "criticalThreshold": 10
+          },
+          "slashing": {
+            "strength": 0,
+            "modifier": 0,
+            "criticalThreshold": 10
+          },
+          "unholy": {
+            "strength": 0,
+            "modifier": 0,
+            "criticalThreshold": 10
+          },
+          "water": {
+            "strength": 0,
+            "modifier": 0,
+            "criticalThreshold": 10
+          }
+        },
         "defenses": {
           "acid": {
             "value": 0,
@@ -196,6 +273,20 @@
             "amplification": 0,
             "negate": false,
             "vulnerable": false
+          },
+          "water": {
+            "value": 0,
+            "min": 0,
+            "max": 0,
+            "block": 0,
+            "absorb": false,
+            "deflect": false,
+            "conduct": false,
+            "immune": false,
+            "resistance": 0,
+            "amplification": 0,
+            "negate": false,
+            "vulnerable": false
           }
         },
         "thermal": {
@@ -204,6 +295,48 @@
           "warm": 1,
           "cool": -1,
           "chilled": -2
+        },
+        "mentalFortitude": {
+          "min": 0,
+          "value": 100,
+          "max": 100
+        },
+        "conditions": {
+          "aim": 0,
+          "block": 0,
+          "burned": 0,
+          "chilled": 0,
+          "concentrating": 0,
+          "corroded": 0,
+          "corruption": 0,
+          "controlling-grapple": 0,
+          "destabilised": 0,
+          "dodge": 0,
+          "enraged": 0,
+          "envenomed": 0,
+          "exhaustion": 0,
+          "fatigue": 0,
+          "fear": 0,
+          "grabbed": 0,
+          "gushing-wounds": 0,
+          "helpless": 0,
+          "hunger": 0,
+          "impaled": 0,
+          "internal": 0,
+          "nauseous": 0,
+          "necrosis": 0,
+          "pain": 0,
+          "paralysed": 0,
+          "parry": 0,
+          "pinned": 0,
+          "restrained": 0,
+          "shock": 0,
+          "speed": 0,
+          "sundered": 0,
+          "thirst": 0,
+          "unconscious": 0,
+          "wet": 0,
+          "winded": 0
         },
         "staminaPoints": {
           "value": 0,
@@ -269,6 +402,7 @@
           "dead": 0
         },
         "canBleed": true,
+        "suffersPain": true,
         "healing": {
           "factor": 1,
           "bonus": 0

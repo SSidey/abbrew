@@ -1,24 +1,10 @@
-ability
-    name
-    description
-    formula
-        active
-            strong
-            weak
-            requirements
-            action
-                action cost
-            reaction
-                trigger
-        passive
-            modifies
-
-            type
-            strong
-            weak
-            requirements
-            action cost
-            trigger
-            modifies
-
-Custom effects / icons
+Allow for multiple damage types
+Add concepts section collapsable to abilities
+Add mental fortitude
+Add roll for virtue/vice
+Add identity item type
+Add stamina points to resources for everyone
+Add spell points based on abilities (should be a default one but hidden, use magic device could be something there for even non spellcasters)
+Determine spell syntax
+Extra abilities e.g. aim / dodge / block / hide / recover etc.
+Custom effects / icons (Combat utility belt?)

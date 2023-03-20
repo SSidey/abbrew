@@ -3,34 +3,52 @@
     <input type="text" name="system.naturalArmour" value="{{system.naturalArmour}}" data-dtype="text" />
     <label for="system.armour.defenses" class="resource-label">Armour Reduces</label>
     <input type="text" name="system.armour.defenses" value="{{system.armour.defenses}}" data-dtype="text" />
+    <hr>
     {{#each system.defenses as |defense key|}}
     <div class="grid-defense">
-        <label for="system.defenses.{{key}}.value">{{key}}</label>
-        <div class="grid-defense-elements">
-            <input type="text" name="system.defenses.{{key}}.value" value="{{defense.value}}" data-dtype="Number" />
-            <span class="defense-span"> / </span>
-            <input type="text" name="system.defenses.{{key}}.max" value="{{defense.max}}" data-dtype="Number" />
-            <label for="system.defenses.{{key}}.block" class="resource-label">Block</label>
-            <input type="text" name="system.defenses.{{key}}.block" value="{{defense.block}}" data-dtype="Number" />
-            <label for="system.defenses.{{key}}.absorb" class="resource-label">Absorb</label>
-            <input type="checkbox" name="system.defenses.{{key}}.absorb" {{checked defense.absorb}} />
-            <label for="system.defenses.{{key}}.deflect" class="resource-label">Deflect</label>
-            <input type="checkbox" name="system.defenses.{{key}}.deflect" {{checked defense.deflect}} />
-            <label for="system.defenses.{{key}}.conduct" class="resource-label">Conduct</label>
-            <input type="checkbox" name="system.defenses.{{key}}.conduct" {{checked defense.conduct}} />
-            <label for="system.defenses.{{key}}.immune" class="resource-label">Immune</label>
-            <input type="checkbox" name="system.defenses.{{key}}.immune" {{checked defense.immune}} />
-            <label for="system.defenses.{{key}}.resistance" class="resource-label">Resistance</label>
-            <input type="text" name="system.defenses.{{key}}.resistance" value="{{defense.resistance}}"
-                data-dtype="Number" />
-            <label for="system.defenses.{{key}}.amplification" class="resource-label">Amplification</label>
-            <input type="text" name="system.defenses.{{key}}.amplification" value="{{defense.amplification}}"
-                data-dtype="Number" />
-            <label for="system.defenses.{{key}}.negate" class="resource-label">Negate</label>
-            <input type="checkbox" name="system.defenses.{{key}}.negate" {{checked defense.negate}} />
-            <label for="system.defenses.{{key}}.vulnerable" class="resource-label">Vulnerable</label>
-            <input type="checkbox" name="system.defenses.{{key}}.vulnerable" {{checked defense.vulnerable}} />
+        <div class="defense-name">
+            <label for="system.defenses.{{key}}.value">{{key}}</label>
         </div>
+        <div>
+            <div class="grid-defense-elements">
+                <input type="text" name="system.defenses.{{key}}.value" value="{{defense.value}}" data-dtype="Number" />
+                <span class="defense-span"> / </span>
+                <input type="text" name="system.defenses.{{key}}.max" value="{{defense.max}}" data-dtype="Number" />
+                <div class="resource-label defense-part">
+                    <label for="system.defenses.{{key}}.block">Block</label>
+                </div>
+                <input type="text" name="system.defenses.{{key}}.block" value="{{defense.block}}" data-dtype="Number" />
+                <div class="resource-label defense-part">
+                    <label for="system.defenses.{{key}}.resistance">Resistance</label>
+                </div>
+                <input type="text" name="system.defenses.{{key}}.resistance" value="{{defense.resistance}}"
+                    data-dtype="Number" />
+                <div class="resource-label defense-part">
+                    <label for="system.defenses.{{key}}.amplification">Amplification</label>
+                </div>
+                <input type="text" name="system.defenses.{{key}}.amplification" value="{{defense.amplification}}"
+                    data-dtype="Number" />
+            </div>
+            <div class="grid-defense-elements">
+                <label class="resource-label">Immune <input type="checkbox" name="system.defenses.{{key}}.immune"
+                        {{checked defense.immune}} /></label>
+                <div></div>
+                <label class="resource-label">Absorb <input type="checkbox" name="system.defenses.{{key}}.absorb"
+                        {{checked defense.absorb}} /></label>
+                <label class="resource-label">Deflect <input type="checkbox" name="system.defenses.{{key}}.deflect"
+                        {{checked defense.deflect}} /></label>
+                <label class="resource-label">Conduct <input type="checkbox" name="system.defenses.{{key}}.conduct"
+                        {{checked defense.conduct}} /></label>
+                <label class="resource-label">Negate <input type="checkbox" name="system.defenses.{{key}}.negate"
+                        {{checked defense.negate}} /></label>
+                <label class="resource-label">Vulnerable <input type="checkbox"
+                        name="system.defenses.{{key}}.vulnerable" {{checked defense.vulnerable}} /></label>
+
+            </div>
+        </div>
+    </div>
+    <div>
+        <hr class="defense-divider">
     </div>
     {{/each}}
 </div>

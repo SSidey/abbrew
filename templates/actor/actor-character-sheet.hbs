@@ -65,9 +65,10 @@
   {{!-- Sheet Tab Navigation --}}
   <nav class="sheet-tabs tabs" data-group="primary">
     {{!-- Default tab is specified in actor-sheet.mjs --}}
-    <a class="item" data-tab="features">Features</a>
-    <a class="item" data-tab="abilities">Features</a>
+    <a class="item" data-tab="statistics">Statistics</a>
+    <a class="item" data-tab="abilities">Abilities</a>
     <a class="item" data-tab="defenses">Defenses</a>
+    <a class="item" data-tab="form">Form</a>
     <a class="item" data-tab="description">Description</a>
     <a class="item" data-tab="items">Items</a>
     <a class="item" data-tab="spells">Spells</a>
@@ -78,7 +79,7 @@
   <section class="sheet-body">
 
     {{!-- Owned Features Tab --}}
-    <div class="tab features" data-group="primary" data-tab="features">
+    <div class="tab statistics" data-group="primary" data-tab="statistics">
       <section class="grid grid-3col">
         <aside class="sidebar">
 
@@ -111,6 +112,10 @@
       {{> "systems/abbrew/templates/actor/parts/actor-defenses.hbs"}}
     </div>
 
+    <div class="tab form" data-group="primary" data-tab="form">
+          {{> "systems/abbrew/templates/actor/parts/actor-anatomy.hbs"}}
+    </div>
+
     {{!-- Biography Tab --}}
     <div class="tab biography" data-group="primary" data-tab="description">
       {{!-- If you want TinyMCE editors to output inline rolls when rendered, you need to pass the actor's roll data to
@@ -121,7 +126,6 @@
     {{!-- Owned Items Tab --}}
     <div class="tab items" data-group="primary" data-tab="items">
       {{> "systems/abbrew/templates/actor/parts/actor-items.hbs"}}
-      {{> "systems/abbrew/templates/actor/parts/actor-anatomy.hbs"}}
     </div>
 
     {{!-- Owned Spells Tab --}}
