@@ -61,7 +61,7 @@ Hooks.once('init', async function () {
     ["spell", AbbrewItemSheet],
     ["resource", AbbrewItemSheet],
     ["attack", AbbrewItemSheet],    
-    ["defense", AbbrewItemSheet]
+    ["defence", AbbrewItemSheet]
   ]
   for (const [type, Sheet] of sheetEntries) {
     Items.registerSheet("abbrew", Sheet, {

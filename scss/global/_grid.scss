@@ -150,36 +150,36 @@
   grid-column-end: span 12
 }
 
-.grid-defense {
+.grid-defence {
   display: grid;
   grid-template-columns: 1fr 10fr;
 }
 
-.grid-defense-elements {
+.grid-defence-elements {
   display: grid;
   grid-template-columns: 3fr 1fr 3fr repeat(6, minmax(0, 3fr));
 }
 
-.grid-defense-elements input,
+.grid-defence-elements input,
 .resource-label {
   text-align: center;
   vertical-align: middle;
 }
 
-.defense-span {
+.defence-span {
   text-align: center;
 }
 
-.defense-name, .defense-part {
+.defence-name, .defence-part {
   display: table
 }
 
-.defense-name label, .defense-part label {
+.defence-name label, .defence-part label {
   display: table-cell;
   text-align: center;
   vertical-align: middle;
 }
 
-hr.defense-divider {
+hr.defence-divider {
   border-top: 1px dashed var(--color-underline-header)
 }

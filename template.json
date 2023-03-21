@@ -10,88 +10,88 @@
           "value": 0,
           "min": 0,
           "max": 0,
-          "defenses": "crushing, slashing, piercing",
-          "defensesArray": []
+          "defences": "crushing, slashing, piercing",
+          "defencesArray": []
         },
         "naturalArmour": "system.abilities.constitution.mod",
         "concepts": {
           "attack": {
-            "strength": 0,
+            "amplification": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "acid": {
-            "strength": 0,
+            "amplification": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "cold": {
-            "strength": 0,
+            "amplification": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "crushing": {
-            "strength": 0,
+            "amplification": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "dark": {
-            "strength": 0,
+            "amplification": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "electricity": {
-            "strength": 0,
+            "amplification": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "energy": {
-            "strength": 0,
+            "amplification": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "heat": {
-            "strength": 0,
+            "amplification": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "holy": {
-            "strength": 0,
+            "amplification": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "light": {
-            "strength": 0,
+            "amplification": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "necrotic": {
-            "strength": 0,
+            "amplification": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "piercing": {
-            "strength": 0,
+            "amplification": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "slashing": {
-            "strength": 0,
+            "amplification": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "unholy": {
-            "strength": 0,
+            "amplification": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "water": {
-            "strength": 0,
+            "amplification": 0,
             "modifier": 0,
             "criticalThreshold": 10
           }
         },
-        "defenses": {
+        "defences": {
           "acid": {
             "value": 0,
             "min": 0,
@@ -303,13 +303,14 @@
         },
         "conditions": {
           "aim": 0,
+          "bleedPrevention": 0,
           "block": 0,
           "burned": 0,
           "chilled": 0,
           "concentrating": 0,
           "corroded": 0,
           "corruption": 0,
-          "controlling-grapple": 0,
+          "controllingGrapple": 0,
           "destabilised": 0,
           "dodge": 0,
           "enraged": 0,
@@ -318,12 +319,12 @@
           "fatigue": 0,
           "fear": 0,
           "grabbed": 0,
-          "gushing-wounds": 0,
+          "gushingWounds": 0,
           "helpless": 0,
           "hunger": 0,
           "impaled": 0,
           "internal": 0,
-          "nauseous": 0,
+          "nausea": 0,
           "necrosis": 0,
           "pain": 0,
           "paralysed": 0,
@@ -357,28 +358,36 @@
         },
         "abilities": {
           "strength": {
-            "value": 0
+            "value": 0,
+            "amplification": 0
           },
           "dexterity": {
-            "value": 0
+            "value": 0,
+            "amplification": 0
           },
           "constitution": {
-            "value": 0
+            "value": 0,
+            "amplification": 0
           },
           "agility": {
-            "value": 0
+            "value": 0,
+            "amplification": 0
           },
           "intelligence": {
-            "value": 0
+            "value": 0,
+            "amplification": 0
           },
           "will": {
-            "value": 0
+            "value": 0,
+            "amplification": 0
           },
           "wits": {
-            "value": 0
+            "value": 0,
+            "amplification": 0
           },
           "visualisation": {
-            "value": 0
+            "value": 0,
+            "amplification": 0
           }
         },
         "XP": {
@@ -443,6 +452,7 @@
       "resource",
       "anatomy",
       "attack",
+      "defence",
       "defense"
     ],
     "templates": {
@@ -494,9 +504,11 @@
           "tier": 1,
           "structure": 0,
           "concepts": [
-            "ABBREW.physical"
+            "physical"
           ],
-          "rarity": 0
+          "rarity": 0,
+          "effects": "",
+          "effectsArray": []
         }
       },
       "weapon": {
@@ -513,6 +525,22 @@
           "traitsArray": [],
           "criticalThreshold": 10
         }
+      },
+      "armour": {
+        "armour": {
+          "requirements": "",
+          "base": false,
+          "mid": false,
+          "outer": false,
+          "armourPoints": "",
+          "type": "",
+          "isEquipped": false
+        }
+      },
+      "consumable": {
+        "consumable": {
+          "requirements": ""
+        }
       }
     },
     "item": {
@@ -521,15 +549,14 @@
         "material",
         "action",
         "damage",
-        "weapon"
+        "weapon",
+        "armour"
       ],
-      "cost": 1,
+      "value": 0,
       "weight": 0,
-      "abilityBonus": {
-        "name": ""
-      },
-      "formula": "@armour.value",
-      "isWeapon": false
+      "isWeapon": false,
+      "isArmour": false,
+      "isConsumable": false
     },
     "feature": {
       "templates": [
@@ -573,7 +600,7 @@
       "actionCost": "",
       "trigger": ""
     },
-    "defense": {
+    "defence": {
       "value": 0,
       "min": 0,
       "max": 0,
@@ -586,6 +613,11 @@
       "amplification": 0,
       "negate": false,
       "vulnerable": false
+    },
+    "defense": {
+      "temlates": [
+        "base"
+      ]
     }
   }
 }

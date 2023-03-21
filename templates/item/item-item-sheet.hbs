@@ -19,7 +19,15 @@
   {{!-- Sheet Tab Navigation --}}
   <nav class="sheet-tabs tabs" data-group="primary">
     <a class="item" data-tab="description">Description</a>
-    <a class="item" data-tab="attributes">Attributes</a>
+    {{#if system.isWeapon }}
+    <a class="item" data-tab="weapon">Weapon</a>
+    {{/if}}
+    {{#if system.isArmour }}
+    <a class="item" data-tab="armour">Armour</a>
+    {{/if}}
+    {{#if system.isConsumable }}
+    <a class="item" data-tab="consumable">Consumable</a>
+    {{/if}}
     <a class="item" data-tab="effects">Effects</a>
   </nav>
 
@@ -42,17 +50,15 @@
 
       <header>
         <div>
-          <input type="checkbox" name="system.isWeapon" {{checked system.isWeapon}} />
-          <label>Is Weapon?</label>
+          <label><input type="checkbox" name="system.isWeapon" {{checked system.isWeapon}} />Is Weapon?</label>
         </div>
-        {{#if system.isWeapon }}
-        {{#each system.weapon}}
         <div>
-          <label class="item-label">{{@key}}</label>
-          <input type="text" name="system.weapon.{{@key}}" value="{{this}}" data-dtype="text" />
+          <label><input type="checkbox" name="system.isArmour" {{checked system.isArmour}} />Is Armour?</label>
         </div>
-        {{/each}}
-        {{/if}}
+        <div>
+          <label><input type="checkbox" name="system.isConsumable" {{checked system.isConsumable}} />Is
+            Consumable?</label>
+        </div>
       </header>
       {{!-- To render inline rolls in a TinyMCE editor, you need to pass the parent actor's (if any) roll data to the
       rollData prop. --}}
@@ -60,13 +66,45 @@
       editable=editable}}
     </div>
 
-    {{!-- Attributes Tab --}}
-    <div class="tab attributes" data-group="primary" data-tab="attributes">
-      {{!-- As you add new fields, add them in here! --}}
-      <div class="resource">
-        <label class="resource-label">Roll Formula</label>
-        <input type="text" name="system.formula" value="{{system.formula}}" data-dtype="String" />
+    {{!-- Weapon Tab --}}
+    <div class="tab" data-group="primary" data-tab="weapon">
+      {{#if system.isWeapon }}
+      {{#each system.weapon}}
+      <div>
+        <label class="item-label">{{@key}}</label>
+        <input type="text" name="system.weapon.{{@key}}" value="{{this}}" data-dtype="text" />
       </div>
+      {{/each}}
+      {{/if}}
+    </div>
+
+    {{!-- Armour Tab --}}
+    <div class="tab" data-group="primary" data-tab="armour">
+      {{#if system.isArmour }}
+      <div>
+        <label class="item-label">Requirements</label>
+        <input type="text" name="system.armour.requirements" value="{{system.armour.requirements}}" data-dtype="text" />
+        <label><input type="checkbox" name="system.armour.base" {{checked system.armour.base}} />Base</label>
+        <label><input type="checkbox" name="system.armour.mid" {{checked system.armour.mid}} />Mid</label>
+        <label><input type="checkbox" name="system.armour.outer" {{checked system.armour.outer}} />Outer</label>
+        <label class="item-label">Armour Points</label>
+        <input type="text" name="system.armour.armourPoints" value="{{system.armour.armourPoints}}" data-dtype="text" />
+        <label class="item-label">Type</label>
+        <input type="text" name="system.armour.type" value="{{system.armour.type}}" data-dtype="text" />
+      </div>
+      {{/if}}
+    </div>
+
+    {{!-- Armour Tab --}}
+    <div class="tab" data-group="primary" data-tab="consumable">
+      {{#if system.isConsumable }}
+      {{#each system.consumable}}
+      <div>
+        <label class="item-label">{{@key}}</label>
+        <input type="text" name="system.consumable.{{@key}}" value="{{this}}" data-dtype="text" />
+      </div>
+      {{/each}}
+      {{/if}}
     </div>
 
     {{!-- Effects Tab --}}

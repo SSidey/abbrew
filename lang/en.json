@@ -29,7 +29,7 @@
   "ITEM.TypeItem": "Item",
   "ITEM.TypeResource": "Resource",
   "ITEM.TypeFeature": "Feature",
-  "ITEM.TypeDefense": "Defense",
+  "ITEM.TypeDefence": "Defence",
   "ABBREW.SheetLabel": "{type} Sheet",
   "ABBREW.SheetType.Anatomy": "Anatomy",
   "ABBREW.EffectEnable": "Enable Effect",

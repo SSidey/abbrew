@@ -1,0 +1,30 @@
+<div>
+    <h3>Armour</h3>
+    <ol class="items-list">
+        <li class="item flexrow items-header">
+            <div class="item-name">Name</div>
+        </li>
+        {{#each armours as |armour|}}
+        <li class="item flexrow" data-item-id="{{armour.name}}">
+            <div class="item-name">
+                <div class="item-image">
+                    <a class="rollable" data-roll-type="item"><img src="{{armour.img}}" title="{{armour.name}}"
+                            width="24" height="24" /></a>
+                </div>
+                <h4>{{armour.name}}</h4>
+            </div>
+            {{#if armour.system.armour.isEquipped}}
+            <div class="flexrow">
+                <button type="button" class="equip-armour" data-action="equip-armour" data-armourId="{{armour.id}}"
+                    data-equip="false">Unequip</button>
+            </div>
+            {{else}}
+            <div>
+                <button type="button" class="equip-armour" data-action="equip-armour" data-armourId="{{armour.id}}"
+                    data-equip="true">Equip</button>
+            </div>
+            {{/if}}
+        </li>
+        {{/each}}
+    </ol>
+</div>

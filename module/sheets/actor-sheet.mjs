@@ -46,6 +46,7 @@ export class AbbrewActorSheet extends ActorSheet {
       this._prepareItems(context);
       this._prepareCharacterData(context);
       this._prepareAttacks(context);
+      this._prepareArmours(context);
     }
 
     // Prepare NPC data and items.
@@ -152,6 +153,13 @@ export class AbbrewActorSheet extends ActorSheet {
 
   /* -------------------------------------------- */
 
+  _prepareArmours(context) {
+    context.armours = context.system.armours;
+  }
+
+
+  /* -------------------------------------------- */
+
   /** @override */
   activateListeners(html) {
     super.activateListeners(html);
@@ -188,6 +196,9 @@ export class AbbrewActorSheet extends ActorSheet {
     html.find('.equip-weapon').click(this._equipWeapon.bind(this));
     html.find('.rollable.attack').click(this._onAttackUse.bind(this));
 
+    // armour
+    html.find('.equip-armour').click(this._equipArmour.bind(this));    
+
     // Drag events for macros.
     if (this.actor.isOwner) {
       let handler = ev => this._onDragStart(ev);
@@ -205,6 +216,14 @@ export class AbbrewActorSheet extends ActorSheet {
     const weaponId = dataSet.weaponid;
     const equip = dataSet.equip === "true";
     await this.actor.equipWeapon(weaponId, equip)
+  }
+
+  async _equipArmour(event) {
+    event.preventDefault();
+    const dataSet = event.target.dataset
+    const armourId = dataSet.armourid;
+    const equip = dataSet.equip === "true";
+    await this.actor.equipArmour(armourId, equip)
   }
 
   /**

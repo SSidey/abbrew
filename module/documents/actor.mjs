@@ -54,11 +54,11 @@ export class AbbrewActor extends Actor {
     this._prepareAbilityModifiers(systemData);
     this._prepareAnatomy(systemData);
     this._prepareMovement(systemData);
-    this._prepareDefenses(systemData);
+    this._prepareDefences(systemData);
     this._prepareArmour(systemData);
     this._preparePower(systemData);
     this._prepareActions(systemData);
-    this._prepareFeatures(systemData);
+    this._prepareFeatures(systemData);    
   }
 
   _prepareAnatomy(systemData) {
@@ -73,9 +73,9 @@ export class AbbrewActor extends Actor {
     systemData.anatomy = this.itemTypes.anatomy;
   }
 
-  _prepareDefenses(systemData) {
-    const defenses = Object.fromEntries(Object.entries(this.itemTypes.defense).map(([k, v]) => [v.name, v.system]));
-    systemData.defenses = { ...systemData.defenses, ...defenses };
+  _prepareDefences(systemData) {
+    const defences = Object.fromEntries(Object.entries(this.itemTypes.defence).map(([k, v]) => [v.name, v.system]));
+    systemData.defences = { ...systemData.defences, ...defences };
   }
 
   _prepareFeatures(systemData) {
@@ -95,7 +95,7 @@ export class AbbrewActor extends Actor {
   _prepareWeaponAttack(weapon) {
     const results = weapon.weaponProfiles.split(',').map((wp, index) => {
       const profileParts = wp.split('-');
-      const damageType = profileParts[0];
+      const damageType = profileParts[0].replace(' ', '');
       const attackType = profileParts[1];
       // Handle Penalty here, check requirements are met.
       const requirements = JSON.parse(weapon.requirements);
@@ -151,6 +151,12 @@ export class AbbrewActor extends Actor {
     await this.updateEmbeddedDocuments("Item", updates);
   };
 
+  async equipArmour(id, equip) {
+    const updates = [];
+    updates.push({ _id: id, system: { armour: { isEquipped: equip } } });
+    await this.updateEmbeddedDocuments("Item", updates);
+  }
+
   _prepareAbilityModifiers(systemData) {
     // Loop through ability scores, and add their modifiers to our sheet output.
     for (let [key, ability] of Object.entries(systemData.abilities)) {
@@ -166,7 +172,7 @@ export class AbbrewActor extends Actor {
   }
 
   _prepareArmour(systemData) {
-    const constitutionModifier = systemData.abilities['constitution'].mod;
+    systemData.armours = this.itemTypes.item.filter(a => a.system.isArmour);
     let naturalBonuses = this.itemTypes.anatomy.map(a => a.system.armourBonus);
     const naturalValue = foundry.utils.getProperty(this, this.system.naturalArmour);
     naturalBonuses = naturalBonuses.map(b => { if (b === 'natural') { b = naturalValue; } return b; });
@@ -174,8 +180,8 @@ export class AbbrewActor extends Actor {
     const fullArmourMax = naturalBonuses.map(b => +b).reduce((accumulator, currentValue) => accumulator + currentValue, initialValue);
     systemData.armour.max = fullArmourMax;
 
-    const defensesArray = systemData.armour.defenses.replace(' ', '').split(',');
-    systemData.armour.defensesArray = defensesArray;
+    const defencesArray = systemData.armour.defences.replace(' ', '').split(',');
+    systemData.armour.defencesArray = defencesArray;
   }
 
   _preparePower(systemData) {
@@ -263,30 +269,32 @@ export class AbbrewActor extends Actor {
 
     const damageType = attackData.attackProfile.weapon.damageType;
 
-    if (!systemData.defenses[damageType]) {
+    if (!systemData.defences[damageType]) {
       const untypedCritical = await this.getCriticalDamage(damageRoll)
       await this.handleDamage(systemData, damage, "untyped", untypedCritical);
     }
 
-    const damageTypeDefense = systemData.defenses[damageType];
+    const damageTypeDefence = systemData.defences[damageType];
 
-    if (damageTypeDefense.absorb) {
+    if (damageTypeDefence.absorb) {
       await this.absorbDamage(actor, systemData, damage);
       return;
     }
-    if (damageTypeDefense.immune) {
+    if (damageTypeDefence.immune) {
       return;
     }
 
-    if (damageTypeDefense.deflect && damageTypeDefense.conduct) {
+    if (damageTypeDefence.deflect && damageTypeDefence.conduct) {
       // NOOP
     }
-    else if (damageTypeDefense.deflect) {
+    else if (damageTypeDefence.deflect) {
       damage = await this.deflectDamage(damageRoll);
     }
-    else if (damageTypeDefense.conduct) {
+    else if (damageTypeDefence.conduct) {
       damage = await this.conductDamage(damageRoll);
     }
+
+    damage = Math.max(damage - damageTypeDefence.block, 0);
 
     if (damage <= 0) {
       return;
@@ -295,26 +303,29 @@ export class AbbrewActor extends Actor {
     // Handle Resistance
     // Handle Amplification
 
-    let criticalDamage = 0;
-    if (damageTypeDefense.vulnerable && !damageTypeDefense.negate) {
+    let criticalDamage = await this.getCriticalDamage(damageRoll);
+
+    if (damageTypeDefence.vulnerable && !damageTypeDefence.negate && criticalDamage === 0) {
       criticalDamage = 1;
-    } else if (damageTypeDefense.negate && !damageTypeDefense.vulnerable) {
+    } else if (damageTypeDefence.negate && !damageTypeDefence.vulnerable) {
       criticalDamage = 0;
-    } else {
-      criticalDamage = await this.getCriticalDamage(damageRoll);
-    }
+    };
 
-    damage = damage -= damageTypeDefense.block;
-
-    if (systemData.armour.defensesArray.includes(damageType)) {
+    if (systemData.armour.defencesArray.includes(damageType)) {
       newArmour = currentArmour - damage;
       if (newArmour < 0) {
         damage = Math.abs(newArmour);
         newArmour = 0;
+      } else {
+        damage = 0;
       }
     }
 
-    const updates = await this.handleDamage(systemData, damage, damageType, criticalDamage, attackData.attackProfile);
+    let updates = {};
+    if (damage > 0) {
+      updates = await this.handleDamage(systemData, damage, damageType, criticalDamage, attackData.attackProfile);
+    }
+
     updates["system.armour.value"] = newArmour;
 
     await actor.update(updates);
@@ -340,7 +351,8 @@ export class AbbrewActor extends Actor {
   }
 
   async getCriticalDamage(damageRoll) {
-    const criticalChecks = damageRoll.terms[0].rolls[0].terms[0].results.filter(r => r.result == 10).length;
+    const criticalThreshold = +damageRoll.terms[0].rolls[0].terms[0].modifiers[0].split('=')[1];
+    const criticalChecks = damageRoll.terms[0].rolls[0].terms[0].results.filter(r => r.result >= criticalThreshold).length;
     return criticalChecks;
   }
 
@@ -382,7 +394,34 @@ export class AbbrewActor extends Actor {
       updates["system.pain"] = pain;
     }
 
+    if (criticalDamage) {
+      switch (attackProfile.weapon.damageType) {
+        case "crushing":
+          await this.handleCrushingCritical(updates, damage, criticalDamage);
+          break;
+        case "slashing":
+          await this.handleSlashingCritical(updates, damage, criticalDamage);
+          break;
+        case "piercing":
+          await this.handlePiercingCritical(updates, damage, criticalDamage);
+          break;
+        default:
+          break;
+      }
+    }
+
     return updates;
   }
 
+  async handleCrushingCritical(updates, damage, _) {
+    updates["system.conditions.sundered"] = damage;
+  }
+
+  async handleSlashingCritical(updates, damage, _) {
+    updates["system.wounds.active"] += damage;
+  }
+
+  async handlePiercingCritical(updates, _, criticalDamage) {
+    updates["system.conditions.gushingWounds"] = criticalDamage;
+  }
 }
