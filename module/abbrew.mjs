@@ -200,6 +200,8 @@ Hooks.once("dragRuler.ready", (SpeedProvider) => {
   dragRuler.registerSystem("abbrew", AbbrewSpeedProvider)
 })
 
+// Combat Start Hooks
+
 Hooks.on("combatStart", async (combat, updateData, updateOptions) => {
   await handleTurnStart(combat, updateData, updateOptions);
 });
@@ -210,4 +212,14 @@ Hooks.on("combatRound", async (combat, updateData, updateOptions) => {
 
 Hooks.on("combatTurn", async (combat, updateData, updateOptions) => {
   await handleTurnStart(combat, updateData, updateOptions);
+})
+
+// Update Hooks
+
+Hooks.on("updateActor", (value) => {
+  console.log('ActorUpdated');
+})
+
+Hooks.on("updateToken", (value) => {
+  console.log('TokenUpdated');
 })

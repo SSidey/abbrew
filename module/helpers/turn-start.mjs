@@ -18,7 +18,7 @@ async function turnStart(actor) {
 
         let gushingWounds = 0;
         if (activeWounds === 0) {
-            await actor.update({ "system.conditions.gushingWounds": newBlood });
+            await actor.update({ "system.conditions.gushingWounds": 0 });
         }
 
         if (actor.system.conditions.gushingWounds > 0) {
@@ -46,10 +46,6 @@ async function turnStart(actor) {
             await actor.update({ "system.conditions.unconscious": 1 });
         } else {
             await actor.update({ "system.conditions.unconscious": 0 });
-        }
-
-        if (newBlood <= actor.system.blood.dead) {
-            await actor.update({ "system.conditions.dead": 1 });
         }
     }
 
