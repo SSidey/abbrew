@@ -47,6 +47,7 @@ export class AbbrewActorSheet extends ActorSheet {
       this._prepareCharacterData(context);
       this._prepareAttacks(context);
       this._prepareArmours(context);
+      context.displayConditions  = actorData.system.displayConditions;
     }
 
     // Prepare NPC data and items.
@@ -174,6 +175,12 @@ export class AbbrewActorSheet extends ActorSheet {
     // -------------------------------------------------------------
     // Everything below here is only needed if the sheet is editable
     if (!this.isEditable) return;
+
+    // Show/Hide Conditions
+    html.find('.conditions-header').click(async ev => {
+      const context = super.getData();
+      await this.actor.update({"system.displayConditions": !this.actor.system.displayConditions});
+    });
 
     // Add Inventory Item
     html.find('.item-create').click(this._onItemCreate.bind(this));

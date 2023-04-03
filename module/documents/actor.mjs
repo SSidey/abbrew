@@ -127,6 +127,7 @@ export class AbbrewActor extends Actor {
           handsSupplied: weapon.handsSupplied,
           handsRequired: weapon.handsRequired,
           traitsArray: weapon.traitsArray,
+          criticalThreshold: weapon.criticalThreshold,
           damageType: damageType,
           attackType: attackType
         },
@@ -180,7 +181,7 @@ export class AbbrewActor extends Actor {
     const fullArmourMax = naturalBonuses.map(b => +b).reduce((accumulator, currentValue) => accumulator + currentValue, initialValue);
     systemData.armour.max = fullArmourMax;
 
-    const defencesArray = systemData.armour.defences.replace(' ', '').split(',');
+    const defencesArray = systemData.armour.defences.replaceAll(' ', '').split(',');
     systemData.armour.defencesArray = defencesArray;
   }
 
@@ -270,7 +271,7 @@ export class AbbrewActor extends Actor {
     const damageType = attackData.attackProfile.weapon.damageType;
 
     if (!systemData.defences[damageType]) {
-      const untypedCritical = await this.getCriticalDamage(damageRoll)
+      const untypedCritical = await this.getCriticalExplosions(damageRoll)
       await this.handleDamage(systemData, damage, "untyped", untypedCritical);
     }
 
@@ -300,18 +301,19 @@ export class AbbrewActor extends Actor {
       return;
     }
 
-    // Handle Resistance
-    // Handle Amplification
+    // TODO: Handle Resistance
+    // TODO: Handle Amplification
 
-    let criticalDamage = await this.getCriticalDamage(damageRoll);
+    let criticalExplosions = await this.getCriticalExplosions(damageRoll);
 
-    if (damageTypeDefence.vulnerable && !damageTypeDefence.negate && criticalDamage === 0) {
-      criticalDamage = 1;
+    if (damageTypeDefence.vulnerable && !damageTypeDefence.negate && criticalExplosions === 0) {
+      criticalExplosions = 1;
     } else if (damageTypeDefence.negate && !damageTypeDefence.vulnerable) {
-      criticalDamage = 0;
+      criticalExplosions = 0;
     };
 
     if (systemData.armour.defencesArray.includes(damageType)) {
+      // TODO: Handle penetrate from weapon and actor defences
       newArmour = currentArmour - damage;
       if (newArmour < 0) {
         damage = Math.abs(newArmour);
@@ -323,7 +325,7 @@ export class AbbrewActor extends Actor {
 
     let updates = {};
     if (damage > 0) {
-      updates = await this.handleDamage(systemData, damage, damageType, criticalDamage, attackData.attackProfile);
+      updates = await this.handleDamage(systemData, damage, damageType, criticalExplosions, attackData.attackProfile);
     }
 
     updates["system.armour.value"] = newArmour;
@@ -350,29 +352,29 @@ export class AbbrewActor extends Actor {
     return damageRoll.total + maximiseDifference;
   }
 
-  async getCriticalDamage(damageRoll) {
+  async getCriticalExplosions(damageRoll) {
     const criticalThreshold = +damageRoll.terms[0].rolls[0].terms[0].modifiers[0].split('=')[1];
     const criticalChecks = damageRoll.terms[0].rolls[0].terms[0].results.filter(r => r.result >= criticalThreshold).length;
     return criticalChecks;
   }
 
-  async handleDamage(systemData, damage, damageType, criticalDamage, attackProfile) {
+  async handleDamage(systemData, damage, damageType, criticalExplosions, attackProfile) {
 
     if (damageType === "heat") {
-      return await this.handleHeat(systemData, damage, criticalDamage, attackProfile);
+      return await this.handleHeat(systemData, damage, criticalExplosions, attackProfile);
     }
 
     if (["crushing", "slashing", "piercing", "untyped"].includes(damageType)) {
-      return await this.handlePhysical(systemData, damage, criticalDamage, attackProfile);
+      return await this.handlePhysical(systemData, damage, criticalExplosions, attackProfile);
     }
   }
 
-  async handleHeat(systemData, damage, criticalDamage, attackProfile) {
+  async handleHeat(systemData, damage, criticalExplosions, attackProfile) {
     const healingWounds = systemData.wounds.healing += damage;
     const thermalState = systemData.state += attackProfile.thermalChange;
     // Can we add conditions automatically? would be good to add burned here...
     const updates = { "system.wounds.healing": damage };
-    if (criticalDamage) {
+    if (criticalExplosions) {
       let currentBlood = systemData.blood.value -= damage;
       let maxBlood = systemData.blood.max -= damage;
       updates["system.blood.current"] = currentBlood;
@@ -381,7 +383,7 @@ export class AbbrewActor extends Actor {
     return updates;
   }
 
-  async handlePhysical(systemData, damage, criticalDamage, attackProfile) {
+  async handlePhysical(systemData, damage, criticalExplosions, attackProfile) {
     const updates = {};
 
     if (systemData.canBleed) {
@@ -394,16 +396,16 @@ export class AbbrewActor extends Actor {
       updates["system.pain"] = pain;
     }
 
-    if (criticalDamage) {
+    if (criticalExplosions) {
       switch (attackProfile.weapon.damageType) {
         case "crushing":
-          await this.handleCrushingCritical(updates, damage, criticalDamage);
+          await this.handleCrushingCritical(updates, damage, criticalExplosions);
           break;
         case "slashing":
-          await this.handleSlashingCritical(updates, damage, criticalDamage);
+          await this.handleSlashingCritical(updates, damage, criticalExplosions);
           break;
         case "piercing":
-          await this.handlePiercingCritical(updates, damage, criticalDamage);
+          await this.handlePiercingCritical(updates, damage, criticalExplosions);
           break;
         default:
           break;
@@ -421,7 +423,7 @@ export class AbbrewActor extends Actor {
     updates["system.wounds.active"] += damage;
   }
 
-  async handlePiercingCritical(updates, _, criticalDamage) {
-    updates["system.conditions.gushingWounds"] = criticalDamage;
+  async handlePiercingCritical(updates, _, criticalExplosions) {
+    updates["system.conditions.gushingWounds"] = criticalExplosions;
   }
 }

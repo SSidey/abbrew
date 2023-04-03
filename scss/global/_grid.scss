@@ -183,3 +183,8 @@
 hr.defence-divider {
   border-top: 1px dashed var(--color-underline-header)
 }
+
+.conditions-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr
+}

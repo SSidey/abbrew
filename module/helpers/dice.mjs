@@ -4,9 +4,17 @@ export async function d10Roll({
     chatMessage = true, rollMode, flavor
 }) {
 
-    const fullParts = ['{1d10x>=10 ', ...parts];
+    // TODO: Set up concept page, maybe under conditions?
+    // TODO: Negate should be an int value so as not to be too strong.
+    let dice = 1 + data.amplification;
+    let weakness = 0 + data.weakness
 
-    const formula = fullParts.join('+') + ' - 0d10, 0}kh';
+    dice = '' + dice;
+    weakness = '' + weakness;
+
+    const fullParts = ['{' + dice + 'd10x>=' + data.criticalThreshold, ...parts];
+
+    const formula = fullParts.join('+') + ' -' + weakness + 'd10, 0}kh';
 
     const defaultRollMode = rollMode || game.settings.get("core", "rollMode");
 
@@ -16,7 +24,7 @@ export async function d10Roll({
         rollMode
     });
 
-    const roll = new CONFIG.Dice.AbbrewRoll(formula, data,);
+    const roll = new CONFIG.Dice.AbbrewRoll(formula, data);
 
     const configured = await roll.configureDialog({ title: "Additional Modifiers" });
 

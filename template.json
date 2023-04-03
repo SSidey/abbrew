@@ -17,76 +17,91 @@
         "concepts": {
           "attack": {
             "amplification": 0,
+            "weakness": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "acid": {
             "amplification": 0,
+            "weakness": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "cold": {
             "amplification": 0,
+            "weakness": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "crushing": {
             "amplification": 0,
+            "weakness": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "dark": {
             "amplification": 0,
+            "weakness": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "electricity": {
             "amplification": 0,
+            "weakness": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "energy": {
             "amplification": 0,
+            "weakness": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "heat": {
             "amplification": 0,
+            "weakness": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "holy": {
             "amplification": 0,
+            "weakness": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "light": {
             "amplification": 0,
+            "weakness": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "necrotic": {
             "amplification": 0,
+            "weakness": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "piercing": {
             "amplification": 0,
+            "weakness": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "slashing": {
             "amplification": 0,
+            "weakness": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "unholy": {
             "amplification": 0,
+            "weakness": 0,
             "modifier": 0,
             "criticalThreshold": 10
           },
           "water": {
             "amplification": 0,
+            "weakness": 0,
             "modifier": 0,
             "criticalThreshold": 10
           }
@@ -330,6 +345,7 @@
           "value": 100,
           "max": 100
         },
+        "displayConditions": false,
         "conditions": {
           "aim": 0,
           "bleedPrevention": 0,

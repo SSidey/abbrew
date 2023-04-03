@@ -66,13 +66,36 @@ function getRollData(actor, attack, attackProfile) {
   // Grab the item's system data as well.
   rollData.attack = foundry.utils.deepClone(attack);
   rollData.attackProfile = foundry.utils.deepClone(attackProfile);
-  rollData.attackProfile.criticalThreshold = getCriticalThreshold(actor, attackProfile);
+  rollData.criticalThreshold = getCriticalThreshold(actor, attackProfile);
+  rollData.amplification = getAmplification(actor, attackProfile);
+  rollData.weakness = getWeakness(actor, attackProfile);
 
   return rollData;
 }
 
-function getCriticalThreshold() {
-  return 8;
+function getCriticalThreshold(actor, attackProfile) {
+  const weaponThreshold = attackProfile.weapon.criticalThreshold;
+  const damageType = attackProfile.weapon.damageType;
+  const globalThreshold = actor.system.concepts['attack'].criticalThreshold;
+  let damageTypeThreshold = 10;
+  if (actor.system.concepts[damageType]) {
+    damageTypeThreshold = actor.system.concepts[damageType].criticalThreshold;
+  }
+
+  const calculatedThreshold = Math.min(weaponThreshold, globalThreshold, damageTypeThreshold)
+
+  // ABBREW: Minimum critical threshold is 5.
+  return Math.max(calculatedThreshold, 5);
+}
+
+function getAmplification(actor, attackProfile) {
+  const damageType = attackProfile.weapon.damageType;
+  return actor.system.concepts[damageType] ? actor.system.concepts[damageType].amplification : 0;
+}
+
+function getWeakness(actor, attackProfile) {
+  const damageType = attackProfile.weapon.damageType;
+  return actor.system.concepts[damageType] ? actor.system.concepts[damageType].weakness : 0;
 }
 
 async function oold() {
