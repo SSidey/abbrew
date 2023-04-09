@@ -119,8 +119,8 @@
             "immune": false,
             "resistance": 0,
             "amplification": 0,
-            "negate": false,
-            "vulnerable": false
+            "negate": 0,
+            "vulnerable": 0
           },
           "cold": {
             "value": 0,
@@ -134,8 +134,8 @@
             "immune": false,
             "resistance": 0,
             "amplification": 0,
-            "negate": false,
-            "vulnerable": false
+            "negate": 0,
+            "vulnerable": 0
           },
           "crushing": {
             "value": 0,
@@ -149,8 +149,8 @@
             "immune": false,
             "resistance": 0,
             "amplification": 0,
-            "negate": false,
-            "vulnerable": false
+            "negate": 0,
+            "vulnerable": 0
           },
           "dark": {
             "value": 0,
@@ -164,8 +164,8 @@
             "immune": false,
             "resistance": 0,
             "amplification": 0,
-            "negate": false,
-            "vulnerable": false
+            "negate": 0,
+            "vulnerable": 0
           },
           "electricity": {
             "value": 0,
@@ -179,8 +179,8 @@
             "immune": false,
             "resistance": 0,
             "amplification": 0,
-            "negate": false,
-            "vulnerable": false
+            "negate": 0,
+            "vulnerable": 0
           },
           "energy": {
             "value": 0,
@@ -194,8 +194,8 @@
             "immune": false,
             "resistance": 0,
             "amplification": 0,
-            "negate": false,
-            "vulnerable": false
+            "negate": 0,
+            "vulnerable": 0
           },
           "heat": {
             "value": 0,
@@ -209,8 +209,8 @@
             "immune": false,
             "resistance": 0,
             "amplification": 0,
-            "negate": false,
-            "vulnerable": false
+            "negate": 0,
+            "vulnerable": 0
           },
           "holy": {
             "value": 0,
@@ -224,8 +224,8 @@
             "immune": false,
             "resistance": 0,
             "amplification": 0,
-            "negate": false,
-            "vulnerable": false
+            "negate": 0,
+            "vulnerable": 0
           },
           "light": {
             "value": 0,
@@ -239,8 +239,8 @@
             "immune": false,
             "resistance": 0,
             "amplification": 0,
-            "negate": false,
-            "vulnerable": false
+            "negate": 0,
+            "vulnerable": 0
           },
           "necrotic": {
             "value": 0,
@@ -254,8 +254,8 @@
             "immune": false,
             "resistance": 0,
             "amplification": 0,
-            "negate": false,
-            "vulnerable": false
+            "negate": 0,
+            "vulnerable": 0
           },
           "pain": {
             "value": 0,
@@ -269,8 +269,8 @@
             "immune": false,
             "resistance": 0,
             "amplification": 0,
-            "negate": false,
-            "vulnerable": false
+            "negate": 0,
+            "vulnerable": 0
           },
           "piercing": {
             "value": 0,
@@ -284,8 +284,8 @@
             "immune": false,
             "resistance": 0,
             "amplification": 0,
-            "negate": false,
-            "vulnerable": false
+            "negate": 0,
+            "vulnerable": 0
           },
           "slashing": {
             "value": 0,
@@ -299,8 +299,8 @@
             "immune": false,
             "resistance": 0,
             "amplification": 0,
-            "negate": false,
-            "vulnerable": false
+            "negate": 0,
+            "vulnerable": 0
           },
           "unholy": {
             "value": 0,
@@ -314,8 +314,8 @@
             "immune": false,
             "resistance": 0,
             "amplification": 0,
-            "negate": false,
-            "vulnerable": false
+            "negate": 0,
+            "vulnerable": 0
           },
           "water": {
             "value": 0,
@@ -329,8 +329,8 @@
             "immune": false,
             "resistance": 0,
             "amplification": 0,
-            "negate": false,
-            "vulnerable": false
+            "negate": 0,
+            "vulnerable": 0
           }
         },
         "thermal": {
@@ -369,7 +369,6 @@
           "hunger": 0,
           "impaled": 0,
           "internal": 0,
-          "nausea": 0,
           "necrosis": 0,
           "pain": 0,
           "paralysed": 0,
@@ -380,7 +379,6 @@
           "speed": 0,
           "sundered": 0,
           "thirst": 0,
-          "unconscious": 0,
           "wet": 0,
           "winded": 0
         },

@@ -58,7 +58,7 @@ export class AbbrewActor extends Actor {
     this._prepareArmour(systemData);
     this._preparePower(systemData);
     this._prepareActions(systemData);
-    this._prepareFeatures(systemData);    
+    this._prepareFeatures(systemData);
   }
 
   _prepareAnatomy(systemData) {
@@ -262,6 +262,7 @@ export class AbbrewActor extends Actor {
     const systemData = this.system;
     let damage = damageRolls[0]._total;
     let damageRoll = damageRolls[0];
+    let damagePenetrate = attackData.attackProfile.weapon.penetration;
     // const modRoll = damageRolls[0];
     // modRoll.terms[0].rolls[0].terms[0].results[0] = {active: true, result: 1};
     // const newRoll = await CONFIG.Dice.AbbrewRoll.fromRoll(modRoll);
@@ -271,7 +272,7 @@ export class AbbrewActor extends Actor {
     const damageType = attackData.attackProfile.weapon.damageType;
 
     if (!systemData.defences[damageType]) {
-      const untypedCritical = await this.getCriticalExplosions(damageRoll)
+      const untypedCritical = await this.getCriticalExplosions(damageRoll, 0, 0)
       await this.handleDamage(systemData, damage, "untyped", untypedCritical);
     }
 
@@ -295,32 +296,32 @@ export class AbbrewActor extends Actor {
       damage = await this.conductDamage(damageRoll);
     }
 
-    damage = Math.max(damage - damageTypeDefence.block, 0);
-
-    if (damage <= 0) {
-      return;
-    }
-
     // TODO: Handle Resistance
     // TODO: Handle Amplification
 
-    let criticalExplosions = await this.getCriticalExplosions(damageRoll);
-
-    if (damageTypeDefence.vulnerable && !damageTypeDefence.negate && criticalExplosions === 0) {
-      criticalExplosions = 1;
-    } else if (damageTypeDefence.negate && !damageTypeDefence.vulnerable) {
-      criticalExplosions = 0;
-    };
+    let criticalExplosions = await this.getCriticalExplosions(damageRoll, damageTypeDefence.vulnerable, damageTypeDefence.negate);
 
     if (systemData.armour.defencesArray.includes(damageType)) {
-      // TODO: Handle penetrate from weapon and actor defences
-      newArmour = currentArmour - damage;
-      if (newArmour < 0) {
-        damage = Math.abs(newArmour);
-        newArmour = 0;
+      const penetrate = damageTypeDefence.penetrate + damagePenetrate;
+
+      const armourAdjustment = damageTypeDefence.block - penetrate;
+
+      const fullDamage = damage;
+      const damageThroughArmour = currentArmour + armourAdjustment - damage;
+      if (damageThroughArmour < 0) {
+        damage = Math.min(Math.abs(damageThroughArmour), fullDamage);
       } else {
         damage = 0;
       }
+
+      if (penetrate < currentArmour + damageTypeDefence.block) {
+        const availableArmour = currentArmour + armourAdjustment;
+        const damageToArmour = Math.min(availableArmour, fullDamage);
+        newArmour = currentArmour - damageToArmour;
+      } else {
+        newArmour = currentArmour;
+      }
+
     }
 
     let updates = {};
@@ -352,10 +353,10 @@ export class AbbrewActor extends Actor {
     return damageRoll.total + maximiseDifference;
   }
 
-  async getCriticalExplosions(damageRoll) {
+  async getCriticalExplosions(damageRoll, vulnerable, negate) {
     const criticalThreshold = +damageRoll.terms[0].rolls[0].terms[0].modifiers[0].split('=')[1];
     const criticalChecks = damageRoll.terms[0].rolls[0].terms[0].results.filter(r => r.result >= criticalThreshold).length;
-    return criticalChecks;
+    return criticalChecks - negate + vulnerable;
   }
 
   async handleDamage(systemData, damage, damageType, criticalExplosions, attackProfile) {
