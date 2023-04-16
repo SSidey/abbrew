@@ -500,7 +500,8 @@
     ],
     "templates": {
       "base": {
-        "description": ""
+        "description": "",
+        "rules": []
       },
       "action": {
         "actionType": "action"

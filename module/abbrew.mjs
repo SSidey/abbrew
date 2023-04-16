@@ -10,6 +10,7 @@ import { preloadHandlebarsTemplates } from "./helpers/templates.mjs";
 import { ABBREW } from "./helpers/config.mjs";
 import AbbrewRoll from "./helpers/abbrew-roll.mjs";
 import { handleTurnStart } from "./helpers/turn-start.mjs";
+import { ChoiceSetPrompt } from "./rules/choice-set-prompt.mjs";
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -19,7 +20,7 @@ Hooks.once('init', async function () {
 
   Handlebars.registerHelper('json', function (context) {
     return JSON.stringify(context);
-  });  
+  });
 
   // Add utility classes to the global game object so that they're more easily
   // accessible in global contexts.
@@ -60,7 +61,7 @@ Hooks.once('init', async function () {
     ["feature", AbbrewItemSheet],
     ["spell", AbbrewItemSheet],
     ["resource", AbbrewItemSheet],
-    ["attack", AbbrewItemSheet],    
+    ["attack", AbbrewItemSheet],
     ["defence", AbbrewItemSheet]
   ]
   for (const [type, Sheet] of sheetEntries) {
@@ -73,6 +74,26 @@ Hooks.once('init', async function () {
 
   // Preload Handlebars templates.
   return preloadHandlebarsTemplates();
+});
+
+
+Hooks.on("pauseGame", async function (paused) {
+  const actor = game.actors.get("rLEUu5Vg7QCj59dE");
+  console.log('paused');
+  const items = actor.items;
+  const choices = items.map(i => ({ id: i._id, name: i.name }));
+  const data = { content: { promptTitle: "Hello", choices }, buttons: {} };
+  const returned = await new ChoiceSetPrompt(data).resolveSelection();
+  console.log(returned);
+  // const template = "systems/abbrew/templates/rules/choice-set-prompt.hbs";
+  // const html = await renderTemplate(template, data);
+  // let d = new Dialog({
+  //   content: html,
+  //   buttons: {},
+  //   render: html => console.log("Register interactivity in the rendered dialog"),
+  //   close: html => console.log("This always is logged no matter which option is chosen")
+  //  });
+  //  d.render(true);   
 });
 
 /* -------------------------------------------- */
@@ -94,7 +115,7 @@ Handlebars.registerHelper('toLowerCase', function (str) {
   return str.toLowerCase();
 });
 
-Handlebars.registerHelper("isNumber", function(value) {
+Handlebars.registerHelper("isNumber", function (value) {
   return typeof value === "number";
 });
 

@@ -53,5 +53,7 @@
     "ABBREW.slashing": "slashing",
     "ABBREW.piercing": "piercing"
   },
-  "ABBREW.DamageButton.FullShort": "Accept"
+  "ABBREW.DamageButton.FullShort": "Accept",
+  "ABBREW.UI.RuleElements.Prompt.NoValidOptions": "No valid options for prompt.", 
+  "ABBREW.UI.RuleElements.Prompt.NoSelectionMade": "No selection made for prompt."
 }

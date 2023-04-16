@@ -48,3 +48,12 @@ ABBREW.DamageProjection = {
   "arc": "ABBREW.Arc",
   "thrust": "ABBREW.Thrust"
 }
+
+ABBREW.UI = {
+  "RuleElements": {
+    "Prompt": {
+      "NoValidOptions": "ABBREW.NoValidOptions",
+      "NoSelectionMade": "ABBREW.NoSelectionMade"
+    }
+  }
+}
