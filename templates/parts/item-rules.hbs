@@ -1,0 +1,29 @@
+<ol class="items-list">
+    <li class="items-header flexrow">
+        <h3 class="item-name rule-name flexrow">{{localize ABBREW.Rules}}</h3>
+        <div class="rule-source">Content</div>
+        <div class="item-controls rule-controls flexrow">
+            <a class="rule-control" data-action="create" title="{{localize 'ABBREW.RuleCreate'}}">
+                <i class="fas fa-plus"></i> {{localize "ABBREW.Add"}}
+            </a>
+        </div>
+    </li>
+
+    <ol class="item-list">
+        {{#each system.rules as |rule|}}
+        <li class="item rule flexrow" data-rule-id={{rule.id}}>
+            <div class="item-name rule-name flexrow">
+                <img class="item-image" src="{{rule.icon}}" />
+                <h4>{{rule.label}}</h4>
+            </div>
+            <textarea class="rule-editor" name="rule.{{rule.id}}" cols="40" rows="5" data-rule-id={{rule.id}}
+                data-form-id="rule.{{rule.id}}">{{rule.content}}</textarea>
+            <div class="item-controls rule-controls flexrow">
+                <a class="rule-control" data-action="delete" title="{{localize 'ABBREW.RuleDelete'}}">
+                    <i class="fas fa-trash"></i>
+                </a>
+            </div>
+        </li>
+        {{/each}}
+    </ol>
+</ol>

@@ -489,6 +489,7 @@
   },
   "Item": {
     "types": [
+      "rule",
       "item",
       "spell",
       "feature",
@@ -586,6 +587,11 @@
           "requirements": ""
         }
       }
+    },
+    "rule": {
+      "templates": [
+        "base"
+      ]
     },
     "item": {
       "templates": [

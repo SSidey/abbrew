@@ -1,4 +1,6 @@
-import {onManageActiveEffect, prepareActiveEffectCategories} from "../helpers/effects.mjs";
+import { onManageActiveEffect, prepareActiveEffectCategories } from "../helpers/effects.mjs";
+import { onManageRule } from "../helpers/rules.mjs";
+
 /**
  * Extend the basic ItemSheet with some very simple modifications
  * @extends {ItemSheet}
@@ -63,10 +65,26 @@ export class AbbrewItemSheet extends ItemSheet {
     if (!this.isEditable) {
       return;
     }
-    
+
     // Active Effect management
-    html.find(".effect-control").click(ev => onManageActiveEffect(ev, this.item));  
+    html.find(".effect-control").click(ev => onManageActiveEffect(ev, this.item));
+
+    // Rules management
+    html.find(".rule-control").click(async ev => await onManageRule(ev, this.item));
 
     // Roll handlers, click handlers, etc. would go here.
+  }
+
+  async _updateObject(event, formData) {
+    if (event.currentTarget.classList.contains("rule-editor")) {
+      const ruleId = event.currentTarget.dataset.ruleId;
+      const updateData = formData[event.currentTarget.dataset.formId];
+      let rules = foundry.utils.deepClone(this.item.system.rules);
+      const index = rules.findIndex(r => r.id == ruleId);
+      rules[index].content = updateData;
+      await this.item.update({
+        "system.rules": rules
+      });
+    }
   }
 }
