@@ -1,5 +1,6 @@
 import { onManageActiveEffect, prepareActiveEffectCategories } from "../helpers/effects.mjs";
-import { onManageRule } from "../helpers/rules.mjs";
+import { onManageRule } from "../rules/rules.mjs";
+import { options } from "../rules/rule-field.mjs";
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -76,15 +77,32 @@ export class AbbrewItemSheet extends ItemSheet {
   }
 
   async _updateObject(event, formData) {
-    if (event.currentTarget.classList.contains("rule-editor")) {
-      const ruleId = event.currentTarget.dataset.ruleId;
-      const updateData = formData[event.currentTarget.dataset.formId];
+    if (event.currentTarget) {
+      await this.manualUpdate(event, formData);
+    }
+    else {
+      super._updateObject(event, formData);
+    }
+  }
+
+  async manualUpdate(event, formData) {
+    const target = event.currentTarget;
+    if (target.classList.contains("rule-editor")) {
+      const dataset = target.dataset;
+      const ruleId = dataset.ruleId;
+      const field = dataset.field;
+      const updateData = formData[target.name];
       let rules = foundry.utils.deepClone(this.item.system.rules);
       const index = rules.findIndex(r => r.id == ruleId);
-      rules[index].content = updateData;
-      await this.item.update({
+      rules[index][field] = updateData;
+      if (field == "type") {
+        rules[index].content = options[updateData].template();
+      }
+      return await this.item.update({
         "system.rules": rules
       });
+    } else {
+      super._updateObject(event, formData);
     }
   }
 }

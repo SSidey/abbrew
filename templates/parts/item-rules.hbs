@@ -12,12 +12,20 @@
     <ol class="item-list">
         {{#each system.rules as |rule|}}
         <li class="item rule flexrow" data-rule-id={{rule.id}}>
+            <select class="rule-editor" name="rule.{{rule.id}}.type" data-rule-id={{rule.id}} data-field="type">
+                {{#select rule.type}}
+                {{#each rule.options as |value key|}}
+                <option value="{{key}}">{{localize value.type}}</option>
+                {{/each}}
+                {{/select}}
+            </select>
             <div class="item-name rule-name flexrow">
                 <img class="item-image" src="{{rule.icon}}" />
-                <h4>{{rule.label}}</h4>
+                <input class="rule-editor" type="text" name="rule.{{rule.id}}.label" value="{{rule.label}}"
+                    data-dtype="text" data-rule-id={{rule.id}} data-field="label" />
             </div>
-            <textarea class="rule-editor" name="rule.{{rule.id}}" cols="40" rows="5" data-rule-id={{rule.id}}
-                data-form-id="rule.{{rule.id}}">{{rule.content}}</textarea>
+            <textarea class="rule-editor" name="rule.{{rule.id}}.content" cols="40" rows="5" data-rule-id={{rule.id}}
+                data-field="content">{{rule.content}}</textarea>
             <div class="item-controls rule-controls flexrow">
                 <a class="rule-control" data-action="delete" title="{{localize 'ABBREW.RuleDelete'}}">
                     <i class="fas fa-trash"></i>

@@ -6,6 +6,7 @@
     ],
     "templates": {
       "base": {
+        "rules": [],
         "armour": {
           "value": 0,
           "min": 0,

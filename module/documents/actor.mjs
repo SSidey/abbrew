@@ -1,4 +1,5 @@
 import { AbbrewAttackProfile } from "./attackprofile.mjs";
+import { prepareRules, applyRule } from "../rules/rules.mjs";
 
 /**
  * Extend the base Actor document by defining a custom roll data structure which is ideal for the Simple system.
@@ -12,13 +13,18 @@ export class AbbrewActor extends Actor {
     // the following, in order: data reset (to clear active effects),
     // prepareBaseData(), prepareEmbeddedDocuments() (including active effects),
     // prepareDerivedData().
+    console.log('before');
     super.prepareData();
+    console.log('between');
+    this._processRules(this);
+    console.log('after');
   }
 
   /** @override */
   prepareBaseData() {
     // Data modifications in this step occur before processing embedded
     // documents or derived data.
+    console.log('is it before?');
   }
 
   /**
@@ -49,7 +55,7 @@ export class AbbrewActor extends Actor {
 
     // Make modifications to data here. For example:
     const systemData = actorData.system;
-
+    // super.applyActiveEffects()
     // Prepare
     this._prepareAbilityModifiers(systemData);
     this._prepareAnatomy(systemData);
@@ -59,6 +65,14 @@ export class AbbrewActor extends Actor {
     this._preparePower(systemData);
     this._prepareActions(systemData);
     this._prepareFeatures(systemData);
+  }
+
+  _processRules(actorData) {
+    if (actorData.system.rules.length == 0) {
+      return;
+    }
+
+    actorData.system.rules.forEach(r => applyRule(r, actorData));
   }
 
   _prepareAnatomy(systemData) {
@@ -426,5 +440,11 @@ export class AbbrewActor extends Actor {
 
   async handlePiercingCritical(updates, _, criticalExplosions) {
     updates["system.conditions.gushingWounds"] = criticalExplosions;
+  }
+
+  _onUpdateEmbeddedDocuments(embeddedName, documents, result, options, userId) {
+    console.log(`Update Object: ${embeddedName}`);
+    super._onUpdateEmbeddedDocuments(embeddedName, documents, result, options, userId);
+    prepareRules(this);
   }
 }

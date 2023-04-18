@@ -58,5 +58,7 @@
   "ABBREW.UI.RuleElements.Prompt.NoSelectionMade": "No selection made for prompt.",
   "ABBREW.RULES": "Rules",
   "ABBREW.RuleCreate": "Create Rule",
-  "ABBREW.RuleDelete": "Delete Rule"
+  "ABBREW.RuleDelete": "Delete Rule",
+  "ABBREW.ActiveEffect": "Active Effect",
+  "ABBREW.ChoiceSet": "Choice Set"
 }

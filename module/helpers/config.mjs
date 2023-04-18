@@ -57,3 +57,8 @@ ABBREW.UI = {
     }
   }
 }
+
+ABBREW.RuleTypes = {
+  "ActiveEffect": "ABBREW.ActiveEffect",
+  "ChoiceSet": "ABBREW.ChoiceSet"
+}
