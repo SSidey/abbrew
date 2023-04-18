@@ -56,7 +56,7 @@
   "ABBREW.DamageButton.FullShort": "Accept",
   "ABBREW.UI.RuleElements.Prompt.NoValidOptions": "No valid options for prompt.",
   "ABBREW.UI.RuleElements.Prompt.NoSelectionMade": "No selection made for prompt.",
-  "ABBREW.RULES": "Rules",
+  "ABBREW.Rules": "Rules",
   "ABBREW.RuleCreate": "Create Rule",
   "ABBREW.RuleDelete": "Delete Rule",
   "ABBREW.ActiveEffect": "Active Effect",

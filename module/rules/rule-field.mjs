@@ -6,15 +6,15 @@ export class AbbrewRuleField {
     type;
     label;
     content;
-    origin;
+    source;
     options;
 
-    constructor({ id, type, label, content, origin }) {
+    constructor({ id, type, label, content, source }) {
         this.id = id;
         this.type = type;
         this.label = label;
         this.content = content;
-        this.origin = origin;
+        this.source = source;
         this.options = options;
     }
 }

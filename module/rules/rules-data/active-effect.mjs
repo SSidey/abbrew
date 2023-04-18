@@ -6,9 +6,20 @@ export class AbbrewActiveEffect extends AbbrewRule {
     operator;
     value;
 
-    constructor(candidate) {
-        super(ABBREW.RuleTypes.ActiveEffect);
-        if (candidate) {
+    static validOperators =
+        [
+            "override",
+            "add",
+            "minus",
+            "multiply",
+            "divide",
+            "upgrade",
+            "downgrade"
+        ]
+
+    constructor(id, candidate, source, valid) {
+        super(id, ABBREW.RuleTypes.ActiveEffect, source, valid);
+        if (candidate && typeof candidate == "object") {
             candidate && Object.assign(this, candidate);
             return;
         }
@@ -17,11 +28,16 @@ export class AbbrewActiveEffect extends AbbrewRule {
     }
 
     static validate(candidate) {
-        return super.validate(candidate) && candidate.hasOwnProperty('operator') && candidate.hasOwnProperty('value');
+        return super.validate(candidate) && candidate.hasOwnProperty('operator') && candidate.hasOwnProperty('value') && this.validOperators.includes(candidate.operator) && !!candidate.value;
     }
 
     static applyRule(rule, actorData) {
+        let changes = {};
         let currentValue = getProperty(actorData, rule.target)
+        if (!currentValue) {
+            return changes;
+        }
+
         let newValue = getProperty(actorData, rule.target)
         switch (rule.operator) {
             case "override":
@@ -33,15 +49,27 @@ export class AbbrewActiveEffect extends AbbrewRule {
             case "minus":
                 newValue = newValue -= +rule.value;
                 break;
+            case "multiply":
+                newValue = newValue * +rule.value;
+                break;
+            case "divide":
+                const divisor = +rule.value !== 0 ? +rule.value : 1;
+                newValue = newValue / divisor;
+                break;
+            case "upgrade":
+                newValue = newValue < rule.value ? rule.value : newValue;
+                break;
+            case "downgrade":
+                newValue = newValue > rule.value ? rule.value : newValue;
+                break;
             default:
                 break;
         }
 
-        let changes = {};
-
         if (currentValue != newValue) {
-            changes[rule.target] = newValue;
-            mergeObject(actorData, changes);
+            const actorChanges = { [rule.target]: newValue };
+            changes = { target: rule.target, value: newValue };
+            mergeObject(actorData, actorChanges);
         }
 
         return changes;

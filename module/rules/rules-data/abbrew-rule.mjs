@@ -1,16 +1,22 @@
 export class AbbrewRule {
+    id;
     type;
     priority;
     predicate;
     target;
+    source;
+    valid;
 
     get _type() {
         return this.type;
     }
 
-    constructor(type) {
+    constructor(id, type, source, valid) {
         this.type = type;
         this.priority = 100;
+        this.id = id;
+        this.valid = valid;
+        this.source = source;
         this.predicate = "";
         this.target = "";
     }

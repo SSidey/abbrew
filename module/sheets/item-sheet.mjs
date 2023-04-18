@@ -1,3 +1,4 @@
+// TODO: Tagify and rollup using vite with .js?
 import { onManageActiveEffect, prepareActiveEffectCategories } from "../helpers/effects.mjs";
 import { onManageRule } from "../rules/rules.mjs";
 import { options } from "../rules/rule-field.mjs";

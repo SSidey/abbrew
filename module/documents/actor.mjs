@@ -83,24 +83,50 @@ export class AbbrewActor extends Actor {
 
   async _preUpdate(changed, options, user) {
     console.log('pre-update');
-    // 1. Check overrides for each change.
-    // 2. If it exists, remove the change from the changed object.
-    if (changed.system.blood.value == 140) {
-      delete changed.system.blood.value;
-      delete changed.system.blood;
-    }
+
+    let flatChanges = flattenObject(changed, 1);
+    let flatChangesArray = Object.keys(flatChanges).map((key) => [key, flatChanges[key]]);
+    const overrideKeys = Object.keys(this.ruleOverrides);
+    flatChangesArray.forEach(c => {
+      if (overrideKeys.includes(c[0]) && this.ruleOverrides[c[0]] == c[1]) {
+        const path = c[0];
+        let keys = path.split('.');
+        let prop = keys.pop();
+        let parent = keys.reduce((obj, key) => obj[key], changed);
+        delete parent[prop];
+      }
+    })
+
     super._preUpdate(changed, options, user);
   }
 
+
+  _onUpdateEmbeddedDocuments(embeddedName, documents, result, options, userId) {
+    console.log(`Update Object: ${embeddedName}`);
+    super._onUpdateEmbeddedDocuments(embeddedName, documents, result, options, userId);
+    // prepareRules(this);
+  }
+
   _processRules(actorData) {
+    prepareRules(this);
     if (actorData.system.rules.length == 0) {
+      this.ruleOverrides = [];
       return;
     }
 
-    // 1. Get Changes
-    // 2. Set Overrides
-    // 3. Merge Objects
-    const changes = actorData.system.rules.map(r => applyRule(r, actorData));
+    let changes = [];
+    actorData.system.rules
+      .filter(
+        r => r.valid
+      ).sort((r1, r2) => r2.priority - r1.priority)
+      .forEach(r => {
+        const ruleChange = applyRule(r, actorData);
+        if (Object.keys(ruleChange).length == 0) {
+          return;
+        }
+        changes[ruleChange.target] = ruleChange.value;
+      });
+
     this.ruleOverrides = changes;
   }
 
@@ -474,11 +500,5 @@ export class AbbrewActor extends Actor {
 
   async handlePiercingCritical(updates, _, criticalExplosions) {
     updates["system.conditions.gushingWounds"] = criticalExplosions;
-  }
-
-  _onUpdateEmbeddedDocuments(embeddedName, documents, result, options, userId) {
-    console.log(`Update Object: ${embeddedName}`);
-    super._onUpdateEmbeddedDocuments(embeddedName, documents, result, options, userId);
-    prepareRules(this);
   }
 }

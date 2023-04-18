@@ -1,6 +1,6 @@
 <ol class="items-list">
     <li class="items-header flexrow">
-        <h3 class="item-name rule-name flexrow">{{localize ABBREW.Rules}}</h3>
+        <h3 class="item-name rule-name flexrow">{{localize 'ABBREW.Rules'}}</h3>
         <div class="rule-source">Content</div>
         <div class="item-controls rule-controls flexrow">
             <a class="rule-control" data-action="create" title="{{localize 'ABBREW.RuleCreate'}}">
@@ -11,22 +11,23 @@
 
     <ol class="item-list">
         {{#each system.rules as |rule|}}
-        <li class="item rule flexrow" data-rule-id={{rule.id}}>
-            <select class="rule-editor" name="rule.{{rule.id}}.type" data-rule-id={{rule.id}} data-field="type">
+        <li class="item rule item-rule-grid-container " data-rule-id={{rule.id}}>
+            <select class="rule-editor item-rule-grid rule-type" name="rule.{{rule.id}}.type" data-rule-id={{rule.id}}
+                data-field="type">
                 {{#select rule.type}}
                 {{#each rule.options as |value key|}}
                 <option value="{{key}}">{{localize value.type}}</option>
                 {{/each}}
                 {{/select}}
             </select>
-            <div class="item-name rule-name flexrow">
-                <img class="item-image" src="{{rule.icon}}" />
+            <div class="item-name rule-name item-rule-grid rule-name">
+                {{!-- <img class="item-image" src="{{rule.icon}}" /> --}}
                 <input class="rule-editor" type="text" name="rule.{{rule.id}}.label" value="{{rule.label}}"
                     data-dtype="text" data-rule-id={{rule.id}} data-field="label" />
             </div>
-            <textarea class="rule-editor" name="rule.{{rule.id}}.content" cols="40" rows="5" data-rule-id={{rule.id}}
-                data-field="content">{{rule.content}}</textarea>
-            <div class="item-controls rule-controls flexrow">
+            <textarea class="rule-editor item-rule-grid rule-content" name="rule.{{rule.id}}.content" cols="40" rows="5"
+                data-rule-id={{rule.id}} data-field="content">{{rule.content}}</textarea>
+            <div class="item-controls rule-controls  item-rule-grid rule-delete">
                 <a class="rule-control" data-action="delete" title="{{localize 'ABBREW.RuleDelete'}}">
                     <i class="fas fa-trash"></i>
                 </a>

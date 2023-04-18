@@ -13,7 +13,7 @@
       return owner.createEmbeddedDocuments("ActiveEffect", [{
         label: "New Effect",
         icon: "icons/svg/aura.svg",
-        origin: owner.uuid,
+        source: owner.uuid,
         "duration.rounds": li.dataset.effectType === "temporary" ? 1 : undefined,
         disabled: li.dataset.effectType === "inactive"
       }]);

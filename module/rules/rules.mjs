@@ -2,6 +2,8 @@ import { AbbrewRuleField, options } from "./rule-field.mjs";
 import { AbbrewActiveEffect } from "./rules-data/active-effect.mjs";
 import { AbbrewChoiceSet } from "./rules-data/choice-set.mjs";
 import { ABBREW } from "../helpers/config.mjs";
+import { AbbrewActor } from "../documents/actor.mjs";
+import { AbbrewRule } from "./rules-data/abbrew-rule.mjs";
 
 /**
  * Manage Rule instances through the Item Sheet via rule control buttons.
@@ -17,7 +19,7 @@ export async function onManageRule(event, item) {
     switch (a.dataset.action) {
         case "create":
             const id = uuid();
-            rules = [new AbbrewRuleField({ id, type: 0, label: "New Rule", content: options[0].template(), origin: item.uuid }),
+            rules = [new AbbrewRuleField({ id, type: 0, label: "New Rule", content: options[0].template(), source: item.uuid }),
             ...rules,];
             break;
         case "delete":
@@ -30,45 +32,53 @@ export async function onManageRule(event, item) {
     });
 }
 
+/**
+ * Provide UUID for rule instances
+ * @returns UUID
+ */
 function uuid() {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
 }
 
+/**
+ * Prepare rules for the given actor from their items.
+ * @param {AbbrewActor} actor 
+ */
 export async function prepareRules(actor) {
-    // const rules = documents[0].system.rules;
     const rules = actor.items._source.map(i => i.system.rules).flat(1);
     const validRules = [];
     for (let i = 0; i < rules.length; i++) {
         const rule = rules[i];
         const parsedRule = JSON.parse(rule.content);
+        let typedRule = {};
+        let valid = false;
         switch (parsedRule.type) {
             case ABBREW.RuleTypes.ActiveEffect:
                 console.log('Active Effect');
-                if (AbbrewActiveEffect.validate(parsedRule)) {
-                    const typedRule = new AbbrewActiveEffect(parsedRule);
-                    validRules.push(typedRule);
-                }
+                valid = AbbrewActiveEffect.validate(parsedRule);
+                typedRule = new AbbrewActiveEffect(rule.id, parsedRule, rule.source, valid);
+                validRules.push(typedRule);
                 break;
             case ABBREW.RuleTypes.ChoiceSet:
                 console.log('Choice Set');
-                if (AbbrewChoiceSet.validate(parsedRule)) {
-                    const typedRule = new AbbrewChoiceSet(parsedRule);
-                    validRules.push(typedRule);
-                }
+                valid = AbbrewChoiceSet.validate(parsedRule);
+                typedRule = new AbbrewChoiceSet(rule.id, parsedRule, rule.source, valid);
+                validRules.push(typedRule);
                 break;
             default:
                 break;
         }
     }
 
-    // TODO:
-    // 1. Need to get uuid down to the rule
-    // 2. merge and replace ids 
-    let currentRules = getProperty(actor, "system.rules");
-    const mergedRules = mergeObject(currentRules, validRules);
-    await actor.update({ "system.rules": mergedRules });
+    await actor.update({ "system.rules": validRules });
 }
 
+/**
+ * Apply a rule to a given actor.
+ * @param {AbbrewRule} rule 
+ * @param {AbbrewActor} actorData 
+ * @returns changes element.
+ */
 export function applyRule(rule, actorData) {
     let changes = {};
     switch (rule.type) {
