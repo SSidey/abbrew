@@ -17,7 +17,7 @@ export class AbbrewRule {
 
     template() { return JSON.stringify(this); };
 
-    static applyRule(rule, actorData) { return actorData; }
+    static applyRule(rule, actorData) { return {}; }
 
     static validate(candidate) {
         return candidate.hasOwnProperty('type') && candidate.hasOwnProperty('priority') && candidate.hasOwnProperty('predicate') && candidate.hasOwnProperty('target');

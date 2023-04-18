@@ -6,6 +6,7 @@ import { prepareRules, applyRule } from "../rules/rules.mjs";
  * @extends {Actor}
  */
 export class AbbrewActor extends Actor {
+  ruleOverrides;
 
   /** @override */
   prepareData() {
@@ -16,7 +17,6 @@ export class AbbrewActor extends Actor {
     console.log('before');
     super.prepareData();
     console.log('between');
-    this._processRules(this);
     console.log('after');
   }
 
@@ -57,6 +57,7 @@ export class AbbrewActor extends Actor {
     const systemData = actorData.system;
     // super.applyActiveEffects()
     // Prepare
+    this._processRules(this);
     this._prepareAbilityModifiers(systemData);
     this._prepareAnatomy(systemData);
     this._prepareMovement(systemData);
@@ -67,12 +68,45 @@ export class AbbrewActor extends Actor {
     this._prepareFeatures(systemData);
   }
 
+  async _updateObject(event, formData) {
+    console.log('here');
+    // call super with revert to rawActor merged with actual changes?
+    await super._updateObject(event, formData);
+  }
+
+  _onUpdate(data, options, userId) {
+    console.log('here2');
+    // call super with revert to rawActor merged with actual changes?
+    super._onUpdate(data, options, userId);
+
+  }
+
+  async _preUpdate(changed, options, user) {
+    console.log('pre-update');
+    // 1. Check overrides for each change.
+    // 2. If it exists, remove the change from the changed object.
+    if (changed.system.blood.value == 140) {
+      delete changed.system.blood.value;
+      delete changed.system.blood;
+    }
+    super._preUpdate(changed, options, user);
+  }
+
   _processRules(actorData) {
     if (actorData.system.rules.length == 0) {
       return;
     }
 
-    actorData.system.rules.forEach(r => applyRule(r, actorData));
+    // 1. Get Changes
+    // 2. Set Overrides
+    // 3. Merge Objects
+    const changes = actorData.system.rules.map(r => applyRule(r, actorData));
+    this.ruleOverrides = changes;
+  }
+
+  async _updateDocuments(documentClass, { updates, options, pack }, user) {
+    console.log('update-documents');
+    super._updateDocuments(documentClass, { updates, options, pack }, user);
   }
 
   _prepareAnatomy(systemData) {

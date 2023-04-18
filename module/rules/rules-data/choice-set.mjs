@@ -22,5 +22,7 @@ export class AbbrewChoiceSet extends AbbrewRule {
         return super.validate(candidate) && candidate.hasOwnProperty('options');
     }
 
-    static applyRule(rule, actorData) { return actorData; }
+    static applyRule(rule, actorData) {
+        return {};
+    }
 }

@@ -21,6 +21,7 @@ export class AbbrewActiveEffect extends AbbrewRule {
     }
 
     static applyRule(rule, actorData) {
+        let currentValue = getProperty(actorData, rule.target)
         let newValue = getProperty(actorData, rule.target)
         switch (rule.operator) {
             case "override":
@@ -35,10 +36,14 @@ export class AbbrewActiveEffect extends AbbrewRule {
             default:
                 break;
         }
-        let changes = {};
-        changes[rule.target] = newValue;
 
-        mergeObject(actorData, changes);
-        return actorData;
+        let changes = {};
+
+        if (currentValue != newValue) {
+            changes[rule.target] = newValue;
+            mergeObject(actorData, changes);
+        }
+
+        return changes;
     }
 }

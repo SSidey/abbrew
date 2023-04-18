@@ -60,22 +60,27 @@ export async function prepareRules(actor) {
                 break;
         }
     }
+
+    // TODO:
+    // 1. Need to get uuid down to the rule
+    // 2. merge and replace ids 
     let currentRules = getProperty(actor, "system.rules");
     const mergedRules = mergeObject(currentRules, validRules);
     await actor.update({ "system.rules": mergedRules });
 }
 
 export function applyRule(rule, actorData) {
+    let changes = {};
     switch (rule.type) {
         case ABBREW.RuleTypes.ActiveEffect:
-            actorData = AbbrewActiveEffect.applyRule(rule, actorData);
+            changes = AbbrewActiveEffect.applyRule(rule, actorData);
             break;
         case ABBREW.RuleTypes.ChoiceSet:
-            actorData = AbbrewChoiceSet.applyRule(rule, actorData);
+            changes = AbbrewChoiceSet.applyRule(rule, actorData);
             break;
         default:
             break;
     }
 
-    return actorData;
+    return changes;
 }
