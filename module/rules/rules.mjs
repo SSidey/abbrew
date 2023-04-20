@@ -48,8 +48,12 @@ function uuid() {
 export async function prepareRules(actor) {
     const rules = actor.items._source.map(i => i.system.rules).flat(1);
     const validRules = [];
+    const sourceTargets = [];
     for (let i = 0; i < rules.length; i++) {
         const rule = rules[i];
+        if (sourceTargets[rule.source.uuid]) {
+            rule.targetElement = sourceTargets[rule.source.uuid];
+        }
         const parsedRule = JSON.parse(rule.content);
         let typedRule = {};
         let valid = false;
@@ -58,12 +62,17 @@ export async function prepareRules(actor) {
                 console.log('Active Effect');
                 valid = AbbrewActiveEffect.validate(parsedRule);
                 typedRule = new AbbrewActiveEffect(rule.id, parsedRule, rule.source, valid);
+                typedRule.targetElement = rule.targetElement;
                 validRules.push(typedRule);
                 break;
             case ABBREW.RuleTypes.ChoiceSet:
                 console.log('Choice Set');
                 valid = AbbrewChoiceSet.validate(parsedRule);
                 typedRule = new AbbrewChoiceSet(rule.id, parsedRule, rule.source, valid);
+                const choice = await AbbrewChoiceSet.getChoice(typedRule, actor);
+                sourceTargets[rule.source.uuid] = choice;
+                typedRule.targetElement = choice;
+                typedRule.choice = choice;
                 validRules.push(typedRule);
                 break;
             default:

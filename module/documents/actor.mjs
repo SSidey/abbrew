@@ -110,8 +110,8 @@ export class AbbrewActor extends Actor {
   }
 
   _processRules(actorData) {
-    // this.prepareItems(this);
-    // this.resetItems(this);
+    this.prepareItems(this);
+    this.resetItems(this);
     prepareRules(this);
     if (actorData.system.rules.length == 0) {
       this.ruleOverrides = [];
