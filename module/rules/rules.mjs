@@ -4,6 +4,7 @@ import { AbbrewChoiceSet } from "./rules-data/choice-set.mjs";
 import { ABBREW } from "../helpers/config.mjs";
 import { AbbrewActor } from "../documents/actor.mjs";
 import { AbbrewRule } from "./rules-data/abbrew-rule.mjs";
+import { RuleSource } from "./rule-source.mjs";
 
 /**
  * Manage Rule instances through the Item Sheet via rule control buttons.
@@ -19,7 +20,7 @@ export async function onManageRule(event, item) {
     switch (a.dataset.action) {
         case "create":
             const id = uuid();
-            rules = [new AbbrewRuleField({ id, type: 0, label: "New Rule", content: options[0].template(), source: item.uuid }),
+            rules = [new AbbrewRuleField({ id, type: 0, label: "New Rule", content: options[0].template(), source: new RuleSource(item.uuid) }),
             ...rules,];
             break;
         case "delete":

@@ -55,7 +55,7 @@ export class ChoiceSetPrompt extends Dialog {
 
         const firstChoice = this.choices.at(0);
         if (firstChoice && this.choices.length === 1) {
-            return (this.selection = firstChoice);
+            return (this.selection = firstChoice[0]);
         }
 
         this.render(true);

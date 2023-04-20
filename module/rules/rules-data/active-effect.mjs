@@ -33,12 +33,16 @@ export class AbbrewActiveEffect extends AbbrewRule {
 
     static applyRule(rule, actorData) {
         let changes = {};
-        let currentValue = getProperty(actorData, rule.target)
+        let targetElement = rule.targetElement ? actorData.items.get(rule.targetElement) : actorData;
+        let targetType = rule.targetElement ? "Item" : "Actor";
+        let currentValue = getProperty(targetElement, rule.target)
         if (!currentValue) {
             return changes;
         }
 
-        let newValue = getProperty(actorData, rule.target)
+        // TODO:
+        // 1. Get Type here so that we can do string concats
+        let newValue = getProperty(targetElement, rule.target)
         switch (rule.operator) {
             case "override":
                 newValue = +rule.value;
@@ -67,9 +71,10 @@ export class AbbrewActiveEffect extends AbbrewRule {
         }
 
         if (currentValue != newValue) {
-            const actorChanges = { [rule.target]: newValue };
-            changes = { target: rule.target, value: newValue };
-            mergeObject(actorData, actorChanges);
+            // culprit?
+            const elementChanges = { [rule.target]: newValue, rules: [rule.id] };
+            changes = { target: rule.target, value: newValue, sourceValue: currentValue, targetType, targetElement: rule.targetElement };
+            mergeObject(targetElement, elementChanges);
         }
 
         return changes;

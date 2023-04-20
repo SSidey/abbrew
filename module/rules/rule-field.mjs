@@ -8,14 +8,18 @@ export class AbbrewRuleField {
     content;
     source;
     options;
+    targetElement;
 
     constructor({ id, type, label, content, source }) {
         this.id = id;
         this.type = type;
+        // TODO: 
+        // 1. Pass this through too.
         this.label = label;
         this.content = content;
         this.source = source;
         this.options = options;
+        this.targetElement = "";
     }
 }
 

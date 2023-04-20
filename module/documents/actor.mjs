@@ -84,18 +84,20 @@ export class AbbrewActor extends Actor {
   async _preUpdate(changed, options, user) {
     console.log('pre-update');
 
-    let flatChanges = flattenObject(changed, 1);
-    let flatChangesArray = Object.keys(flatChanges).map((key) => [key, flatChanges[key]]);
-    const overrideKeys = Object.keys(this.ruleOverrides);
-    flatChangesArray.forEach(c => {
-      if (overrideKeys.includes(c[0]) && this.ruleOverrides[c[0]] == c[1]) {
-        const path = c[0];
-        let keys = path.split('.');
-        let prop = keys.pop();
-        let parent = keys.reduce((obj, key) => obj[key], changed);
-        delete parent[prop];
-      }
-    })
+    if (this.ruleOverrides) {
+      let flatChanges = flattenObject(changed, 1);
+      let flatChangesArray = Object.keys(flatChanges).map((key) => [key, flatChanges[key]]);
+      const overrideKeys = Object.keys(this.ruleOverrides);
+      flatChangesArray.forEach(c => {
+        if (overrideKeys.includes(c[0]) && this.ruleOverrides[c[0]].overrideValue == c[1]) {
+          const path = c[0];
+          let keys = path.split('.');
+          let prop = keys.pop();
+          let parent = keys.reduce((obj, key) => obj[key], changed);
+          delete parent[prop];
+        }
+      })
+    }
 
     super._preUpdate(changed, options, user);
   }
@@ -108,6 +110,8 @@ export class AbbrewActor extends Actor {
   }
 
   _processRules(actorData) {
+    // this.prepareItems(this);
+    // this.resetItems(this);
     prepareRules(this);
     if (actorData.system.rules.length == 0) {
       this.ruleOverrides = [];
@@ -115,6 +119,8 @@ export class AbbrewActor extends Actor {
     }
 
     let changes = [];
+    this.ruleOverrides = [];
+    actorData.ruleOverrides = [];
     actorData.system.rules
       .filter(
         r => r.valid
@@ -124,10 +130,50 @@ export class AbbrewActor extends Actor {
         if (Object.keys(ruleChange).length == 0) {
           return;
         }
-        changes[ruleChange.target] = ruleChange.value;
+        changes[ruleChange.target] = {
+          overrideValue: ruleChange.value,
+          sourceValue: ruleChange.sourceValue,
+          targetType: ruleChange.targetType,
+          targetElement: ruleChange.targetElement
+        };
+        actorData.ruleOverrides[ruleChange.target] = changes[ruleChange.target];
       });
 
     this.ruleOverrides = changes;
+  }
+
+  /**
+   * Reset item overridden fields to pre-rule values.
+   * @param {AbbrewActor} actorData    
+   */
+  prepareItems(actorData) {
+    actorData.items.filter(i => i.system.rules.length > 0).forEach(i => {
+      i.system.rules.forEach(r => {
+        if (r.source.actor && r.source.item) {
+          return;
+        }
+        r.source.actor = this.id;
+        r.source.item = i.id;
+        r.source.uuid = `Actor.${this.id}.Item.${i.id}`;
+      });
+    });
+  }
+
+  resetItems(actorData) {
+    if (!actorData.ruleOverrides) {
+      return;
+    }
+    for (const [key, override] of Object.entries(actorData.ruleOverrides)) {
+      if (override.targetType == "Item") {
+        const item = actorData.items.get(override.targetElement);
+        const path = key;
+        let keys = path.split('.');
+        let itemValue = keys.reduce((obj, key) => obj[key], item);
+        if (itemValue == override.overrideValue) {
+          setProperty(item, key, override.sourceValue);
+        }
+      }
+    }
   }
 
   async _updateDocuments(documentClass, { updates, options, pack }, user) {

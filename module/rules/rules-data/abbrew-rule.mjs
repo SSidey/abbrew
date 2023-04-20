@@ -3,6 +3,7 @@ export class AbbrewRule {
     type;
     priority;
     predicate;
+    // The property to modify e.g. system.abilities.strength.value
     target;
     source;
     valid;
