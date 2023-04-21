@@ -11,8 +11,8 @@ export class AbbrewChoiceSet extends AbbrewRule {
         this.target = target;
     }
 
-    constructor(id, candidate, source, valid) {
-        super(id, ABBREW.RuleTypes.ChoiceSet, source, valid);
+    constructor(id, label, candidate, source, valid) {
+        super(id, label, ABBREW.RuleTypes.ChoiceSet, source, valid);
         if (candidate && typeof candidate == "object") {
             candidate && Object.assign(this, candidate);
             return;
@@ -45,36 +45,33 @@ export class AbbrewChoiceSet extends AbbrewRule {
         }
 
         if (rule.options.includes("consumable")) {
-            choices.push(getItemConsumable(actorData));
+            choices = mergeObject(choices, this.getItemConsumable(actorData));
         }
 
         if (rule.options.includes("anatomy")) {
-            choices.push(getItemAnatomy(actorData));
+            choices = mergeObject(choices, this.getItemAnatomy(actorData));
         }
 
         const data = { content: { promptTitle: "Hello", choices }, buttons: {} };
         const choice = await new ChoiceSetPrompt(data).resolveSelection();
 
-        // const parentItem = actorData.items.get(rule.owner);
-
-        // setProperty(parentItem, `system.rules[${rule.id}]`, choice);
-
-        // return {};
-
-        // Seems Sus
-        const parentItem = actorData.items.get(rule.source.item);
-        const duplicateItem = deepClone(parentItem);
-        for (let i = 0; i < duplicateItem.system.rules.length; i++) {
-            duplicateItem.system.rules[i].targetElement = choice;
-            if (duplicateItem.system.rules[i].id == rule.id) {
-                duplicateItem.system.rules[i].choice = choice;
-                const ruleContent = duplicateItem.system.rules[i].content;
+        let parentItemId = rule.source.item;
+        if (!rule.source.actor) {
+            parentItemId = actorData.items.map(i => i.system.rules).flat(1).filter(i => i.id == rule.id)[0].source.item;
+        }
+        const parentItem = actorData.items.get(parentItemId);
+        // const duplicateItem = deepClone(parentItem);
+        for (let i = 0; i < parentItem.system.rules.length; i++) {
+            parentItem.system.rules[i].targetElement = choice;
+            if (parentItem.system.rules[i].id == rule.id) {
+                parentItem.system.rules[i].choice = choice;
+                const ruleContent = parentItem.system.rules[i].content;
                 let parsedContent = JSON.parse(ruleContent);
                 parsedContent.choice = choice;
-                duplicateItem.system.rules[i].content = JSON.stringify(parsedContent);
+                parentItem.system.rules[i].content = JSON.stringify(parsedContent);
             }
         }
-        setProperty(parentItem, "system.rules", duplicateItem.system.rules);
+        parentItem.update({ system: { rules: parentItem.system.rules } });
         return choice;
     }
 

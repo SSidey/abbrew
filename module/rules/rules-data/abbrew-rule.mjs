@@ -1,5 +1,6 @@
 export class AbbrewRule {
     id;
+    label;
     type;
     priority;
     predicate;
@@ -12,10 +13,11 @@ export class AbbrewRule {
         return this.type;
     }
 
-    constructor(id, type, source, valid) {
+    constructor(id, label, type, source, valid) {
         this.type = type;
         this.priority = 100;
         this.id = id;
+        this.label = label;
         this.valid = valid;
         this.source = source;
         this.predicate = "";

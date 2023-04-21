@@ -17,8 +17,8 @@ export class AbbrewActiveEffect extends AbbrewRule {
             "downgrade"
         ]
 
-    constructor(id, candidate, source, valid) {
-        super(id, ABBREW.RuleTypes.ActiveEffect, source, valid);
+    constructor(id, label, candidate, source, valid) {
+        super(id, label, ABBREW.RuleTypes.ActiveEffect, source, valid);
         if (candidate && typeof candidate == "object") {
             candidate && Object.assign(this, candidate);
             return;
@@ -71,9 +71,12 @@ export class AbbrewActiveEffect extends AbbrewRule {
         }
 
         if (currentValue != newValue) {
-            // culprit?
             const elementChanges = { [rule.target]: newValue, rules: [rule.id] };
-            changes = { target: rule.target, value: newValue, sourceValue: currentValue, targetType, targetElement: rule.targetElement };
+            let sourceValue = currentValue;
+            if (Object.keys(actorData.ruleOverrides).includes(rule.target)) {
+                sourceValue = actorData.ruleOverrides[rule.target].sourceValue;
+            }
+            changes = { target: rule.target, value: newValue, sourceValue, targetType, targetElement: rule.targetElement };
             mergeObject(targetElement, elementChanges);
         }
 

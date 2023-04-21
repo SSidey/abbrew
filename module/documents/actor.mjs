@@ -106,7 +106,6 @@ export class AbbrewActor extends Actor {
   _onUpdateEmbeddedDocuments(embeddedName, documents, result, options, userId) {
     console.log(`Update Object: ${embeddedName}`);
     super._onUpdateEmbeddedDocuments(embeddedName, documents, result, options, userId);
-    // prepareRules(this);
   }
 
   _processRules(actorData) {
@@ -154,8 +153,10 @@ export class AbbrewActor extends Actor {
         }
         r.source.actor = this.id;
         r.source.item = i.id;
-        r.source.uuid = `Actor.${this.id}.Item.${i.id}`;
-      });
+        r.source.uuid = `Actor.${this.id}.Item.${i.id}`; 
+      }); 
+      const item = actorData.items.get(i.id);   
+      setProperty(item, 'system.rules', i.system.rules);
     });
   }
 

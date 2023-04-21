@@ -61,14 +61,14 @@ export async function prepareRules(actor) {
             case ABBREW.RuleTypes.ActiveEffect:
                 console.log('Active Effect');
                 valid = AbbrewActiveEffect.validate(parsedRule);
-                typedRule = new AbbrewActiveEffect(rule.id, parsedRule, rule.source, valid);
+                typedRule = new AbbrewActiveEffect(rule.id, rule.label, parsedRule, rule.source, valid);
                 typedRule.targetElement = rule.targetElement;
                 validRules.push(typedRule);
                 break;
             case ABBREW.RuleTypes.ChoiceSet:
                 console.log('Choice Set');
                 valid = AbbrewChoiceSet.validate(parsedRule);
-                typedRule = new AbbrewChoiceSet(rule.id, parsedRule, rule.source, valid);
+                typedRule = new AbbrewChoiceSet(rule.id, rule.label, parsedRule, rule.source, valid);
                 const choice = await AbbrewChoiceSet.getChoice(typedRule, actor);
                 sourceTargets[rule.source.uuid] = choice;
                 typedRule.targetElement = choice;
