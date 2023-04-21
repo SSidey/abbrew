@@ -1,5 +1,6 @@
 import { AbbrewAttackProfile } from "./attackprofile.mjs";
 import { prepareRules, applyRule } from "../rules/rules.mjs";
+import { writeToPath } from "../helpers/write-to-path.mjs";
 
 /**
  * Extend the base Actor document by defining a custom roll data structure which is ideal for the Simple system.
@@ -153,10 +154,10 @@ export class AbbrewActor extends Actor {
         }
         r.source.actor = this.id;
         r.source.item = i.id;
-        r.source.uuid = `Actor.${this.id}.Item.${i.id}`; 
-      }); 
-      const item = actorData.items.get(i.id);   
-      setProperty(item, 'system.rules', i.system.rules);
+        r.source.uuid = `Actor.${this.id}.Item.${i.id}`;
+      });
+      const item = actorData.items.get(i.id);
+      writeToPath(item,'system.rules', i.system.rules )
     });
   }
 
@@ -171,7 +172,7 @@ export class AbbrewActor extends Actor {
         let keys = path.split('.');
         let itemValue = keys.reduce((obj, key) => obj[key], item);
         if (itemValue == override.overrideValue) {
-          setProperty(item, key, override.sourceValue);
+          writeToPath(item, path, override.sourceValue);
         }
       }
     }

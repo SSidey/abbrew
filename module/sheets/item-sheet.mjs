@@ -78,6 +78,8 @@ export class AbbrewItemSheet extends ItemSheet {
   }
 
   async _updateObject(event, formData) {
+    // TODO: Check against overrideValue, do something with it.
+    // if (event.handleObj.type == 'change') { allow the change } else { reset the formData value to our override }
     if (event.currentTarget) {
       await this.manualUpdate(event, formData);
     }
@@ -105,5 +107,11 @@ export class AbbrewItemSheet extends ItemSheet {
     } else {
       super._updateObject(event, formData);
     }
+  }
+
+  close(options = {}) {
+    console.log('closing sheet');
+    this.getData();
+    super.close(options);
   }
 }
