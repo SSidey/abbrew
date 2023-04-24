@@ -207,7 +207,7 @@ export class AbbrewActor extends Actor {
   }
 
   _getWeapons() {
-    return this._getItemWeapons().map(i => ({ "name": i.name, "img": i.img, "weaponId": i._id, "weight": i.system.weight, "concepts": i.system.concepts, "material": i.system.material, ...i.system.weapon }));
+    return this._getItemWeapons().map(i => ({ "name": i.name, "img": i.img, "weaponId": i._id, "weight": i.system.weight, "concepts": i.system.concepts, "material": i.system.material, "equipState": i.system.equipState, ...i.system.weapon }));
   }
 
   _getItemWeapons() {
@@ -236,7 +236,7 @@ export class AbbrewActor extends Actor {
 
       return new AbbrewAttackProfile(
         index,
-        "@system.abilities.strength.mod",
+        "@system.statistics.strength.mod",
         damageBase,
         true,
         {
@@ -263,33 +263,33 @@ export class AbbrewActor extends Actor {
       name: weapon.name,
       image: weapon.img || "icons/svg/sword.svg",
       isWeapon: true,
-      isEquipped: weapon.isEquipped,
+      isEquipped: weapon.equipState.wielded,
       profiles: results
     }
   };
 
   async equipWeapon(id, equip) {
     const updates = [];
-    updates.push({ _id: id, system: { weapon: { isEquipped: equip } } });
+    updates.push({ _id: id, system: { equipState: { wielded: equip } } });
     await this.updateEmbeddedDocuments("Item", updates);
   };
 
   async equipArmour(id, equip) {
     const updates = [];
-    updates.push({ _id: id, system: { armour: { isEquipped: equip } } });
+    updates.push({ _id: id, system: { equipState: equip } });
     await this.updateEmbeddedDocuments("Item", updates);
   }
 
   _prepareAbilityModifiers(systemData) {
     // Loop through ability scores, and add their modifiers to our sheet output.
-    for (let [key, ability] of Object.entries(systemData.abilities)) {
+    for (let [key, ability] of Object.entries(systemData.statistics)) {
       // Calculate the modifier using abbrew rules.
       ability.mod = Math.floor(ability.value / 2);
     }
   }
 
   _prepareMovement(systemData) {
-    const base = systemData.abilities.agility.mod;
+    const base = systemData.statistics.agility.mod;
     const limbs = systemData.anatomy.filter(a => a.system.tagsArray.includes('primary')).length;
     systemData.movement.base = base * limbs;
   }
@@ -319,7 +319,7 @@ export class AbbrewActor extends Actor {
 
   // TODO: Generalise or change
   _sumValues(systemData) {
-    return Object.values(systemData.abilities).reduce(function (sum, ability) {
+    return Object.values(systemData.statistics).reduce(function (sum, ability) {
       return sum += ability.value;
     }, 0);
   }
@@ -356,8 +356,8 @@ export class AbbrewActor extends Actor {
 
     // Copy the ability scores to the top level, so that rolls can use
     // formulas like `@str.mod + 4`.
-    if (data.abilities) {
-      for (let [k, v] of Object.entries(data.abilities)) {
+    if (data.statistics) {
+      for (let [k, v] of Object.entries(data.statistics)) {
         data[k] = foundry.utils.deepClone(v);
       }
     }

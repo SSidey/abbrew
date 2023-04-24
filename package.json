@@ -4,10 +4,10 @@
   "description": "CSS compiler for the Abbrew system",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "gulp build",
     "preview": "vite preview",
     "compile": "gulp css",
-    "watch": "gulp",
+    "watch": "gulp watch",
     "gulp": "gulp",
     "link": "gulp link"
   },

@@ -73,7 +73,7 @@ export class AbbrewItemSheet extends ItemSheet {
     // 1. Probably just want these split out anyway
     const requirements = html[0].querySelector('input[name="system.weapon.requirements"]');
     if (requirements) {
-      var taggedRequirements = new Tagify(requirements, {});      
+      var taggedRequirements = new Tagify(requirements, {});
     }
 
     // Active Effect management
@@ -86,7 +86,7 @@ export class AbbrewItemSheet extends ItemSheet {
   }
 
   async _updateObject(event, formData) {
-    if (event.handleObj && event.handleObj.type == 'change') {
+    if ((event.handleObj && event.handleObj.type == 'change') || (event.type && event.type == 'change')) {
 
       if (event.currentTarget) {
         await this.manualUpdate(event, formData);
@@ -96,7 +96,7 @@ export class AbbrewItemSheet extends ItemSheet {
       }
     }
 
-    console.log('form submit prevented');
+    return;
   }
 
   async manualUpdate(event, formData) {

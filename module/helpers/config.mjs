@@ -4,26 +4,26 @@ export const ABBREW = {};
  * The set of Ability Scores used within the sytem.
  * @type {Object}
  */
-ABBREW.abilities = {
-  "strength": "ABBREW.AbilityStrength",
-  "dexterity": "ABBREW.AbilityDexterity",
-  "constitution": "ABBREW.AbilityConstitution",
-  "agility": "ABBREW.AbilityAgility",
-  "intelligence": "ABBREW.AbilityIntelligence",
-  "will": "ABBREW.AbilityWill",
-  "wits": "ABBREW.AbilityWits",
-  "visualisation": "ABBREW.AbilityVisualisation"
+ABBREW.statistics = {
+  "strength": "ABBREW.StatisticStrength",
+  "dexterity": "ABBREW.StatisticDexterity",
+  "constitution": "ABBREW.StatisticConstitution",
+  "agility": "ABBREW.StatisticAgility",
+  "intelligence": "ABBREW.StatisticIntelligence",
+  "will": "ABBREW.StatisticWill",
+  "wits": "ABBREW.StatisticWits",
+  "visualisation": "ABBREW.StatisticVisualisation"
 };
 
-ABBREW.abilityAbbreviations = {
-  "str": "ABBREW.AbilityStrengthAbbreviation",
-  "dex": "ABBREW.AbilityDexterityAbbreviation",
-  "con": "ABBREW.AbilityConstitutionAbbreviation",
-  "agi": "ABBREW.AbilityAgilityAbbreviation",
-  "int": "ABBREW.AbilityIntelligenceAbbreviation",
-  "wll": "ABBREW.AbilityWillAbbreviation",
-  "wts": "ABBREW.AbilityWitsAbbreviation",
-  "wis": "ABBREW.AbilityVisualisationAbbreviation"
+ABBREW.StatisticAbbreviations = {
+  "str": "ABBREW.StatisticStrengthAbbreviation",
+  "dex": "ABBREW.StatisticDexterityAbbreviation",
+  "con": "ABBREW.StatisticConstitutionAbbreviation",
+  "agi": "ABBREW.StatisticAgilityAbbreviation",
+  "int": "ABBREW.StatisticIntelligenceAbbreviation",
+  "wll": "ABBREW.StatisticWillAbbreviation",
+  "wts": "ABBREW.StatisticWitsAbbreviation",
+  "wis": "ABBREW.StatisticVisualisationAbbreviation"
 };
 
 ABBREW.ActionTypes = {

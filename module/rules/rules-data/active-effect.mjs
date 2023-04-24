@@ -5,6 +5,7 @@ export class AbbrewActiveEffect extends AbbrewRule {
 
     operator;
     value;
+    requireEquippedItem;
 
     static validOperators =
         [
@@ -25,6 +26,7 @@ export class AbbrewActiveEffect extends AbbrewRule {
         }
         this.operator = "";
         this.value = "";
+        this.requireEquippedItem = false;
     }
 
     static validate(candidate) {
@@ -34,37 +36,47 @@ export class AbbrewActiveEffect extends AbbrewRule {
     static applyRule(rule, actorData) {
         let changes = {};
         let targetElement = rule.targetElement ? actorData.items.get(rule.targetElement) : actorData;
-        let targetType = rule.targetElement ? "Item" : "Actor";
+        let targetElementType = rule.targetElement ? "Item" : "Actor";
         let currentValue = getProperty(targetElement, rule.target)
         if (!currentValue) {
             return changes;
         }
 
-        // TODO:
-        // 1. Get Type here so that we can do string concats
+        let targetType = getType(currentValue);
+        let ruleValue = null;
+        if (rule.value[0] == '$') {
+            ruleValue = getProperty(actorData.items.get(rule.source.item), rule.value.substring(1, rule.value.length));
+        } else if (rule.value[0] == '£') {
+            ruleValue = getProperty(actorData, rule.value.substring(1, rule.value.length));
+        } else {
+            ruleValue = rule.value;
+        }
+
+        let delta = this._castDelta(ruleValue, targetType);
+
         let newValue = getProperty(targetElement, rule.target)
         switch (rule.operator) {
             case "override":
-                newValue = +rule.value;
+                newValue = delta;
                 break;
             case "add":
-                newValue = newValue += +rule.value;
+                newValue = newValue += delta;
                 break;
             case "minus":
-                newValue = newValue -= +rule.value;
+                newValue = newValue -= delta;
                 break;
             case "multiply":
-                newValue = newValue * +rule.value;
+                newValue = newValue * delta;
                 break;
             case "divide":
-                const divisor = +rule.value !== 0 ? +rule.value : 1;
+                const divisor = delta !== 0 ? delta : 1;
                 newValue = newValue / divisor;
                 break;
             case "upgrade":
-                newValue = newValue < rule.value ? rule.value : newValue;
+                newValue = newValue < delta ? delta : newValue;
                 break;
             case "downgrade":
-                newValue = newValue > rule.value ? rule.value : newValue;
+                newValue = newValue > delta ? delta : newValue;
                 break;
             default:
                 break;
@@ -76,10 +88,37 @@ export class AbbrewActiveEffect extends AbbrewRule {
             if (Object.keys(actorData.ruleOverrides).includes(rule.target)) {
                 sourceValue = actorData.ruleOverrides[rule.target].sourceValue;
             }
-            changes = { target: rule.target, value: newValue, sourceValue, targetType, targetElement: rule.targetElement };
+            changes = { target: rule.target, value: newValue, sourceValue, targetElementType, targetElement: rule.targetElement };
             mergeObject(targetElement, elementChanges);
         }
 
         return changes;
+    }
+
+    static _castDelta(raw, type) {
+        let delta;
+        switch (type) {
+            case "boolean":
+                delta = Boolean(this._parseOrString(raw));
+                break;
+            case "number":
+                delta = Number.fromString(raw);
+                if (Number.isNaN(delta)) delta = 0;
+                break;
+            case "string":
+                delta = String(raw);
+                break;
+            default:
+                delta = this._parseOrString(raw);
+        }
+        return delta;
+    }
+
+    static _parseOrString(raw) {
+        try {
+            return JSON.parse(raw);
+        } catch (err) {
+            return raw;
+        }
     }
 }

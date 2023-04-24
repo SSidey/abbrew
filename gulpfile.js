@@ -6,6 +6,7 @@ const fs = require("fs-extra");
 const path = require("path");
 const chalk = require("chalk");
 const argv = require("yargs").argv;
+const cp = require("child_process");
 
 /* ----------------------------------------- */
 /*  Compile Sass
@@ -36,6 +37,29 @@ function compileScss() {
     .pipe(gulp.dest("./public/css"))
 }
 const css = gulp.series(compileScss);
+
+/********************/
+/*		BUILDING  		*/
+/********************/
+
+function build() {
+  return cp.spawn("npx", ["vite", "build"], { stdio: "inherit", shell: true });
+}
+
+function _distWatcher() {
+  const publicDirPath = path.resolve(process.cwd(), "public");
+  const watcher = gulp.watch(["public/**/*.hbs"], { ignoreInitial: false });
+  watcher.on('change', async function(file, stats) {
+    console.log(`File ${file} was changed`);
+    const partial_file = path.relative(publicDirPath, file)
+    await fs.copy(path.join("public", partial_file), path.join("dist", partial_file));
+  });
+}
+
+function watch() {
+  _distWatcher();
+  return cp.spawn("npx", ["vite", "build", "-w"], { stdio: "inherit", shell: true });
+}
 
 /* ----------------------------------------- */
 /*  Watch Updates
@@ -103,11 +127,13 @@ async function linkUserData() {
 /* ----------------------------------------- */
 
 exports.link = linkUserData
+exports.watch = watch;
 exports.default = gulp.series(
   compileScss,
   watchUpdates
 );
 exports.build = gulp.series(
-  compileScss
+  compileScss,
+  build
 );
 exports.css = css;

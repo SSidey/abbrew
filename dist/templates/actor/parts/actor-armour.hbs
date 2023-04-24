@@ -13,7 +13,7 @@
                 </div>
                 <h4>{{armour.name}}</h4>
             </div>
-            {{#if armour.system.armour.isEquipped}}
+            {{#if armour.system.equipState.worn}}
             <div class="flexrow">
                 <button type="button" class="equip-armour" data-action="equip-armour" data-armourId="{{armour.id}}"
                     data-equip="false">Unequip</button>

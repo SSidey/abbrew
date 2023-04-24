@@ -154,7 +154,7 @@ export default class AbbrewRoll extends Roll {
 
         // // Customize the modifier
         // if (form.ability?.value) {
-        //   const abl = this.data.abilities[form.ability.value];
+        //   const abl = this.data.statistics[form.ability.value];
         //   this.terms = this.terms.flatMap(t => {
         //     if (t.term === "@mod") return new NumericTerm({ number: abl.mod });
         //     if (t.term === "@abilityCheckBonus") {
@@ -164,7 +164,7 @@ export default class AbbrewRoll extends Roll {
         //     }
         //     return t;
         //   });
-        //   this.options.flavor += ` (${CONFIG.DND5E.abilities[form.ability.value]})`;
+        //   this.options.flavor += ` (${CONFIG.DND5E.statistics[form.ability.value]})`;
         // }
 
         // Apply advantage or disadvantage

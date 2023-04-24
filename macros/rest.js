@@ -8,7 +8,7 @@ async function rest() {
     console.log("healingFactor: ", healingFactor);
     let healingBonus = actor.system.healing.bonus;
     console.log("healingBonus: ", healingBonus);
-    let healingBase = actor.system.abilities.constitution.value;
+    let healingBase = actor.system.statistics.constitution.value;
     console.log("healingBase: ", healingBase);
     let restHealing = (healingBase * healingFactor) + healingBonus;
     console.log("restHealing: ", restHealing);

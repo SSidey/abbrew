@@ -20,10 +20,13 @@
                 {{/each}}
                 {{/select}}
             </select>
-            <div class="item-name rule-name item-rule-grid rule-name">
+            <div class="item-name item-rule-grid rule-name">
                 {{!-- <img class="item-image" src="{{rule.icon}}" /> --}}
                 <input class="rule-editor" type="text" name="rule.{{rule.id}}.label" value="{{rule.label}}"
                     data-dtype="text" data-rule-id={{rule.id}} data-field="label" />
+            </div>
+            <div class="item-rule-grid rule-active">
+                <label><input type="checkbox" class="rule-editor" name="rule.{{rule.id}}.active" data-rule-id={{rule.id}} data-field="active" {{checked rule.active}} />Active</label>
             </div>
             <textarea class="rule-editor item-rule-grid rule-content" name="rule.{{rule.id}}.content" cols="40" rows="5"
                 data-rule-id={{rule.id}} data-field="content">{{rule.content}}</textarea>

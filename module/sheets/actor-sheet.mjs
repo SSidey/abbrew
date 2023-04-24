@@ -73,8 +73,8 @@ export class AbbrewActorSheet extends ActorSheet {
    */
   _prepareCharacterData(context) {
     // Handle ability scores.
-    for (let [k, v] of Object.entries(context.system.abilities)) {
-      v.label = game.i18n.localize(CONFIG.ABBREW.abilities[k]) ?? k;
+    for (let [k, v] of Object.entries(context.system.statistics)) {
+      v.label = game.i18n.localize(CONFIG.ABBREW.statistics[k]) ?? k;
     }
   }
 

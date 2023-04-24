@@ -4,6 +4,7 @@ import { AbbrewChoiceSet } from "./rules-data/choice-set.mjs";
 export class AbbrewRuleField {
     id;
     type;
+    active;
     label;
     content;
     source;
@@ -13,8 +14,7 @@ export class AbbrewRuleField {
     constructor({ id, type, label, content, source }) {
         this.id = id;
         this.type = type;
-        // TODO: 
-        // 1. Pass this through too.
+        this.active = true;
         this.label = label;
         this.content = content;
         this.source = source;

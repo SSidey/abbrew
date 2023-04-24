@@ -14,7 +14,7 @@
           "defences": "crushing, slashing, piercing",
           "defencesArray": []
         },
-        "naturalArmour": "system.abilities.constitution.mod",
+        "naturalArmour": "system.statistics.constitution.mod",
         "concepts": {
           "attack": {
             "amplification": 0,
@@ -400,7 +400,7 @@
             "multiplier": 1
           }
         },
-        "abilities": {
+        "statistics": {
           "strength": {
             "value": 0,
             "amplification": 0
@@ -513,7 +513,7 @@
         "criticalThreshold": 10
       },
       "attackProfile": {
-        "abilityModifier": "system.abilities.strength.mod",
+        "abilityModifier": "system.statistics.strength.mod",
         "damageBase": 0,
         "isWeapon": false,
         "weapon": {
@@ -526,7 +526,6 @@
           "handsSupplied": 0,
           "handsRequired": 0,
           "traitsArray": [],
-          "isEquipped": false,
           "criticalThreshold": 10
         },
         "isMagic": false,
@@ -541,7 +540,6 @@
         "weaponId": "",
         "isWeapon": false,
         "isMagic": false,
-        "isEquipped": false,
         "profiles": []
       },
       "material": {
@@ -567,7 +565,6 @@
           "penetration": 0,
           "traits": "",
           "handsRequired": 0,
-          "isEquipped": false,
           "traitsArray": [],
           "criticalThreshold": 10
         }
@@ -579,8 +576,7 @@
           "mid": false,
           "outer": false,
           "armourPoints": "",
-          "type": "",
-          "isEquipped": false
+          "type": ""
         }
       },
       "consumable": {
@@ -607,7 +603,13 @@
       "weight": 0,
       "isWeapon": false,
       "isArmour": false,
-      "isConsumable": false
+      "isConsumable": false,
+      "equipState": {
+        "dropped": false,
+        "carried": false,
+        "worn": false,
+        "wielded": false
+      }
     },
     "feature": {
       "templates": [

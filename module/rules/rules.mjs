@@ -51,6 +51,9 @@ export async function prepareRules(actor) {
     const sourceTargets = [];
     for (let i = 0; i < rules.length; i++) {
         const rule = rules[i];
+        if (!rule.active) {
+            continue;
+        }
         if (sourceTargets[rule.source.uuid]) {
             rule.targetElement = sourceTargets[rule.source.uuid];
         }
@@ -63,7 +66,10 @@ export async function prepareRules(actor) {
                 valid = AbbrewActiveEffect.validate(parsedRule);
                 typedRule = new AbbrewActiveEffect(rule.id, rule.label, parsedRule, rule.source, valid);
                 typedRule.targetElement = rule.targetElement;
-                validRules.push(typedRule);
+                const equipState = actor.items.get(typedRule.source.item).system.equipState;
+                if ((typedRule.requireEquippedItem && (equipState.worn || equipState.wielded)) || (!typedRule.requireEquippedItem)) {
+                    validRules.push(typedRule);
+                }
                 break;
             case ABBREW.RuleTypes.ChoiceSet:
                 console.log('Choice Set');
