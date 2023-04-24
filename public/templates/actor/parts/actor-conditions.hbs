@@ -1,0 +1,15 @@
+<div>
+    <h3 class="conditions-header">Conditions</h3>
+    {{#if displayConditions}}
+    <div class="conditions-list">
+        {{#each system.conditions as |value key|}}
+        <div class="conditions-grid">
+            <div class="resource-label defence-part">
+                <label for="system.conditions.{{key}}">{{key}}</label>
+            </div>
+            <input type="text" name="system.conditions.{{key}}" value="{{value}}" data-dtype="Number" />
+        </div>
+        {{/each}}
+    </div>
+    {{/if}}
+</div>

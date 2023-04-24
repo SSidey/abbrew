@@ -1,0 +1,143 @@
+<form class="{{cssClass}} {{actor.type}} flexcol" autocomplete="off">
+
+  {{!-- Sheet Header --}}
+  <header class="sheet-header">
+    <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="100" width="100" />
+    <div class="header-fields">
+      <h1 class="charname"><input name="name" type="text" value="{{actor.name}}" placeholder="Name" /></h1>
+      {{!-- The grid classes are defined in scss/global/_grid.scss. To use,
+      use both the "grid" and "grid-Ncol" class where "N" can be any number
+      from 1 to 12 and will create that number of columns. --}}
+      <div class="resources grid grid-3col">
+
+        {{!-- "flex-group-center" is also defined in the _grid.scss file
+        and it will add a small amount of padding, a border, and will
+        center all of its child elements content and text. --}}
+        <div class="resource flex-group-center">
+          <label for="system.blood.value" class="resource-label">Blood</label>
+          <div class="resource-content flexrow flex-center flex-between">
+            <input type="text" name="system.blood.value" value="{{system.blood.value}}" data-dtype="Number" />
+            <span> / </span>
+            <input type="text" name="system.blood.max" value="{{system.blood.max}}" data-dtype="Number" />
+          </div>
+        </div>
+
+        <div class="resource flex-group-center">
+          <label for="system.armour.value" class="resource-label">Armour</label>
+          <div class="resource-content flexrow flex-center flex-between">
+            <input type="text" name="system.armour.value" value="{{system.armour.value}}" data-dtype="Number" />
+            <span> / </span>
+            <input type="text" name="system.armour.max" value="{{system.armour.max}}" data-dtype="Number" />
+          </div>
+        </div>
+
+        <div class="resource flex-group-center">
+          <label for="system.attributes.tier.value" class="resource-label"
+            title="{{system.attributes.power.value}}">Tier</label>
+          <div class="resource-content flexrow flex-center flex-between">
+            <input type="text" name="system.attributes.tier.value" value="{{system.attributes.tier.value}}"
+              data-dtype="Number" />
+          </div>
+        </div>
+
+      </div>
+      <div class="resources grid grid-3col">
+        <div class="resource flex-group-center">
+          <label for="system.wounds.active" class="resource-label">Active Wounds</label>
+          <div class="resource-content flexrow flex-center flex-between">
+            <input type="text" name="system.wounds.active" value="{{system.wounds.active}}" data-dtype="Number" />
+          </div>
+        </div>
+
+        <div class="resource flex-group-center">
+          <label for="system.wounds.healing" class="resource-label">Healing Wounds</label>
+          <div class="resource-content flexrow flex-center flex-between">
+            <input type="text" name="system.wounds.healing" value="{{system.wounds.healing}}" data-dtype="Number" />
+          </div>
+        </div>
+
+        <div class="resource flex-group-center"></div>
+
+      </div>
+    </div>
+  </header>
+
+  {{!-- Sheet Tab Navigation --}}
+  <nav class="sheet-tabs tabs" data-group="primary">
+    {{!-- Default tab is specified in actor-sheet.mjs --}}
+    <a class="item" data-tab="statistics">Statistics</a>
+    <a class="item" data-tab="abilities">Abilities</a>
+    <a class="item" data-tab="defences">Defences</a>
+    <a class="item" data-tab="form">Form</a>
+    <a class="item" data-tab="description">Description</a>
+    <a class="item" data-tab="items">Items</a>
+    <a class="item" data-tab="spells">Spells</a>
+    <a class="item" data-tab="effects">Effects</a>
+  </nav>
+
+  {{!-- Sheet Body --}}
+  <section class="sheet-body">
+
+    {{!-- Owned Features Tab --}}
+    <div class="tab statistics" data-group="primary" data-tab="statistics">
+      <section class="grid grid-3col">
+        <aside class="sidebar">
+
+          {{!-- The grid classes are defined in scss/global/_grid.scss. To use,
+          use both the "grid" and "grid-Ncol" class where "N" can be any number
+          from 1 to 12 and will create that number of columns. --}}
+          <div class="abilities flexcol">
+            {{#each system.abilities as |ability key|}}
+            <div class="ability flexrow flex-group-center">
+              <label for="system.abilities.{{key}}.value" class="resource-label rollable flexlarge align-left"
+                data-ability="@abilities.{{key}}.mod" data-label="{{ability.label}}">{{ability.label}}</label>
+              <input type="text" name="system.abilities.{{key}}.value" value="{{ability.value}}" data-dtype="Number" />
+              <span class="ability-mod rollable" data-ability="@abilities.{{key}}.mod"
+                data-label="{{ability.label}}">{{numberFormat ability.mod decimals=0 sign=true}}</span>
+            </div>
+            {{/each}}
+          </div>
+        </aside>
+
+      </section>
+    </div>
+
+    <div class="tab abilities" data-group="primary" data-tab="abilities">
+      {{> "systems/abbrew/templates/actor/parts/actor-resources.hbs"}}
+      {{> "systems/abbrew/templates/actor/parts/actor-attacks.hbs"}}
+      {{> "systems/abbrew/templates/actor/parts/actor-features.hbs"}}
+    </div>
+
+    <div class="tab defences" data-group="primary" data-tab="defences">
+      {{> "systems/abbrew/templates/actor/parts/actor-defences.hbs"}}
+    </div>
+
+    <div class="tab form" data-group="primary" data-tab="form">
+      {{> "systems/abbrew/templates/actor/parts/actor-form.hbs"}}
+    </div>
+
+    {{!-- Biography Tab --}}
+    <div class="tab biography" data-group="primary" data-tab="description">
+      {{!-- If you want TinyMCE editors to output inline rolls when rendered, you need to pass the actor's roll data to
+      the rollData property. --}}
+      {{editor system.biography target="system.biography" rollData=rollData button=true owner=owner editable=editable}}
+    </div>
+
+    {{!-- Owned Items Tab --}}
+    <div class="tab items" data-group="primary" data-tab="items">
+      {{> "systems/abbrew/templates/actor/parts/actor-items.hbs"}}
+    </div>
+
+    {{!-- Owned Spells Tab --}}
+    <div class="tab spells" data-group="primary" data-tab="spells">
+      {{> "systems/abbrew/templates/actor/parts/actor-spells.hbs"}}
+    </div>
+
+    {{!-- Active Effects Tab --}}
+    <div class="tab effects" data-group="primary" data-tab="effects">
+      {{> "systems/abbrew/templates/actor/parts/actor-conditions.hbs"}}
+      {{> "systems/abbrew/templates/actor/parts/actor-effects.hbs"}}
+    </div>
+
+  </section>
+</form>

@@ -11,7 +11,7 @@
   "authors": [{
     "name": "Abde"
   }],
-  "esmodules": ["module/abbrew.mjs"],
+  "esmodules": ["./abbrew.mjs"],
   "styles": ["css/abbrew.css"],
   "scripts": [],
   "packs": [],
