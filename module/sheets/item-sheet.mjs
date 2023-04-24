@@ -78,14 +78,17 @@ export class AbbrewItemSheet extends ItemSheet {
   }
 
   async _updateObject(event, formData) {
-    // TODO: Check against overrideValue, do something with it.
-    // if (event.handleObj.type == 'change') { allow the change } else { reset the formData value to our override }
-    if (event.currentTarget) {
-      await this.manualUpdate(event, formData);
+    if (event.handleObj && event.handleObj.type == 'change') {
+
+      if (event.currentTarget) {
+        await this.manualUpdate(event, formData);
+      }
+      else {
+        super._updateObject(event, formData);
+      }
     }
-    else {
-      super._updateObject(event, formData);
-    }
+
+    console.log('form submit prevented');
   }
 
   async manualUpdate(event, formData) {

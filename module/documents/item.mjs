@@ -85,7 +85,7 @@ export class AbbrewItem extends Item {
     return card;
   }
 
-  async displayCard(options={}) {
+  async displayCard(options = {}) {
 
     // Render the chat card template
     const token = this.actor.token;
@@ -257,7 +257,7 @@ export class AbbrewItem extends Item {
       return ui.notifications.error(err);
     }
 
-    await item.rollAttack({event});
+    await item.rollAttack({ event });
 
     // Re-enable the button
     button.disabled = false;
@@ -310,6 +310,10 @@ export class AbbrewItem extends Item {
     return { rollData, parts };
   }
 
+  async update(data = {}, context = {}) {
+    console.log('update item');
+    super.update(data, context);
+  }
 
   /**
    * Handle toggling the visibility of chat card content when the name is clicked
