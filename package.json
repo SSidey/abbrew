@@ -28,6 +28,7 @@
     "yargs": "^15.4.1"
   },
   "dependencies": {
+    "@yaireo/tagify": "^4.17.8",
     "vite": "^4.3.1"
   }
 }

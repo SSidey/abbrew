@@ -157,7 +157,7 @@ export class AbbrewActor extends Actor {
         r.source.uuid = `Actor.${this.id}.Item.${i.id}`;
       });
       const item = actorData.items.get(i.id);
-      writeToPath(item,'system.rules', i.system.rules )
+      writeToPath(item, 'system.rules', i.system.rules)
     });
   }
 
@@ -220,7 +220,7 @@ export class AbbrewActor extends Actor {
       const damageType = profileParts[0].replace(' ', '');
       const attackType = profileParts[1];
       // Handle Penalty here, check requirements are met.
-      const requirements = JSON.parse(weapon.requirements);
+      const requirements = { strength: { value: 5 } }; // JSON.parse(weapon.requirements);
       let damageBase = 0;
       switch (profileParts[1]) {
         case "arc":

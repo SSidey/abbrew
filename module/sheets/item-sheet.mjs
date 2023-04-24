@@ -2,6 +2,7 @@
 import { onManageActiveEffect, prepareActiveEffectCategories } from "../helpers/effects.mjs";
 import { onManageRule } from "../rules/rules.mjs";
 import { options } from "../rules/rule-field.mjs";
+import Tagify from "@yaireo/tagify";
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -66,6 +67,13 @@ export class AbbrewItemSheet extends ItemSheet {
     // Everything below here is only needed if the sheet is editable
     if (!this.isEditable) {
       return;
+    }
+
+    // TODO:
+    // 1. Probably just want these split out anyway
+    const requirements = html[0].querySelector('input[name="system.weapon.requirements"]');
+    if (requirements) {
+      var taggedRequirements = new Tagify(requirements, {});      
     }
 
     // Active Effect management
