@@ -29,6 +29,7 @@ const config = {
       emptyOutDir: true,
       sourcemap: true,
       brotliSize: true,
+      minify: false,
       terserOptions: {
         mangle: false,
         keep_classnames: true,

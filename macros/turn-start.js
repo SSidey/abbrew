@@ -12,10 +12,26 @@ async function turnStart() {
         let currentBlood = actor.system.blood.value;
         console.log(currentBlood);
 
-        let newBlood = currentBlood - activeWounds;
+        let newBlood = currentBlood - Math.min(0, activeWounds - actor.system.conditions.bleedPrevention);
         console.log(newBlood);
 
-        await actor.update({ "system.blood.value": newBlood });
+        if (currentBlood != newBlood) {
+            await actor.update({ "system.blood.value": newBlood });
+        }
+        else {
+            await actor.update(
+                {
+                    system: {
+                        wounds: {
+                            active: 0,
+                            healing: actor.system.wounds.healing + activeWounds
+                        },
+                        conditions: {
+                            gushingWounds: 0
+                        }
+                    }
+                });
+        }
     }
 
     let armour = actor.system.armour;

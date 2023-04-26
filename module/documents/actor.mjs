@@ -276,7 +276,7 @@ export class AbbrewActor extends Actor {
 
   async equipArmour(id, equip) {
     const updates = [];
-    updates.push({ _id: id, system: { equipState: equip } });
+    updates.push({ _id: id, system: { equipState: { worn: equip } } });
     await this.updateEmbeddedDocuments("Item", updates);
   }
 
@@ -426,24 +426,22 @@ export class AbbrewActor extends Actor {
     if (systemData.armour.defencesArray.includes(damageType)) {
       const penetrate = damageTypeDefence.penetrate + damagePenetrate;
 
-      const armourAdjustment = damageTypeDefence.block - penetrate;
+      const adjustedBlock = Math.max(0, damageTypeDefence.block - penetrate);
+      const adjustedPenetration = Math.max(0, penetrate - damageTypeDefence.block)
 
       const fullDamage = damage;
-      const damageThroughArmour = currentArmour + armourAdjustment - damage;
+      let adjustedArmour = currentArmour + adjustedBlock - adjustedPenetration;
+      adjustedArmour = adjustedArmour < 0 ? 0 : adjustedArmour;
+      const damageThroughArmour = adjustedArmour - damage ;
       if (damageThroughArmour < 0) {
         damage = Math.min(Math.abs(damageThroughArmour), fullDamage);
       } else {
         damage = 0;
       }
 
-      if (penetrate < currentArmour + damageTypeDefence.block) {
-        const availableArmour = currentArmour + armourAdjustment;
-        const damageToArmour = Math.min(availableArmour, fullDamage);
-        newArmour = currentArmour - damageToArmour;
-      } else {
-        newArmour = currentArmour;
-      }
-
+      const damageThroughBlock = adjustedBlock - fullDamage;
+      const adjustedDamageThroughBlock = damageThroughBlock > 0 ? 0 : damageThroughBlock;
+      newArmour = Math.max(0, currentArmour - Math.abs(adjustedDamageThroughBlock));
     }
 
     let updates = {};

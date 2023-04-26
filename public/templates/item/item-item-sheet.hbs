@@ -70,12 +70,32 @@
     {{!-- Weapon Tab --}}
     <div class="tab" data-group="primary" data-tab="weapon">
       {{#if system.isWeapon }}
-      {{#each system.weapon}}
       <div>
-        <label class="item-label">{{@key}}</label>
-        <input type="text" name="system.weapon.{{@key}}" value="{{this}}" data-dtype="text" />
+        <label class="item-label">Requirements</label>
+        <input type="text" name="system.weapon.requirements" value="{{system.weapon.requirements}}" data-dtype="text" />
+        <br>
+        <label class="item-label">Reach</label>
+        <input type="number" name="system.weapon.reach" value="{{system.weapon.reach}}" data-dtype="Number" />
+        <label class="item-label">MinimumEffectiveReach</label>
+        <input type="number" name="system.weapon.minimumEffectiveReach" value="{{system.weapon.minimumEffectiveReach}}"
+          data-dtype="Number" />
+        <label><input type="checkbox" name="system.weapon.focused" {{checked system.weapon.focused}} />Focused</label>
+        <br>
+        <label class="item-label">Weapon Profiles</label>
+        {{!-- TODO: 1. Good one for tagify --}}
+        <input type="text" name="system.weapon.weaponProfiles" value="{{system.weapon.weaponProfiles}}"
+          data-dtype="text" />
+        <label class="item-label">Penetration</label>
+        <input type="number" name="system.weapon.penetration" value="{{system.weapon.penetration}}" data-dtype="Number" />
+        <label class="item-label">Traits</label>
+        <input type="text" name="system.weapon.traits" value="{{system.weapon.traits}}" data-dtype="text" />
+        <label class="item-label">Hands Required</label>
+        <input type="number" name="system.weapon.handsRequired" value="{{system.weapon.handsRequired}}"
+          data-dtype="Number" />
+        <label class="item-label">Critical Threshold</label>
+        <input type="number" name="system.weapon.criticalThreshold" value="{{system.weapon.criticalThreshold}}"
+          data-dtype="Number" />
       </div>
-      {{/each}}
       {{/if}}
     </div>
 

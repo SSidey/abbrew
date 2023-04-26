@@ -16,6 +16,16 @@ async function turnStart(actor) {
         let currentBlood = actor.system.blood.value;
         console.log(currentBlood);
 
+        let bleedPrevention = actor.system.conditions.bleedPrevention;
+        if (bleedPrevention > 0) {
+            bleedPrevention = bleedPrevention < activeWounds ? bleedPrevention : activeWounds;
+            let healingWounds = actor.system.wounds.healing + bleedPrevention;
+            await actor.update({ "system.wounds.healing": healingWounds });
+        }
+
+        activeWounds = activeWounds - bleedPrevention;
+        await actor.update({ system: { wounds: { active: activeWounds } } });
+
         let gushingWounds = 0;
         if (activeWounds === 0) {
             await actor.update({ "system.conditions.gushingWounds": 0 });
@@ -25,16 +35,12 @@ async function turnStart(actor) {
             gushingWounds = actor.system.conditions.gushingWounds * 5;
         }
 
-        let bleedPrevention = actor.system.conditions.bleedPrevention;
-        if (bleedPrevention > 0) {
-            let healingWounds = actor.system.wounds.healing + bleedPrevention;
-            await actor.update({ "system.wounds.healing": healingWounds });
-        }
-
-        let newBlood = currentBlood - (activeWounds + gushingWounds - bleedPrevention);
+        let newBlood = Math.max(currentBlood - (activeWounds + gushingWounds), 0);
         console.log(newBlood);
 
-        await actor.update({ "system.blood.value": newBlood });
+        if (newBlood != currentBlood) {
+            await actor.update({ "system.blood.value": newBlood });
+        }
 
         if (newBlood <= actor.system.blood.nausea) {
             await actor.update({ "system.conditions.nausea": 1 });
