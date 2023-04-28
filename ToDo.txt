@@ -8,3 +8,21 @@ Add spell points based on abilities (should be a default one but hidden, use mag
 Determine spell syntax
 Extra abilities e.g. aim / dodge / block / hide / recover etc.
 Custom effects / icons (Combat utility belt?)
+
+Could determine positioning, but feels like not worth:
+  // Get Targets 
+  // game.canvas.tokens.placeables[0].target.parent.actor
+  // Get rotation
+  // game.canvas.tokens.placeables[1].document.rotation
+  // Get token height/width
+  // game.canvas.tokens.placeables[2].document.height
+  // game.canvas.tokens.placeables[2].document.width
+  // Get token center
+  // game.canvas.tokens.placeables.filter(p => p.document.actorId == "rLEUu5Vg7QCj59dE" && p.controlled)[0].center
+  // Get active tokens
+  // actor.getActiveTokens()
+  // actor.getActiveTokens().filter(t => t.controlled)  
+  var placeables = /* await */ game.canvas.tokens.placeables;
+  var token = /* await */ placeables.filter(p => p.document.actorId == this.id && p.controlled)[0];
+  var nonAllyTokens = /* await */ placeables.filter(p => p.document.disposition != token.document.disposition);  
+  var center = token.center;

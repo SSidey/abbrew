@@ -1,7 +1,7 @@
 import { d10Roll } from "../helpers/dice.mjs";
 
-Hooks.on('init', () => {
-  $(document).on('click', '.damage-application button', onDamageAccept);
+Hooks.on('init', /*async*/ () => {
+  $(document).on('click', '.damage-application button', /*await*/ onDamageAccept);
 });
 
 export class AbbrewAttackProfile {
@@ -186,7 +186,7 @@ async function displayCard(options = {}, attack, attackProfile, actor) {
   return card;
 }
 
-async function onDamageAccept(event) {
+/* async */ function onDamageAccept(event) {
   console.log(event);
   // Extract card data
   const button = event.currentTarget;
@@ -194,7 +194,7 @@ async function onDamageAccept(event) {
   const messageId = card.closest(".message").dataset.messageId;
   const message = game.messages.get(messageId);
   const tokens = canvas.tokens.controlled.filter((token) => token.actor);
-  await tokens[0].actor.acceptDamage(message.rolls, message.flags.data);
+  /* await */ tokens[0].actor.acceptDamage(message.rolls, message.flags.data);
 }
 
 export async function onAttackCardAction(event) {

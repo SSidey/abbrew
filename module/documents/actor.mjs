@@ -377,31 +377,73 @@ export class AbbrewActor extends Actor {
     // Process additional NPC data here.
   }
 
-  async acceptDamage(damageRolls, attackData) {
-    // Gets targets
-    // [...(game.user.targets?.values() ?? [])].filter(t => !!t.actor)
-    const actor = this;
-    const systemData = this.system;
+  toRadians(angle) {
+    return angle * (Math.PI / 180);
+  }
+
+  dot(a, b) {
+    return a.map((x, i) => a[i] * b[i]).reduce((m, n) => m + n);
+  }
+
+  normalize(vector) {
+    var length = Math.sqrt(vector.x * vector.x + vector.y * vector.y); //calculating length
+    vector.x = vector.x / length; //assigning new value to x (dividing x by length of the vector)
+    vector.y = vector.y / length; //assigning new value to y
+    return vector;
+  };
+
+  // Directly Down is 0, Left is 90, Up 180, Right 270
+  /* async */ acceptDamage(damageRolls, attackData) {
+    let actor = this;
+    let systemData = this.system;
     let damage = damageRolls[0]._total;
     let damageRoll = damageRolls[0];
     let damagePenetrate = attackData.attackProfile.weapon.penetration;
     // const modRoll = damageRolls[0];
     // modRoll.terms[0].rolls[0].terms[0].results[0] = {active: true, result: 1};
     // const newRoll = await CONFIG.Dice.AbbrewRoll.fromRoll(modRoll);
+    var placeables = /* await */ game.canvas.tokens.placeables;
+    var token = /* await */ placeables.filter(p => p.document.actorId == this.id && p.controlled)[0];
+    var nonAllyTokens = /* await */ placeables.filter(p => p.document.disposition != token.document.disposition);
+    var center = token.center;
+
+    var tokenAngle = this.toRadians(token.document.rotation);
+    var nonAllyAngle = this.toRadians(nonAllyTokens[0].document.rotation);
+
+    var tokenVector = { x: Math.cos(tokenAngle), y: Math.sin(tokenAngle) };
+    var nonAllyVector = { x: Math.cos(nonAllyAngle), y: Math.sin(nonAllyAngle) };
+    var vectorToFace = { x: token.center.x - nonAllyTokens[0].center.x, y: token.center.y - nonAllyTokens[0].center.y };
+
+    tokenVector = this.normalize(tokenVector);
+    tokenVector = Object.values(tokenVector);
+    nonAllyVector = this.normalize(nonAllyVector);
+    nonAllyVector = Object.values(nonAllyVector);
+    vectorToFace = this.normalize(vectorToFace);
+    vectorToFace = Object.values(vectorToFace);
+    var isNonAllyFacing = tokenVector.map((x, i) => vectorToFace[i] * nonAllyVector[i]).reduce((m, n) => m + n);
+    var matching = tokenVector.map((x, i) => tokenVector[i] * nonAllyVector[i]).reduce((m, n) => m + n);
+    console.log('enemy facing: ' + Math.round(isNonAllyFacing * 100000) / 100000);
+    console.log('which side: ' + Math.round(matching * 100000) / 100000);
+    // Matching: Positive if behind the target?
+    // Matching: 0 if side
+    // Matching: Negative if front
+    // more sense to reverse and go from the attacker?
+    // Then reverse and check which side
+
     let currentArmour = systemData.armour.value;
     let newArmour = currentArmour;
 
     const damageType = attackData.attackProfile.weapon.damageType;
 
     if (!systemData.defences[damageType]) {
-      const untypedCritical = await this.getCriticalExplosions(damageRoll, 0, 0)
-      await this.handleDamage(systemData, damage, "untyped", untypedCritical);
+      const untypedCritical = this.getCriticalExplosions(damageRoll, 0, 0)
+      this.handleDamage(systemData, damage, "untyped", untypedCritical);
     }
 
     const damageTypeDefence = systemData.defences[damageType];
 
     if (damageTypeDefence.absorb) {
-      await this.absorbDamage(actor, systemData, damage);
+      this.absorbDamage(actor, systemData, damage);
       return;
     }
     if (damageTypeDefence.immune) {
@@ -412,16 +454,16 @@ export class AbbrewActor extends Actor {
       // NOOP
     }
     else if (damageTypeDefence.deflect) {
-      damage = await this.deflectDamage(damageRoll);
+      damage = this.deflectDamage(damageRoll);
     }
     else if (damageTypeDefence.conduct) {
-      damage = await this.conductDamage(damageRoll);
+      damage = this.conductDamage(damageRoll);
     }
 
     // TODO: Handle Resistance
     // TODO: Handle Amplification
 
-    let criticalExplosions = await this.getCriticalExplosions(damageRoll, damageTypeDefence.vulnerable, damageTypeDefence.negate);
+    let criticalExplosions = this.getCriticalExplosions(damageRoll, damageTypeDefence.vulnerable, damageTypeDefence.negate);
 
     if (systemData.armour.defencesArray.includes(damageType)) {
       const penetrate = damageTypeDefence.penetrate + damagePenetrate;
@@ -432,7 +474,7 @@ export class AbbrewActor extends Actor {
       const fullDamage = damage;
       let adjustedArmour = currentArmour + adjustedBlock - adjustedPenetration;
       adjustedArmour = adjustedArmour < 0 ? 0 : adjustedArmour;
-      const damageThroughArmour = adjustedArmour - damage ;
+      const damageThroughArmour = adjustedArmour - damage;
       if (damageThroughArmour < 0) {
         damage = Math.min(Math.abs(damageThroughArmour), fullDamage);
       } else {
@@ -446,51 +488,51 @@ export class AbbrewActor extends Actor {
 
     let updates = {};
     if (damage > 0) {
-      updates = await this.handleDamage(systemData, damage, damageType, criticalExplosions, attackData.attackProfile);
+      updates = this.handleDamage(systemData, damage, damageType, criticalExplosions, attackData.attackProfile);
     }
 
     updates["system.armour.value"] = newArmour;
 
-    await actor.update(updates);
+    actor.update(updates);
   }
 
-  async absorbDamage(actor, systemData, damage) {
+  absorbDamage(actor, systemData, damage) {
     let currentBlood = systemData.blood.value;
     currentBlood = Math.min(currentBlood + damage, systemData.blood.fullMax);
     const maxBlood = Math.max(currentBlood, systemData.blood.max);
-    await actor.update({ "system.blood.value": currentBlood, "system.blood.max": maxBlood });
+    actor.update({ "system.blood.value": currentBlood, "system.blood.max": maxBlood });
   }
 
-  async deflectDamage(damageRoll) {
+  deflectDamage(damageRoll) {
     const diceResults = damageRoll.terms[0].rolls[0].terms[0].results.reduce((a, b) => a + b.result, 0);
     return damageRoll.total - diceResults;
   }
 
-  async conductDamage(damageRoll) {
+  conductDamage(damageRoll) {
     const diceResults = damageRoll.terms[0].rolls[0].terms[0].results.reduce((a, b) => a + b.result, 0);
     const totalDice = damageRoll.terms[0].rolls[0].terms[0].results.length;
     const maximiseDifference = (totalDice * 10) - diceResults;
     return damageRoll.total + maximiseDifference;
   }
 
-  async getCriticalExplosions(damageRoll, vulnerable, negate) {
+  getCriticalExplosions(damageRoll, vulnerable, negate) {
     const criticalThreshold = +damageRoll.terms[0].rolls[0].terms[0].modifiers[0].split('=')[1];
     const criticalChecks = damageRoll.terms[0].rolls[0].terms[0].results.filter(r => r.result >= criticalThreshold).length;
     return criticalChecks - negate + vulnerable;
   }
 
-  async handleDamage(systemData, damage, damageType, criticalExplosions, attackProfile) {
+  handleDamage(systemData, damage, damageType, criticalExplosions, attackProfile) {
 
     if (damageType === "heat") {
-      return await this.handleHeat(systemData, damage, criticalExplosions, attackProfile);
+      return this.handleHeat(systemData, damage, criticalExplosions, attackProfile);
     }
 
     if (["crushing", "slashing", "piercing", "untyped"].includes(damageType)) {
-      return await this.handlePhysical(systemData, damage, criticalExplosions, attackProfile);
+      return this.handlePhysical(systemData, damage, criticalExplosions, attackProfile);
     }
   }
 
-  async handleHeat(systemData, damage, criticalExplosions, attackProfile) {
+  handleHeat(systemData, damage, criticalExplosions, attackProfile) {
     const healingWounds = systemData.wounds.healing += damage;
     const thermalState = systemData.state += attackProfile.thermalChange;
     // Can we add conditions automatically? would be good to add burned here...
@@ -504,7 +546,7 @@ export class AbbrewActor extends Actor {
     return updates;
   }
 
-  async handlePhysical(systemData, damage, criticalExplosions, attackProfile) {
+  handlePhysical(systemData, damage, criticalExplosions, attackProfile) {
     const updates = {};
 
     if (systemData.canBleed) {
@@ -520,13 +562,13 @@ export class AbbrewActor extends Actor {
     if (criticalExplosions) {
       switch (attackProfile.weapon.damageType) {
         case "crushing":
-          await this.handleCrushingCritical(updates, damage, criticalExplosions);
+          this.handleCrushingCritical(updates, damage, criticalExplosions);
           break;
         case "slashing":
-          await this.handleSlashingCritical(updates, damage, criticalExplosions);
+          this.handleSlashingCritical(updates, damage, criticalExplosions);
           break;
         case "piercing":
-          await this.handlePiercingCritical(updates, damage, criticalExplosions);
+          this.handlePiercingCritical(updates, damage, criticalExplosions);
           break;
         default:
           break;
@@ -536,15 +578,15 @@ export class AbbrewActor extends Actor {
     return updates;
   }
 
-  async handleCrushingCritical(updates, damage, _) {
+  handleCrushingCritical(updates, damage, _) {
     updates["system.conditions.sundered"] = damage;
   }
 
-  async handleSlashingCritical(updates, damage, _) {
+  handleSlashingCritical(updates, damage, _) {
     updates["system.wounds.active"] += damage;
   }
 
-  async handlePiercingCritical(updates, _, criticalExplosions) {
+  handlePiercingCritical(updates, _, criticalExplosions) {
     updates["system.conditions.gushingWounds"] = criticalExplosions;
   }
 }
