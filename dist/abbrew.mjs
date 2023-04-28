@@ -35,18 +35,6 @@ async function d10Roll({
   messageData.flags = { data };
   await roll.toMessage(messageData);
 }
-Hooks.on(
-  "init",
-  /*async*/
-  () => {
-    $(document).on(
-      "click",
-      ".damage-application button",
-      /*await*/
-      onDamageAccept
-    );
-  }
-);
 class AbbrewAttackProfile {
   constructor(id, abilityModifier, damageBase, isWeapon, weapon, isMagic, magic) {
     __publicField(this, "id", "");
@@ -119,15 +107,6 @@ function getAmplification(actor, attackProfile) {
 function getWeakness(actor, attackProfile) {
   const damageType = attackProfile.weapon.damageType;
   return actor.system.concepts[damageType] ? actor.system.concepts[damageType].weakness : 0;
-}
-function onDamageAccept(event) {
-  console.log(event);
-  const button = event.currentTarget;
-  const card = button.closest(".chat-message");
-  const messageId = card.closest(".message").dataset.messageId;
-  const message = game.messages.get(messageId);
-  const tokens = canvas.tokens.controlled.filter((token) => token.actor);
-  tokens[0].actor.acceptDamage(message.rolls, message.flags.data);
 }
 class AbbrewRule {
   constructor(id, label, type, source, valid) {
@@ -901,6 +880,26 @@ class AbbrewActor extends Actor {
     if (this.type !== "npc")
       return;
   }
+  /* -------------------------------------------- */
+  /*  Chat Message Helpers                        */
+  /* -------------------------------------------- */
+  /**
+   * Apply listeners to chat messages.
+   * @param {HTML} html  Rendered chat message.
+   */
+  static chatListeners(html) {
+    html.on("click", ".damage-application button", this.onDamageAccept.bind(this));
+  }
+  /* async */
+  static onDamageAccept(event) {
+    console.log(event);
+    const button = event.currentTarget;
+    const card = button.closest(".chat-message");
+    const messageId = card.closest(".message").dataset.messageId;
+    const message = game.messages.get(messageId);
+    const tokens = canvas.tokens.controlled.filter((token) => token.actor);
+    tokens[0].actor.acceptDamage(message.rolls, message.flags.data);
+  }
   toRadians(angle) {
     return angle * (Math.PI / 180);
   }
@@ -912,6 +911,10 @@ class AbbrewActor extends Actor {
     vector.x = vector.x / length;
     vector.y = vector.y / length;
     return vector;
+  }
+  convertFoundryAngle(angle) {
+    const angleDiff = angle - 270;
+    return angleDiff > 0 ? 360 - angleDiff : Math.abs(angleDiff);
   }
   // Directly Down is 0, Left is 90, Up 180, Right 270
   /* async */
@@ -934,18 +937,18 @@ class AbbrewActor extends Actor {
       placeables.filter((p) => p.document.disposition != token.document.disposition)
     );
     token.center;
-    var tokenAngle = this.toRadians(token.document.rotation);
-    var nonAllyAngle = this.toRadians(nonAllyTokens[0].document.rotation);
+    var tokenAngle = this.toRadians(this.convertFoundryAngle(token.document.rotation));
+    var nonAllyAngle = this.toRadians(this.convertFoundryAngle(nonAllyTokens[0].document.rotation));
     var tokenVector = { x: Math.cos(tokenAngle), y: Math.sin(tokenAngle) };
     var nonAllyVector = { x: Math.cos(nonAllyAngle), y: Math.sin(nonAllyAngle) };
-    var vectorToFace = { x: token.center.x - nonAllyTokens[0].center.x, y: token.center.y - nonAllyTokens[0].center.y };
+    var vectorToFace = { x: token.center.x - nonAllyTokens[0].center.x, y: nonAllyTokens[0].center.y - token.center.y };
     tokenVector = this.normalize(tokenVector);
     tokenVector = Object.values(tokenVector);
     nonAllyVector = this.normalize(nonAllyVector);
     nonAllyVector = Object.values(nonAllyVector);
     vectorToFace = this.normalize(vectorToFace);
     vectorToFace = Object.values(vectorToFace);
-    var isNonAllyFacing = tokenVector.map((x, i) => vectorToFace[i] * nonAllyVector[i]).reduce((m, n) => m + n);
+    var isNonAllyFacing = vectorToFace.map((x, i) => vectorToFace[i] * nonAllyVector[i]).reduce((m, n) => m + n);
     var matching = tokenVector.map((x, i) => tokenVector[i] * nonAllyVector[i]).reduce((m, n) => m + n);
     console.log("enemy facing: " + Math.round(isNonAllyFacing * 1e5) / 1e5);
     console.log("which side: " + Math.round(matching * 1e5) / 1e5);
@@ -3069,7 +3072,10 @@ function rollItemMacro(itemUuid) {
     item.roll();
   });
 }
-Hooks.on("renderChatLog", (app, html, data) => AbbrewItem.chatListeners(html));
+Hooks.on("renderChatLog", (app, html, data) => {
+  AbbrewActor.chatListeners(html);
+  AbbrewItem.chatListeners(html);
+});
 Hooks.on("abbrew.ability", function(ability) {
   console.log("Hooked on " + ability);
 });

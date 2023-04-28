@@ -188,7 +188,10 @@ function rollItemMacro(itemUuid) {
   });
 }
 
-Hooks.on("renderChatLog", (app, html, data) => AbbrewItem.chatListeners(html));
+Hooks.on("renderChatLog", (app, html, data) => {
+  AbbrewActor.chatListeners(html);
+  AbbrewItem.chatListeners(html);
+});
 
 Hooks.on("abbrew.ability", function (ability) {
   console.log("Hooked on " + ability);

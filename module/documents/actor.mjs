@@ -377,6 +377,30 @@ export class AbbrewActor extends Actor {
     // Process additional NPC data here.
   }
 
+  /* -------------------------------------------- */
+  /*  Chat Message Helpers                        */
+  /* -------------------------------------------- */
+
+  /**
+   * Apply listeners to chat messages.
+   * @param {HTML} html  Rendered chat message.
+   */
+  static chatListeners(html) {
+    html.on('click', '.damage-application button', this.onDamageAccept.bind(this));
+  }
+
+  /* async */static onDamageAccept(event) {
+    console.log(event);
+    // Extract card data
+    const button = event.currentTarget;
+    const card = button.closest(".chat-message");
+    const messageId = card.closest(".message").dataset.messageId;
+    const message = game.messages.get(messageId);
+    const tokens = canvas.tokens.controlled.filter((token) => token.actor);
+    /* await */ tokens[0].actor.acceptDamage(message.rolls, message.flags.data);
+  }
+
+
   toRadians(angle) {
     return angle * (Math.PI / 180);
   }
@@ -391,6 +415,11 @@ export class AbbrewActor extends Actor {
     vector.y = vector.y / length; //assigning new value to y
     return vector;
   };
+
+  convertFoundryAngle(angle) {
+    const angleDiff = angle - 270;
+    return angleDiff > 0 ? 360 - angleDiff : Math.abs(angleDiff);
+  }
 
   // Directly Down is 0, Left is 90, Up 180, Right 270
   /* async */ acceptDamage(damageRolls, attackData) {
@@ -407,12 +436,13 @@ export class AbbrewActor extends Actor {
     var nonAllyTokens = /* await */ placeables.filter(p => p.document.disposition != token.document.disposition);
     var center = token.center;
 
-    var tokenAngle = this.toRadians(token.document.rotation);
-    var nonAllyAngle = this.toRadians(nonAllyTokens[0].document.rotation);
+    var tokenAngle = this.toRadians(this.convertFoundryAngle(token.document.rotation));
+    var nonAllyAngle = this.toRadians(this.convertFoundryAngle(nonAllyTokens[0].document.rotation));
 
+    // TODO: Get normal to this, so we can determine left vs right
     var tokenVector = { x: Math.cos(tokenAngle), y: Math.sin(tokenAngle) };
     var nonAllyVector = { x: Math.cos(nonAllyAngle), y: Math.sin(nonAllyAngle) };
-    var vectorToFace = { x: token.center.x - nonAllyTokens[0].center.x, y: token.center.y - nonAllyTokens[0].center.y };
+    var vectorToFace = { x: token.center.x - nonAllyTokens[0].center.x, y: nonAllyTokens[0].center.y - token.center.y };
 
     tokenVector = this.normalize(tokenVector);
     tokenVector = Object.values(tokenVector);
@@ -420,7 +450,7 @@ export class AbbrewActor extends Actor {
     nonAllyVector = Object.values(nonAllyVector);
     vectorToFace = this.normalize(vectorToFace);
     vectorToFace = Object.values(vectorToFace);
-    var isNonAllyFacing = tokenVector.map((x, i) => vectorToFace[i] * nonAllyVector[i]).reduce((m, n) => m + n);
+    var isNonAllyFacing = vectorToFace.map((x, i) => vectorToFace[i] * nonAllyVector[i]).reduce((m, n) => m + n);
     var matching = tokenVector.map((x, i) => tokenVector[i] * nonAllyVector[i]).reduce((m, n) => m + n);
     console.log('enemy facing: ' + Math.round(isNonAllyFacing * 100000) / 100000);
     console.log('which side: ' + Math.round(matching * 100000) / 100000);
