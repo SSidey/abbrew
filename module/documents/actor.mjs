@@ -421,6 +421,45 @@ export class AbbrewActor extends Actor {
     return angleDiff > 0 ? 360 - angleDiff : Math.abs(angleDiff);
   }
 
+  getUnobservedPenalty() {    
+    var placeables = game.canvas.tokens.placeables;
+    var token = placeables.filter(p => p.document.actorId == this.id && p.controlled)[0];
+    var nonAllyTokens = placeables.filter(p => p.document.disposition != token.document.disposition);
+    var center = token.center;
+
+    var tokenAngle = this.toRadians(this.convertFoundryAngle(token.document.rotation));
+    var tokenRightFaceAngleCandidate = tokenAngle + 90;
+    var tokenRightFaceAngle = tokenRightFaceAngleCandidate >= 360 ? 360 - tokenRightFaceAngleCandidate : tokenRightFaceAngleCandidate;
+    tokenRightFaceAngle = this.toRadians(this.convertFoundryAngle(tokenRightFaceAngle));
+    var nonAllyAngle = this.toRadians(this.convertFoundryAngle(nonAllyTokens[0].document.rotation));
+
+    
+    var tokenVector = { x: Math.cos(tokenAngle), y: Math.sin(tokenAngle) };
+    var tokenRightFaceVector = { x: Math.cos(tokenRightFaceAngle), y: Math.sin(tokenRightFaceAngle)};
+    var nonAllyVector = { x: Math.cos(nonAllyAngle), y: Math.sin(nonAllyAngle) };
+    var vectorToFace = { x: token.center.x - nonAllyTokens[0].center.x, y: nonAllyTokens[0].center.y - token.center.y };
+
+    tokenVector = this.normalize(tokenVector);
+    tokenVector = Object.values(tokenVector);
+    tokenRightFaceVector = this.normalize(tokenRightFaceVector);
+    tokenRightFaceVector = Object.values(tokenRightFaceVector);
+    nonAllyVector = this.normalize(nonAllyVector);
+    nonAllyVector = Object.values(nonAllyVector);
+    vectorToFace = this.normalize(vectorToFace);
+    vectorToFace = Object.values(vectorToFace);
+    var isNonAllyFacing = vectorToFace.map((x, i) => vectorToFace[i] * nonAllyVector[i]).reduce((m, n) => m + n);
+    var matching = tokenVector.map((x, i) => tokenVector[i] * nonAllyVector[i]).reduce((m, n) => m + n);
+    var matchingRightFace = tokenVector.map((x, i) => tokenRightFaceVector[i] * nonAllyVector[i]).reduce((m, n) => m + n);
+    console.log('enemy facing: ' + Math.round(isNonAllyFacing * 100000) / 100000);
+    console.log('which side: ' + Math.round(matching * 100000) / 100000);
+    console.log('which  right side: ' + Math.round(matchingRightFace * 100000) / 100000);
+    // Matching: Positive if behind the target?
+    // Matching: 0 if side
+    // Matching: Negative if front
+    // more sense to reverse and go from the attacker?
+    // Then reverse and check which side
+  }
+
   // Directly Down is 0, Left is 90, Up 180, Right 270
   /* async */ acceptDamage(damageRolls, attackData) {
     let actor = this;
@@ -431,34 +470,7 @@ export class AbbrewActor extends Actor {
     // const modRoll = damageRolls[0];
     // modRoll.terms[0].rolls[0].terms[0].results[0] = {active: true, result: 1};
     // const newRoll = await CONFIG.Dice.AbbrewRoll.fromRoll(modRoll);
-    var placeables = /* await */ game.canvas.tokens.placeables;
-    var token = /* await */ placeables.filter(p => p.document.actorId == this.id && p.controlled)[0];
-    var nonAllyTokens = /* await */ placeables.filter(p => p.document.disposition != token.document.disposition);
-    var center = token.center;
-
-    var tokenAngle = this.toRadians(this.convertFoundryAngle(token.document.rotation));
-    var nonAllyAngle = this.toRadians(this.convertFoundryAngle(nonAllyTokens[0].document.rotation));
-
-    // TODO: Get normal to this, so we can determine left vs right
-    var tokenVector = { x: Math.cos(tokenAngle), y: Math.sin(tokenAngle) };
-    var nonAllyVector = { x: Math.cos(nonAllyAngle), y: Math.sin(nonAllyAngle) };
-    var vectorToFace = { x: token.center.x - nonAllyTokens[0].center.x, y: nonAllyTokens[0].center.y - token.center.y };
-
-    tokenVector = this.normalize(tokenVector);
-    tokenVector = Object.values(tokenVector);
-    nonAllyVector = this.normalize(nonAllyVector);
-    nonAllyVector = Object.values(nonAllyVector);
-    vectorToFace = this.normalize(vectorToFace);
-    vectorToFace = Object.values(vectorToFace);
-    var isNonAllyFacing = vectorToFace.map((x, i) => vectorToFace[i] * nonAllyVector[i]).reduce((m, n) => m + n);
-    var matching = tokenVector.map((x, i) => tokenVector[i] * nonAllyVector[i]).reduce((m, n) => m + n);
-    console.log('enemy facing: ' + Math.round(isNonAllyFacing * 100000) / 100000);
-    console.log('which side: ' + Math.round(matching * 100000) / 100000);
-    // Matching: Positive if behind the target?
-    // Matching: 0 if side
-    // Matching: Negative if front
-    // more sense to reverse and go from the attacker?
-    // Then reverse and check which side
+    const unobservedPenalty = this.getUnobservedPenalty();
 
     let currentArmour = systemData.armour.value;
     let newArmour = currentArmour;
