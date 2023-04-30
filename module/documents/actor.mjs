@@ -78,7 +78,6 @@ export class AbbrewActor extends Actor {
   }
 
   async _preUpdate(changed, options, user) {
-    console.log('pre-update');
 
     if (this.ruleOverrides) {
       let flatChanges = flattenObject(changed, 1);
@@ -458,58 +457,137 @@ export class AbbrewActor extends Actor {
     return Object.values(normalisedVector);
   }
 
+  getVectorToFacePoint(token, point) {
+    const vectorToFace = { x: point[0] - token.center.x, y: token.center.y - point[1] };
+    const normalisedVector = this.normalize(vectorToFace);
+    return Object.values(normalisedVector);
+  }
+
   dot(vectorA, vectorB) {
     return vectorA.map((x, i) => vectorA[i] * vectorB[i]).reduce((m, n) => m + n);
   }
+
+  boundedAddition = function (i, j, min, max) {
+    if (isNaN(min)) min = -Infinity;
+    if (isNaN(max)) max = Infinity;
+    var res = i + j;
+    return res < min ? min : res > max ? max : res;
+  };
+
+  getQuadrant(tokenOtherVector, tokenSecondOtherVector, vectorToFace) {
+    const bound = 0.7
+    const minBound = - bound;
+    const maxBound = bound;
+    const otherMeasure = this.dot(tokenOtherVector, vectorToFace);
+    const secondOtherMeasure = this.dot(tokenSecondOtherVector, vectorToFace);
+    const roundedOtherMeasure = Math.round(otherMeasure * 100000) / 100000;
+    const diag1 = roundedOtherMeasure < minBound ? { front: 1, right: 1 } : roundedOtherMeasure > maxBound ? { front: -1, right: -1 } : { front: 0, right: 0 };
+    const roundedSecond = Math.round(secondOtherMeasure * 100000) / 100000;
+    const diag2 = roundedSecond < minBound ? { front: -1, right: 1 } : roundedSecond > maxBound ? { front: 1, right: -1 } : { front: 0, right: 0 };
+
+    const result = { front: this.boundedAddition(diag1.front, diag2.front, -1, 1), right: this.boundedAddition(diag1.right, diag2.right, -1, 1) };
+    return result;
+  }
+
+  // seems to get to top left corner?
+  // tooltip one is right
+  // getDistanceBetweenTokens(token, target) {
+  //   // Distance between two targets in foundry
+  //   // if (!token) return ui.notifications.info("no token selected");
+  //   // const target = Array.from(game.user.targets)[0]; // only uses the first target
+  //   // if (!target) return ui.notifications.info("You have no target");
+  //   const distance = canvas.grid.measureDistance(token, target).toFixed(1); //gets the distance between to tokens, rounded to 1 decimal place.
+  //   const content = `${token.name} is ${distance} units from ${target.name}`;
+  //   ChatMessage.create({ content, whisper: ChatMessage.getWhisperRecipients(game.user.name) }); //self whisper by player / gm.
+  // }
+
+  getDistanceBetweenTokens(token, targetToken) {
+    const grid = canvas.grid;
+    const ttRect = targetToken.bounds;
+    const atRect = token.bounds;
+    const ttPos = { x: targetToken.center.x, y: targetToken.center.y };
+    const atPos = { x: token.center.x, y: token.center.y };
+    if (ttRect.width > grid.size) {
+      if (ttRect.right < atRect.left) {
+        ttPos.x = ttRect.right - grid.size / 2;
+      } else if (ttRect.left > atRect.right) {
+        ttPos.x = ttRect.left + grid.size / 2;
+      } else {
+        ttPos.x = atPos.x;
+      }
+    }
+    if (ttRect.height > grid.size) {
+      if (ttRect.bottom < atRect.top) {
+        ttPos.y = ttRect.bottom - grid.size / 2;
+      } else if (ttRect.top > atRect.bottom) {
+        ttPos.y = ttRect.top + grid.size / 2;
+      } else {
+        ttPos.y = atPos.y;
+      }
+    }
+    if (atRect.width > grid.size) {
+      if (atRect.right < ttRect.left) {
+        atPos.x = atRect.right - grid.size / 2;
+      } else if (atRect.left > ttRect.right) {
+        atPos.x = atRect.left + grid.size / 2;
+      } else {
+        atPos.x = ttPos.x;
+      }
+    }
+    if (atRect.height > grid.size) {
+      if (atRect.bottom < ttRect.top) {
+        atPos.y = atRect.bottom - grid.size / 2;
+      } else if (atRect.top > ttRect.bottom) {
+        atPos.y = atRect.top + grid.size / 2;
+      } else {
+        atPos.y = ttPos.y;
+      }
+    }
+    return grid.measureDistance(ttPos, atPos, { gridSpaces: true });
+  };
 
   getUnobservedPenalty() {
     const placeables = game.canvas.tokens.placeables;
     const token = placeables.filter(p => p.document.actorId == this.id && p.controlled)[0];
     const nonAllyTokens = placeables.filter(p => p.document.disposition != token.document.disposition);
 
-    const tokenVector = this.getTokenVectorFacing(token);
-    const tokenRightFaceVector = this.getTokenVectorNormal(token);
-    const tokenOtherVector = this.getTokenVectorAdjusted(token, 45);
-    const tokenSecondOtherVector = this.getTokenVectorAdjusted(token, 135);
+    // Grid Size = 100px x 100px
+    // Magnitude for Size 1 = ~141
+    // tokens should be NxN in scale, height == width
+    const tokenDiagonalMagnitude = 70 * token.document.height;
+    const tokenRearRightPoint = [(token.center.x + this.getTokenVectorAdjusted(token, 135)[0] * tokenDiagonalMagnitude), (token.center.y - this.getTokenVectorAdjusted(token, 135)[1] * tokenDiagonalMagnitude)];
+    const tokenFrontLeftPoint = [(token.center.x + this.getTokenVectorAdjusted(token, 315)[0] * tokenDiagonalMagnitude), (token.center.y - this.getTokenVectorAdjusted(token, 315)[1] * tokenDiagonalMagnitude)];
+
+    const tokenFrontRightVector = this.getTokenVectorAdjusted(token, 45);
+    const tokenRearRightVector = this.getTokenVectorAdjusted(token, 135);
 
     nonAllyTokens.forEach(enemyToken => {
+
       const vectorToFace = this.getVectorToFace(enemyToken, token);
       const enemyTokenVector = this.getTokenVectorFacing(enemyToken);
 
-      const isNonAllyFacing = this.dot(vectorToFace, enemyTokenVector);
-      const matching = this.dot(tokenVector, vectorToFace);
-      const matchingRightFace = this.dot(tokenRightFaceVector, vectorToFace);
-      const otherMeasure = this.dot(tokenOtherVector, vectorToFace);
-      const secondOtherMeasure = this.dot(tokenSecondOtherVector, vectorToFace);
+      const distance = this.getDistanceBetweenTokens(enemyToken, token);
+      const enemyReaches = enemyToken.actor.itemTypes.item.filter(i => i.system.isWeapon && i.system.equipState.wielded).map(i => i.system.weapon.reach);
+      const enemyReach = Math.max(...enemyReaches);
+      const threateningReach = Math.floor(enemyToken.actor.system.size * (1 + enemyReach));
 
-      console.log('enemy facing: ' + Math.round(isNonAllyFacing * 100000) / 100000);
+      if(threateningReach < distance) {
+        // console.log('threatenedDistance ' + threateningReach + ' was not enough to reach target at distance ' + distance);
+        return;
+      }
 
-      // Works for 1x1, 
-      // DOESN'T WORK: point at 2 diagonal corners and comparing? if left of one but right of another then it's mid? left of both left, right of both right
-      // Look at adding a 45 degree variant? may need 2 don't seem to be helping...
-      const roundedMatching = Math.round(matching * 100000) / 100000;
-      const fR = roundedMatching < -0.7 ? 'Front' : roundedMatching > 0.7 ? 'Rear' : 'Mid';
-      const roundedMatchingRightFace = Math.round(matchingRightFace * 100000) / 100000;
-      const lR = roundedMatchingRightFace < -0.7 ? 'Right' : roundedMatchingRightFace > 0.7 ? 'Left' : 'Mid';
-      const roundedOtherMeasure = Math.round(otherMeasure * 100000) / 100000;
-      const diag1 = roundedOtherMeasure < -0.9 ? 'FrontRight' : roundedOtherMeasure > 0.9 ? 'RearLeft' : '';
-      const roundedSecond = Math.round(secondOtherMeasure * 100000) / 100000;
-      const diag2 = roundedSecond < -0.9 ? 'RearRight' : roundedSecond > 0.9 ? 'FrontLeft' : '';
-      console.log('Front/Rear: ' + roundedMatching);
-      console.log('Left/Right: ' + roundedMatchingRightFace);
-      console.log('Other: ' + roundedOtherMeasure);
-      console.log('Other2: ' + roundedSecond);
-      console.log('which side: ' + fR + ' ' + lR);
-      console.log('diagonals: ' + diag1 + ' ' + diag2);
+      if (this.dot(vectorToFace, enemyTokenVector) > 0.7) {
+        const vectorToFaceRearRight = this.getVectorToFacePoint(enemyToken, tokenRearRightPoint);
+        const vectorToFaceFrontLeft = this.getVectorToFacePoint(enemyToken, tokenFrontLeftPoint);
+
+        const rearRightResult = this.getQuadrant(tokenFrontRightVector, tokenRearRightVector, vectorToFaceRearRight);
+        const frontLeftResult = this.getQuadrant(tokenFrontRightVector, tokenRearRightVector, vectorToFaceFrontLeft);
+        const result = { front: this.boundedAddition(rearRightResult.front, frontLeftResult.front, -1, 1), right: this.boundedAddition(rearRightResult.right, frontLeftResult.right, -1, 1) };
+        const frontRear = result.front > 0 ? 'front' : result.front < 0 ? 'rear' : 'mid';
+        const rightLeft = result.right > 0 ? 'right' : result.right < 0 ? 'left' : 'mid';
+        console.log('diagonals: ' + frontRear + ' ' + rightLeft);
+      }
     });
-    // Matching: Positive if behind the target?
-    // Matching: 0 if side
-    // Matching: Negative if front
-    // more sense to reverse and go from the attacker?
-    // Then reverse and check which side
-
-    // Right side: Right<-0.7<Mid<0.7<Left
-    // Front side: Front<-0.7<Mid<0.7<Rear
 
 
   }
