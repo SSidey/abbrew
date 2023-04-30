@@ -576,14 +576,10 @@ class AbbrewActor extends Actor {
   }
   /** @override */
   prepareData() {
-    console.log("before");
     super.prepareData();
-    console.log("between");
-    console.log("after");
   }
   /** @override */
   prepareBaseData() {
-    console.log("is it before?");
   }
   /**
    * @override
@@ -623,7 +619,6 @@ class AbbrewActor extends Actor {
     await super._updateObject(event, formData);
   }
   _onUpdate(data, options2, userId) {
-    console.log("here2");
     super._onUpdate(data, options2, userId);
   }
   async _preUpdate(changed, options2, user) {
@@ -920,37 +915,71 @@ class AbbrewActor extends Actor {
     return this.toRadians(this.convertFoundryAngle(token.document.rotation));
   }
   getTokenNormal(token) {
-    const tokenAngle = this.convertFoundryAngle(token.document.rotation);
-    const tokenRightFaceAngleCandidate = tokenAngle + 90;
-    const tokenRightFaceAngle = tokenRightFaceAngleCandidate >= 360 ? 360 - tokenRightFaceAngleCandidate : tokenRightFaceAngleCandidate;
-    return tokenRightFaceAngle = this.toRadians(this.convertFoundryAngle(tokenRightFaceAngle));
+    return this.getTokenRotationAdjusted(token, 90);
+  }
+  getTokenRotationAdjusted(token, rotation) {
+    const tokenAngle = token.document.rotation;
+    const tokenModifiedAngleCandidate = tokenAngle + rotation;
+    const tokenModifiedAngle = tokenModifiedAngleCandidate >= 360 ? 360 - tokenModifiedAngleCandidate : tokenModifiedAngleCandidate;
+    return this.toRadians(this.convertFoundryAngle(tokenModifiedAngle));
+  }
+  getTokenVectorFacing(token) {
+    const tokenAngle = this.getTokenAngle(token);
+    return this.getVectorFromAngle(tokenAngle);
+  }
+  getTokenVectorNormal(token) {
+    const tokenRightFaceAngle = this.getTokenNormal(token);
+    return this.getVectorFromAngle(tokenRightFaceAngle);
+  }
+  getTokenVectorAdjusted(token, rotation) {
+    const tokenAdjustedAngle = this.getTokenRotationAdjusted(token, rotation);
+    return this.getVectorFromAngle(tokenAdjustedAngle);
+  }
+  getVectorFromAngle(angle) {
+    const vector = { x: Math.cos(angle), y: Math.sin(angle) };
+    const normalisedVector = this.normalize(vector);
+    return Object.values(normalisedVector);
+  }
+  getVectorToFace(token, targetToken) {
+    const vectorToFace = { x: targetToken.center.x - token.center.x, y: token.center.y - targetToken.center.y };
+    const normalisedVector = this.normalize(vectorToFace);
+    return Object.values(normalisedVector);
+  }
+  dot(vectorA, vectorB) {
+    return vectorA.map((x, i) => vectorA[i] * vectorB[i]).reduce((m, n) => m + n);
   }
   getUnobservedPenalty() {
-    var placeables = game.canvas.tokens.placeables;
-    var token = placeables.filter((p) => p.document.actorId == this.id && p.controlled)[0];
-    var nonAllyTokens = placeables.filter((p) => p.document.disposition != token.document.disposition);
-    token.center;
-    var tokenAngle = this.getTokenAngle(token);
-    var tokenRightFaceAngle = this.getTokenNormal(token);
-    var nonAllyAngle = this.toRadians(this.convertFoundryAngle(nonAllyTokens[0].document.rotation));
-    var tokenVector = { x: Math.cos(tokenAngle), y: Math.sin(tokenAngle) };
-    var tokenRightFaceVector = { x: Math.cos(tokenRightFaceAngle), y: Math.sin(tokenRightFaceAngle) };
-    var nonAllyVector = { x: Math.cos(nonAllyAngle), y: Math.sin(nonAllyAngle) };
-    var vectorToFace = { x: token.center.x - nonAllyTokens[0].center.x, y: nonAllyTokens[0].center.y - token.center.y };
-    tokenVector = this.normalize(tokenVector);
-    tokenVector = Object.values(tokenVector);
-    tokenRightFaceVector = this.normalize(tokenRightFaceVector);
-    tokenRightFaceVector = Object.values(tokenRightFaceVector);
-    nonAllyVector = this.normalize(nonAllyVector);
-    nonAllyVector = Object.values(nonAllyVector);
-    vectorToFace = this.normalize(vectorToFace);
-    vectorToFace = Object.values(vectorToFace);
-    var isNonAllyFacing = vectorToFace.map((x, i) => vectorToFace[i] * nonAllyVector[i]).reduce((m, n) => m + n);
-    var matching = tokenVector.map((x, i) => tokenVector[i] * nonAllyVector[i]).reduce((m, n) => m + n);
-    var matchingRightFace = tokenVector.map((x, i) => tokenRightFaceVector[i] * nonAllyVector[i]).reduce((m, n) => m + n);
-    console.log("enemy facing: " + Math.round(isNonAllyFacing * 1e5) / 1e5);
-    console.log("which side: " + Math.round(matching * 1e5) / 1e5);
-    console.log("which  right side: " + Math.round(matchingRightFace * 1e5) / 1e5);
+    const placeables = game.canvas.tokens.placeables;
+    const token = placeables.filter((p) => p.document.actorId == this.id && p.controlled)[0];
+    const nonAllyTokens = placeables.filter((p) => p.document.disposition != token.document.disposition);
+    const tokenVector = this.getTokenVectorFacing(token);
+    const tokenRightFaceVector = this.getTokenVectorNormal(token);
+    const tokenOtherVector = this.getTokenVectorAdjusted(token, 45);
+    const tokenSecondOtherVector = this.getTokenVectorAdjusted(token, 135);
+    nonAllyTokens.forEach((enemyToken) => {
+      const vectorToFace = this.getVectorToFace(enemyToken, token);
+      const enemyTokenVector = this.getTokenVectorFacing(enemyToken);
+      const isNonAllyFacing = this.dot(vectorToFace, enemyTokenVector);
+      const matching = this.dot(tokenVector, vectorToFace);
+      const matchingRightFace = this.dot(tokenRightFaceVector, vectorToFace);
+      const otherMeasure = this.dot(tokenOtherVector, vectorToFace);
+      const secondOtherMeasure = this.dot(tokenSecondOtherVector, vectorToFace);
+      console.log("enemy facing: " + Math.round(isNonAllyFacing * 1e5) / 1e5);
+      const roundedMatching = Math.round(matching * 1e5) / 1e5;
+      const fR = roundedMatching < -0.7 ? "Front" : roundedMatching > 0.7 ? "Rear" : "Mid";
+      const roundedMatchingRightFace = Math.round(matchingRightFace * 1e5) / 1e5;
+      const lR = roundedMatchingRightFace < -0.7 ? "Right" : roundedMatchingRightFace > 0.7 ? "Left" : "Mid";
+      const roundedOtherMeasure = Math.round(otherMeasure * 1e5) / 1e5;
+      const diag1 = roundedOtherMeasure < -0.9 ? "FrontRight" : roundedOtherMeasure > 0.9 ? "RearLeft" : "";
+      const roundedSecond = Math.round(secondOtherMeasure * 1e5) / 1e5;
+      const diag2 = roundedSecond < -0.9 ? "RearRight" : roundedSecond > 0.9 ? "FrontLeft" : "";
+      console.log("Front/Rear: " + roundedMatching);
+      console.log("Left/Right: " + roundedMatchingRightFace);
+      console.log("Other: " + roundedOtherMeasure);
+      console.log("Other2: " + roundedSecond);
+      console.log("which side: " + fR + " " + lR);
+      console.log("diagonals: " + diag1 + " " + diag2);
+    });
   }
   // Directly Down is 0, Left is 90, Up 180, Right 270
   /* async */

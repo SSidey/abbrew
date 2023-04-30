@@ -15,17 +15,14 @@ export class AbbrewActor extends Actor {
     // the following, in order: data reset (to clear active effects),
     // prepareBaseData(), prepareEmbeddedDocuments() (including active effects),
     // prepareDerivedData().
-    console.log('before');
     super.prepareData();
-    console.log('between');
-    console.log('after');
   }
 
   /** @override */
   prepareBaseData() {
     // Data modifications in this step occur before processing embedded
     // documents or derived data.
-    console.log('is it before?');
+    // console.log('is it before?');
   }
 
   /**
@@ -76,8 +73,6 @@ export class AbbrewActor extends Actor {
   }
 
   _onUpdate(data, options, userId) {
-    console.log('here2');
-    // call super with revert to rawActor merged with actual changes?
     super._onUpdate(data, options, userId);
 
   }
@@ -421,43 +416,102 @@ export class AbbrewActor extends Actor {
     return angleDiff > 0 ? 360 - angleDiff : Math.abs(angleDiff);
   }
 
-  getUnobservedPenalty() {    
-    var placeables = game.canvas.tokens.placeables;
-    var token = placeables.filter(p => p.document.actorId == this.id && p.controlled)[0];
-    var nonAllyTokens = placeables.filter(p => p.document.disposition != token.document.disposition);
-    var center = token.center;
+  getTokenAngle(token) {
+    return this.toRadians(this.convertFoundryAngle(token.document.rotation));
+  }
 
-    var tokenAngle = this.toRadians(this.convertFoundryAngle(token.document.rotation));
-    var tokenRightFaceAngleCandidate = tokenAngle + 90;
-    var tokenRightFaceAngle = tokenRightFaceAngleCandidate >= 360 ? 360 - tokenRightFaceAngleCandidate : tokenRightFaceAngleCandidate;
-    tokenRightFaceAngle = this.toRadians(this.convertFoundryAngle(tokenRightFaceAngle));
-    var nonAllyAngle = this.toRadians(this.convertFoundryAngle(nonAllyTokens[0].document.rotation));
+  getTokenNormal(token) {
+    return this.getTokenRotationAdjusted(token, 90);
+  }
 
-    
-    var tokenVector = { x: Math.cos(tokenAngle), y: Math.sin(tokenAngle) };
-    var tokenRightFaceVector = { x: Math.cos(tokenRightFaceAngle), y: Math.sin(tokenRightFaceAngle)};
-    var nonAllyVector = { x: Math.cos(nonAllyAngle), y: Math.sin(nonAllyAngle) };
-    var vectorToFace = { x: token.center.x - nonAllyTokens[0].center.x, y: nonAllyTokens[0].center.y - token.center.y };
+  getTokenRotationAdjusted(token, rotation) {
+    const tokenAngle = token.document.rotation;
+    const tokenModifiedAngleCandidate = tokenAngle + rotation;
+    const tokenModifiedAngle = tokenModifiedAngleCandidate >= 360 ? 360 - tokenModifiedAngleCandidate : tokenModifiedAngleCandidate;
+    return this.toRadians(this.convertFoundryAngle(tokenModifiedAngle));
+  }
 
-    tokenVector = this.normalize(tokenVector);
-    tokenVector = Object.values(tokenVector);
-    tokenRightFaceVector = this.normalize(tokenRightFaceVector);
-    tokenRightFaceVector = Object.values(tokenRightFaceVector);
-    nonAllyVector = this.normalize(nonAllyVector);
-    nonAllyVector = Object.values(nonAllyVector);
-    vectorToFace = this.normalize(vectorToFace);
-    vectorToFace = Object.values(vectorToFace);
-    var isNonAllyFacing = vectorToFace.map((x, i) => vectorToFace[i] * nonAllyVector[i]).reduce((m, n) => m + n);
-    var matching = tokenVector.map((x, i) => tokenVector[i] * nonAllyVector[i]).reduce((m, n) => m + n);
-    var matchingRightFace = tokenVector.map((x, i) => tokenRightFaceVector[i] * nonAllyVector[i]).reduce((m, n) => m + n);
-    console.log('enemy facing: ' + Math.round(isNonAllyFacing * 100000) / 100000);
-    console.log('which side: ' + Math.round(matching * 100000) / 100000);
-    console.log('which  right side: ' + Math.round(matchingRightFace * 100000) / 100000);
+  getTokenVectorFacing(token) {
+    const tokenAngle = this.getTokenAngle(token);
+    return this.getVectorFromAngle(tokenAngle);
+  }
+
+  getTokenVectorNormal(token) {
+    const tokenRightFaceAngle = this.getTokenNormal(token);
+    return this.getVectorFromAngle(tokenRightFaceAngle);
+  }
+
+  getTokenVectorAdjusted(token, rotation) {
+    const tokenAdjustedAngle = this.getTokenRotationAdjusted(token, rotation);
+    return this.getVectorFromAngle(tokenAdjustedAngle);
+  }
+
+  getVectorFromAngle(angle) {
+    const vector = { x: Math.cos(angle), y: Math.sin(angle) };
+    const normalisedVector = this.normalize(vector);
+    return Object.values(normalisedVector);
+  }
+
+  getVectorToFace(token, targetToken) {
+    const vectorToFace = { x: targetToken.center.x - token.center.x, y: token.center.y - targetToken.center.y };
+    const normalisedVector = this.normalize(vectorToFace);
+    return Object.values(normalisedVector);
+  }
+
+  dot(vectorA, vectorB) {
+    return vectorA.map((x, i) => vectorA[i] * vectorB[i]).reduce((m, n) => m + n);
+  }
+
+  getUnobservedPenalty() {
+    const placeables = game.canvas.tokens.placeables;
+    const token = placeables.filter(p => p.document.actorId == this.id && p.controlled)[0];
+    const nonAllyTokens = placeables.filter(p => p.document.disposition != token.document.disposition);
+
+    const tokenVector = this.getTokenVectorFacing(token);
+    const tokenRightFaceVector = this.getTokenVectorNormal(token);
+    const tokenOtherVector = this.getTokenVectorAdjusted(token, 45);
+    const tokenSecondOtherVector = this.getTokenVectorAdjusted(token, 135);
+
+    nonAllyTokens.forEach(enemyToken => {
+      const vectorToFace = this.getVectorToFace(enemyToken, token);
+      const enemyTokenVector = this.getTokenVectorFacing(enemyToken);
+
+      const isNonAllyFacing = this.dot(vectorToFace, enemyTokenVector);
+      const matching = this.dot(tokenVector, vectorToFace);
+      const matchingRightFace = this.dot(tokenRightFaceVector, vectorToFace);
+      const otherMeasure = this.dot(tokenOtherVector, vectorToFace);
+      const secondOtherMeasure = this.dot(tokenSecondOtherVector, vectorToFace);
+
+      console.log('enemy facing: ' + Math.round(isNonAllyFacing * 100000) / 100000);
+
+      // Works for 1x1, 
+      // DOESN'T WORK: point at 2 diagonal corners and comparing? if left of one but right of another then it's mid? left of both left, right of both right
+      // Look at adding a 45 degree variant? may need 2 don't seem to be helping...
+      const roundedMatching = Math.round(matching * 100000) / 100000;
+      const fR = roundedMatching < -0.7 ? 'Front' : roundedMatching > 0.7 ? 'Rear' : 'Mid';
+      const roundedMatchingRightFace = Math.round(matchingRightFace * 100000) / 100000;
+      const lR = roundedMatchingRightFace < -0.7 ? 'Right' : roundedMatchingRightFace > 0.7 ? 'Left' : 'Mid';
+      const roundedOtherMeasure = Math.round(otherMeasure * 100000) / 100000;
+      const diag1 = roundedOtherMeasure < -0.9 ? 'FrontRight' : roundedOtherMeasure > 0.9 ? 'RearLeft' : '';
+      const roundedSecond = Math.round(secondOtherMeasure * 100000) / 100000;
+      const diag2 = roundedSecond < -0.9 ? 'RearRight' : roundedSecond > 0.9 ? 'FrontLeft' : '';
+      console.log('Front/Rear: ' + roundedMatching);
+      console.log('Left/Right: ' + roundedMatchingRightFace);
+      console.log('Other: ' + roundedOtherMeasure);
+      console.log('Other2: ' + roundedSecond);
+      console.log('which side: ' + fR + ' ' + lR);
+      console.log('diagonals: ' + diag1 + ' ' + diag2);
+    });
     // Matching: Positive if behind the target?
     // Matching: 0 if side
     // Matching: Negative if front
     // more sense to reverse and go from the attacker?
     // Then reverse and check which side
+
+    // Right side: Right<-0.7<Mid<0.7<Left
+    // Front side: Front<-0.7<Mid<0.7<Rear
+
+
   }
 
   // Directly Down is 0, Left is 90, Up 180, Right 270
