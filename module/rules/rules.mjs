@@ -66,6 +66,10 @@ export async function prepareRules(actor) {
                 valid = AbbrewActiveEffect.validate(parsedRule);
                 typedRule = new AbbrewActiveEffect(rule.id, rule.label, parsedRule, rule.source, valid);
                 typedRule.targetElement = rule.targetElement;
+                // TODO: Rules need adjusted when dropped in not to use the base item Id
+                // if(!actor.items.get(typedRule.source.item)) {
+                //     break;
+                // }
                 const equipState = actor.items.get(typedRule.source.item).system.equipState;
                 if ((typedRule.requireEquippedItem && (equipState.worn || equipState.wielded)) || (!typedRule.requireEquippedItem)) {
                     validRules.push(typedRule);

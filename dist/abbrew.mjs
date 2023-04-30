@@ -1037,7 +1037,7 @@ class AbbrewActor extends Actor {
     const tokenFrontLeftPoint = [token.center.x + this.getTokenVectorAdjusted(token, 315)[0] * tokenDiagonalMagnitude, token.center.y - this.getTokenVectorAdjusted(token, 315)[1] * tokenDiagonalMagnitude];
     const tokenFrontRightVector = this.getTokenVectorAdjusted(token, 45);
     const tokenRearRightVector = this.getTokenVectorAdjusted(token, 135);
-    nonAllyTokens.forEach((enemyToken) => {
+    const penalties = nonAllyTokens.map((enemyToken) => {
       const vectorToFace = this.getVectorToFace(enemyToken, token);
       const enemyTokenVector = this.getTokenVectorFacing(enemyToken);
       const distance = this.getDistanceBetweenTokens(enemyToken, token);
@@ -1045,7 +1045,7 @@ class AbbrewActor extends Actor {
       const enemyReach = Math.max(...enemyReaches);
       const threateningReach = Math.floor(enemyToken.actor.system.size * (1 + enemyReach));
       if (threateningReach < distance) {
-        return;
+        return 0;
       }
       if (this.dot(vectorToFace, enemyTokenVector) > 0.7) {
         const vectorToFaceRearRight = this.getVectorToFacePoint(enemyToken, tokenRearRightPoint);
@@ -1053,11 +1053,16 @@ class AbbrewActor extends Actor {
         const rearRightResult = this.getQuadrant(tokenFrontRightVector, tokenRearRightVector, vectorToFaceRearRight);
         const frontLeftResult = this.getQuadrant(tokenFrontRightVector, tokenRearRightVector, vectorToFaceFrontLeft);
         const result = { front: this.boundedAddition(rearRightResult.front, frontLeftResult.front, -1, 1), right: this.boundedAddition(rearRightResult.right, frontLeftResult.right, -1, 1) };
-        const frontRear = result.front > 0 ? "front" : result.front < 0 ? "rear" : "mid";
-        const rightLeft = result.right > 0 ? "right" : result.right < 0 ? "left" : "mid";
+        const frontRear = result.front > 0 ? "Front" : result.front < 0 ? "Rear" : "Mid";
+        const rightLeft = result.right > 0 ? "Right" : result.right < 0 ? "Left" : "Mid";
         console.log("diagonals: " + frontRear + " " + rightLeft);
+        const penalty = token.actor.system.conditions["observationPenalty" + frontRear + rightLeft];
+        return penalty;
       }
+      return 0;
     });
+    const totalPenalty = penalties.map((p) => p < 0 ? 0 : p).reduce((a, b) => a + b);
+    return totalPenalty;
   }
   // Directly Down is 0, Left is 90, Up 180, Right 270
   /* async */
@@ -1067,7 +1072,7 @@ class AbbrewActor extends Actor {
     let damage = damageRolls[0]._total;
     let damageRoll = damageRolls[0];
     let damagePenetrate = attackData.attackProfile.weapon.penetration;
-    this.getUnobservedPenalty();
+    const unobservedPenalty = this.getUnobservedPenalty();
     let currentArmour = systemData.armour.value;
     let newArmour = currentArmour;
     const damageType = attackData.attackProfile.weapon.damageType;
@@ -1092,7 +1097,7 @@ class AbbrewActor extends Actor {
     }
     let criticalExplosions = this.getCriticalExplosions(damageRoll, damageTypeDefence.vulnerable, damageTypeDefence.negate);
     if (systemData.armour.defencesArray.includes(damageType)) {
-      const penetrate = damageTypeDefence.penetrate + damagePenetrate;
+      const penetrate = damageTypeDefence.penetrate + damagePenetrate + unobservedPenalty;
       const adjustedBlock = Math.max(0, damageTypeDefence.block - penetrate);
       const adjustedPenetration = Math.max(0, penetrate - damageTypeDefence.block);
       const fullDamage = damage;

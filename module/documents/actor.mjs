@@ -561,7 +561,7 @@ export class AbbrewActor extends Actor {
     const tokenFrontRightVector = this.getTokenVectorAdjusted(token, 45);
     const tokenRearRightVector = this.getTokenVectorAdjusted(token, 135);
 
-    nonAllyTokens.forEach(enemyToken => {
+    const penalties = nonAllyTokens.map(enemyToken => {
 
       const vectorToFace = this.getVectorToFace(enemyToken, token);
       const enemyTokenVector = this.getTokenVectorFacing(enemyToken);
@@ -573,7 +573,7 @@ export class AbbrewActor extends Actor {
 
       if(threateningReach < distance) {
         // console.log('threatenedDistance ' + threateningReach + ' was not enough to reach target at distance ' + distance);
-        return;
+        return 0;
       }
 
       if (this.dot(vectorToFace, enemyTokenVector) > 0.7) {
@@ -583,13 +583,18 @@ export class AbbrewActor extends Actor {
         const rearRightResult = this.getQuadrant(tokenFrontRightVector, tokenRearRightVector, vectorToFaceRearRight);
         const frontLeftResult = this.getQuadrant(tokenFrontRightVector, tokenRearRightVector, vectorToFaceFrontLeft);
         const result = { front: this.boundedAddition(rearRightResult.front, frontLeftResult.front, -1, 1), right: this.boundedAddition(rearRightResult.right, frontLeftResult.right, -1, 1) };
-        const frontRear = result.front > 0 ? 'front' : result.front < 0 ? 'rear' : 'mid';
-        const rightLeft = result.right > 0 ? 'right' : result.right < 0 ? 'left' : 'mid';
-        console.log('diagonals: ' + frontRear + ' ' + rightLeft);
+        const frontRear = result.front > 0 ? 'Front' : result.front < 0 ? 'Rear' : 'Mid';
+        const rightLeft = result.right > 0 ? 'Right' : result.right < 0 ? 'Left' : 'Mid';
+        console.log('diagonals: ' + frontRear + ' ' + rightLeft);    
+        const penalty = token.actor.system.conditions["observationPenalty" + frontRear + rightLeft];     
+        return penalty;
       }
+
+      return 0;
     });
 
-
+    const totalPenalty = penalties.map(p => p < 0 ? 0 : p).reduce((a,b)=>a+b);
+    return totalPenalty;
   }
 
   // Directly Down is 0, Left is 90, Up 180, Right 270
@@ -640,7 +645,7 @@ export class AbbrewActor extends Actor {
     let criticalExplosions = this.getCriticalExplosions(damageRoll, damageTypeDefence.vulnerable, damageTypeDefence.negate);
 
     if (systemData.armour.defencesArray.includes(damageType)) {
-      const penetrate = damageTypeDefence.penetrate + damagePenetrate;
+      const penetrate = damageTypeDefence.penetrate + damagePenetrate + unobservedPenalty;
 
       const adjustedBlock = Math.max(0, damageTypeDefence.block - penetrate);
       const adjustedPenetration = Math.max(0, penetrate - damageTypeDefence.block)
@@ -709,7 +714,7 @@ export class AbbrewActor extends Actor {
   handleHeat(systemData, damage, criticalExplosions, attackProfile) {
     const healingWounds = systemData.wounds.healing += damage;
     const thermalState = systemData.state += attackProfile.thermalChange;
-    // Can we add conditions automatically? would be good to add burned here...
+    // TODO: (Can we add) We can! add conditions automatically? would be good to add burned here...
     const updates = { "system.wounds.healing": damage };
     if (criticalExplosions) {
       let currentBlood = systemData.blood.value -= damage;
