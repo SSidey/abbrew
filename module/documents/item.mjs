@@ -165,6 +165,7 @@ export class AbbrewItem extends Item {
     data.description = await TextEditor.enrichHTML(data.description, {
       async: true,
       relativeTo: this,
+      links: true,
       rollData: this.getRollData(),
       ...htmlOptions
     });

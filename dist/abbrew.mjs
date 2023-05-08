@@ -1305,6 +1305,7 @@ class AbbrewItem extends Item {
     data.description = await TextEditor.enrichHTML(data.description, {
       async: true,
       relativeTo: this,
+      links: true,
       rollData: this.getRollData(),
       ...htmlOptions
     });
@@ -2820,7 +2821,7 @@ class AbbrewItemSheet extends ItemSheet {
   }
   /* -------------------------------------------- */
   /** @override */
-  getData() {
+  async getData() {
     var _a;
     const context = super.getData();
     const itemData = context.item;
@@ -2832,6 +2833,11 @@ class AbbrewItemSheet extends ItemSheet {
     context.effects = prepareActiveEffectCategories(this.item.effects);
     context.system = itemData.system;
     context.flags = itemData.flags;
+    context.system.enrichedDescription = await TextEditor.enrichHTML(context.system.description, {
+      async: true,
+      relativeTo: this,
+      links: true
+    });
     return context;
   }
   /* -------------------------------------------- */
@@ -2855,8 +2861,9 @@ class AbbrewItemSheet extends ItemSheet {
       } else {
         super._updateObject(event, formData);
       }
+    } else {
+      super._updateObject(event, formData);
     }
-    return;
   }
   async manualUpdate(event, formData) {
     const target = event.currentTarget;

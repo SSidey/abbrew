@@ -34,7 +34,7 @@ export class AbbrewItemSheet extends ItemSheet {
   /* -------------------------------------------- */
 
   /** @override */
-  getData() {
+  async getData() {
     // Retrieve base data structure.
     const context = super.getData();
 
@@ -54,6 +54,11 @@ export class AbbrewItemSheet extends ItemSheet {
     // Add the actor's data to context.data for easier access, as well as flags.
     context.system = itemData.system;
     context.flags = itemData.flags;
+    context.system.enrichedDescription = await TextEditor.enrichHTML(context.system.description, {
+      async: true,
+      relativeTo: this,
+      links: true
+    });
 
     return context;
   }
@@ -94,9 +99,9 @@ export class AbbrewItemSheet extends ItemSheet {
       else {
         super._updateObject(event, formData);
       }
+    } else {
+      super._updateObject(event, formData);
     }
-
-    return;
   }
 
   async manualUpdate(event, formData) {
