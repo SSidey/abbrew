@@ -532,6 +532,9 @@ async function prepareRules(actor) {
         valid = AbbrewActiveEffect.validate(parsedRule);
         typedRule = new AbbrewActiveEffect(rule.id, rule.label, parsedRule, rule.source, valid);
         typedRule.targetElement = rule.targetElement;
+        if (!actor.items.get(typedRule.source.item)) {
+          break;
+        }
         const equipState = actor.items.get(typedRule.source.item).system.equipState;
         if (typedRule.requireEquippedItem && (equipState.worn || equipState.wielded) || !typedRule.requireEquippedItem) {
           validRules.push(typedRule);
@@ -711,6 +714,26 @@ class AbbrewActor extends Actor {
         }
       }
     }
+  }
+  createEmbeddedDocuments(data, context) {
+    console.log("createEmbeddedDocuments");
+    super.createEmbeddedDocuments(data, context);
+  }
+  async _onCreateEmbeddedDocuments(embeddedName, ...args) {
+    console.log("_onCreateEmbeddedDocuments");
+    args[0].forEach(
+      (data) => {
+        data.system.rules.forEach(
+          (rule) => rule.source = {
+            actor: this.id,
+            item: data._id,
+            uuid: "Actor." + this.id + ".Item." + data._id
+          }
+        );
+        this.items.get(data._id).update({ "system.rules": data.system.rules });
+      }
+    );
+    await super._onCreateEmbeddedDocuments(embeddedName, ...args);
   }
   async _updateDocuments(documentClass, { updates, options: options2, pack }, user) {
     console.log("update-documents");
@@ -973,17 +996,6 @@ class AbbrewActor extends Actor {
     const result = { front: this.boundedAddition(diag1.front, diag2.front, -1, 1), right: this.boundedAddition(diag1.right, diag2.right, -1, 1) };
     return result;
   }
-  // seems to get to top left corner?
-  // tooltip one is right
-  // getDistanceBetweenTokens(token, target) {
-  //   // Distance between two targets in foundry
-  //   // if (!token) return ui.notifications.info("no token selected");
-  //   // const target = Array.from(game.user.targets)[0]; // only uses the first target
-  //   // if (!target) return ui.notifications.info("You have no target");
-  //   const distance = canvas.grid.measureDistance(token, target).toFixed(1); //gets the distance between to tokens, rounded to 1 decimal place.
-  //   const content = `${token.name} is ${distance} units from ${target.name}`;
-  //   ChatMessage.create({ content, whisper: ChatMessage.getWhisperRecipients(game.user.name) }); //self whisper by player / gm.
-  // }
   getDistanceBetweenTokens(token, targetToken) {
     const grid = canvas.grid;
     const ttRect = targetToken.bounds;
@@ -1531,6 +1543,7 @@ class AbbrewActorSheet extends ActorSheet {
     const abilities = [];
     const gear = [];
     const features = [];
+    const formModifiers = [];
     const spells = {
       0: [],
       1: [],
@@ -1547,6 +1560,12 @@ class AbbrewActorSheet extends ActorSheet {
       i.img = i.img || DEFAULT_TOKEN;
       if (i.type === "anatomy") {
         anatomy.push(i);
+      } else if (i.type === "form") {
+        if (JSON.parse(i.system.tags).filter((t) => t.value === "Base").length > 0) {
+          context.baseForm = i;
+        } else {
+          formModifiers.push(i);
+        }
       } else if (i.type === "resource") {
         resources.push(i);
       } else if (i.type === "item") {
@@ -1566,6 +1585,7 @@ class AbbrewActorSheet extends ActorSheet {
     context.features = features;
     context.spells = spells;
     context.anatomy = anatomy;
+    context.formModifiers = formModifiers;
     context.ability = abilities;
   }
   /* -------------------------------------------- */
@@ -2860,7 +2880,7 @@ class AbbrewItemSheet extends ItemSheet {
   }
   close(options2 = {}) {
     console.log("closing sheet");
-    this.getData();
+    options2.submit = false;
     super.close(options2);
   }
 }
@@ -2868,6 +2888,14 @@ class AbbrewItemAnatomySheet extends AbbrewItemSheet {
   /** @override */
   activateListeners(html) {
     super.activateListeners(html);
+    const requirements = html[0].querySelector('input[name="system.tags"]');
+    if (requirements) {
+      new tagify_minExports(requirements, {});
+    }
+    const armourPoints = html[0].querySelector('input[name="system.armourPoints"]');
+    if (requirements) {
+      new tagify_minExports(armourPoints, {});
+    }
   }
   /** @override */
   get template() {
@@ -3093,6 +3121,21 @@ async function turnStart(actor) {
   }
   await actor.update({ "system.armour.value": newArmour });
 }
+class AbbrewItemFormSheet extends AbbrewItemSheet {
+  /** @override */
+  activateListeners(html) {
+    super.activateListeners(html);
+    const requirements = html[0].querySelector('input[name="system.tags"]');
+    if (requirements) {
+      new tagify_minExports(requirements, {});
+    }
+  }
+  /** @override */
+  get template() {
+    const path = "systems/abbrew/templates/item";
+    return `${path}/item-form-sheet.hbs`;
+  }
+}
 Hooks.once("init", async function() {
   Handlebars.registerHelper("json", function(context) {
     return JSON.stringify(context);
@@ -3121,7 +3164,8 @@ Hooks.once("init", async function() {
     ["spell", AbbrewItemSheet],
     ["resource", AbbrewItemSheet],
     ["attack", AbbrewItemSheet],
-    ["defence", AbbrewItemSheet]
+    ["defence", AbbrewItemSheet],
+    ["form", AbbrewItemFormSheet]
   ];
   for (const [type, Sheet] of sheetEntries) {
     Items.registerSheet("abbrew", Sheet, {

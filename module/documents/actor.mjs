@@ -172,6 +172,29 @@ export class AbbrewActor extends Actor {
     }
   }
 
+  createEmbeddedDocuments(data, context) {
+    console.log('createEmbeddedDocuments');
+    super.createEmbeddedDocuments(data, context);
+  }
+
+  async _onCreateEmbeddedDocuments(embeddedName, ...args) {
+    console.log('_onCreateEmbeddedDocuments');
+    args[0].forEach(
+      data => {
+        data.system.rules.forEach(
+          rule =>
+            rule.source = {
+              actor: this.id,
+              item: data._id,
+              uuid: "Actor." + this.id + ".Item." + data._id
+            }
+        );
+        this.items.get(data._id).update({ 'system.rules': data.system.rules });
+      }
+    )
+    await super._onCreateEmbeddedDocuments(embeddedName, ...args);
+  }
+
   async _updateDocuments(documentClass, { updates, options, pack }, user) {
     console.log('update-documents');
     super._updateDocuments(documentClass, { updates, options, pack }, user);
@@ -489,18 +512,6 @@ export class AbbrewActor extends Actor {
     return result;
   }
 
-  // seems to get to top left corner?
-  // tooltip one is right
-  // getDistanceBetweenTokens(token, target) {
-  //   // Distance between two targets in foundry
-  //   // if (!token) return ui.notifications.info("no token selected");
-  //   // const target = Array.from(game.user.targets)[0]; // only uses the first target
-  //   // if (!target) return ui.notifications.info("You have no target");
-  //   const distance = canvas.grid.measureDistance(token, target).toFixed(1); //gets the distance between to tokens, rounded to 1 decimal place.
-  //   const content = `${token.name} is ${distance} units from ${target.name}`;
-  //   ChatMessage.create({ content, whisper: ChatMessage.getWhisperRecipients(game.user.name) }); //self whisper by player / gm.
-  // }
-
   getDistanceBetweenTokens(token, targetToken) {
     const grid = canvas.grid;
     const ttRect = targetToken.bounds;
@@ -571,7 +582,7 @@ export class AbbrewActor extends Actor {
       const enemyReach = Math.max(...enemyReaches);
       const threateningReach = Math.floor(enemyToken.actor.system.size * (1 + enemyReach));
 
-      if(threateningReach < distance) {
+      if (threateningReach < distance) {
         // console.log('threatenedDistance ' + threateningReach + ' was not enough to reach target at distance ' + distance);
         return 0;
       }
@@ -585,15 +596,15 @@ export class AbbrewActor extends Actor {
         const result = { front: this.boundedAddition(rearRightResult.front, frontLeftResult.front, -1, 1), right: this.boundedAddition(rearRightResult.right, frontLeftResult.right, -1, 1) };
         const frontRear = result.front > 0 ? 'Front' : result.front < 0 ? 'Rear' : 'Mid';
         const rightLeft = result.right > 0 ? 'Right' : result.right < 0 ? 'Left' : 'Mid';
-        console.log('diagonals: ' + frontRear + ' ' + rightLeft);    
-        const penalty = token.actor.system.conditions["observationPenalty" + frontRear + rightLeft];     
+        console.log('diagonals: ' + frontRear + ' ' + rightLeft);
+        const penalty = token.actor.system.conditions["observationPenalty" + frontRear + rightLeft];
         return penalty;
       }
 
       return 0;
     });
 
-    const totalPenalty = penalties.map(p => p < 0 ? 0 : p).reduce((a,b)=>a+b);
+    const totalPenalty = penalties.map(p => p < 0 ? 0 : p).reduce((a, b) => a + b);
     return totalPenalty;
   }
 

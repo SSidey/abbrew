@@ -504,6 +504,7 @@
       "feature",
       "resource",
       "anatomy",
+      "form",
       "attack",
       "defence",
       "defense"
@@ -591,6 +592,9 @@
         "consumable": {
           "requirements": ""
         }
+      },
+      "tagged": {
+        "tags": ""
       }
     },
     "rule": {
@@ -648,6 +652,12 @@
       "hands": 0,
       "armourPoints": "",
       "armourPointsArray": []
+    },
+    "form": {
+      "templates": [
+        "base",
+        "tagged"
+      ]
     },
     "attack": {
       "templates": [

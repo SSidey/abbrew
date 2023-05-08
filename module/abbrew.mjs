@@ -11,6 +11,7 @@ import { ABBREW } from "./helpers/config.mjs";
 import AbbrewRoll from "./helpers/abbrew-roll.mjs";
 import { handleTurnStart } from "./helpers/turn-start.mjs";
 import { ChoiceSetPrompt } from "./rules/choice-set-prompt.mjs";
+import { AbbrewItemFormSheet } from "./sheets/item-form-sheet.mjs";
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -62,7 +63,8 @@ Hooks.once('init', async function () {
     ["spell", AbbrewItemSheet],
     ["resource", AbbrewItemSheet],
     ["attack", AbbrewItemSheet],
-    ["defence", AbbrewItemSheet]
+    ["defence", AbbrewItemSheet],    
+    ["form", AbbrewItemFormSheet]
   ]
   for (const [type, Sheet] of sheetEntries) {
     Items.registerSheet("abbrew", Sheet, {

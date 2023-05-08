@@ -2,17 +2,13 @@ import { AbbrewItemSheet } from "./item-sheet.mjs";
 import Tagify from "@yaireo/tagify";
 
 
-export class AbbrewItemAnatomySheet extends AbbrewItemSheet {
+export class AbbrewItemFormSheet extends AbbrewItemSheet {
     /** @override */
     activateListeners(html) {
         super.activateListeners(html);
         const requirements = html[0].querySelector('input[name="system.tags"]');
         if (requirements) {
             var taggedRequirements = new Tagify(requirements, {});
-        }
-        const armourPoints = html[0].querySelector('input[name="system.armourPoints"]');
-        if (requirements) {
-            var taggedArmourPoints = new Tagify(armourPoints, {});
         }
     }
 
@@ -24,7 +20,7 @@ export class AbbrewItemAnatomySheet extends AbbrewItemSheet {
 
         // Alternatively, you could use the following return statement to do a
         // unique item sheet by type, like `weapon-sheet.html`.
-        return `${path}/item-anatomy-sheet.hbs`;
+        return `${path}/item-form-sheet.hbs`;
     }
 
 }

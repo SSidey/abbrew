@@ -36,6 +36,7 @@
     <a class="item" data-tab="description">Description</a>
     <a class="item" data-tab="attributes">Attributes</a>
     <a class="item" data-tab="effects">Effects</a>
+    <a class="item" data-tab="rules">Rules</a>
   </nav>
 
   {{!-- Sheet Body --}}
@@ -61,6 +62,11 @@
     {{!-- Effects Tab --}}
     <div class="tab effects" data-group="primary" data-tab="effects">
       {{> "systems/abbrew/templates/parts/active-effects.hbs"}}
+    </div>
+
+    {{!-- Rules Tab --}}
+    <div class="tab rules" data-group="primary" data-tab="rules">
+      {{> "systems/abbrew/templates/parts/item-rules.hbs"}}
     </div>
   </section>
 </form>

@@ -122,7 +122,8 @@ export class AbbrewItemSheet extends ItemSheet {
 
   close(options = {}) {
     console.log('closing sheet');
-    this.getData();
+    // this.getData();
+    options.submit = false;
     super.close(options);
   }
 }

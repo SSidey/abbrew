@@ -47,7 +47,7 @@ export class AbbrewActorSheet extends ActorSheet {
       this._prepareCharacterData(context);
       this._prepareAttacks(context);
       this._prepareArmours(context);
-      context.displayConditions  = actorData.system.displayConditions;
+      context.displayConditions = actorData.system.displayConditions;
     }
 
     // Prepare NPC data and items.
@@ -92,6 +92,7 @@ export class AbbrewActorSheet extends ActorSheet {
     const abilities = [];
     const gear = [];
     const features = [];
+    const formModifiers = [];
     const spells = {
       0: [],
       1: [],
@@ -111,6 +112,13 @@ export class AbbrewActorSheet extends ActorSheet {
       // Append to resources.
       if (i.type === 'anatomy') {
         anatomy.push(i);
+      }
+      else if (i.type === 'form') {
+        if (JSON.parse(i.system.tags).filter(t => t.value === 'Base').length > 0) {
+          context.baseForm = i;
+        } else {
+          formModifiers.push(i);
+        }
       }
       // Append to resources.
       else if (i.type === 'resource') {
@@ -143,6 +151,7 @@ export class AbbrewActorSheet extends ActorSheet {
     context.features = features;
     context.spells = spells;
     context.anatomy = anatomy;
+    context.formModifiers = formModifiers;
     context.ability = abilities;
   }
 
@@ -179,7 +188,7 @@ export class AbbrewActorSheet extends ActorSheet {
     // Show/Hide Conditions
     html.find('.conditions-header').click(async ev => {
       const context = super.getData();
-      await this.actor.update({"system.displayConditions": !this.actor.system.displayConditions});
+      await this.actor.update({ "system.displayConditions": !this.actor.system.displayConditions });
     });
 
     // Add Inventory Item
@@ -204,7 +213,7 @@ export class AbbrewActorSheet extends ActorSheet {
     html.find('.rollable.attack').click(this._onAttackUse.bind(this));
 
     // armour
-    html.find('.equip-armour').click(this._equipArmour.bind(this));    
+    html.find('.equip-armour').click(this._equipArmour.bind(this));
 
     // Drag events for macros.
     if (this.actor.isOwner) {
