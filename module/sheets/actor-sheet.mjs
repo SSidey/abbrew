@@ -185,6 +185,16 @@ export class AbbrewActorSheet extends ActorSheet {
     // Everything below here is only needed if the sheet is editable
     if (!this.isEditable) return;
 
+    // Render Compendium
+    html.find(".open-compendium").on("click", (event) => {
+      if (event.currentTarget.dataset.compendium) {
+          const compendium = game.packs.get(event.currentTarget.dataset.compendium);
+          if (compendium) {
+              compendium.render(true);
+          }
+      }
+  });
+
     // Show/Hide Conditions
     html.find('.conditions-header').click(async ev => {
       const context = super.getData();

@@ -1,6 +1,7 @@
 import { AbbrewAttackProfile } from "./attackprofile.mjs";
 import { prepareRules, applyRule } from "../rules/rules.mjs";
 import { writeToPath } from "../helpers/write-to-path.mjs";
+import { ChoiceSetPrompt } from "../rules/choice-set-prompt.mjs";
 
 /**
  * Extend the base Actor document by defining a custom roll data structure which is ideal for the Simple system.
@@ -55,6 +56,7 @@ export class AbbrewActor extends Actor {
     const systemData = actorData.system;
     // super.applyActiveEffects()
     // Prepare
+    // TODO: Allow for rules to specify when to be run? We won't have access to e.g. modifiers
     this._processRules(this);
     this._prepareAbilityModifiers(systemData);
     this._prepareAnatomy(systemData);
@@ -195,6 +197,26 @@ export class AbbrewActor extends Actor {
     await super._onCreateEmbeddedDocuments(embeddedName, ...args);
   }
 
+  _onDeleteEmbeddedDocuments(embeddedName, ...args) {
+    console.log('delete item');
+    const armourEquipped = this.itemTypes.item.filter(i => i.system.isArmour && i.system.armour.equippedTo === args[1][0]);
+    if (armourEquipped.length > 0) {
+      armourEquipped.forEach(i => i.update(
+        {
+          system: {
+            equipState: {
+              worn: false
+            },
+            armour: {
+              equippedTo: ""
+            }
+          }
+        }
+      ))
+    }
+    super._onDeleteEmbeddedDocuments(embeddedName, ...args);
+  }
+
   async _updateDocuments(documentClass, { updates, options, pack }, user) {
     console.log('update-documents');
     super._updateDocuments(documentClass, { updates, options, pack }, user);
@@ -236,7 +258,7 @@ export class AbbrewActor extends Actor {
       const profileParts = wp.split('-');
       const damageType = profileParts[0].replace(' ', '');
       const attackType = profileParts[1];
-      // Handle Penalty here, check requirements are met.
+      // TODO: Handle Penalty here, check requirements are met.
       const requirements = { strength: { value: 5 } }; // JSON.parse(weapon.requirements);
       let damageBase = 0;
       switch (profileParts[1]) {
@@ -293,8 +315,62 @@ export class AbbrewActor extends Actor {
 
   async equipArmour(id, equip) {
     const updates = [];
-    updates.push({ _id: id, system: { equipState: { worn: equip } } });
+
+    const armourPiece = this.items.get(id);
+    const skillCost = this.getSkillCost(armourPiece);
+
+    let equipTo = "";
+    if (equip && this.validSkillCost(skillCost)) {
+      equipTo = await this.checkArmourForm(armourPiece);
+    }
+
+    if (equip && !equipTo) {
+      return;
+    }
+
+    updates.push({ _id: id, system: { equipState: { worn: equip }, armour: { equippedTo: equipTo } } });
     await this.updateEmbeddedDocuments("Item", updates);
+  }
+
+  async checkArmourForm(armourPiece) {
+    if (+armourPiece.system.armour.size != this.system.size) {
+      return false;
+    }
+    const formParts = this.itemTypes.anatomy.filter(a => JSON.parse(a.system.tags).map(t => t.value).includes(JSON.parse(armourPiece.system.armour.form)[0].value));
+    const anatomyParts = formParts.filter(a => JSON.parse(a.system.tags).map(t => t.value).includes(JSON.parse(armourPiece.system.armour.anatomy)[0].value));
+    if (anatomyParts.length == 0) {
+      return false;
+    }
+    const candidateAnatomyIds = anatomyParts.map(a => a.id);
+    const conflictingPieceCandidates = this.itemTypes.item.filter(i => i.system.isArmour).filter(a => a.system.equipState.worn && candidateAnatomyIds.includes(a.system.armour.equippedTo));
+    const conflictingPieces = conflictingPieceCandidates.filter(a =>
+      ((a.system.armour.layers.base.covers || a.system.armour.layers.base.blocks) && (armourPiece.system.armour.layers.base.covers || armourPiece.system.armour.layers.base.blocks)) ||
+      ((a.system.armour.layers.mid.covers || a.system.armour.layers.mid.blocks) && (armourPiece.system.armour.layers.mid.covers || armourPiece.system.armour.layers.mid.blocks)) ||
+      ((a.system.armour.layers.outer.covers || a.system.armour.layers.outer.blocks) && (armourPiece.system.armour.layers.outer.covers || armourPiece.system.armour.layers.outer.blocks))
+    );
+    const conflictAnatomyIds = conflictingPieces.map(a => a.system.armour.equippedTo);
+    const choices = candidateAnatomyIds.filter(i => !conflictAnatomyIds.includes(i)).map(i => this.items.get(i)).map(i => ({ id: i._id, name: i.name }));
+
+    if (choices.length == 0) {
+      return "";
+    }
+    if (choices.length > 1) {
+      const data = { content: { promptTitle: "Equip Where?", choices }, buttons: {} };
+      const choice = await new ChoiceSetPrompt(data).resolveSelection();
+      return choice;
+    }
+    return choices[0].id;
+  }
+
+  getSkillCost(armourPiece) {
+    const mid = armourPiece.system.armour.layers.mid.covers ? 1 : 0;
+    const outer = armourPiece.system.armour.layers.outer.covers ? 2 : 0;
+    return mid + outer;
+  }
+
+  validSkillCost(skillCost) {
+    const usedSkill = this.itemTypes.item.filter(i => i.system.isArmour && i.system.equipState.worn).map(i => this.getSkillCost(i)).reduce((a, b) => a + b, 0);
+    return usedSkill + skillCost <= this.system.armour.skill;
   }
 
   _prepareAbilityModifiers(systemData) {
@@ -307,21 +383,12 @@ export class AbbrewActor extends Actor {
 
   _prepareMovement(systemData) {
     const base = systemData.statistics.agility.mod;
-    const limbs = systemData.anatomy.filter(a => a.system.tagsArray.includes('primary')).length;
+    const limbs = systemData.anatomy.filter(a => JSON.parse(a.system.tags).map(t => t.value).includes('Agility')).length;
     systemData.movement.base = base * limbs;
   }
 
   _prepareArmour(systemData) {
     systemData.armours = this.itemTypes.item.filter(a => a.system.isArmour);
-    let naturalBonuses = this.itemTypes.anatomy.map(a => a.system.armourBonus);
-    const naturalValue = foundry.utils.getProperty(this, this.system.naturalArmour);
-    naturalBonuses = naturalBonuses.map(b => { if (b === 'natural') { b = naturalValue; } return b; });
-    const initialValue = 0;
-    const fullArmourMax = naturalBonuses.map(b => +b).reduce((accumulator, currentValue) => accumulator + currentValue, initialValue);
-    systemData.armour.max = fullArmourMax;
-
-    const defencesArray = systemData.armour.defences.replaceAll(' ', '').split(',');
-    systemData.armour.defencesArray = defencesArray;
   }
 
   _preparePower(systemData) {

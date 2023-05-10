@@ -74,11 +74,28 @@ export class AbbrewItemSheet extends ItemSheet {
       return;
     }
 
-    // TODO:
-    // 1. Probably just want these split out anyway
+    // Weapon
     const requirements = html[0].querySelector('input[name="system.weapon.requirements"]');
     if (requirements) {
       var taggedRequirements = new Tagify(requirements, {});
+    }
+
+    // Armour
+    const form = html[0].querySelector('input[name="system.armour.form"]');
+    if (form) {
+      var taggedForm = new Tagify(form, {});
+    }
+    const anatomy = html[0].querySelector('input[name="system.armour.anatomy"]');
+    if (anatomy) {
+      var taggedAnatomy = new Tagify(anatomy, {});
+    }
+    const type = html[0].querySelector('input[name="system.armour.type"]');
+    if (type) {
+      var taggedType = new Tagify(type, {});
+    }
+    const armourPoints = html[0].querySelector('input[name="system.armour.armourPoints"]');
+    if (type) {
+      var taggedArmourPoints = new Tagify(armourPoints, {});
     }
 
     // Active Effect management
@@ -86,6 +103,13 @@ export class AbbrewItemSheet extends ItemSheet {
 
     // Rules management
     html.find(".rule-control").click(async ev => await onManageRule(ev, this.item));
+
+    // Render child item sheet for viewing/editing prior to the editable check.
+    html.find('.item-edit').click(ev => {
+      const li = $(ev.currentTarget).parents(".item");
+      const item = this.actor.items.get(li.data("itemId"));
+      item.sheet.render(true);
+    });
 
     // Roll handlers, click handlers, etc. would go here.
   }

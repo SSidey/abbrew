@@ -86,7 +86,8 @@
         <input type="text" name="system.weapon.weaponProfiles" value="{{system.weapon.weaponProfiles}}"
           data-dtype="text" />
         <label class="item-label">Penetration</label>
-        <input type="number" name="system.weapon.penetration" value="{{system.weapon.penetration}}" data-dtype="Number" />
+        <input type="number" name="system.weapon.penetration" value="{{system.weapon.penetration}}"
+          data-dtype="Number" />
         <label class="item-label">Traits</label>
         <input type="text" name="system.weapon.traits" value="{{system.weapon.traits}}" data-dtype="text" />
         <label class="item-label">Hands Required</label>
@@ -103,16 +104,47 @@
     <div class="tab" data-group="primary" data-tab="armour">
       {{#if system.isArmour }}
       <div>
-        <label class="item-label">Requirements</label>
-        <input type="text" name="system.armour.requirements" value="{{system.armour.requirements}}" data-dtype="text" />
-        <label><input type="checkbox" name="system.armour.base" {{checked system.armour.base}} />Base</label>
-        <label><input type="checkbox" name="system.armour.mid" {{checked system.armour.mid}} />Mid</label>
-        <label><input type="checkbox" name="system.armour.outer" {{checked system.armour.outer}} />Outer</label>
+        <div>
+          <label class="item-label">Armour Value</label>
+          <input type="number" name="system.armour.value" value="{{system.armour.value}}" data-dtype="number" />
+        </div>
+        <div>
+          <label class="item-label">Form </label>
+          <input type="text" name="system.armour.form" value="{{system.armour.form}}" data-dtype="text" />
+        </div>
+        <div>
+          <label class="item-label">Anatomy</label>
+          <input type="text" name="system.armour.anatomy" value="{{system.armour.anatomy}}" data-dtype="text" />
+        </div>
+        <div>
+          <label class="item-label">Size</label>
+          <input type="number" name="system.armour.size" value="{{system.armour.size}}" data-dtype="number" />
+        </div>
+        <div>
+          <label class="item-label">Type</label>
+          <input type="text" name="system.armour.type" value="{{system.armour.type}}" data-dtype="text" />
+        </div>
+        {{#if system.armour.equippedTo}}
+        <label class="item-label">Equipped To</label>
+        <span class="item" data-item-id="{{system.armour.equippedTo}}">{{system.armour.equippedTo}}
+          <a class="item-edit"><i class="fas fa-fw fa-edit"></i></a>
+        </span>
+        {{/if}}
         <hr>
         <label class="item-label">Armour Points</label>
         <input type="text" name="system.armour.armourPoints" value="{{system.armour.armourPoints}}" data-dtype="text" />
-        <label class="item-label">Type</label>
-        <input type="text" name="system.armour.type" value="{{system.armour.type}}" data-dtype="text" />
+        <br>
+        <label>Base: Covers <input type="checkbox" name="system.armour.layers.base.covers" {{checked
+            system.armour.layers.base.covers}} /> Blocks <input type="checkbox" name="system.armour.layers.base.blocks"
+            {{checked system.armour.layers.base.blocks}} /></label>
+        <br>
+        <label>Mid: Covers <input type="checkbox" name="system.armour.layers.mid.covers" {{checked
+            system.armour.layers.mid.covers}} /> Blocks <input type="checkbox" name="system.armour.layers.mid.blocks"
+            {{checked system.armour.layers.mid.blocks}} /></label>
+        <br>
+        <label>Outer: Covers <input type="checkbox" name="system.armour.layers.outer.covers" {{checked
+            system.armour.layers.outer.covers}} /> Blocks <input type="checkbox"
+            name="system.armour.layers.outer.blocks" {{checked system.armour.layers.outer.blocks}} /></label>
       </div>
       {{/if}}
     </div>

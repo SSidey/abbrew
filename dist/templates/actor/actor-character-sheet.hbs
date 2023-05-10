@@ -27,7 +27,7 @@
           <div class="resource-content flexrow flex-center flex-between">
             <input type="text" name="system.armour.value" value="{{system.armour.value}}" data-dtype="Number" />
             <span> / </span>
-            <input type="text" name="system.armour.max" value="{{system.armour.max}}" data-dtype="Number" />
+            <input type="text" name="system.armour.max" value="{{system.armour.max}}" data-dtype="Number" readonly/>
           </div>
         </div>
 
@@ -86,14 +86,14 @@
           {{!-- The grid classes are defined in scss/global/_grid.scss. To use,
           use both the "grid" and "grid-Ncol" class where "N" can be any number
           from 1 to 12 and will create that number of columns. --}}
-          <div class="abilities flexcol">
-            {{#each system.statistics as |ability key|}}
-            <div class="ability flexrow flex-group-center">
+          <div class="statistics flexcol">
+            {{#each system.statistics as |statistic key|}}
+            <div class="statistic flexrow flex-group-center">
               <label for="system.statistics.{{key}}.value" class="resource-label rollable flexlarge align-left"
-                data-ability="@abilities.{{key}}.mod" data-label="{{ability.label}}">{{ability.label}}</label>
-              <input type="text" name="system.statistics.{{key}}.value" value="{{ability.value}}" data-dtype="Number" />
-              <span class="ability-mod rollable" data-ability="@abilities.{{key}}.mod"
-                data-label="{{ability.label}}">{{numberFormat ability.mod decimals=0 sign=true}}</span>
+                data-statistic="@statistics.{{key}}.mod" data-label="{{statistic.label}}">{{statistic.label}}</label>
+              <input type="text" name="system.statistics.{{key}}.value" value="{{statistic.value}}" data-dtype="Number" />
+              <span class="statistic-mod rollable" data-statistic="@statistics.{{key}}.mod"
+                data-label="{{statistic.label}}">{{numberFormat statistic.mod decimals=0 sign=true}}</span>
             </div>
             {{/each}}
           </div>

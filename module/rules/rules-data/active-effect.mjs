@@ -33,24 +33,29 @@ export class AbbrewActiveEffect extends AbbrewRule {
         return super.validate(candidate) && candidate.hasOwnProperty('operator') && candidate.hasOwnProperty('value') && this.validOperators.includes(candidate.operator) && !!candidate.value;
     }
 
+    static getRuleValue(rule, ruleValue, actorData) {
+        if (ruleValue[0] == '$') {
+            ruleValue = getProperty(actorData.items.get(rule.source.item), ruleValue.substring(1, ruleValue.length));
+            return this.getRuleValue(rule, ruleValue, actorData);
+        } else if (ruleValue[0] == '£') {
+            ruleValue = getProperty(actorData, ruleValue.substring(1, ruleValue.length));
+            return this.getRuleValue(rule, ruleValue, actorData);
+        } else {
+            return ruleValue;
+        }
+    }
+
     static applyRule(rule, actorData) {
         let changes = {};
         let targetElement = rule.targetElement ? actorData.items.get(rule.targetElement) : actorData;
         let targetElementType = rule.targetElement ? "Item" : "Actor";
         let currentValue = getProperty(targetElement, rule.target)
-        if (!currentValue) {
+        if (!currentValue && currentValue != 0) {
             return changes;
         }
 
         let targetType = getType(currentValue);
-        let ruleValue = null;
-        if (rule.value[0] == '$') {
-            ruleValue = getProperty(actorData.items.get(rule.source.item), rule.value.substring(1, rule.value.length));
-        } else if (rule.value[0] == '£') {
-            ruleValue = getProperty(actorData, rule.value.substring(1, rule.value.length));
-        } else {
-            ruleValue = rule.value;
-        }
+        let ruleValue = this.getRuleValue(rule, rule.value, actorData);
 
         let delta = this._castDelta(ruleValue, targetType);
 

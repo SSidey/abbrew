@@ -1,9 +1,6 @@
 {
   "Actor": {
-    "types": [
-      "character",
-      "npc"
-    ],
+    "types": ["character", "npc"],
     "templates": {
       "base": {
         "rules": [],
@@ -12,7 +9,8 @@
           "min": 0,
           "max": 0,
           "defences": "crushing, slashing, piercing",
-          "defencesArray": []
+          "defencesArray": [],
+          "skill": 0
         },
         "naturalArmour": "system.statistics.constitution.mod",
         "concepts": {
@@ -370,19 +368,19 @@
           "hunger": 0,
           "impaled": 0,
           "internal": 0,
-          "necrosis": 0,  
+          "necrosis": 0,
           "observationPenaltyFrontLeft": 15,
           "observationPenaltyFrontMid": 15,
-          "observationPenaltyFrontRight": 15,          
+          "observationPenaltyFrontRight": 15,
           "observationPenaltyMidLeft": 15,
           "observationPenaltyMidRight": 15,
           "observationPenaltyRearLeft": 15,
           "observationPenaltyRearMid": 15,
-          "observationPenaltyRearRight": 15,   
+          "observationPenaltyRearRight": 15,
           "pain": 0,
           "paralysed": 0,
           "parry": 0,
-          "pinned": 0, 
+          "pinned": 0,
           "restrained": 0,
           "shock": 0,
           "speed": 0,
@@ -485,14 +483,10 @@
       }
     },
     "character": {
-      "templates": [
-        "base"
-      ]
+      "templates": ["base"]
     },
     "npc": {
-      "templates": [
-        "base"
-      ],
+      "templates": ["base"],
       "cr": 0
     }
   },
@@ -556,9 +550,8 @@
           "name": "",
           "tier": 1,
           "structure": 0,
-          "concepts": [
-            "physical"
-          ],
+          "concepts": ["physical"],
+          "type": "",
           "rarity": 0,
           "effects": "",
           "effectsArray": []
@@ -580,12 +573,19 @@
       },
       "armour": {
         "armour": {
-          "requirements": "",
-          "base": false,
-          "mid": false,
-          "outer": false,
+          "value": 0,
+          "form": "",
+          "type": "",
+          "size": 0,
+          "anatomy": "",
           "armourPoints": "",
-          "type": ""
+          "skillCost": "",
+          "layers": {
+            "base": { "covers": false, "blocks": false },
+            "mid": { "covers": false, "blocks": false },
+            "outer": { "covers": false, "blocks": false }
+          },
+          "equippedTo": ""
         }
       },
       "consumable": {
@@ -598,19 +598,10 @@
       }
     },
     "rule": {
-      "templates": [
-        "base"
-      ]
+      "templates": ["base"]
     },
     "item": {
-      "templates": [
-        "base",
-        "material",
-        "action",
-        "damage",
-        "weapon",
-        "armour"
-      ],
+      "templates": ["base", "material", "action", "damage", "weapon", "armour"],
       "value": 0,
       "weight": 0,
       "isWeapon": false,
@@ -624,46 +615,30 @@
       }
     },
     "feature": {
-      "templates": [
-        "base"
-      ]
+      "templates": ["base"]
     },
     "spell": {
-      "templates": [
-        "base"
-      ],
+      "templates": ["base"],
       "spellLevel": 1
     },
     "resource": {
-      "templates": [
-        "base"
-      ],
+      "templates": ["base"],
       "current": 0,
       "maximum": 0
     },
     "anatomy": {
-      "templates": [
-        "base"
-      ],
+      "templates": ["base"],
       "tags": "",
       "tagsArray": [],
       "grappleScore": "",
       "armourBonus": "",
-      "hands": 0,
-      "armourPoints": "",
-      "armourPointsArray": []
+      "hands": 0
     },
     "form": {
-      "templates": [
-        "base",
-        "tagged"
-      ]
+      "templates": ["base", "tagged"]
     },
     "attack": {
-      "templates": [
-        "base",
-        "attack"
-      ],
+      "templates": ["base", "attack"],
       "type": "",
       "strong": "",
       "weak": "",
@@ -686,9 +661,7 @@
       "vulnerable": false
     },
     "defense": {
-      "temlates": [
-        "base"
-      ]
+      "temlates": ["base"]
     }
   }
 }
