@@ -862,29 +862,39 @@ class AbbrewActor extends Actor {
       return false;
     }
     const anatomyPoints = JSON.parse(armourPiece.system.armour.anatomy);
-    const equippedIds = [];
+    let equippedIds = [];
+    let equippedAnatomy = [];
+    const ignoreAnatomyPoint = [];
     for (const anatomyPoint of anatomyPoints) {
-      const formParts = this.itemTypes.anatomy.filter((a) => JSON.parse(a.system.tags).map((t) => t.value).includes(JSON.parse(armourPiece.system.armour.form)[0].value));
-      const anatomyParts = formParts.filter((a) => JSON.parse(a.system.tags).map((t) => t.value).includes(anatomyPoint.value));
-      if (anatomyParts.length == 0) {
-        return false;
-      }
-      const candidateAnatomyIds = anatomyParts.map((a) => a.id);
-      const conflictingPieceCandidates = this.itemTypes.item.filter((i) => i.system.isArmour).filter((a) => a.system.equipState.worn && candidateAnatomyIds.some((id) => a.system.armour.equippedTo.includes(id)));
-      const conflictingPieces = conflictingPieceCandidates.filter(
-        (a) => (a.system.armour.layers.base.covers || a.system.armour.layers.base.blocks) && (armourPiece.system.armour.layers.base.covers || armourPiece.system.armour.layers.base.blocks) || (a.system.armour.layers.mid.covers || a.system.armour.layers.mid.blocks) && (armourPiece.system.armour.layers.mid.covers || armourPiece.system.armour.layers.mid.blocks) || (a.system.armour.layers.outer.covers || a.system.armour.layers.outer.blocks) && (armourPiece.system.armour.layers.outer.covers || armourPiece.system.armour.layers.outer.blocks)
-      );
-      const conflictAnatomyIds = conflictingPieces.map((a) => a.system.armour.equippedTo).flat(1);
-      const choices2 = candidateAnatomyIds.filter((i) => !equippedIds.includes(i)).filter((i) => !conflictAnatomyIds.includes(i)).map((i) => this.items.get(i)).map((i) => ({ id: i._id, name: i.name }));
-      if (choices2.length == 1) {
-        equippedIds.push(choices2[0].id);
-      } else if (choices2.length > 1) {
-        const data = { content: { promptTitle: "Equip Where?", choices: choices2 }, buttons: {} };
-        const choice = await new ChoiceSetPrompt(data).resolveSelection();
-        equippedIds.push(choice);
-      } else {
-        equippedIds = [];
-        return;
+      if (!ignoreAnatomyPoint.includes(anatomyPoint.value)) {
+        const formParts = this.itemTypes.anatomy.filter((a) => JSON.parse(a.system.tags).map((t) => t.value).includes(JSON.parse(armourPiece.system.armour.form)[0].value));
+        const anatomyParts = formParts.filter((a) => JSON.parse(a.system.tags).map((t) => t.value).includes(anatomyPoint.value));
+        if (anatomyParts.length == 0) {
+          return false;
+        }
+        const candidateAnatomyIds = anatomyParts.map((a) => a.id);
+        const conflictingPieceCandidates = this.itemTypes.item.filter((i) => i.system.isArmour).filter((a) => a.system.equipState.worn && candidateAnatomyIds.some((id) => a.system.armour.equippedTo.includes(id)));
+        const conflictingPieces = conflictingPieceCandidates.filter(
+          (a) => (a.system.armour.layers.base.covers || a.system.armour.layers.base.blocks) && (armourPiece.system.armour.layers.base.covers || armourPiece.system.armour.layers.base.blocks) || (a.system.armour.layers.mid.covers || a.system.armour.layers.mid.blocks) && (armourPiece.system.armour.layers.mid.covers || armourPiece.system.armour.layers.mid.blocks) || (a.system.armour.layers.outer.covers || a.system.armour.layers.outer.blocks) && (armourPiece.system.armour.layers.outer.covers || armourPiece.system.armour.layers.outer.blocks)
+        );
+        const conflictAnatomyIds = conflictingPieces.map((a) => a.system.armour.equippedTo).flat(1);
+        const choices2 = candidateAnatomyIds.filter((i) => !equippedIds.includes(i)).filter((i) => !conflictAnatomyIds.includes(i)).map((i) => this.items.get(i)).map((i) => ({ id: i._id, name: i.name }));
+        if (anatomyPoints.filter((a) => a.value == anatomyPoint.value).length + equippedAnatomy.filter((a) => a == anatomyPoint.value).length == choices2.length) {
+          choices2.forEach((c) => equippedIds.push(c.id));
+          ignoreAnatomyPoint.push(anatomyPoint.value);
+        } else {
+          if (choices2.length == 1) {
+            equippedIds.push(choices2[0].id);
+            equippedAnatomy.push(anatomyPoint.value);
+          } else if (choices2.length > 1) {
+            const data = { content: { promptTitle: "Equip Where?", choices: choices2 }, buttons: {} };
+            const choice = await new ChoiceSetPrompt(data).resolveSelection();
+            equippedIds.push(choice);
+            equippedAnatomy.push(anatomyPoint.value);
+          } else {
+            equippedIds = [];
+          }
+        }
       }
     }
     return equippedIds;
