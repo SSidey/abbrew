@@ -319,12 +319,12 @@ export class AbbrewActor extends Actor {
     const armourPiece = this.items.get(id);
     const skillCost = this.getSkillCost(armourPiece);
 
-    let equipTo = "";
+    let equipTo = [];
     if (equip && this.validSkillCost(skillCost)) {
       equipTo = await this.checkArmourForm(armourPiece);
     }
 
-    if (equip && !equipTo) {
+    if (equip && equipTo.length == 0) {
       return;
     }
 
@@ -336,36 +336,47 @@ export class AbbrewActor extends Actor {
     if (+armourPiece.system.armour.size != this.system.size) {
       return false;
     }
-    const formParts = this.itemTypes.anatomy.filter(a => JSON.parse(a.system.tags).map(t => t.value).includes(JSON.parse(armourPiece.system.armour.form)[0].value));
-    const anatomyParts = formParts.filter(a => JSON.parse(a.system.tags).map(t => t.value).includes(JSON.parse(armourPiece.system.armour.anatomy)[0].value));
-    if (anatomyParts.length == 0) {
-      return false;
-    }
-    const candidateAnatomyIds = anatomyParts.map(a => a.id);
-    const conflictingPieceCandidates = this.itemTypes.item.filter(i => i.system.isArmour).filter(a => a.system.equipState.worn && candidateAnatomyIds.includes(a.system.armour.equippedTo));
-    const conflictingPieces = conflictingPieceCandidates.filter(a =>
-      ((a.system.armour.layers.base.covers || a.system.armour.layers.base.blocks) && (armourPiece.system.armour.layers.base.covers || armourPiece.system.armour.layers.base.blocks)) ||
-      ((a.system.armour.layers.mid.covers || a.system.armour.layers.mid.blocks) && (armourPiece.system.armour.layers.mid.covers || armourPiece.system.armour.layers.mid.blocks)) ||
-      ((a.system.armour.layers.outer.covers || a.system.armour.layers.outer.blocks) && (armourPiece.system.armour.layers.outer.covers || armourPiece.system.armour.layers.outer.blocks))
-    );
-    const conflictAnatomyIds = conflictingPieces.map(a => a.system.armour.equippedTo);
-    const choices = candidateAnatomyIds.filter(i => !conflictAnatomyIds.includes(i)).map(i => this.items.get(i)).map(i => ({ id: i._id, name: i.name }));
+    const anatomyPoints = JSON.parse(armourPiece.system.armour.anatomy);
+    const equippedIds = [];
+    const pendingChoices = [];
+    for (const anatomyPoint of anatomyPoints) {
+      const formParts = this.itemTypes.anatomy.filter(a => JSON.parse(a.system.tags).map(t => t.value).includes(JSON.parse(armourPiece.system.armour.form)[0].value));
+      const anatomyParts = formParts.filter(a => JSON.parse(a.system.tags).map(t => t.value).includes(anatomyPoint.value));
+      if (anatomyParts.length == 0) {
+        return false;
+      }
+      const candidateAnatomyIds = anatomyParts.map(a => a.id);
+      const conflictingPieceCandidates = this.itemTypes.item.filter(i => i.system.isArmour).filter(a => a.system.equipState.worn && candidateAnatomyIds.some(id => a.system.armour.equippedTo.includes(id)));
+      const conflictingPieces = conflictingPieceCandidates.filter(a =>
+        ((a.system.armour.layers.base.covers || a.system.armour.layers.base.blocks) && (armourPiece.system.armour.layers.base.covers || armourPiece.system.armour.layers.base.blocks)) ||
+        ((a.system.armour.layers.mid.covers || a.system.armour.layers.mid.blocks) && (armourPiece.system.armour.layers.mid.covers || armourPiece.system.armour.layers.mid.blocks)) ||
+        ((a.system.armour.layers.outer.covers || a.system.armour.layers.outer.blocks) && (armourPiece.system.armour.layers.outer.covers || armourPiece.system.armour.layers.outer.blocks))
+      );
+      const conflictAnatomyIds = conflictingPieces.map(a => a.system.armour.equippedTo).flat(1);
+      const choices = candidateAnatomyIds.filter(i => !equippedIds.includes(i)).filter(i => !conflictAnatomyIds.includes(i)).map(i => this.items.get(i)).map(i => ({ id: i._id, name: i.name }));
 
-    if (choices.length == 0) {
-      return "";
-    }
-    if (choices.length > 1) {
-      const data = { content: { promptTitle: "Equip Where?", choices }, buttons: {} };
-      const choice = await new ChoiceSetPrompt(data).resolveSelection();
-      return choice;
-    }
-    return choices[0].id;
+      if (choices.length == 1) {
+        equippedIds.push(choices[0].id);
+      }
+      else if (choices.length > 1) {
+        const data = { content: { promptTitle: "Equip Where?", choices }, buttons: {} };
+        const choice = await new ChoiceSetPrompt(data).resolveSelection();
+        equippedIds.push(choice);
+      }
+      else {
+        equippedIds = [];
+        return;
+      }
+    };
+    // for(const pendingChoice of pendingChoices)
+    return equippedIds;
   }
 
   getSkillCost(armourPiece) {
+    const armourPoints = JSON.parse(armourPiece.system.armour.armourPoints).length;
     const mid = armourPiece.system.armour.layers.mid.covers ? 1 : 0;
     const outer = armourPiece.system.armour.layers.outer.covers ? 2 : 0;
-    return mid + outer;
+    return (mid + outer) * armourPoints;
   }
 
   validSkillCost(skillCost) {

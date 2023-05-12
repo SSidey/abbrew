@@ -106,7 +106,8 @@
       <div>
         <div>
           <label class="item-label">Armour Value</label>
-          <input type="number" name="system.armour.value" value="{{system.armour.value}}" data-dtype="number" />
+          <input type="number" name="system.armour.value" value="{{system.armour.value}}" data-dtype="number"
+            readonly />
         </div>
         <div>
           <label class="item-label">Form </label>
@@ -125,10 +126,16 @@
           <input type="text" name="system.armour.type" value="{{system.armour.type}}" data-dtype="text" />
         </div>
         {{#if system.armour.equippedTo}}
-        <label class="item-label">Equipped To</label>
-        <span class="item" data-item-id="{{system.armour.equippedTo}}">{{system.armour.equippedTo}}
-          <a class="item-edit"><i class="fas fa-fw fa-edit"></i></a>
-        </span>
+        <div>
+          <label class="item-label">Equipped to:</label>
+        </div>
+        {{#each system.armour.equippedTo as |equippedTo| }}
+        <div>
+          <span class="item" data-item-id="{{equippedTo}}">{{equippedTo}}
+            <a class="item-edit"><i class="fas fa-fw fa-edit"></i></a>
+          </span>
+        </div>
+        {{/each}}
         {{/if}}
         <hr>
         <label class="item-label">Armour Points</label>

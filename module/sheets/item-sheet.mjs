@@ -83,19 +83,48 @@ export class AbbrewItemSheet extends ItemSheet {
     // Armour
     const form = html[0].querySelector('input[name="system.armour.form"]');
     if (form) {
-      var taggedForm = new Tagify(form, {});
+      const settings = {
+        enforceWhitelist: true,
+        mode: "select",
+        whitelist: ["Humanoid", "Beast"],
+      };
+      var taggedForm = new Tagify(form, settings);
     }
     const anatomy = html[0].querySelector('input[name="system.armour.anatomy"]');
     if (anatomy) {
-      var taggedAnatomy = new Tagify(anatomy, {});
+      const settings = {
+        // mode: 'mix',
+        // pattern: '#',
+        // dropdown: {
+        //    enabled: 1
+        // },
+        // whitelist:['alice','bob','foo','bar'],
+        duplicates: true,
+      }
+      var taggedAnatomy = new Tagify(anatomy, settings);
     }
     const type = html[0].querySelector('input[name="system.armour.type"]');
     if (type) {
-      var taggedType = new Tagify(type, {});
+      const settings = {
+        enforceWhitelist: true,
+        mode: "select",
+        whitelist: ["Cloth", "Hide", "Chain", "Plate", "Accessory"],
+      };
+      var taggedType = new Tagify(type, settings);
     }
     const armourPoints = html[0].querySelector('input[name="system.armour.armourPoints"]');
     if (type) {
-      var taggedArmourPoints = new Tagify(armourPoints, {});
+      const settings = {
+        dropdown: {
+          maxItems: 20,           // <- mixumum allowed rendered suggestions
+          classname: "tags-look", // <- custom classname for this dropdown, so it could be targeted
+          enabled: 0,             // <- show suggestions on focus
+          closeOnSelect: false    // <- do not hide the suggestions dropdown once an item has been selected
+        },
+        whitelist:['Abdomen','Chest_Left','Chest_Right','Shoulder_Left', 'Shoulder_Right', 'Upper_Arm', 'Lower_Arm', 'Hand', 'Finger', 'Upper_Leg', 'Lower_Leg', 'Foot', 'Head', 'Finger'],
+        duplicates: true,
+      }
+      var taggedArmourPoints = new Tagify(armourPoints, settings);
     }
 
     // Active Effect management

@@ -113,6 +113,7 @@ export class AbbrewActorSheet extends ActorSheet {
       if (i.type === 'anatomy') {
         anatomy.push(i);
       }
+      // TODO: This should set e.g. speed / dex etc. multipliers calculated per limbs and the like
       else if (i.type === 'form') {
         if (JSON.parse(i.system.tags).filter(t => t.value === 'Base').length > 0) {
           context.baseForm = i;

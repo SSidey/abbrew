@@ -585,7 +585,7 @@
             "mid": { "covers": false, "blocks": false },
             "outer": { "covers": false, "blocks": false }
           },
-          "equippedTo": ""
+          "equippedTo": []
         }
       },
       "consumable": {
