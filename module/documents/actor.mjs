@@ -263,10 +263,10 @@ export class AbbrewActor extends Actor {
       let damageBase = 0;
       switch (profileParts[1]) {
         case "arc":
-          damageBase = + weapon.material.structure + (requirements.strength.value * (1 + weapon.minimumEffectiveReach)) + (weapon.material.tier * 5);
+          damageBase = +weapon.material.structure + (+requirements.strength.value * (1 + +weapon.minimumEffectiveReach)) + (+weapon.material.tier * 5);
           break;
         case "thrust":
-          damageBase = + weapon.material.structure + (weapon.material.tier * 5);
+          damageBase = +weapon.material.structure + (+weapon.material.tier * 5);
           weapon.penetration = weapon.material.tier * 5;
           break;
         default:
@@ -694,8 +694,7 @@ export class AbbrewActor extends Actor {
     return totalPenalty;
   }
 
-  // Directly Down is 0, Left is 90, Up 180, Right 270
-  /* async */ acceptDamage(damageRolls, attackData) {
+  acceptDamage(damageRolls, attackData) {
     let actor = this;
     let systemData = this.system;
     let damage = damageRolls[0]._total;
@@ -741,7 +740,9 @@ export class AbbrewActor extends Actor {
 
     let criticalExplosions = this.getCriticalExplosions(damageRoll, damageTypeDefence.vulnerable, damageTypeDefence.negate);
 
-    if (systemData.armour.defencesArray.includes(damageType)) {
+    const armourArray = this.getArmourReductionArray();
+
+    if (armourArray.includes(damageType)) {
       const penetrate = damageTypeDefence.penetrate + damagePenetrate + unobservedPenalty;
 
       const adjustedBlock = Math.max(0, damageTypeDefence.block - penetrate);
@@ -770,6 +771,12 @@ export class AbbrewActor extends Actor {
     updates["system.armour.value"] = newArmour;
 
     actor.update(updates);
+  }
+
+  getArmourReductionArray() {
+    const naturalArmourReductions = JSON.parse(this.system.armour.defences).map(d => d.value);
+    const armourReductions = this.itemTypes.item.filter(i => i.system.isArmour && i.system.equipState.worn).map(a => JSON.parse(a.system.material.concepts).map(c => c.value)).flat(1);
+    return naturalArmourReductions.concat(armourReductions);
   }
 
   absorbDamage(actor, systemData, damage) {

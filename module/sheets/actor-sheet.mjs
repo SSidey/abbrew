@@ -1,6 +1,7 @@
-import { useAttack, onAttackCardAction } from "../documents/attackprofile.mjs";
+import { useAttack } from "../documents/attackprofile.mjs";
 import { ChatAbbrew } from "../helpers/chat.mjs";
 import { onManageActiveEffect, prepareActiveEffectCategories } from "../helpers/effects.mjs";
+import Tagify from "@yaireo/tagify";
 
 /**
  * Extend the basic ActorSheet
@@ -185,6 +186,21 @@ export class AbbrewActorSheet extends ActorSheet {
     // -------------------------------------------------------------
     // Everything below here is only needed if the sheet is editable
     if (!this.isEditable) return;
+
+    // Defences
+    const naturalArmourReduces = html[0].querySelector('input[name="system.armour.defences"]');
+    if (naturalArmourReduces) {
+      const settings = {
+        dropdown: {
+          maxItems: 20,           // <- mixumum allowed rendered suggestions
+          classname: "tags-look", // <- custom classname for this dropdown, so it could be targeted
+          enabled: 0,             // <- show suggestions on focus
+          closeOnSelect: false    // <- do not hide the suggestions dropdown once an item has been selected
+        },
+        whitelist:['crushing', 'slashing', 'piercing', 'fire', 'water'],
+      }
+      var taggedNaturalArmourReduces = new Tagify(naturalArmourReduces, settings);
+    }
 
     // Render Compendium
     html.find(".open-compendium").on("click", (event) => {

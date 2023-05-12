@@ -74,6 +74,21 @@ export class AbbrewItemSheet extends ItemSheet {
       return;
     }
 
+    // Material
+    const concepts = html[0].querySelector('input[name="system.material.concepts"]');
+    if (concepts) {
+      const settings = {
+        dropdown: {
+          maxItems: 20,           // <- mixumum allowed rendered suggestions
+          classname: "tags-look", // <- custom classname for this dropdown, so it could be targeted
+          enabled: 0,             // <- show suggestions on focus
+          closeOnSelect: false    // <- do not hide the suggestions dropdown once an item has been selected
+        },
+        whitelist:['crushing', 'slashing', 'piercing', 'fire', 'water'],
+      }
+      var taggedConcepts = new Tagify(concepts, settings);
+    }
+
     // Weapon
     const requirements = html[0].querySelector('input[name="system.weapon.requirements"]');
     if (requirements) {

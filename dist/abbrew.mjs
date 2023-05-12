@@ -797,10 +797,10 @@ class AbbrewActor extends Actor {
       let damageBase = 0;
       switch (profileParts[1]) {
         case "arc":
-          damageBase = +weapon.material.structure + requirements.strength.value * (1 + weapon.minimumEffectiveReach) + weapon.material.tier * 5;
+          damageBase = +weapon.material.structure + +requirements.strength.value * (1 + +weapon.minimumEffectiveReach) + +weapon.material.tier * 5;
           break;
         case "thrust":
-          damageBase = +weapon.material.structure + weapon.material.tier * 5;
+          damageBase = +weapon.material.structure + +weapon.material.tier * 5;
           weapon.penetration = weapon.material.tier * 5;
           break;
         default:
@@ -1147,8 +1147,6 @@ class AbbrewActor extends Actor {
     const totalPenalty = penalties.map((p) => p < 0 ? 0 : p).reduce((a, b) => a + b);
     return totalPenalty;
   }
-  // Directly Down is 0, Left is 90, Up 180, Right 270
-  /* async */
   acceptDamage(damageRolls, attackData) {
     let actor = this;
     let systemData = this.system;
@@ -1179,7 +1177,8 @@ class AbbrewActor extends Actor {
       damage = this.conductDamage(damageRoll);
     }
     let criticalExplosions = this.getCriticalExplosions(damageRoll, damageTypeDefence.vulnerable, damageTypeDefence.negate);
-    if (systemData.armour.defencesArray.includes(damageType)) {
+    const armourArray = this.getArmourReductionArray();
+    if (armourArray.includes(damageType)) {
       const penetrate = damageTypeDefence.penetrate + damagePenetrate + unobservedPenalty;
       const adjustedBlock = Math.max(0, damageTypeDefence.block - penetrate);
       const adjustedPenetration = Math.max(0, penetrate - damageTypeDefence.block);
@@ -1202,6 +1201,11 @@ class AbbrewActor extends Actor {
     }
     updates["system.armour.value"] = newArmour;
     actor.update(updates);
+  }
+  getArmourReductionArray() {
+    const naturalArmourReductions = JSON.parse(this.system.armour.defences).map((d) => d.value);
+    const armourReductions = this.itemTypes.item.filter((i) => i.system.isArmour && i.system.equipState.worn).map((a) => JSON.parse(a.system.material.concepts).map((c) => c.value)).flat(1);
+    return naturalArmourReductions.concat(armourReductions);
   }
   absorbDamage(actor, systemData, damage) {
     let currentBlood = systemData.blood.value;
@@ -1566,224 +1570,6 @@ function prepareActiveEffectCategories(effects) {
       categories.passive.effects.push(e);
   }
   return categories;
-}
-class AbbrewActorSheet extends ActorSheet {
-  /** @override */
-  static get defaultOptions() {
-    return mergeObject(super.defaultOptions, {
-      classes: ["abbrew", "sheet", "actor"],
-      template: "systems/abbrew/templates/actor/actor-sheet.hbs",
-      width: 600,
-      height: 600,
-      tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "features" }]
-    });
-  }
-  /** @override */
-  get template() {
-    return `systems/abbrew/templates/actor/actor-${this.actor.type}-sheet.hbs`;
-  }
-  /* -------------------------------------------- */
-  /** @override */
-  getData() {
-    const context = super.getData();
-    const actorData = this.actor.toObject(false);
-    context.system = actorData.system;
-    context.flags = actorData.flags;
-    if (actorData.type == "character") {
-      this._prepareItems(context);
-      this._prepareCharacterData(context);
-      this._prepareAttacks(context);
-      this._prepareArmours(context);
-      context.displayConditions = actorData.system.displayConditions;
-    }
-    if (actorData.type == "npc") {
-      this._prepareItems(context);
-    }
-    context.rollData = context.actor.getRollData();
-    context.effects = prepareActiveEffectCategories(this.actor.effects);
-    return context;
-  }
-  /**
-   * Organize and classify Items for Character sheets.
-   *
-   * @param {Object} actorData The actor to prepare.
-   *
-   * @return {undefined}
-   */
-  _prepareCharacterData(context) {
-    for (let [k, v] of Object.entries(context.system.statistics)) {
-      v.label = game.i18n.localize(CONFIG.ABBREW.statistics[k]) ?? k;
-    }
-  }
-  /**
-   * Organize and classify Items for Character sheets.
-   *
-   * @param {Object} actorData The actor to prepare.
-   *
-   * @return {undefined}
-   */
-  _prepareItems(context) {
-    const anatomy = [];
-    const resources = [];
-    const abilities = [];
-    const gear = [];
-    const features = [];
-    const formModifiers = [];
-    const spells = {
-      0: [],
-      1: [],
-      2: [],
-      3: [],
-      4: [],
-      5: [],
-      6: [],
-      7: [],
-      8: [],
-      9: []
-    };
-    for (let i of context.items) {
-      i.img = i.img || DEFAULT_TOKEN;
-      if (i.type === "anatomy") {
-        anatomy.push(i);
-      } else if (i.type === "form") {
-        if (JSON.parse(i.system.tags).filter((t) => t.value === "Base").length > 0) {
-          context.baseForm = i;
-        } else {
-          formModifiers.push(i);
-        }
-      } else if (i.type === "resource") {
-        resources.push(i);
-      } else if (i.type === "item") {
-        gear.push(i);
-      } else if (i.type === "feature") {
-        features.push(i);
-      } else if (i.type === "ability") {
-        abilities.push(i);
-      } else if (i.type === "spell") {
-        if (i.system.spellLevel != void 0) {
-          spells[i.system.spellLevel].push(i);
-        }
-      }
-    }
-    context.resource = resources;
-    context.gear = gear;
-    context.features = features;
-    context.spells = spells;
-    context.anatomy = anatomy;
-    context.formModifiers = formModifiers;
-    context.ability = abilities;
-  }
-  /* -------------------------------------------- */
-  _prepareAttacks(context) {
-    context.attacks = context.system.attacks;
-  }
-  /* -------------------------------------------- */
-  _prepareArmours(context) {
-    context.armours = context.system.armours;
-  }
-  /* -------------------------------------------- */
-  /** @override */
-  activateListeners(html) {
-    super.activateListeners(html);
-    html.find(".item-edit").click((ev) => {
-      const li = $(ev.currentTarget).parents(".item");
-      const item = this.actor.items.get(li.data("itemId"));
-      item.sheet.render(true);
-    });
-    if (!this.isEditable)
-      return;
-    html.find(".open-compendium").on("click", (event) => {
-      if (event.currentTarget.dataset.compendium) {
-        const compendium = game.packs.get(event.currentTarget.dataset.compendium);
-        if (compendium) {
-          compendium.render(true);
-        }
-      }
-    });
-    html.find(".conditions-header").click(async (ev) => {
-      super.getData();
-      await this.actor.update({ "system.displayConditions": !this.actor.system.displayConditions });
-    });
-    html.find(".item-create").click(this._onItemCreate.bind(this));
-    html.find(".item-delete").click((ev) => {
-      const li = $(ev.currentTarget).parents(".item");
-      const item = this.actor.items.get(li.data("itemId"));
-      item.delete();
-      li.slideUp(200, () => this.render(false));
-    });
-    html.find(".effect-control").click((ev) => onManageActiveEffect(ev, this.actor));
-    html.find(".rollable .item-image").click(this._onItemUse.bind(this));
-    html.find(".equip-weapon").click(this._equipWeapon.bind(this));
-    html.find(".rollable.attack").click(this._onAttackUse.bind(this));
-    html.find(".equip-armour").click(this._equipArmour.bind(this));
-    if (this.actor.isOwner) {
-      let handler = (ev) => this._onDragStart(ev);
-      html.find("li.item").each((i, li) => {
-        if (li.classList.contains("inventory-header"))
-          return;
-        li.setAttribute("draggable", true);
-        li.addEventListener("dragstart", handler, false);
-      });
-    }
-  }
-  async _equipWeapon(event) {
-    event.preventDefault();
-    const dataSet = event.target.dataset;
-    const weaponId = dataSet.weaponid;
-    const equip = dataSet.equip === "true";
-    await this.actor.equipWeapon(weaponId, equip);
-  }
-  async _equipArmour(event) {
-    event.preventDefault();
-    const dataSet = event.target.dataset;
-    const armourId = dataSet.armourid;
-    const equip = dataSet.equip === "true";
-    await this.actor.equipArmour(armourId, equip);
-  }
-  /**
-   * Handle creating a new Owned Item for the actor using initial data defined in the HTML dataset
-   * @param {Event} event   The originating click event
-   * @private
-   */
-  async _onItemCreate(event) {
-    event.preventDefault();
-    const header = event.currentTarget;
-    const type = header.dataset.type;
-    if (type === "ability" && this.actor.system.IP.current + 1 > this.actor.system.IP.total) {
-      const err = game.i18n.format("ABBREW.InspirationPointsExceededWarn", { max: this.actor.system.IP.total });
-      return ui.notifications.error(err);
-    }
-    const itemData = {
-      name: game.i18n.format("ABBREW.ItemNew", { type: game.i18n.localize(`ITEM.Type${type.capitalize()}`) }),
-      type,
-      system: { ...header.dataset.type }
-    };
-    delete itemData.system.type;
-    return this.actor.createEmbeddedDocuments("Item", [itemData]);
-  }
-  /**
-   * Handle clickable rolls.
-   * @param {Event} event   The originating click event
-   * @private
-   */
-  async _onItemUse(event) {
-    event.preventDefault();
-    const element = event.currentTarget;
-    element.dataset;
-    this.actor;
-    ChatAbbrew();
-    const itemId = event.currentTarget.closest(".item").dataset.itemId;
-    const item = this.actor.items.get(itemId);
-    return item.use({}, { event });
-  }
-  async _onAttackUse(event) {
-    event.preventDefault();
-    console.log(event);
-    const data = event.target.dataset;
-    const attack = this.actor.system.attacks.filter((a) => a.id === data.attack)[0];
-    const attackProfile = attack.profiles.flat().filter((ap) => ap.id === +data.attackprofile)[0];
-    useAttack(attack, attackProfile, this.actor);
-  }
 }
 var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
 var tagify_minExports = {};
@@ -2896,6 +2682,241 @@ var tagify_min = {
     } }, N.prototype.removeTag = N.prototype.removeTags, N;
   });
 })(tagify_min);
+class AbbrewActorSheet extends ActorSheet {
+  /** @override */
+  static get defaultOptions() {
+    return mergeObject(super.defaultOptions, {
+      classes: ["abbrew", "sheet", "actor"],
+      template: "systems/abbrew/templates/actor/actor-sheet.hbs",
+      width: 600,
+      height: 600,
+      tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "features" }]
+    });
+  }
+  /** @override */
+  get template() {
+    return `systems/abbrew/templates/actor/actor-${this.actor.type}-sheet.hbs`;
+  }
+  /* -------------------------------------------- */
+  /** @override */
+  getData() {
+    const context = super.getData();
+    const actorData = this.actor.toObject(false);
+    context.system = actorData.system;
+    context.flags = actorData.flags;
+    if (actorData.type == "character") {
+      this._prepareItems(context);
+      this._prepareCharacterData(context);
+      this._prepareAttacks(context);
+      this._prepareArmours(context);
+      context.displayConditions = actorData.system.displayConditions;
+    }
+    if (actorData.type == "npc") {
+      this._prepareItems(context);
+    }
+    context.rollData = context.actor.getRollData();
+    context.effects = prepareActiveEffectCategories(this.actor.effects);
+    return context;
+  }
+  /**
+   * Organize and classify Items for Character sheets.
+   *
+   * @param {Object} actorData The actor to prepare.
+   *
+   * @return {undefined}
+   */
+  _prepareCharacterData(context) {
+    for (let [k, v] of Object.entries(context.system.statistics)) {
+      v.label = game.i18n.localize(CONFIG.ABBREW.statistics[k]) ?? k;
+    }
+  }
+  /**
+   * Organize and classify Items for Character sheets.
+   *
+   * @param {Object} actorData The actor to prepare.
+   *
+   * @return {undefined}
+   */
+  _prepareItems(context) {
+    const anatomy = [];
+    const resources = [];
+    const abilities = [];
+    const gear = [];
+    const features = [];
+    const formModifiers = [];
+    const spells = {
+      0: [],
+      1: [],
+      2: [],
+      3: [],
+      4: [],
+      5: [],
+      6: [],
+      7: [],
+      8: [],
+      9: []
+    };
+    for (let i of context.items) {
+      i.img = i.img || DEFAULT_TOKEN;
+      if (i.type === "anatomy") {
+        anatomy.push(i);
+      } else if (i.type === "form") {
+        if (JSON.parse(i.system.tags).filter((t) => t.value === "Base").length > 0) {
+          context.baseForm = i;
+        } else {
+          formModifiers.push(i);
+        }
+      } else if (i.type === "resource") {
+        resources.push(i);
+      } else if (i.type === "item") {
+        gear.push(i);
+      } else if (i.type === "feature") {
+        features.push(i);
+      } else if (i.type === "ability") {
+        abilities.push(i);
+      } else if (i.type === "spell") {
+        if (i.system.spellLevel != void 0) {
+          spells[i.system.spellLevel].push(i);
+        }
+      }
+    }
+    context.resource = resources;
+    context.gear = gear;
+    context.features = features;
+    context.spells = spells;
+    context.anatomy = anatomy;
+    context.formModifiers = formModifiers;
+    context.ability = abilities;
+  }
+  /* -------------------------------------------- */
+  _prepareAttacks(context) {
+    context.attacks = context.system.attacks;
+  }
+  /* -------------------------------------------- */
+  _prepareArmours(context) {
+    context.armours = context.system.armours;
+  }
+  /* -------------------------------------------- */
+  /** @override */
+  activateListeners(html) {
+    super.activateListeners(html);
+    html.find(".item-edit").click((ev) => {
+      const li = $(ev.currentTarget).parents(".item");
+      const item = this.actor.items.get(li.data("itemId"));
+      item.sheet.render(true);
+    });
+    if (!this.isEditable)
+      return;
+    const naturalArmourReduces = html[0].querySelector('input[name="system.armour.defences"]');
+    if (naturalArmourReduces) {
+      const settings = {
+        dropdown: {
+          maxItems: 20,
+          // <- mixumum allowed rendered suggestions
+          classname: "tags-look",
+          // <- custom classname for this dropdown, so it could be targeted
+          enabled: 0,
+          // <- show suggestions on focus
+          closeOnSelect: false
+          // <- do not hide the suggestions dropdown once an item has been selected
+        },
+        whitelist: ["crushing", "slashing", "piercing", "fire", "water"]
+      };
+      new tagify_minExports(naturalArmourReduces, settings);
+    }
+    html.find(".open-compendium").on("click", (event) => {
+      if (event.currentTarget.dataset.compendium) {
+        const compendium = game.packs.get(event.currentTarget.dataset.compendium);
+        if (compendium) {
+          compendium.render(true);
+        }
+      }
+    });
+    html.find(".conditions-header").click(async (ev) => {
+      super.getData();
+      await this.actor.update({ "system.displayConditions": !this.actor.system.displayConditions });
+    });
+    html.find(".item-create").click(this._onItemCreate.bind(this));
+    html.find(".item-delete").click((ev) => {
+      const li = $(ev.currentTarget).parents(".item");
+      const item = this.actor.items.get(li.data("itemId"));
+      item.delete();
+      li.slideUp(200, () => this.render(false));
+    });
+    html.find(".effect-control").click((ev) => onManageActiveEffect(ev, this.actor));
+    html.find(".rollable .item-image").click(this._onItemUse.bind(this));
+    html.find(".equip-weapon").click(this._equipWeapon.bind(this));
+    html.find(".rollable.attack").click(this._onAttackUse.bind(this));
+    html.find(".equip-armour").click(this._equipArmour.bind(this));
+    if (this.actor.isOwner) {
+      let handler = (ev) => this._onDragStart(ev);
+      html.find("li.item").each((i, li) => {
+        if (li.classList.contains("inventory-header"))
+          return;
+        li.setAttribute("draggable", true);
+        li.addEventListener("dragstart", handler, false);
+      });
+    }
+  }
+  async _equipWeapon(event) {
+    event.preventDefault();
+    const dataSet = event.target.dataset;
+    const weaponId = dataSet.weaponid;
+    const equip = dataSet.equip === "true";
+    await this.actor.equipWeapon(weaponId, equip);
+  }
+  async _equipArmour(event) {
+    event.preventDefault();
+    const dataSet = event.target.dataset;
+    const armourId = dataSet.armourid;
+    const equip = dataSet.equip === "true";
+    await this.actor.equipArmour(armourId, equip);
+  }
+  /**
+   * Handle creating a new Owned Item for the actor using initial data defined in the HTML dataset
+   * @param {Event} event   The originating click event
+   * @private
+   */
+  async _onItemCreate(event) {
+    event.preventDefault();
+    const header = event.currentTarget;
+    const type = header.dataset.type;
+    if (type === "ability" && this.actor.system.IP.current + 1 > this.actor.system.IP.total) {
+      const err = game.i18n.format("ABBREW.InspirationPointsExceededWarn", { max: this.actor.system.IP.total });
+      return ui.notifications.error(err);
+    }
+    const itemData = {
+      name: game.i18n.format("ABBREW.ItemNew", { type: game.i18n.localize(`ITEM.Type${type.capitalize()}`) }),
+      type,
+      system: { ...header.dataset.type }
+    };
+    delete itemData.system.type;
+    return this.actor.createEmbeddedDocuments("Item", [itemData]);
+  }
+  /**
+   * Handle clickable rolls.
+   * @param {Event} event   The originating click event
+   * @private
+   */
+  async _onItemUse(event) {
+    event.preventDefault();
+    const element = event.currentTarget;
+    element.dataset;
+    this.actor;
+    ChatAbbrew();
+    const itemId = event.currentTarget.closest(".item").dataset.itemId;
+    const item = this.actor.items.get(itemId);
+    return item.use({}, { event });
+  }
+  async _onAttackUse(event) {
+    event.preventDefault();
+    console.log(event);
+    const data = event.target.dataset;
+    const attack = this.actor.system.attacks.filter((a) => a.id === data.attack)[0];
+    const attackProfile = attack.profiles.flat().filter((ap) => ap.id === +data.attackprofile)[0];
+    useAttack(attack, attackProfile, this.actor);
+  }
+}
 class AbbrewItemSheet extends ItemSheet {
   /** @override */
   static get defaultOptions() {
@@ -2938,6 +2959,23 @@ class AbbrewItemSheet extends ItemSheet {
     super.activateListeners(html);
     if (!this.isEditable) {
       return;
+    }
+    const concepts = html[0].querySelector('input[name="system.material.concepts"]');
+    if (concepts) {
+      const settings = {
+        dropdown: {
+          maxItems: 20,
+          // <- mixumum allowed rendered suggestions
+          classname: "tags-look",
+          // <- custom classname for this dropdown, so it could be targeted
+          enabled: 0,
+          // <- show suggestions on focus
+          closeOnSelect: false
+          // <- do not hide the suggestions dropdown once an item has been selected
+        },
+        whitelist: ["crushing", "slashing", "piercing", "fire", "water"]
+      };
+      new tagify_minExports(concepts, settings);
     }
     const requirements = html[0].querySelector('input[name="system.weapon.requirements"]');
     if (requirements) {
