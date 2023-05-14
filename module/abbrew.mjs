@@ -12,6 +12,7 @@ import AbbrewRoll from "./helpers/abbrew-roll.mjs";
 import { handleTurnStart } from "./helpers/turn-start.mjs";
 import { ChoiceSetPrompt } from "./rules/choice-set-prompt.mjs";
 import { AbbrewItemFormSheet } from "./sheets/item-form-sheet.mjs";
+import { ConceptBuilder } from "./concept-builder/concept-builder.mjs";
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -79,23 +80,12 @@ Hooks.once('init', async function () {
 });
 
 
-Hooks.on("pauseGame", async function (paused) {
-  const actor = game.actors.get("rLEUu5Vg7QCj59dE");
+Hooks.on("pauseGame", function (paused) {
   console.log('paused');
-  const items = actor.items;
-  const choices = items.map(i => ({ id: i._id, name: i.name }));
-  const data = { content: { promptTitle: "Hello", choices }, buttons: {} };
-  const returned = await new ChoiceSetPrompt(data).resolveSelection();
-  console.log(returned);
-  // const template = "systems/abbrew/templates/rules/choice-set-prompt.hbs";
-  // const html = await renderTemplate(template, data);
-  // let d = new Dialog({
-  //   content: html,
-  //   buttons: {},
-  //   render: html => console.log("Register interactivity in the rendered dialog"),
-  //   close: html => console.log("This always is logged no matter which option is chosen")
-  //  });
-  //  d.render(true);   
+  const data = { content: { builderTitle: "Hello" }, buttons: {} };
+  new ConceptBuilder(data).renderBuilder();
+  console.log('rendered');
+ 
 });
 
 /* -------------------------------------------- */

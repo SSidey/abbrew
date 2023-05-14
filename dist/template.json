@@ -492,7 +492,7 @@
   },
   "Item": {
     "types": [
-      "rule",
+      "concept",
       "item",
       "spell",
       "feature",
@@ -501,11 +501,13 @@
       "form",
       "attack",
       "defence",
-      "defense"
+      "defense",
+      "rule"
     ],
     "templates": {
       "base": {
         "description": "",
+        "concepts": [],
         "rules": []
       },
       "action": {
@@ -598,6 +600,9 @@
       }
     },
     "rule": {
+      "templates": ["base"]
+    },
+    "concept": {
       "templates": ["base"]
     },
     "item": {

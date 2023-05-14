@@ -1,0 +1,38 @@
+{
+  "name": "Torso",
+  "type": "anatomy",
+  "system": {
+    "description": "",
+    "concepts": [],
+    "rules": [],
+    "tags": "[{\"value\":\"Vital\"},{\"value\":\"Humanoid\"},{\"value\":\"Torso\"}]",
+    "tagsArray": [],
+    "grappleScore": 0,
+    "armourBonus": "",
+    "hands": 0,
+    "armourPoints": "[{\"value\":\"Abdomen\"},{\"value\":\"Chest_Left\"},{\"value\":\"Chest_Right\"},{\"value\":\"Shoulder_Left\"},{\"value\":\"Shoulder_Right\"}]",
+    "armourPointsArray": [],
+    "formula": ""
+  },
+  "img": "icons/svg/item-bag.svg",
+  "effects": [],
+  "flags": {
+    "core": {
+      "sourceId": "Actor.WF8QUhDpILbjTDVp.Item.XnXzZogPmDnP0qQ5"
+    },
+    "exportSource": {
+      "world": "abbrew",
+      "system": "abbrew",
+      "coreVersion": "10.291",
+      "systemVersion": "1.0.0"
+    }
+  },
+  "_stats": {
+    "systemId": "abbrew",
+    "systemVersion": "1.0.0",
+    "coreVersion": "10.291",
+    "createdTime": 1676931505121,
+    "modifiedTime": 1683669972853,
+    "lastModifiedBy": "GUeHPkfN7JbUYOoz"
+  }
+}

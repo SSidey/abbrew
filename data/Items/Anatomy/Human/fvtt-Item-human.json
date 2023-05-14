@@ -1,0 +1,28 @@
+{
+  "name": "Human",
+  "type": "form",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "concepts": [],
+    "rules": [],
+    "tags": "[{\"value\":\"Base\"},{\"value\":\"Humanoid\"}]"
+  },
+  "effects": [],
+  "flags": {
+    "exportSource": {
+      "world": "abbrew",
+      "system": "abbrew",
+      "coreVersion": "10.291",
+      "systemVersion": "1.0.0"
+    }
+  },
+  "_stats": {
+    "systemId": "abbrew",
+    "systemVersion": "1.0.0",
+    "coreVersion": "10.291",
+    "createdTime": 1683673633384,
+    "modifiedTime": 1683673644353,
+    "lastModifiedBy": "GUeHPkfN7JbUYOoz"
+  }
+}

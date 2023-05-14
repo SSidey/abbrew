@@ -30,6 +30,7 @@
   "ITEM.TypeResource": "Resource",
   "ITEM.TypeFeature": "Feature",
   "ITEM.TypeDefence": "Defence",
+  "ITEM.TypeConcept": "Concept",
   "ABBREW.SheetLabel": "{type} Sheet",
   "ABBREW.SheetType.Anatomy": "Anatomy",
   "ABBREW.EffectEnable": "Enable Effect",

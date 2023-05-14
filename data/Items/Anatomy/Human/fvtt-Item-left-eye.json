@@ -1,0 +1,194 @@
+{
+  "name": "Left Eye",
+  "type": "anatomy",
+  "system": {
+    "0": "a",
+    "1": "n",
+    "2": "a",
+    "3": "t",
+    "4": "o",
+    "5": "m",
+    "6": "y",
+    "description": "",
+    "concepts": [],
+    "rules": [
+      {
+        "id": "lheu6ekvkmb53mug67",
+        "type": 0,
+        "active": true,
+        "label": "New Rule",
+        "content": "{\"type\":\"ABBREW.ActiveEffect\",\"priority\":100,\"predicate\":\"\",\"target\":\"system.conditions.observationPenaltyMidLeft\",\"operator\":\"minus\",\"value\":\"5\",\"requireEquippedItem\":false}",
+        "source": {
+          "actor": "klGPamARBovVJzPB",
+          "item": "gEuDKFmNfCstrtRH",
+          "uuid": "Actor.klGPamARBovVJzPB.Item.gEuDKFmNfCstrtRH"
+        },
+        "options": [
+          {
+            "type": "ABBREW.ActiveEffect",
+            "priority": 100,
+            "predicate": "",
+            "target": "",
+            "operator": "",
+            "value": "",
+            "requireEquippedItem": false
+          },
+          {
+            "type": "ABBREW.ChoiceSet",
+            "priority": 100,
+            "predicate": "",
+            "target": "",
+            "options": [
+              "weapon",
+              "armour",
+              "consumable",
+              "anatomy"
+            ],
+            "choice": ""
+          }
+        ],
+        "targetElement": ""
+      },
+      {
+        "id": "lheu6bz4uocju8mo0e8",
+        "type": 0,
+        "active": true,
+        "label": "New Rule",
+        "content": "{\"type\":\"ABBREW.ActiveEffect\",\"priority\":100,\"predicate\":\"\",\"target\":\"system.conditions.observationPenaltyFrontRight\",\"operator\":\"minus\",\"value\":\"9\",\"requireEquippedItem\":false}",
+        "source": {
+          "actor": "klGPamARBovVJzPB",
+          "item": "gEuDKFmNfCstrtRH",
+          "uuid": "Actor.klGPamARBovVJzPB.Item.gEuDKFmNfCstrtRH"
+        },
+        "options": [
+          {
+            "type": "ABBREW.ActiveEffect",
+            "priority": 100,
+            "predicate": "",
+            "target": "",
+            "operator": "",
+            "value": "",
+            "requireEquippedItem": false
+          },
+          {
+            "type": "ABBREW.ChoiceSet",
+            "priority": 100,
+            "predicate": "",
+            "target": "",
+            "options": [
+              "weapon",
+              "armour",
+              "consumable",
+              "anatomy"
+            ],
+            "choice": ""
+          }
+        ],
+        "targetElement": ""
+      },
+      {
+        "id": "lheu641mg8stn8yi9bc",
+        "type": 0,
+        "active": true,
+        "label": "New Rule",
+        "content": "{\"type\":\"ABBREW.ActiveEffect\",\"priority\":100,\"predicate\":\"\",\"target\":\"system.conditions.observationPenaltyFrontLeft\",\"operator\":\"minus\",\"value\":\"9\",\"requireEquippedItem\":false}",
+        "source": {
+          "actor": "klGPamARBovVJzPB",
+          "item": "gEuDKFmNfCstrtRH",
+          "uuid": "Actor.klGPamARBovVJzPB.Item.gEuDKFmNfCstrtRH"
+        },
+        "options": [
+          {
+            "type": "ABBREW.ActiveEffect",
+            "priority": 100,
+            "predicate": "",
+            "target": "",
+            "operator": "",
+            "value": "",
+            "requireEquippedItem": false
+          },
+          {
+            "type": "ABBREW.ChoiceSet",
+            "priority": 100,
+            "predicate": "",
+            "target": "",
+            "options": [
+              "weapon",
+              "armour",
+              "consumable",
+              "anatomy"
+            ],
+            "choice": ""
+          }
+        ],
+        "targetElement": ""
+      },
+      {
+        "id": "lheu5ym4935k1cfdrt",
+        "type": 0,
+        "active": true,
+        "label": "New Rule",
+        "content": "{\"type\":\"ABBREW.ActiveEffect\",\"priority\":100,\"predicate\":\"\",\"target\":\"system.conditions.observationPenaltyFrontMid\",\"operator\":\"minus\",\"value\":\"9\",\"requireEquippedItem\":false}",
+        "source": {
+          "actor": "klGPamARBovVJzPB",
+          "item": "gEuDKFmNfCstrtRH",
+          "uuid": "Actor.klGPamARBovVJzPB.Item.gEuDKFmNfCstrtRH"
+        },
+        "options": [
+          {
+            "type": "ABBREW.ActiveEffect",
+            "priority": 100,
+            "predicate": "",
+            "target": "",
+            "operator": "",
+            "value": "",
+            "requireEquippedItem": false
+          },
+          {
+            "type": "ABBREW.ChoiceSet",
+            "priority": 100,
+            "predicate": "",
+            "target": "",
+            "options": [
+              "weapon",
+              "armour",
+              "consumable",
+              "anatomy"
+            ],
+            "choice": ""
+          }
+        ],
+        "targetElement": ""
+      }
+    ],
+    "tags": "[{\"value\":\"Vision\"}]",
+    "tagsArray": [],
+    "grappleScore": null,
+    "armourBonus": "",
+    "hands": 0,
+    "armourPoints": "",
+    "armourPointsArray": [],
+    "formula": ""
+  },
+  "img": "icons/svg/item-bag.svg",
+  "effects": [],
+  "flags": {
+    "core": {
+      "sourceId": "Actor.rLEUu5Vg7QCj59dE.Item.qXvCJoUnZeqFzpNc"
+    },
+    "exportSource": {
+      "world": "abbrew",
+      "system": "abbrew",
+      "coreVersion": "10.291",
+      "systemVersion": "1.0.0"
+    }
+  },
+  "_stats": {
+    "systemId": "abbrew",
+    "systemVersion": "1.0.0",
+    "coreVersion": "10.291",
+    "createdTime": 1683549904321,
+    "modifiedTime": 1683670025239,
+    "lastModifiedBy": "GUeHPkfN7JbUYOoz"
+  }
+}

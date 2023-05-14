@@ -335,7 +335,6 @@ class ChoiceSetPrompt extends Dialog {
     data.footer = this.data.footer;
     data.choices = data.content.choices;
     data.promptTitle = data.content.promptTitle;
-    console.log(data);
     return data;
   }
   /** Return early if there is only one choice */
@@ -1284,23 +1283,20 @@ class AbbrewActor extends Actor {
   }
 }
 class AbbrewItem extends Item {
-  constructor() {
-    super(...arguments);
-    __publicField(this, "armourTypeBonus", {
-      Plate: 5,
-      Chain: 3,
-      Hide: 2,
-      Cloth: 1,
-      Accessory: 0
-    });
-  }
   /**
    * Augment the basic Item data model with additional dynamic data.
    */
   prepareData() {
     super.prepareData();
     if (this.system.isArmour) {
-      this.system.armour.value = (+this.system.material.tier + +this.system.material.structure + this.armourTypeBonus[JSON.parse(this.system.armour.type).map((t) => t.value)[0]]) * JSON.parse(this.system.armour.armourPoints).length;
+      const armourTypeBonus = {
+        Plate: 5,
+        Chain: 3,
+        Hide: 2,
+        Cloth: 1,
+        Accessory: 0
+      };
+      this.system.armour.value = (+this.system.material.tier + +this.system.material.structure + armourTypeBonus[JSON.parse(this.system.armour.type).map((t) => t.value)[0]]) * JSON.parse(this.system.armour.armourPoints).length;
     }
   }
   /**
@@ -3327,6 +3323,98 @@ class AbbrewItemFormSheet extends AbbrewItemSheet {
     return `${path}/item-form-sheet.hbs`;
   }
 }
+class Concept {
+  constructor(name, description, concepts = []) {
+    __publicField(this, "name");
+    __publicField(this, "description");
+    __publicField(this, "concepts");
+    this.name = name;
+    this.description = description;
+    this.concepts = concepts;
+  }
+}
+class ConceptBuilder extends Dialog {
+  constructor(data = { builderTitle }, options2 = {}) {
+    options2.buttons = {};
+    data.buttons = {};
+    super(data, options2);
+    __publicField(this, "concepts");
+    this.concepts = [];
+  }
+  /** @override */
+  get template() {
+    return "systems/abbrew/templates/concept-builder/builder.hbs";
+  }
+  /** @override */
+  activateListeners($html) {
+    const html = $html[0];
+    html.querySelectorAll("a[data-choice], button[type=button]").forEach((element) => {
+      element.addEventListener("click", (event) => {
+        console.log("clicked");
+        this.selection = event.currentTarget.dataset.id;
+        this.close();
+      });
+    });
+    document.querySelectorAll("li.item").forEach((li) => {
+      li.ondragstart = this.onDragStart;
+    });
+    document.querySelectorAll("li[item]").forEach((li) => {
+      li.ondragstart = this.onDragStart;
+    });
+    html.querySelector(".main-concept").ondragover = this.onDragOver;
+    html.querySelector(".main-concept").ondrop = this.onDrop.bind(this);
+  }
+  onDragOver(ev) {
+    ev.preventDefault();
+  }
+  onDrop(ev) {
+    const dataString = ev.dataTransfer.getData("text");
+    const abbrewDataString = ev.dataTransfer.getData("abbrew");
+    console.log(dataString);
+    console.log(abbrewDataString);
+    let item;
+    if (dataString && JSON.parse(dataString).uuid.split(".")[0] == "Actor") {
+      const uuidSplit = JSON.parse(dataString).uuid.split(".");
+      const actorId = uuidSplit[1];
+      const itemId = uuidSplit[3];
+      item = game.actors.get(actorId).items.get(itemId);
+    } else if (dataString && JSON.parse(dataString).uuid.split(".")[0] == "Item") {
+      const uuidSplit = JSON.parse(dataString).uuid.split(".");
+      const itemId = uuidSplit[1];
+      item = game.items.get(itemId);
+    } else {
+      const abbrewData = JSON.parse(abbrewDataString);
+      const itemId = Object.keys(abbrewData).includes("documentId") ? abbrewData["documentId"] : abbrewData["itemId"];
+      item = game.items.get(itemId);
+    }
+    console.log(item);
+    if (item && item.type == "concept") {
+      this.concepts.push(new Concept(item.name, item.system.concepts));
+      this.render();
+    }
+  }
+  onDragStart(ev) {
+    ev.dataTransfer.setData("abbrew", JSON.stringify(ev.target.dataset));
+  }
+  getData() {
+    console.log("getData", this);
+    const data = super.getData();
+    data.header = this.data.header;
+    data.footer = this.data.footer;
+    data.concepts = this.concepts;
+    data.builderTitle = data.content.builderTitle;
+    console.log(data);
+    return data;
+  }
+  renderBuilder() {
+    this.render(true);
+  }
+  /** @override */
+  /** Close the dialog, applying the effect with configured target or warning the user that something went wrong. */
+  async close({ force = false } = {}) {
+    await super.close({ force });
+  }
+}
 Hooks.once("init", async function() {
   Handlebars.registerHelper("json", function(context) {
     return JSON.stringify(context);
@@ -3367,14 +3455,11 @@ Hooks.once("init", async function() {
   }
   return preloadHandlebarsTemplates();
 });
-Hooks.on("pauseGame", async function(paused) {
-  const actor = game.actors.get("rLEUu5Vg7QCj59dE");
+Hooks.on("pauseGame", function(paused) {
   console.log("paused");
-  const items = actor.items;
-  const choices2 = items.map((i) => ({ id: i._id, name: i.name }));
-  const data = { content: { promptTitle: "Hello", choices: choices2 }, buttons: {} };
-  const returned = await new ChoiceSetPrompt(data).resolveSelection();
-  console.log(returned);
+  const data = { content: { builderTitle: "Hello" }, buttons: {} };
+  new ConceptBuilder(data).renderBuilder();
+  console.log("rendered");
 });
 Handlebars.registerHelper("concat", function() {
   var outStr = "";

@@ -14,16 +14,15 @@ export class AbbrewItem extends Item {
     super.prepareData();
     if (this.system.isArmour) {
       // TODO: JSON.parse giving errors for new items with no tagified data
-      this.system.armour.value = (+this.system.material.tier + +this.system.material.structure + this.armourTypeBonus[JSON.parse(this.system.armour.type).map(t => t.value)[0]]) * JSON.parse(this.system.armour.armourPoints).length;
+      const armourTypeBonus = {
+        Plate: 5,
+        Chain: 3,
+        Hide: 2,
+        Cloth: 1,
+        Accessory: 0
+      }
+      this.system.armour.value = (+this.system.material.tier + +this.system.material.structure + armourTypeBonus[JSON.parse(this.system.armour.type).map(t => t.value)[0]]) * JSON.parse(this.system.armour.armourPoints).length;
     }
-  }
-
-  armourTypeBonus = {
-    Plate: 5,
-    Chain: 3,
-    Hide: 2,
-    Cloth: 1,
-    Accessory: 0
   }
 
   /**

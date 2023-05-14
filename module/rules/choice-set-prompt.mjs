@@ -40,8 +40,6 @@ export class ChoiceSetPrompt extends Dialog {
         data.choices = data.content.choices;
         data.promptTitle = data.content.promptTitle;
 
-        console.log(data);
-
         return data;
     }
 

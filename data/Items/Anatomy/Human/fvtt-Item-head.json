@@ -1,0 +1,38 @@
+{
+  "name": "Head",
+  "type": "anatomy",
+  "system": {
+    "description": "",
+    "concepts": [],
+    "rules": [],
+    "tags": "[{\"value\":\"Vital\"},{\"value\":\"Humanoid\"},{\"value\":\"Head\"}]",
+    "tagsArray": [],
+    "grappleScore": 0,
+    "armourBonus": "",
+    "hands": 0,
+    "armourPoints": "[{\"value\":\"Head\"}]",
+    "armourPointsArray": [],
+    "formula": ""
+  },
+  "img": "icons/svg/item-bag.svg",
+  "effects": [],
+  "flags": {
+    "core": {
+      "sourceId": "Actor.WF8QUhDpILbjTDVp.Item.hhYO372qOKYOPNS2"
+    },
+    "exportSource": {
+      "world": "abbrew",
+      "system": "abbrew",
+      "coreVersion": "10.291",
+      "systemVersion": "1.0.0"
+    }
+  },
+  "_stats": {
+    "systemId": "abbrew",
+    "systemVersion": "1.0.0",
+    "coreVersion": "10.291",
+    "createdTime": 1676932034217,
+    "modifiedTime": 1683669962020,
+    "lastModifiedBy": "GUeHPkfN7JbUYOoz"
+  }
+}

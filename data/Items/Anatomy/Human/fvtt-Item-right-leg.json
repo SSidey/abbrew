@@ -1,0 +1,38 @@
+{
+  "name": "Right Leg",
+  "type": "anatomy",
+  "system": {
+    "description": "",
+    "concepts": [],
+    "rules": [],
+    "tags": "[{\"value\":\"Agility\"},{\"value\":\"Humanoid\"},{\"value\":\"Leg\"}]",
+    "tagsArray": [],
+    "grappleScore": 1,
+    "armourBonus": "",
+    "hands": 0,
+    "armourPoints": "[{\"value\":\"Upper_Leg\"},{\"value\":\"Lower_Leg\"},{\"value\":\"Foot\"}]",
+    "armourPointsArray": [],
+    "formula": ""
+  },
+  "img": "icons/svg/item-bag.svg",
+  "effects": [],
+  "flags": {
+    "core": {
+      "sourceId": "Actor.WF8QUhDpILbjTDVp.Item.N0zd8PdgiedWZTIP"
+    },
+    "exportSource": {
+      "world": "abbrew",
+      "system": "abbrew",
+      "coreVersion": "10.291",
+      "systemVersion": "1.0.0"
+    }
+  },
+  "_stats": {
+    "systemId": "abbrew",
+    "systemVersion": "1.0.0",
+    "coreVersion": "10.291",
+    "createdTime": 1676931996023,
+    "modifiedTime": 1683670001289,
+    "lastModifiedBy": "GUeHPkfN7JbUYOoz"
+  }
+}

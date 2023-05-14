@@ -1,0 +1,14 @@
+<div class="content">
+    <h3>{{builderTitle}}</h3>
+    {{!-- TODO: Make this draggable --}}
+    {{!-- TODO: Sidebar for saved concepts --}}
+    {{!-- TODO: How do we then export it? --}}
+    <div id="main-concept" class="main-concept" style="min-width:400px; min-height:400px; background-color: coral;">
+        <p>Fuck</p>
+        {{#each concepts as |concept|}}
+        <div style="min-width:100px; min-height:100px; background-color: rgb(80, 191, 255); margin:40px;">
+            <h3>{{concept.name}}</h3>
+        </div>
+        {{/each}}
+    </div>
+</div>
