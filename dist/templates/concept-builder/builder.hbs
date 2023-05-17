@@ -1,14 +1,38 @@
-<div class="content">
-    <h3>{{builderTitle}}</h3>
-    {{!-- TODO: Make this draggable --}}
-    {{!-- TODO: Sidebar for saved concepts --}}
-    {{!-- TODO: How do we then export it? --}}
-    <div id="main-concept" class="main-concept" style="min-width:400px; min-height:400px; background-color: coral;">
-        <p>Fuck</p>
-        {{#each concepts as |concept|}}
-        <div style="min-width:100px; min-height:100px; background-color: rgb(80, 191, 255); margin:40px;">
-            <h3>{{concept.name}}</h3>
+<div class="content abbrew">
+    <div class="builder-container">
+        <h3>{{builderTitle}}</h3>
+        <div class="concept-container">
+            <div id="main-concept" class="main-concept" draggable="true">
+                <div class="mainConceptHeader">
+                    <h3>New Concept:</h3>
+                    <input class="concept-name" name="activeConcept" type="text" value="{{activeConcept}}"
+                        placeholder="Name" draggable="true" />
+                    <input class="concept-value" name="conceptValue" type="text" value="{{conceptValue}}"
+                        placeholder="value" draggable="true" />
+                </div>
+                {{#each concepts as |concept|}}
+                <div class="subConcept">
+                    <h3>{{concept.name}}</h3>
+                    <span>{{concept.description}}</span>
+                </div>
+                {{/each}}
+            </div>
+            <div class="saved-concepts" style="min-width:200px; padding-top:10px; background-color: #5E6764">
+                <h3 class="saved-concept-name">Saved Concepts
+                </h3>
+                {{#each savedConcepts as |concept id|}}
+                <div class="saved-concept" data-id="{{id}}" draggable="true">
+                    <h3>{{concept.name}}</h3>
+                    <span>{{concept.description}}</span>
+                </div>
+                {{/each}}
+            </div>
         </div>
-        {{/each}}
+        <div class="builder-buttons">
+            <button class="concept-builder-button" id="clear">Clear</button>
+            <button class="concept-builder-button" id="clearSaved">Clear Saved</button>
+            <button class="concept-builder-button" id="createConcept">Create Concept</button>
+            <button class="concept-builder-button" id="createSpell">Create Spell</button>
+        </div>
     </div>
 </div>

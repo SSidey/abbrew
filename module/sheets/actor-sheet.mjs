@@ -94,6 +94,7 @@ export class AbbrewActorSheet extends ActorSheet {
     const gear = [];
     const features = [];
     const formModifiers = [];
+    const concepts = [];
     const spells = {
       0: [],
       1: [],
@@ -138,6 +139,9 @@ export class AbbrewActorSheet extends ActorSheet {
       else if (i.type === 'ability') {
         abilities.push(i);
       }
+      else if (i.type === 'concept') {
+        concepts.push(i);
+      }
       // Append to spells.
       else if (i.type === 'spell') {
         if (i.system.spellLevel != undefined) {
@@ -155,6 +159,7 @@ export class AbbrewActorSheet extends ActorSheet {
     context.anatomy = anatomy;
     context.formModifiers = formModifiers;
     context.ability = abilities;
+    context.concepts = concepts;
   }
 
   /* -------------------------------------------- */
@@ -197,7 +202,7 @@ export class AbbrewActorSheet extends ActorSheet {
           enabled: 0,             // <- show suggestions on focus
           closeOnSelect: false    // <- do not hide the suggestions dropdown once an item has been selected
         },
-        whitelist:['crushing', 'slashing', 'piercing', 'fire', 'water'],
+        whitelist: ['crushing', 'slashing', 'piercing', 'fire', 'water'],
       }
       var taggedNaturalArmourReduces = new Tagify(naturalArmourReduces, settings);
     }
@@ -205,12 +210,12 @@ export class AbbrewActorSheet extends ActorSheet {
     // Render Compendium
     html.find(".open-compendium").on("click", (event) => {
       if (event.currentTarget.dataset.compendium) {
-          const compendium = game.packs.get(event.currentTarget.dataset.compendium);
-          if (compendium) {
-              compendium.render(true);
-          }
+        const compendium = game.packs.get(event.currentTarget.dataset.compendium);
+        if (compendium) {
+          compendium.render(true);
+        }
       }
-  });
+    });
 
     // Show/Hide Conditions
     html.find('.conditions-header').click(async ev => {

@@ -1,0 +1,24 @@
+{
+  "name": "ABC123",
+  "type": "concept",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "concepts": [],
+    "rules": []
+  },
+  "effects": [],
+  "flags": {
+    "exportSource": {
+      "world": "abbrew",
+      "system": "abbrew",
+      "coreVersion": "10.291",
+      "systemVersion": "1.0.0"
+    }
+  },
+  "_stats": {
+    "systemId": "abbrew",
+    "systemVersion": "1.0.0",
+    "coreVersion": "10.291"
+  }
+}

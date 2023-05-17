@@ -2740,6 +2740,7 @@ class AbbrewActorSheet extends ActorSheet {
     const gear = [];
     const features = [];
     const formModifiers = [];
+    const concepts = [];
     const spells = {
       0: [],
       1: [],
@@ -2770,6 +2771,8 @@ class AbbrewActorSheet extends ActorSheet {
         features.push(i);
       } else if (i.type === "ability") {
         abilities.push(i);
+      } else if (i.type === "concept") {
+        concepts.push(i);
       } else if (i.type === "spell") {
         if (i.system.spellLevel != void 0) {
           spells[i.system.spellLevel].push(i);
@@ -2783,6 +2786,7 @@ class AbbrewActorSheet extends ActorSheet {
     context.anatomy = anatomy;
     context.formModifiers = formModifiers;
     context.ability = abilities;
+    context.concepts = concepts;
   }
   /* -------------------------------------------- */
   _prepareAttacks(context) {
@@ -3102,6 +3106,7 @@ const preloadHandlebarsTemplates = async function() {
     "systems/abbrew/templates/actor/parts/actor-attacks.hbs",
     "systems/abbrew/templates/actor/parts/actor-defences.hbs",
     "systems/abbrew/templates/actor/parts/actor-armour.hbs",
+    "systems/abbrew/templates/actor/parts/actor-concepts.hbs",
     "systems/abbrew/templates/actor/parts/actor-form.hbs",
     "systems/abbrew/templates/actor/parts/actor-conditions.hbs",
     "systems/abbrew/templates/parts/active-effects.hbs",
@@ -3324,22 +3329,38 @@ class AbbrewItemFormSheet extends AbbrewItemSheet {
   }
 }
 class Concept {
-  constructor(name, description, concepts = []) {
+  constructor(name, value, description, concepts = []) {
     __publicField(this, "name");
+    __publicField(this, "value");
     __publicField(this, "description");
     __publicField(this, "concepts");
     this.name = name;
+    this.value = value;
     this.description = description;
     this.concepts = concepts;
   }
 }
+function createSpell(concept) {
+}
 class ConceptBuilder extends Dialog {
   constructor(data = { builderTitle }, options2 = {}) {
+    options2.width = 516;
     options2.buttons = {};
+    data.content.builderTitle = "Concept Builder";
     data.buttons = {};
     super(data, options2);
     __publicField(this, "concepts");
+    __publicField(this, "activeConcept");
+    __publicField(this, "conceptParents");
+    __publicField(this, "savedConcepts");
+    __publicField(this, "description");
+    __publicField(this, "conceptValue");
     this.concepts = [];
+    this.description = "";
+    this.activeConcept = "";
+    this.conceptValue = "";
+    this.conceptParents = [];
+    this.savedConcepts = [];
   }
   /** @override */
   get template() {
@@ -3348,21 +3369,56 @@ class ConceptBuilder extends Dialog {
   /** @override */
   activateListeners($html) {
     const html = $html[0];
-    html.querySelectorAll("a[data-choice], button[type=button]").forEach((element) => {
-      element.addEventListener("click", (event) => {
-        console.log("clicked");
-        this.selection = event.currentTarget.dataset.id;
-        this.close();
-      });
-    });
+    html.querySelector(".concept-name").onchange = this.onConceptNameChange.bind(this);
+    html.querySelector(".concept-value").onchange = this.onConceptValueChange.bind(this);
     document.querySelectorAll("li.item").forEach((li) => {
       li.ondragstart = this.onDragStart;
     });
     document.querySelectorAll("li[item]").forEach((li) => {
       li.ondragstart = this.onDragStart;
     });
+    html.querySelector(".concept-name").ondragstart = this.ignoreDragStart.bind(this);
+    html.querySelector(".concept-value").ondragstart = this.ignoreDragStart.bind(this);
+    html.querySelector(".main-concept").ondragstart = this.onMainConceptDragStart.bind(this);
     html.querySelector(".main-concept").ondragover = this.onDragOver;
     html.querySelector(".main-concept").ondrop = this.onDrop.bind(this);
+    html.querySelector(".saved-concepts").ondragstart = this.onSavedConceptDragStart.bind(this);
+    html.querySelector(".saved-concepts").ondragover = this.onDragOver;
+    html.querySelector(".saved-concepts").ondrop = this.onDropForSave.bind(this);
+    html.querySelector(".builder-buttons").onclick = this.onButtonsClick.bind(this);
+  }
+  ignoreDragStart(ev) {
+    ev.preventDefault();
+    ev.stopPropagation();
+  }
+  onConceptNameChange(ev) {
+    this.activeConcept = ev.target.value;
+  }
+  onConceptValueChange(ev) {
+    this.conceptValue = ev.target.value;
+  }
+  onButtonsClick(ev) {
+    ev.preventDefault();
+    if (ev.target && ev.target.classList[0] == "concept-builder-button") {
+      if (ev.target.id == "clear") {
+        this.reset();
+      } else if (ev.target.id == "clearSaved") {
+        this.savedConcepts = [];
+      } else if (ev.target.id === "createConcept") {
+        const itemData = {
+          name: this.activeConcept,
+          type: "concept",
+          system: { description: this.description, value: this.conceptValue, concepts: this.concepts }
+        };
+        delete itemData.system.type;
+        const tokens = canvas.tokens.controlled.filter((token) => token.actor);
+        const actor = tokens[0].actor;
+        return actor.createEmbeddedDocuments("Item", [itemData]);
+      } else if (ev.target.id === "createSpell") {
+        createSpell(new Concept(this.activeConcept, this.conceptValue, this.description, this.concepts));
+      }
+      this.render();
+    }
   }
   onDragOver(ev) {
     ev.preventDefault();
@@ -3370,8 +3426,13 @@ class ConceptBuilder extends Dialog {
   onDrop(ev) {
     const dataString = ev.dataTransfer.getData("text");
     const abbrewDataString = ev.dataTransfer.getData("abbrew");
-    console.log(dataString);
-    console.log(abbrewDataString);
+    const savedConceptString = ev.dataTransfer.getData("abbrew-savedConcept");
+    if (savedConceptString) {
+      const savedConceptData = JSON.parse(savedConceptString);
+      this.handleConceptDrop(savedConceptData);
+      this.render();
+      return;
+    }
     let item;
     if (dataString && JSON.parse(dataString).uuid.split(".")[0] == "Actor") {
       const uuidSplit = JSON.parse(dataString).uuid.split(".");
@@ -3382,28 +3443,91 @@ class ConceptBuilder extends Dialog {
       const uuidSplit = JSON.parse(dataString).uuid.split(".");
       const itemId = uuidSplit[1];
       item = game.items.get(itemId);
-    } else {
+    } else if (abbrewDataString) {
       const abbrewData = JSON.parse(abbrewDataString);
       const itemId = Object.keys(abbrewData).includes("documentId") ? abbrewData["documentId"] : abbrewData["itemId"];
       item = game.items.get(itemId);
+    } else {
+      return;
     }
-    console.log(item);
     if (item && item.type == "concept") {
-      this.concepts.push(new Concept(item.name, item.system.concepts));
+      this.handleConceptItemDrop(item);
+      this.render();
+    } else {
+      this.handleItemDrop(item);
       this.render();
     }
+  }
+  handleConceptDrop(concept) {
+    if (this.activeConcept === "") {
+      this.activeConcept = concept.name;
+      this.conceptValue = concept.conceptValue;
+      this.description = concept.description;
+      this.concepts = concept.concepts;
+    } else {
+      this.concepts.push(new Concept(concept.name, concept.conceptValue, concept.description, concept.concepts));
+    }
+  }
+  handleConceptItemDrop(conceptItem) {
+    const safeConcept = deepClone(conceptItem);
+    if (this.activeConcept === "") {
+      this.activeConcept = safeConcept.name;
+      this.conceptValue = safeConcept.system.value;
+      this.description = safeConcept.system.description;
+      this.concepts = [...safeConcept.system.concepts];
+    } else {
+      this.concepts.push(new Concept(safeConcept.name, safeConcept.system.value, safeConcept.system.description, safeConcept.system.concepts));
+    }
+  }
+  handleItemDrop(item) {
+    const safeItem = deepClone(item);
+    if (this.activeConcept === "") {
+      this.activeConcept = safeItem.name;
+      this.conceptValue = "";
+      this.description = safeItem.system.description;
+      this.concepts = [...safeItem.system.concepts];
+    } else {
+      const itemConcept = new Concept(safeItem.name, "", safeItem.system.description, safeItem.system.concepts);
+      this.concepts.push(itemConcept);
+    }
+  }
+  onDropForSave(ev) {
+    const conceptString = ev.dataTransfer.getData("abbrew-concept");
+    const conceptData = JSON.parse(conceptString);
+    if (conceptData.name) {
+      this.savedConcepts.push(conceptData);
+      this.reset();
+      this.render();
+    }
+  }
+  reset() {
+    this.activeConcept = "";
+    this.conceptValue = "";
+    this.description = "";
+    this.concepts = [];
   }
   onDragStart(ev) {
     ev.dataTransfer.setData("abbrew", JSON.stringify(ev.target.dataset));
   }
-  getData() {
-    console.log("getData", this);
+  onMainConceptDragStart(ev) {
+    ev.dataTransfer.setData("abbrew-concept", JSON.stringify({ name: this.activeConcept, conceptValue: this.conceptValue, description: this.description, concepts: this.concepts }));
+  }
+  onSavedConceptDragStart(ev) {
+    if (ev.target && ev.target.classList[0] == "saved-concept") {
+      const savedConcept = this.savedConcepts[ev.target.dataset.id];
+      ev.dataTransfer.setData("abbrew-savedConcept", JSON.stringify(savedConcept));
+    }
+  }
+  async getData() {
     const data = super.getData();
     data.header = this.data.header;
     data.footer = this.data.footer;
+    data.activeConcept = this.activeConcept;
+    data.description = this.description;
+    data.conceptValue = this.conceptValue;
     data.concepts = this.concepts;
-    data.builderTitle = data.content.builderTitle;
-    console.log(data);
+    data.savedConcepts = this.savedConcepts;
+    data.builderTitle = this.data.content.builderTitle;
     return data;
   }
   renderBuilder() {
@@ -3444,6 +3568,7 @@ Hooks.once("init", async function() {
     ["resource", AbbrewItemSheet],
     ["attack", AbbrewItemSheet],
     ["defence", AbbrewItemSheet],
+    ["concept", AbbrewItemSheet],
     ["form", AbbrewItemFormSheet]
   ];
   for (const [type, Sheet] of sheetEntries) {
