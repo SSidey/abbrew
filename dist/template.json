@@ -603,7 +603,9 @@
       "templates": ["base"]
     },
     "concept": {
-      "templates": ["base"]
+      "templates": ["base"],
+      "complexity": 0,
+      "effects": ""
     },
     "item": {
       "templates": ["base", "material", "action", "damage", "weapon", "armour"],

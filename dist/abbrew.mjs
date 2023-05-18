@@ -3329,14 +3329,18 @@ class AbbrewItemFormSheet extends AbbrewItemSheet {
   }
 }
 class Concept {
-  constructor(name, value, description, concepts = []) {
+  constructor(name, value, description, effects, complexity, concepts = []) {
     __publicField(this, "name");
     __publicField(this, "value");
     __publicField(this, "description");
     __publicField(this, "concepts");
+    __publicField(this, "effects");
+    __publicField(this, "complexity");
     this.name = name;
     this.value = value;
     this.description = description;
+    this.effects = effects;
+    this.complexity = complexity;
     this.concepts = concepts;
   }
 }
@@ -3355,10 +3359,14 @@ class ConceptBuilder extends Dialog {
     __publicField(this, "savedConcepts");
     __publicField(this, "description");
     __publicField(this, "conceptValue");
+    __publicField(this, "conceptComplexity");
+    __publicField(this, "conceptEffects");
     this.concepts = [];
     this.description = "";
     this.activeConcept = "";
     this.conceptValue = "";
+    this.conceptComplexity = "";
+    this.conceptEffects = "";
     this.conceptParents = [];
     this.savedConcepts = [];
   }
@@ -3371,6 +3379,8 @@ class ConceptBuilder extends Dialog {
     const html = $html[0];
     html.querySelector(".concept-name").onchange = this.onConceptNameChange.bind(this);
     html.querySelector(".concept-value").onchange = this.onConceptValueChange.bind(this);
+    html.querySelector(".concept-complexity").onchange = this.onConceptComplexityChange.bind(this);
+    html.querySelector(".concept-effects-editor").onchange = this.onConceptEffectsChange.bind(this);
     document.querySelectorAll("li.item").forEach((li) => {
       li.ondragstart = this.onDragStart;
     });
@@ -3379,6 +3389,8 @@ class ConceptBuilder extends Dialog {
     });
     html.querySelector(".concept-name").ondragstart = this.ignoreDragStart.bind(this);
     html.querySelector(".concept-value").ondragstart = this.ignoreDragStart.bind(this);
+    html.querySelector(".concept-complexity").ondragstart = this.ignoreDragStart.bind(this);
+    html.querySelector(".concept-effects-editor").ondragstart = this.ignoreDragStart.bind(this);
     html.querySelector(".main-concept").ondragstart = this.onMainConceptDragStart.bind(this);
     html.querySelector(".main-concept").ondragover = this.onDragOver;
     html.querySelector(".main-concept").ondrop = this.onDrop.bind(this);
@@ -3397,6 +3409,12 @@ class ConceptBuilder extends Dialog {
   onConceptValueChange(ev) {
     this.conceptValue = ev.target.value;
   }
+  onConceptComplexityChange(ev) {
+    this.conceptComplexity = ev.target.value;
+  }
+  onConceptEffectsChange(ev) {
+    this.conceptEffects = ev.target.value;
+  }
   onButtonsClick(ev) {
     ev.preventDefault();
     if (ev.target && ev.target.classList[0] == "concept-builder-button") {
@@ -3405,17 +3423,26 @@ class ConceptBuilder extends Dialog {
       } else if (ev.target.id == "clearSaved") {
         this.savedConcepts = [];
       } else if (ev.target.id === "createConcept") {
+        if (!this.activeConcept) {
+          return;
+        }
         const itemData = {
           name: this.activeConcept,
           type: "concept",
-          system: { description: this.description, value: this.conceptValue, concepts: this.concepts }
+          flags: { createdBy: game.users.current.name, createdById: game.users.current.id },
+          system: { description: this.description, value: this.conceptValue, effects: this.conceptEffects, complexity: +this.conceptComplexity, concepts: this.concepts }
         };
         delete itemData.system.type;
         const tokens = canvas.tokens.controlled.filter((token) => token.actor);
-        const actor = tokens[0].actor;
+        let actor;
+        if (tokens.length > 0) {
+          actor = tokens[0].actor;
+        } else {
+          actor = game.actors.get("R1GFMOm51DVBezHq");
+        }
         return actor.createEmbeddedDocuments("Item", [itemData]);
       } else if (ev.target.id === "createSpell") {
-        createSpell(new Concept(this.activeConcept, this.conceptValue, this.description, this.concepts));
+        createSpell(new Concept(this.activeConcept, this.conceptValue, this.description, this.conceptEffects, this.conceptComplexity, this.concepts));
       }
       this.render();
     }
@@ -3458,14 +3485,17 @@ class ConceptBuilder extends Dialog {
       this.render();
     }
   }
+  // On save or create concept, sum the complexities and apply modifications to effects
   handleConceptDrop(concept) {
     if (this.activeConcept === "") {
       this.activeConcept = concept.name;
       this.conceptValue = concept.conceptValue;
       this.description = concept.description;
+      this.conceptEffects = concept.effects;
+      this.conceptComplexity = +concept.complexity;
       this.concepts = concept.concepts;
     } else {
-      this.concepts.push(new Concept(concept.name, concept.conceptValue, concept.description, concept.concepts));
+      this.concepts.push(new Concept(concept.name, concept.conceptValue, concept.description, concept.effects, +concept.complexity, concept.concepts));
     }
   }
   handleConceptItemDrop(conceptItem) {
@@ -3474,9 +3504,11 @@ class ConceptBuilder extends Dialog {
       this.activeConcept = safeConcept.name;
       this.conceptValue = safeConcept.system.value;
       this.description = safeConcept.system.description;
+      this.conceptEffects = safeConcept.system.effects;
+      this.conceptComplexity = +safeConcept.system.complexity;
       this.concepts = [...safeConcept.system.concepts];
     } else {
-      this.concepts.push(new Concept(safeConcept.name, safeConcept.system.value, safeConcept.system.description, safeConcept.system.concepts));
+      this.concepts.push(new Concept(safeConcept.name, safeConcept.system.value, safeConcept.system.description, safeConcept.system.effects, +safeConcept.system.complexity, safeConcept.system.concepts));
     }
   }
   handleItemDrop(item) {
@@ -3485,9 +3517,11 @@ class ConceptBuilder extends Dialog {
       this.activeConcept = safeItem.name;
       this.conceptValue = "";
       this.description = safeItem.system.description;
+      this.conceptEffects = "";
+      this.conceptComplexity = 0;
       this.concepts = [...safeItem.system.concepts];
     } else {
-      const itemConcept = new Concept(safeItem.name, "", safeItem.system.description, safeItem.system.concepts);
+      const itemConcept = new Concept(safeItem.name, "", safeItem.system.description, "", 0, safeItem.system.concepts);
       this.concepts.push(itemConcept);
     }
   }
@@ -3501,6 +3535,8 @@ class ConceptBuilder extends Dialog {
     }
   }
   reset() {
+    this.conceptEffects = "";
+    this.conceptComplexity = "";
     this.activeConcept = "";
     this.conceptValue = "";
     this.description = "";
@@ -3528,6 +3564,8 @@ class ConceptBuilder extends Dialog {
     data.concepts = this.concepts;
     data.savedConcepts = this.savedConcepts;
     data.builderTitle = this.data.content.builderTitle;
+    data.conceptComplexity = this.conceptComplexity;
+    data.conceptEffects = this.conceptEffects;
     return data;
   }
   renderBuilder() {
