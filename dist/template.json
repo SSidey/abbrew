@@ -604,6 +604,7 @@
     },
     "concept": {
       "templates": ["base"],
+      "type": "",
       "complexity": 0,
       "effects": ""
     },

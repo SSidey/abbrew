@@ -3037,6 +3037,8 @@ class AbbrewItemSheet extends ItemSheet {
       const item = this.actor.items.get(li.data("itemId"));
       item.sheet.render(true);
     });
+    html[0].ondragover = this.onDragOver;
+    html[0].ondrop = this.onDrop.bind(this);
   }
   async _updateObject(event, formData) {
     if (event.handleObj && event.handleObj.type == "change" || event.type && event.type == "change") {
@@ -3073,6 +3075,49 @@ class AbbrewItemSheet extends ItemSheet {
     console.log("closing sheet");
     options2.submit = false;
     super.close(options2);
+  }
+  onDragOver(ev) {
+    ev.preventDefault();
+  }
+  onDrop(ev) {
+    const dataString = ev.dataTransfer.getData("text");
+    const abbrewDataString = ev.dataTransfer.getData("abbrew");
+    const savedConceptString = ev.dataTransfer.getData("abbrew-savedConcept");
+    if (savedConceptString) {
+      const savedConceptData = JSON.parse(savedConceptString);
+      this.handleConceptDrop(savedConceptData);
+      this.render();
+      return;
+    }
+    let item;
+    if (dataString && JSON.parse(dataString).uuid.split(".")[0] == "Actor") {
+      const uuidSplit = JSON.parse(dataString).uuid.split(".");
+      const actorId = uuidSplit[1];
+      const itemId = uuidSplit[3];
+      item = game.actors.get(actorId).items.get(itemId);
+    } else if (dataString && JSON.parse(dataString).uuid.split(".")[0] == "Item") {
+      const uuidSplit = JSON.parse(dataString).uuid.split(".");
+      const itemId = uuidSplit[1];
+      item = game.items.get(itemId);
+    } else if (abbrewDataString) {
+      const abbrewData = JSON.parse(abbrewDataString);
+      const itemId = Object.keys(abbrewData).includes("documentId") ? abbrewData["documentId"] : abbrewData["itemId"];
+      item = game.items.get(itemId);
+    } else {
+      return;
+    }
+    if (item && item.type == "concept") {
+      this.handleConceptDrop(item);
+    }
+  }
+  handleConceptDrop(conceptItem) {
+    deepClone(conceptItem);
+    if (this.item.type == "item") {
+      handleItemConceptDrop(conceptItem);
+    }
+  }
+  handleItemConceptDrop(concept) {
+    concept.system.concepts;
   }
 }
 class AbbrewItemAnatomySheet extends AbbrewItemSheet {
@@ -3355,6 +3400,7 @@ class ConceptBuilder extends Dialog {
     super(data, options2);
     __publicField(this, "concepts");
     __publicField(this, "activeConcept");
+    __publicField(this, "conceptType");
     __publicField(this, "conceptParents");
     __publicField(this, "savedConcepts");
     __publicField(this, "description");
@@ -3363,6 +3409,7 @@ class ConceptBuilder extends Dialog {
     __publicField(this, "conceptEffects");
     this.concepts = [];
     this.description = "";
+    this.conceptType = "";
     this.activeConcept = "";
     this.conceptValue = "";
     this.conceptComplexity = "";
@@ -3377,7 +3424,17 @@ class ConceptBuilder extends Dialog {
   /** @override */
   activateListeners($html) {
     const html = $html[0];
+    const conceptTypes = html[0].querySelector('input[name="conceptType"]');
+    if (conceptTypes) {
+      const settings = {
+        enforceWhitelist: true,
+        mode: "select",
+        whitelist: ["Concept", "MaterialType", "ArmourType", "ArmourAnatomy", "ArmourPoints"]
+      };
+      new Tagify(conceptTypes, settings);
+    }
     html.querySelector(".concept-name").onchange = this.onConceptNameChange.bind(this);
+    html.querySelector(".concept-type").onchange = this.onConceptTypeChange.bind(this);
     html.querySelector(".concept-value").onchange = this.onConceptValueChange.bind(this);
     html.querySelector(".concept-complexity").onchange = this.onConceptComplexityChange.bind(this);
     html.querySelector(".concept-effects-editor").onchange = this.onConceptEffectsChange.bind(this);
@@ -3388,6 +3445,7 @@ class ConceptBuilder extends Dialog {
       li.ondragstart = this.onDragStart;
     });
     html.querySelector(".concept-name").ondragstart = this.ignoreDragStart.bind(this);
+    html.querySelector(".concept-type").ondragstart = this.ignoreDragStart.bind(this);
     html.querySelector(".concept-value").ondragstart = this.ignoreDragStart.bind(this);
     html.querySelector(".concept-complexity").ondragstart = this.ignoreDragStart.bind(this);
     html.querySelector(".concept-effects-editor").ondragstart = this.ignoreDragStart.bind(this);
@@ -3405,6 +3463,9 @@ class ConceptBuilder extends Dialog {
   }
   onConceptNameChange(ev) {
     this.activeConcept = ev.target.value;
+  }
+  onConceptTypeChange(ev) {
+    this.conceptType = ev.target.value;
   }
   onConceptValueChange(ev) {
     this.conceptValue = ev.target.value;
@@ -3536,6 +3597,7 @@ class ConceptBuilder extends Dialog {
   }
   reset() {
     this.conceptEffects = "";
+    this.conceptType = "";
     this.conceptComplexity = "";
     this.activeConcept = "";
     this.conceptValue = "";
@@ -3559,6 +3621,7 @@ class ConceptBuilder extends Dialog {
     data.header = this.data.header;
     data.footer = this.data.footer;
     data.activeConcept = this.activeConcept;
+    data.conceptType = this.conceptType;
     data.description = this.description;
     data.conceptValue = this.conceptValue;
     data.concepts = this.concepts;

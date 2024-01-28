@@ -7,12 +7,14 @@
                     <h3>New Concept:</h3>
                     <input class="concept-name" name="activeConcept" type="text" value="{{activeConcept}}"
                         placeholder="Name" draggable="true" />
-                    <input class="concept-complexity" name="conceptComplexity" type="number" value="{{conceptComplexity}}"
-                        placeholder="0" draggable="true" />
+                    <input class="concept-type" name="conceptType" type="text" value="{{conceptType}}"
+                        draggable="true" />
+                    <input class="concept-complexity" name="conceptComplexity" type="number"
+                        value="{{conceptComplexity}}" placeholder="0" draggable="true" />
                     <input class="concept-value" name="conceptValue" type="text" value="{{conceptValue}}"
                         placeholder="value" draggable="true" />
-                    <textarea class="concept-effects-editor" name="conceptEffects" cols="40"
-                        rows="5" draggable="true">{{conceptEffects}}</textarea>
+                    <textarea class="concept-effects-editor" name="conceptEffects" cols="40" rows="5"
+                        draggable="true">{{conceptEffects}}</textarea>
                 </div>
                 {{#each concepts as |concept|}}
                 <div class="subConcept">
