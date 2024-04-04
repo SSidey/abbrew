@@ -1,4 +1,4 @@
-export default class BoilerplateActorBase extends foundry.abstract.TypeDataModel {
+export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
   static defineSchema() {
     const fields = foundry.data.fields;

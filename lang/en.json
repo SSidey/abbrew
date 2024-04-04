@@ -1,16 +1,18 @@
 {
-  "BOILERPLATE": {
+  "ABBREW": {
     "Ability": {
       "Str": { "long": "Strength", "abbr": "str" },
-      "Con": { "long": "Constitution", "abbr": "con" },
       "Dex": { "long": "Dexterity", "abbr": "dex" },
+      "Agi": { "long": "Agility", "abbr": "agi" },
+      "Con": { "long": "Constitution", "abbr": "con" },
       "Int": { "long": "Intelligence", "abbr": "int" },
-      "Wis": { "long": "Wisdom", "abbr": "wis" },
-      "Cha": { "long": "Charisma", "abbr": "cha" }
+      "Wit": { "long": "Wits", "abbr": "wit" },
+      "Vis": { "long": "Visualisation", "abbr": "vis" },
+      "Wil": { "long": "Will", "abbr": "wil" }
     },
     "SheetLabels": {
-      "Actor": "Boilerplate Actor Sheet",
-      "Item": "Boilerplate Item Sheet"
+      "Actor": "Abbrew Actor Sheet",
+      "Item": "Abbrew Item Sheet"
     },
     "Item": {
       "Spell": {

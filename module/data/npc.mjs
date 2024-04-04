@@ -1,6 +1,6 @@
-import BoilerplateActorBase from "./actor-base.mjs";
+import AbbrewActorBase from "./actor-base.mjs";
 
-export default class BoilerplateNPC extends BoilerplateActorBase {
+export default class AbbrewNPC extends AbbrewActorBase {
 
   static defineSchema() {
     const fields = foundry.data.fields;

@@ -1,23 +1,28 @@
-export const BOILERPLATE = {};
+export const ABBREW = {};
 
 /**
  * The set of Ability Scores used within the system.
  * @type {Object}
  */
-BOILERPLATE.abilities = {
-  str: 'BOILERPLATE.Ability.Str.long',
-  dex: 'BOILERPLATE.Ability.Dex.long',
-  con: 'BOILERPLATE.Ability.Con.long',
-  int: 'BOILERPLATE.Ability.Int.long',
-  wis: 'BOILERPLATE.Ability.Wis.long',
-  cha: 'BOILERPLATE.Ability.Cha.long',
+ABBREW.abilities = {
+  str: 'ABBREW.Ability.Str.long',
+  dex: 'ABBREW.Ability.Dex.long',
+  agi: 'ABBREW.Ability.Agi.long',
+  con: 'ABBREW.Ability.Con.long',
+  int: 'ABBREW.Ability.Int.long',
+  wit: 'ABBREW.Ability.Wit.long',
+  vis: 'ABBREW.Ability.Vis.long',
+  wil: 'ABBREW.Ability.Wil.long',
 };
 
-BOILERPLATE.abilityAbbreviations = {
-  str: 'BOILERPLATE.Ability.Str.abbr',
-  dex: 'BOILERPLATE.Ability.Dex.abbr',
-  con: 'BOILERPLATE.Ability.Con.abbr',
-  int: 'BOILERPLATE.Ability.Int.abbr',
-  wis: 'BOILERPLATE.Ability.Wis.abbr',
-  cha: 'BOILERPLATE.Ability.Cha.abbr',
+ABBREW.abilityAbbreviations = {
+  str: 'ABBREW.Ability.Str.abbr',
+  dex: 'ABBREW.Ability.Dex.abbr',
+  agi: 'ABBREW.Ability.Agi.abbr',
+  con: 'ABBREW.Ability.Con.abbr',
+  int: 'ABBREW.Ability.Int.abbr',
+  wis: 'ABBREW.Ability.Wis.abbr',
+  cha: 'ABBREW.Ability.Cha.abbr',
+  vis: 'ABBREW.Ability.Vis.abbr',
+  wil: 'ABBREW.Ability.Wil.abbr',
 };

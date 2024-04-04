@@ -1,6 +1,6 @@
-import BoilerplateItemBase from "./item-base.mjs";
+import AbbrewItemBase from "./item-base.mjs";
 
-export default class BoilerplateSpell extends BoilerplateItemBase {
+export default class AbbrewSpell extends AbbrewItemBase {
 
   static defineSchema() {
     const fields = foundry.data.fields;
