@@ -5,22 +5,12 @@
  */
 export const preloadHandlebarsTemplates = async function () {
   return loadTemplates([
-
     // Actor partials.
-    "systems/abbrew/templates/actor/parts/actor-features.hbs",
-    "systems/abbrew/templates/actor/parts/actor-items.hbs",
-    "systems/abbrew/templates/actor/parts/actor-anatomy.hbs",
-    "systems/abbrew/templates/actor/parts/actor-resources.hbs",
-    "systems/abbrew/templates/actor/parts/actor-spells.hbs",
-    "systems/abbrew/templates/actor/parts/actor-effects.hbs",
-    "systems/abbrew/templates/actor/parts/actor-attacks.hbs",
-    "systems/abbrew/templates/actor/parts/actor-defences.hbs",
-    "systems/abbrew/templates/actor/parts/actor-armour.hbs",
-    "systems/abbrew/templates/actor/parts/actor-concepts.hbs",
-    "systems/abbrew/templates/actor/parts/actor-form.hbs",
-    "systems/abbrew/templates/actor/parts/actor-conditions.hbs",
-    "systems/abbrew/templates/parts/active-effects.hbs",
-    "systems/abbrew/templates/chat/damage-roll.hbs",
-    "systems/abbrew/templates/parts/item-rules.hbs"
+    'systems/boilerplate/templates/actor/parts/actor-features.hbs',
+    'systems/boilerplate/templates/actor/parts/actor-items.hbs',
+    'systems/boilerplate/templates/actor/parts/actor-spells.hbs',
+    'systems/boilerplate/templates/actor/parts/actor-effects.hbs',
+    // Item partials
+    'systems/boilerplate/templates/item/parts/item-effects.hbs',
   ]);
 };

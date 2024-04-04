@@ -1,6 +1,0 @@
-{"type":"ABBREW.ActiveEffect","priority":100,"predicate":"","target":"system.blood.value","operator":"add","value":"10"}
-{"type":"ABBREW.ActiveEffect","priority":100,"predicate":"","target":"system.blood.value","operator":"minus","value":"20"}
-{"type":"ABBREW.ActiveEffect","priority":100,"predicate":"","target":"system.blood.value","operator":"multiply","value":"2"}
-{"type":"ABBREW.ActiveEffect","priority":100,"predicate":"","target":"system.blood.value","operator":"divide","value":"1.5"}
-{"type":"ABBREW.ActiveEffect","priority":100,"predicate":"","target":"system.blood.value","operator":"upgrade","value":"1.5"}
-{"type":"ABBREW.ActiveEffect","priority":100,"predicate":"","target":"system.blood.value","operator":"downgrade","value":"1.5"}

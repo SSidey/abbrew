@@ -1,64 +1,23 @@
-export const ABBREW = {};
+export const BOILERPLATE = {};
 
 /**
- * The set of Ability Scores used within the sytem.
+ * The set of Ability Scores used within the system.
  * @type {Object}
  */
-ABBREW.statistics = {
-  "strength": "ABBREW.StatisticStrength",
-  "dexterity": "ABBREW.StatisticDexterity",
-  "constitution": "ABBREW.StatisticConstitution",
-  "agility": "ABBREW.StatisticAgility",
-  "intelligence": "ABBREW.StatisticIntelligence",
-  "will": "ABBREW.StatisticWill",
-  "wits": "ABBREW.StatisticWits",
-  "visualisation": "ABBREW.StatisticVisualisation"
+BOILERPLATE.abilities = {
+  str: 'BOILERPLATE.Ability.Str.long',
+  dex: 'BOILERPLATE.Ability.Dex.long',
+  con: 'BOILERPLATE.Ability.Con.long',
+  int: 'BOILERPLATE.Ability.Int.long',
+  wis: 'BOILERPLATE.Ability.Wis.long',
+  cha: 'BOILERPLATE.Ability.Cha.long',
 };
 
-ABBREW.StatisticAbbreviations = {
-  "str": "ABBREW.StatisticStrengthAbbreviation",
-  "dex": "ABBREW.StatisticDexterityAbbreviation",
-  "con": "ABBREW.StatisticConstitutionAbbreviation",
-  "agi": "ABBREW.StatisticAgilityAbbreviation",
-  "int": "ABBREW.StatisticIntelligenceAbbreviation",
-  "wll": "ABBREW.StatisticWillAbbreviation",
-  "wts": "ABBREW.StatisticWitsAbbreviation",
-  "wis": "ABBREW.StatisticVisualisationAbbreviation"
+BOILERPLATE.abilityAbbreviations = {
+  str: 'BOILERPLATE.Ability.Str.abbr',
+  dex: 'BOILERPLATE.Ability.Dex.abbr',
+  con: 'BOILERPLATE.Ability.Con.abbr',
+  int: 'BOILERPLATE.Ability.Int.abbr',
+  wis: 'BOILERPLATE.Ability.Wis.abbr',
+  cha: 'BOILERPLATE.Ability.Cha.abbr',
 };
-
-ABBREW.ActionTypes = {
-  "Damage": "damage"
-};
-
-ABBREW.Reach = {
-  "natural": "ABBREW.ReachNatural",
-  "short": "ABBREW.ReachShort",
-  "standard": "ABBREW.ReachStandard",
-  "long": "ABBREW.ReachLong"
-}
-
-ABBREW.DamageTypes = {
-  "physical": "ABBREW.physical",
-  "crushing": "ABBREW.crushing",
-  "slashing": "ABBREW.slashing",
-  "piercing": "ABBREW.piercing"
-};
-
-ABBREW.DamageProjection = {
-  "arc": "ABBREW.Arc",
-  "thrust": "ABBREW.Thrust"
-}
-
-ABBREW.UI = {
-  "RuleElements": {
-    "Prompt": {
-      "NoValidOptions": "ABBREW.NoValidOptions",
-      "NoSelectionMade": "ABBREW.NoSelectionMade"
-    }
-  }
-}
-
-ABBREW.RuleTypes = {
-  "ActiveEffect": "ABBREW.ActiveEffect",
-  "ChoiceSet": "ABBREW.ChoiceSet"
-}
