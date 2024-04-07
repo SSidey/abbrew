@@ -57,8 +57,8 @@
 
     {{!-- Owned Features Tab --}}
     <div class="tab features" data-group="primary" data-tab="features">
-      <section class="grid grid-3col">
-        <aside class="sidebar">
+      <section class="grid grid-4col">
+        <aside class="sidebar grid-span-2">
 
           {{!-- The grid classes are defined in scss/global/_grid.scss. To use,
           use both the "grid" and "grid-Ncol" class where "N" can be any number
@@ -66,10 +66,10 @@
           <div class="abilities flexcol">
             {{#each system.abilities as |ability key|}}
             <div class="ability flexrow flex-group-center">
-              <label for="system.abilities.{{key}}.value" class="resource-label rollable flexlarge align-left" data-roll="d20+@abilities.{{key}}.mod" data-label="{{ability.label}}">{{ability.label}}</label>
+              <label for="system.abilities.{{key}}.value" class="resource-label rollable flexlarge align-left" data-roll="d10+@abilities.{{key}}.value" data-label="{{ability.label}}">{{ability.label}}</label>
               <input type="text" name="system.abilities.{{key}}.value" value="{{ability.value}}" data-dtype="Number"/>
-              <span class="ability-mod rollable" data-roll="d20+@abilities.{{key}}.mod" data-label="{{ability.label}}">{{numberFormat ability.mod decimals=0 sign=true}}</span>
-              <span class="ability-mod rollable" data-roll="d20+@abilities.{{key}}.tier" data-label="{{ability.tier}}">{{numberFormat ability.tier decimals=0 sign=true}}</span>
+              <input type="text" name="system.abilities.{{key}}.rank" value="{{ability.rank}}" data-dtype="Number" readonly/>
+              <input type="text" name="system.abilities.{{key}}.tier" value="{{ability.tier}}" data-dtype="Number" readonly/>
             </div>
             {{/each}}
           </div>
