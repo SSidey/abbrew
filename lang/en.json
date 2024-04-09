@@ -1,6 +1,6 @@
 {
   "ABBREW": {
-    "Ability": {
+    "Attribute": {
       "Str": { "long": "Strength", "abbr": "str" },
       "Dex": { "long": "Dexterity", "abbr": "dex" },
       "Agi": { "long": "Agility", "abbr": "agi" },
@@ -26,7 +26,8 @@
       "Temporary": "Temporary Effects",
       "Passive": "Passive Effects",
       "Inactive": "Inactive Effects"
-    }
+    },
+    "AttributeIncrease": "Attribute Increase"
   },
 
   "TYPES": {
@@ -37,7 +38,8 @@
     "Item": {
       "item": "Item",
       "feature": "Feature",
-      "spell": "Spell"
+      "spell": "Spell",
+      "skill": "Skill"
     }
   }
 }

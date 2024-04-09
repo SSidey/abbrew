@@ -8,3 +8,4 @@ export {default as AbbrewItemBase} from "./item-base.mjs";
 export {default as AbbrewItem} from "./item.mjs";
 export {default as AbbrewFeature} from "./feature.mjs";
 export {default as AbbrewSpell} from "./spell.mjs";
+export {default as AbbrewSkill} from "./skill.mjs";

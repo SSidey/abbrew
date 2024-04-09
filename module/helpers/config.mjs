@@ -1,28 +1,30 @@
 export const ABBREW = {};
 
 /**
- * The set of Ability Scores used within the system.
+ * The set of Attribute Scores used within the system.
  * @type {Object}
  */
-ABBREW.abilities = {
-  str: 'ABBREW.Ability.Str.long',
-  dex: 'ABBREW.Ability.Dex.long',
-  agi: 'ABBREW.Ability.Agi.long',
-  con: 'ABBREW.Ability.Con.long',
-  int: 'ABBREW.Ability.Int.long',
-  wit: 'ABBREW.Ability.Wit.long',
-  vis: 'ABBREW.Ability.Vis.long',
-  wil: 'ABBREW.Ability.Wil.long',
+ABBREW.attributes = {
+  str: 'ABBREW.Attribute.Str.long',
+  dex: 'ABBREW.Attribute.Dex.long',
+  agi: 'ABBREW.Attribute.Agi.long',
+  con: 'ABBREW.Attribute.Con.long',
+  int: 'ABBREW.Attribute.Int.long',
+  wit: 'ABBREW.Attribute.Wit.long',
+  vis: 'ABBREW.Attribute.Vis.long',
+  wil: 'ABBREW.Attribute.Wil.long',
 };
 
-ABBREW.abilityAbbreviations = {
-  str: 'ABBREW.Ability.Str.abbr',
-  dex: 'ABBREW.Ability.Dex.abbr',
-  agi: 'ABBREW.Ability.Agi.abbr',
-  con: 'ABBREW.Ability.Con.abbr',
-  int: 'ABBREW.Ability.Int.abbr',
-  wis: 'ABBREW.Ability.Wis.abbr',
-  cha: 'ABBREW.Ability.Cha.abbr',
-  vis: 'ABBREW.Ability.Vis.abbr',
-  wil: 'ABBREW.Ability.Wil.abbr',
+ABBREW.attributeAbbreviations = {
+  str: 'ABBREW.Attribute.Str.abbr',
+  dex: 'ABBREW.Attribute.Dex.abbr',
+  agi: 'ABBREW.Attribute.Agi.abbr',
+  con: 'ABBREW.Attribute.Con.abbr',
+  int: 'ABBREW.Attribute.Int.abbr',
+  wis: 'ABBREW.Attribute.Wis.abbr',
+  cha: 'ABBREW.Attribute.Cha.abbr',
+  vis: 'ABBREW.Attribute.Vis.abbr',
+  wil: 'ABBREW.Attribute.Wil.abbr',
 };
+
+ABBREW.SkillAttributeIncrease = "ABBREW.AttributeIncrease";

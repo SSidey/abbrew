@@ -54,6 +54,11 @@ export class AbbrewItemSheet extends ItemSheet {
 
     // Prepare active effects for easier access
     context.effects = prepareActiveEffectCategories(this.item.effects);
+    
+    const choices = { a: "Choice A", b: "Choice B" };
+    context.choices = choices;
+
+    context.config = CONFIG.ABBREW;
 
     return context;
   }

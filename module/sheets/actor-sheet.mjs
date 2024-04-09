@@ -18,7 +18,7 @@ export class AbbrewActorSheet extends ActorSheet {
         {
           navSelector: '.sheet-tabs',
           contentSelector: '.sheet-body',
-          initial: 'features',
+          initial: 'skills',
         },
       ],
     });
@@ -78,7 +78,7 @@ export class AbbrewActorSheet extends ActorSheet {
    * @return {undefined}
    */
   _prepareCharacterData(context) {
-    // Handle ability scores.
+    // Handle attribute scores.
     // for (let [k, v] of Object.entries(context.system.abilities)) {
     //   v.label = game.i18n.localize(CONFIG.ABBREW.abilities[k]) ?? k;
     // }
@@ -92,9 +92,10 @@ export class AbbrewActorSheet extends ActorSheet {
    * @return {undefined}
    */
   _prepareItems(context) {
-    // Initialize containers.
+    // Initialize containers.    
     const gear = [];
     const features = [];
+    const skills = [];
     const spells = {
       0: [],
       1: [],
@@ -119,6 +120,10 @@ export class AbbrewActorSheet extends ActorSheet {
       else if (i.type === 'feature') {
         features.push(i);
       }
+      // Append to skills.
+      else if(i.type === 'skill') {
+        skills.push(i);
+      }
       // Append to spells.
       else if (i.type === 'spell') {
         if (i.system.spellLevel != undefined) {
@@ -128,9 +133,11 @@ export class AbbrewActorSheet extends ActorSheet {
     }
 
     // Assign and return
+    console.log("Actor");
     context.gear = gear;
     context.features = features;
     context.spells = spells;
+    context.skills = skills;
   }
 
   /* -------------------------------------------- */
@@ -233,7 +240,7 @@ export class AbbrewActorSheet extends ActorSheet {
 
     // Handle rolls that supply the formula directly.
     if (dataset.roll) {
-      let label = dataset.label ? `[ability] ${dataset.label}` : '';
+      let label = dataset.label ? `[attribute] ${dataset.label}` : '';
       let roll = new Roll(dataset.roll, this.actor.getRollData());
       roll.toMessage({
         speaker: ChatMessage.getSpeaker({ actor: this.actor }),
