@@ -51,7 +51,9 @@ Hooks.once('init', function () {
     feature: models.AbbrewFeature,
     spell: models.AbbrewSpell,
     skill: models.AbbrewSkill,
-    anatomy: models.AbbrewAnatomy
+    anatomy: models.AbbrewAnatomy,
+    armour: models.AbbrewArmour,
+    weapon: models.AbbrewWeapon
   }
 
   // Active Effects are never copied to the Actor,

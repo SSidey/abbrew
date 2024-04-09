@@ -51,7 +51,9 @@
       "feature": "Feature",
       "spell": "Spell",
       "skill": "Skill",
-      "anatomy": "Anatomy"
+      "anatomy": "Anatomy",
+      "armour": "Armour",
+      "weapon": "Weapon"
     }
   }
 }

@@ -109,6 +109,8 @@ export class AbbrewActorSheet extends ActorSheet {
       9: [],
     };
     const anatomy = [];
+    const armour = [];
+    const weapons = [];
 
     // Iterate through items, allocating to containers
     for (let i of context.items) {
@@ -128,6 +130,12 @@ export class AbbrewActorSheet extends ActorSheet {
       else if(i.type === 'anatomy') {
         anatomy.push(i);
       }
+      else if(i.type === 'armour') {
+        armour.push(i);
+      }
+      else if(i.type === 'weapon') {
+        weapons.push(i);
+      }
       // Append to spells.
       else if (i.type === 'spell') {
         if (i.system.spellLevel != undefined) {
@@ -142,6 +150,8 @@ export class AbbrewActorSheet extends ActorSheet {
     context.spells = spells;
     context.skills = skills;
     context.anatomy = anatomy;
+    context.armour = armour;
+    context.weapons = weapons;
   }
 
   /* -------------------------------------------- */
