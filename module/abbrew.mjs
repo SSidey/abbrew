@@ -50,9 +50,10 @@ Hooks.once('init', function () {
     item: models.AbbrewItem,
     feature: models.AbbrewFeature,
     spell: models.AbbrewSpell,
-    skill: models.AbbrewSkill
+    skill: models.AbbrewSkill,
+    anatomy: models.AbbrewAnatomy
   }
-  
+
   // Active Effects are never copied to the Actor,
   // but will still apply to the Actor from within the Item
   // if the transfer property on the Active Effect is true.
@@ -156,4 +157,10 @@ function rollItemMacro(itemUuid) {
     // Trigger the item roll
     item.roll();
   });
+}
+
+Hooks.on("applyActiveEffect", applyCustomEffects);
+
+function applyCustomEffects(actor, change) {
+  console.log("CUSTOM");
 }

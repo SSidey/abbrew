@@ -28,3 +28,16 @@ ABBREW.attributeAbbreviations = {
 };
 
 ABBREW.SkillAttributeIncrease = "ABBREW.AttributeIncrease";
+
+ABBREW.damageTypes = {
+  crushing: 'ABBREW.DamageTypes.crushing',
+  piercing: 'ABBREW.DamageTypes.piercing',
+  slashing: 'ABBREW.DamageTypes.slashing'
+}
+
+ABBREW.facing = {
+  front: "ABBREW.Facing.front",
+  left: "ABBREW.Facing.left",
+  right: "ABBREW.Facing.right",
+  back: "ABBREW.Facing.back",
+}

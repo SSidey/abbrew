@@ -27,7 +27,18 @@
       "Passive": "Passive Effects",
       "Inactive": "Inactive Effects"
     },
-    "AttributeIncrease": "Attribute Increase"
+    "AttributeIncrease": "Attribute Increase",
+    "DamageTypes": {
+      "crushing": "Crushing",
+      "piercing": "Piercing",
+      "slashing": "Slashing"
+    },
+    "Facing": {
+      "front": "front",
+      "left": "left",
+      "right": "right",
+      "back": "back"
+    }
   },
 
   "TYPES": {
@@ -39,7 +50,8 @@
       "item": "Item",
       "feature": "Feature",
       "spell": "Spell",
-      "skill": "Skill"
+      "skill": "Skill",
+      "anatomy": "Anatomy"
     }
   }
 }

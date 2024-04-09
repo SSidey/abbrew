@@ -108,6 +108,7 @@ export class AbbrewActorSheet extends ActorSheet {
       8: [],
       9: [],
     };
+    const anatomy = [];
 
     // Iterate through items, allocating to containers
     for (let i of context.items) {
@@ -124,6 +125,9 @@ export class AbbrewActorSheet extends ActorSheet {
       else if(i.type === 'skill') {
         skills.push(i);
       }
+      else if(i.type === 'anatomy') {
+        anatomy.push(i);
+      }
       // Append to spells.
       else if (i.type === 'spell') {
         if (i.system.spellLevel != undefined) {
@@ -133,11 +137,11 @@ export class AbbrewActorSheet extends ActorSheet {
     }
 
     // Assign and return
-    console.log("Actor");
     context.gear = gear;
     context.features = features;
     context.spells = spells;
     context.skills = skills;
+    context.anatomy = anatomy;
   }
 
   /* -------------------------------------------- */
