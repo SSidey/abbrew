@@ -36,7 +36,17 @@
     "Immunity": "Immunity",
     "Weakness": "Weakness",
     "Guard": "Guard",
-    "ArmourPoints": "Armour Points",
+    "ArmourPoints": {
+      "label": "Armour Points",
+      "Points": {
+        "head": "Head",
+        "torso": "Torso",
+        "arm": "Arm",
+        "leg": "Leg",
+        "tail": "Tail",
+        "wing": "Wing"
+      }
+    },
     "Resistances": {
       "crushing": "Crushing",
       "piercing": "Piercing",

@@ -1942,8 +1942,27 @@ class AbbrewItemSheet extends ItemSheet {
         this._onDamageReductionAction(t, t.dataset.action);
     });
     const armourPoints = html[0].querySelector('input[name="system.armourPoints"]');
+    const armourPointsSettings = {
+      dropdown: {
+        maxItems: 20,
+        // <- mixumum allowed rendered suggestions
+        classname: "tags-look",
+        // <- custom classname for this dropdown, so it could be targeted
+        enabled: 0,
+        // <- show suggestions on focus
+        closeOnSelect: false,
+        // <- do not hide the suggestions dropdown once an item has been selected
+        includeSelectedTags: true
+        // <- Should the suggestions list Include already-selected tags (after filtering)
+      },
+      userInput: false,
+      // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+      duplicates: true,
+      // <- Should duplicate tags be allowed or not
+      whitelist: [...Object.values(CONFIG.ABBREW.armourPoints.points).map((key) => game.i18n.localize(key))]
+    };
     if (armourPoints) {
-      new Tagify(armourPoints, {});
+      new Tagify(armourPoints, armourPointsSettings);
     }
   }
   /**
@@ -1960,6 +1979,7 @@ class AbbrewItemSheet extends ItemSheet {
         return this.removeDamageReduction(target);
     }
   }
+  // TODO: Potentially had the wrong item.mjs...
   addDamageReduction() {
     const damageReduction = this.item.system.defense.damageReduction;
     return this.item.update({ "system.defense.damageReduction": [...damageReduction, {}] });
@@ -2011,7 +2031,17 @@ ABBREW.attributeAbbreviations = {
   wil: "ABBREW.Attribute.Wil.abbr"
 };
 ABBREW.SkillAttributeIncrease = "ABBREW.AttributeIncrease";
-ABBREW.ArmourPoints = "ABBREW.ArmourPoints";
+ABBREW.armourPoints = {
+  label: "ABBREW.ArmourPoints.label",
+  points: {
+    head: "ABBREW.ArmourPoints.Points.head",
+    torso: "ABBREW.ArmourPoints.Points.torso",
+    arm: "ABBREW.ArmourPoints.Points.arm",
+    leg: "ABBREW.ArmourPoints.Points.leg",
+    tail: "ABBREW.ArmourPoints.Points.tail",
+    wing: "ABBREW.ArmourPoints.Points.wing"
+  }
+};
 ABBREW.concepts = {
   physical: "ABBREW.Concepts.physical",
   crushing: "ABBREW.Resistances.crushing",

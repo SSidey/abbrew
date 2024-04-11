@@ -28,7 +28,17 @@ ABBREW.attributeAbbreviations = {
 };
 
 ABBREW.SkillAttributeIncrease = "ABBREW.AttributeIncrease";
-ABBREW.ArmourPoints = "ABBREW.ArmourPoints";
+ABBREW.armourPoints = {
+  label: "ABBREW.ArmourPoints.label",
+  points: {
+    head: "ABBREW.ArmourPoints.Points.head",
+    torso: "ABBREW.ArmourPoints.Points.torso",
+    arm: "ABBREW.ArmourPoints.Points.arm",
+    leg: "ABBREW.ArmourPoints.Points.leg",
+    tail: "ABBREW.ArmourPoints.Points.tail",
+    wing: "ABBREW.ArmourPoints.Points.wing"
+  }
+}
 
 ABBREW.concepts = {
   physical: 'ABBREW.Concepts.physical',
