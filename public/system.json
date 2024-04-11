@@ -1,0 +1,47 @@
+{
+  "id": "abbrew",
+  "name": "abbrew",
+  "title": "Abbrew",
+  "description": "The Abbrew system for FoundryVTT!",
+  "authors": [
+    {
+      "name": "Abde"
+    }
+  ],
+  "url": "",
+  "license": "LICENSE.txt",
+  "readme": "README.md",
+  "bugs": "Replace this with a link to file issues or tickets",
+  "changelog": "CHANGELOG.md",
+  "media": [
+    {
+      "type": "setup",
+      "url": "systems/abbrew/assets/anvil-impact.png",
+      "thumbnail": "systems/abbrew/assets/anvil-impact.png"
+    }
+  ],
+  "version": "2.0.0",
+  "compatibility": {
+    "minimum": 11,
+    "verified": "11.315"
+  },
+  "esmodules": ["./abbrew.mjs"],
+  "styles": ["css/abbrew.css"],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "packs": [],
+  "packFolders": [],
+  "socket": false,
+  "manifest": "",
+  "download": "",
+  "background": "systems/abbrew/assets/anvil-impact.png",
+  "gridDistance": 1,
+  "gridUnits": "m",
+  "primaryTokenAttribute": "health",
+  "secondaryTokenAttribute": "power"
+}

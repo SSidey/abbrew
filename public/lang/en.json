@@ -1,0 +1,72 @@
+{
+  "ABBREW": {
+    "Attribute": {
+      "Str": { "long": "Strength", "abbr": "str" },
+      "Dex": { "long": "Dexterity", "abbr": "dex" },
+      "Agi": { "long": "Agility", "abbr": "agi" },
+      "Con": { "long": "Constitution", "abbr": "con" },
+      "Int": { "long": "Intelligence", "abbr": "int" },
+      "Wit": { "long": "Wits", "abbr": "wit" },
+      "Vis": { "long": "Visualisation", "abbr": "vis" },
+      "Wil": { "long": "Will", "abbr": "wil" }
+    },
+    "SheetLabels": {
+      "Actor": "Abbrew Actor Sheet",
+      "Item": "Abbrew Item Sheet"
+    },
+    "Item": {
+      "Spell": {
+        "SpellLVL": "Level {level} Spells",
+        "AddLVL": "Add LVL {level}"
+      }
+    },
+    "Effect": {
+      "Source": "Source",
+      "Toggle": "Toggle Effect",
+      "Temporary": "Temporary Effects",
+      "Passive": "Passive Effects",
+      "Inactive": "Inactive Effects"
+    },
+    "DamageReduction": {
+      "abbreviation": "DR",
+      "full": "Damage Reduction"
+    },
+    "AttributeIncrease": "Attribute Increase",
+    "Resistance": "Resistance",
+    "Immunity": "Immunity",
+    "Weakness": "Weakness",
+    "Guard": "Guard",
+    "ArmourPoints": "Armour Points",
+    "Resistances": {
+      "crushing": "Crushing",
+      "piercing": "Piercing",
+      "slashing": "Slashing"
+    },
+    "Concepts": {
+      "physical": "Physical"
+    },
+    "Facing": {
+      "front": "front",
+      "left": "left",
+      "right": "right",
+      "back": "back"
+    },
+    "Type": "Type"
+  },
+
+  "TYPES": {
+    "Actor": {
+      "character": "Character",
+      "npc": "NPC"
+    },
+    "Item": {
+      "item": "Item",
+      "feature": "Feature",
+      "spell": "Spell",
+      "skill": "Skill",
+      "anatomy": "Anatomy",
+      "armour": "Armour",
+      "weapon": "Weapon"
+    }
+  }
+}

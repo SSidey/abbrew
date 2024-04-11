@@ -2,7 +2,7 @@ import {
   onManageActiveEffect,
   prepareActiveEffectCategories,
 } from '../helpers/effects.mjs';
-// import Tagify from '@yaireo/tagify'
+import Tagify from '@yaireo/tagify'
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -82,10 +82,10 @@ export class AbbrewItemSheet extends ItemSheet {
       if (t.dataset.action) this._onDamageReductionAction(t, t.dataset.action);
     });
 
-    // const armourPoints = html[0].querySelector('input[name="system.armourPoints"]');
-    // if (armourPoints) {
-    //     var taggedArmourPoints = new Tagify(armourPoints, {});
-    // }
+    const armourPoints = html[0].querySelector('input[name="system.armourPoints"]');
+    if (armourPoints) {
+        var taggedArmourPoints = new Tagify(armourPoints, {});
+    }
   }
 
   /**
