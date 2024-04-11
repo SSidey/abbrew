@@ -51,6 +51,7 @@
   <nav class="sheet-tabs tabs" data-group="primary">
     {{!-- Default tab is specified in actor-sheet.mjs --}}
     <a class="item" data-tab="skills">Skills</a>
+    <a class="item" data-tab="defenses">Defenses</a>
     <a class="item" data-tab="description">Description</a>
     <a class="item" data-tab="items">Items</a>
     <a class="item" data-tab="spells">Spells</a>
@@ -95,6 +96,11 @@
         </section>
 
       </section>
+    </div>
+
+    {{!-- Defenses Tab --}}
+    <div class="tab defenses" data-group="primary" data-tab="defenses">
+      {{> "systems/abbrew/templates/actor/parts/actor-defenses.hbs"}}
     </div>
 
     {{!-- Biography Tab --}}

@@ -2,6 +2,7 @@ import {
   onManageActiveEffect,
   prepareActiveEffectCategories,
 } from '../helpers/effects.mjs';
+// import Tagify from '@yaireo/tagify'
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -80,6 +81,11 @@ export class AbbrewItemSheet extends ItemSheet {
       const t = event.currentTarget;
       if (t.dataset.action) this._onDamageReductionAction(t, t.dataset.action);
     });
+
+    // const armourPoints = html[0].querySelector('input[name="system.armourPoints"]');
+    // if (armourPoints) {
+    //     var taggedArmourPoints = new Tagify(armourPoints, {});
+    // }
   }
 
   /**
@@ -100,8 +106,7 @@ export class AbbrewItemSheet extends ItemSheet {
 
   addDamageReduction() {
     const damageReduction = this.item.system.defense.damageReduction;
-    const newDamageReduction = { id: crypto.randomUUID() };
-    return this.item.update({ "system.defense.damageReduction": [...damageReduction, newDamageReduction] });
+    return this.item.update({ "system.defense.damageReduction": [...damageReduction, {}] });
   }
 
   removeDamageReduction(target) {

@@ -28,6 +28,7 @@ ABBREW.attributeAbbreviations = {
 };
 
 ABBREW.SkillAttributeIncrease = "ABBREW.AttributeIncrease";
+ABBREW.ArmourPoints = "ABBREW.ArmourPoints";
 
 ABBREW.concepts = {
   physical: 'ABBREW.Concepts.physical',

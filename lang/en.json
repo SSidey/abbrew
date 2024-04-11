@@ -35,6 +35,8 @@
     "Resistance": "Resistance",
     "Immunity": "Immunity",
     "Weakness": "Weakness",
+    "Guard": "Guard",
+    "ArmourPoints": "Armour Points",
     "Resistances": {
       "crushing": "Crushing",
       "piercing": "Piercing",

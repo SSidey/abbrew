@@ -67,6 +67,8 @@ export class AbbrewActorSheet extends ActorSheet {
       this.actor.allApplicableEffects()
     );
 
+    context.config = CONFIG.ABBREW;
+
     return context;
   }
 

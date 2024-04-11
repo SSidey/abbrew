@@ -1,4 +1,14 @@
 <ol class="form-list">
+    <div class="grid grid-2col">
+        <div class="guard">
+            <label class="guard-label">Guard</label>
+            <input type="text" name="system.defense.guard" value="{{system.defense.guard}}" data-dtype="Number" />
+        </div>
+        <div>
+            <label>{{localize "ABBREW.ArmourPoints"}}</label>
+            <input type="text" name="system.armourPoints" value="{{system.armourPoints}}"></input>
+        </div>
+    </div>
     {{#each system.defense.damageReduction as |damageReduction i|}}
     <li class="item effect flexrow" data-id="{{i}}">
         <div>
@@ -9,19 +19,23 @@
         </div>
         <div>
             <label>{{ localize "ABBREW.DamageReduction.abbreviation" }}</label>
-            <input type="text" name="system.defense.damageReduction.{{i}}.value" value="{{damageReduction.value}}" data-dtype="Number" />
+            <input type="text" name="system.defense.damageReduction.{{i}}.value" value="{{damageReduction.value}}"
+                data-dtype="Number" />
         </div>
         <div>
             <label>{{ localize "ABBREW.Resistance" }}</label>
-            <input type="text" name="system.defense.damageReduction.{{i}}.resistance" value="{{damageReduction.resistance}}" data-dtype="Number" />
+            <input type="text" name="system.defense.damageReduction.{{i}}.resistance"
+                value="{{damageReduction.resistance}}" data-dtype="Number" />
         </div>
         <div>
             <label>{{ localize "ABBREW.Immunity" }}</label>
-            <input type="text" name="system.defense.damageReduction.{{i}}.immunity" value="{{damageReduction.immunity}}" data-dtype="Number" />
+            <input type="text" name="system.defense.damageReduction.{{i}}.immunity" value="{{damageReduction.immunity}}"
+                data-dtype="Number" />
         </div>
         <div>
             <label>{{ localize "ABBREW.Weakness" }}</label>
-            <input type="text" name="system.defense.damageReduction.{{i}}.weakness" value="{{damageReduction.weakness}}" data-dtype="Number" />
+            <input type="text" name="system.defense.damageReduction.{{i}}.weakness" value="{{damageReduction.weakness}}"
+                data-dtype="Number" />
         </div>
         <a class="damage-reduction-control remove-damage-reduction" data-action="remove-damage-reduction">
             <i class="fa-solid fa-minus"></i>

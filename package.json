@@ -14,5 +14,8 @@
   "private": true,
   "devDependencies": {
     "sass": "^1.53.0"
+  },
+  "dependencies": {
+    "@yaireo/tagify": "^4.24.0"
   }
 }

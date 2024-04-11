@@ -30,16 +30,17 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         });
         return obj;
       }, {})),
-      damageReduction: new fields.SchemaField(Object.keys(CONFIG.ABBREW.concepts).reduce((obj, concept) => {
-        obj[concept] = new fields.SchemaField({
+      damageReduction: new fields.ArrayField(
+        new fields.SchemaField({
+          type: new fields.StringField({ required: true, blank: true }),
           value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
           resistance: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
           weakness: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
           immunity: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
           label: new fields.StringField({ required: true, blank: true })
-        });
-        return obj;
-      }, {}))
+        })
+      ),
+      dodge: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 })
     });
 
     schema.biography = new fields.StringField({ required: true, blank: true }); // equivalent to passing ({initial: ""}) for StringFields
@@ -90,13 +91,26 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
     for (const key in this.defense.damageTypes) {
       // Handle damage type label localization.
-      this.defense.damageTypes[key].label = game.i18n.localize(CONFIG.ABBREW.damageTypes[key]) ?? key;
+      // this.defense.damageTypes[key].label = game.i18n.localize(CONFIG.ABBREW.damageTypes[key]) ?? key;
     }
 
     for (const key in this.defense.guard) {
       // Handle damage type label localization.
       this.defense.guard[key].label = game.i18n.localize(CONFIG.ABBREW.facing[key]) ?? key;
     }
+
+    this._prepareGuard();
+  }
+
+  _prepareGuard() {
+    const guardBonus = this.parent.items.filter(i => i.type === 'armour').map(a => a.system.defense.guard).reduce((a, b) => a + b, 0);
+    Object.keys(this.defense.guard).map(k => {
+      this.defense.guard[k].max = this.defense.guard[k].base + guardBonus;
+      if (this.defense.guard[k].value > this.defense.guard[k].max) {
+        this.defense.guard[k].value = this.defense.guard[k].max;
+      }
+    });
+    this.defense.dodge = this.attributes.agi.value - guardBonus;
   }
 
   getRollData() {

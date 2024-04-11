@@ -12,7 +12,6 @@ export default class AbbrewArmour extends AbbrewItemBase {
             guard: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
             damageReduction: new fields.ArrayField(
                 new fields.SchemaField({
-                    id: new fields.StringField({ required: true, blank: true }),
                     type: new fields.StringField({ required: true, blank: true }),
                     value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
                     resistance: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
