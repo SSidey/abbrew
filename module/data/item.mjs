@@ -27,5 +27,5 @@ export default class AbbrewItem extends AbbrewItemBase {
     const roll = this.roll;
 
     this.formula = `${roll.diceNum}${roll.diceSize}${roll.diceBonus}`
-  }
+  } 
 }

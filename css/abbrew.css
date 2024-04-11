@@ -353,6 +353,9 @@
   flex: 0 0 200px;
   padding: 0 8px;
 }
+.abbrew ol li.damage-reduction {
+  list-style-type: none;
+}
 .abbrew .effects .item .effect-source,
 .abbrew .effects .item .effect-duration,
 .abbrew .effects .item .effect-controls {

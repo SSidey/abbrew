@@ -75,5 +75,39 @@ export class AbbrewItemSheet extends ItemSheet {
     html.on('click', '.effect-control', (ev) =>
       onManageActiveEffect(ev, this.item)
     );
+
+    html.find(".damage-reduction-control").click(event => {
+      const t = event.currentTarget;
+      if (t.dataset.action) this._onDamageReductionAction(t, t.dataset.action);
+    });
+  }
+
+  /**
+   * Handle one of the add or remove damage reduction buttons.
+   * @param {Element} target  Button or context menu entry that triggered this action.
+   * @param {string} action   Action being triggered.
+   * @returns {Promise|void}
+   */
+  _onDamageReductionAction(target, action) {
+    switch (action) {
+      case 'add-damage-reduction':
+        return this.addDamageReduction();
+      case 'remove-damage-reduction':
+        return this.removeDamageReduction(target);
+        break;
+    }
+  }
+
+  addDamageReduction() {
+    const damageReduction = this.item.system.defense.damageReduction;
+    const newDamageReduction = { id: crypto.randomUUID() };
+    return this.item.update({ "system.defense.damageReduction": [...damageReduction, newDamageReduction] });
+  }
+
+  removeDamageReduction(target) {
+    const id = target.closest("li").dataset.id;
+    const defense = foundry.utils.deepClone(this.item.system.defense);
+    defense.damageReduction.splice(Number(id), 1);
+    return this.item.update({ "system.defense.damageReduction": defense.damageReduction });
   }
 }

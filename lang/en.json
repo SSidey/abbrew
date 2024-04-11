@@ -27,18 +27,29 @@
       "Passive": "Passive Effects",
       "Inactive": "Inactive Effects"
     },
+    "DamageReduction": {
+      "abbreviation": "DR",
+      "full": "Damage Reduction"
+    },
     "AttributeIncrease": "Attribute Increase",
-    "DamageTypes": {
+    "Resistance": "Resistance",
+    "Immunity": "Immunity",
+    "Weakness": "Weakness",
+    "Resistances": {
       "crushing": "Crushing",
       "piercing": "Piercing",
       "slashing": "Slashing"
+    },
+    "Concepts": {
+      "physical": "Physical"
     },
     "Facing": {
       "front": "front",
       "left": "left",
       "right": "right",
       "back": "back"
-    }
+    },
+    "Type": "Type"
   },
 
   "TYPES": {

@@ -30,8 +30,8 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         });
         return obj;
       }, {})),
-      damageTypes: new fields.SchemaField(Object.keys(CONFIG.ABBREW.damageTypes).reduce((obj, damageType) => {
-        obj[damageType] = new fields.SchemaField({
+      damageReduction: new fields.SchemaField(Object.keys(CONFIG.ABBREW.concepts).reduce((obj, concept) => {
+        obj[concept] = new fields.SchemaField({
           value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
           resistance: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
           weakness: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
@@ -40,7 +40,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         });
         return obj;
       }, {}))
-    })
+    });
 
     schema.biography = new fields.StringField({ required: true, blank: true }); // equivalent to passing ({initial: ""}) for StringFields
 

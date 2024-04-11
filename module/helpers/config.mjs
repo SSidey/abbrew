@@ -29,10 +29,11 @@ ABBREW.attributeAbbreviations = {
 
 ABBREW.SkillAttributeIncrease = "ABBREW.AttributeIncrease";
 
-ABBREW.damageTypes = {
-  crushing: 'ABBREW.DamageTypes.crushing',
-  piercing: 'ABBREW.DamageTypes.piercing',
-  slashing: 'ABBREW.DamageTypes.slashing'
+ABBREW.concepts = {
+  physical: 'ABBREW.Concepts.physical',
+  crushing: 'ABBREW.Resistances.crushing',
+  piercing: 'ABBREW.Resistances.piercing',
+  slashing: 'ABBREW.Resistances.slashing'
 }
 
 ABBREW.facing = {
