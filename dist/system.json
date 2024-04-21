@@ -42,6 +42,6 @@
   "background": "systems/abbrew/assets/anvil-impact.png",
   "gridDistance": 1,
   "gridUnits": "m",
-  "primaryTokenAttribute": "health",
-  "secondaryTokenAttribute": "power"
+  "primaryTokenAttribute": "blood",
+  "secondaryTokenAttribute": "guard"
 }

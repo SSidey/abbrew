@@ -82,6 +82,11 @@ export class AbbrewItemSheet extends ItemSheet {
       if (t.dataset.action) this._onDamageReductionAction(t, t.dataset.action);
     });
 
+    html.find(".damage-control").click(event => {
+      const t = event.currentTarget;
+      if (t.dataset.action) this._onDamageAction(t, t.dataset.action);
+    });
+
     const armourPoints = html[0].querySelector('input[name="system.armourPoints"]');
     const armourPointsSettings = {      
       dropdown: {
@@ -116,6 +121,22 @@ export class AbbrewItemSheet extends ItemSheet {
     }
   }
 
+  /**
+   * Handle one of the add or remove damage reduction buttons.
+   * @param {Element} target  Button or context menu entry that triggered this action.
+   * @param {string} action   Action being triggered.
+   * @returns {Promise|void}
+   */
+  _onDamageAction(target, action) {
+    switch (action) {
+      case 'add-damage':
+        return this.addDamage();
+      case 'remove-damage':
+        return this.removeDamage(target);
+        break;
+    }
+  }
+
   // TODO: Potentially had the wrong item.mjs...
   addDamageReduction() {
     const damageReduction = this.item.system.defense.damageReduction;
@@ -127,5 +148,18 @@ export class AbbrewItemSheet extends ItemSheet {
     const defense = foundry.utils.deepClone(this.item.system.defense);
     defense.damageReduction.splice(Number(id), 1);
     return this.item.update({ "system.defense.damageReduction": defense.damageReduction });
+  }
+
+  // TODO: Potentially had the wrong item.mjs...
+  addDamage() {
+    const damage = this.item.system.damage;    
+    return this.item.update({ "system.damage": [...damage, {}] });
+  }
+
+  removeDamage(target) {
+    const id = target.closest("li").dataset.id;
+    const damage = foundry.utils.deepClone(this.item.system.damage);
+    damage.splice(Number(id), 1);
+    return this.item.update({ "system.damage": damage });
   }
 }

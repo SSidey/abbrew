@@ -296,6 +296,7 @@ class AbbrewActorSheet extends ActorSheet {
    * @private
    */
   _onRoll(event) {
+    console.log("actor roll");
     event.preventDefault();
     const element = event.currentTarget;
     const dataset = element.dataset;
@@ -1941,6 +1942,11 @@ class AbbrewItemSheet extends ItemSheet {
       if (t.dataset.action)
         this._onDamageReductionAction(t, t.dataset.action);
     });
+    html.find(".damage-control").click((event) => {
+      const t = event.currentTarget;
+      if (t.dataset.action)
+        this._onDamageAction(t, t.dataset.action);
+    });
     const armourPoints = html[0].querySelector('input[name="system.armourPoints"]');
     const armourPointsSettings = {
       dropdown: {
@@ -1959,7 +1965,7 @@ class AbbrewItemSheet extends ItemSheet {
       // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
       duplicates: true,
       // <- Should duplicate tags be allowed or not
-      whitelist: [...Object.values(CONFIG.ABBREW.armourPoints.points).map((key) => game.i18n.localize(key))]
+      whitelist: [...Object.values(CONFIG.ABBREW.armourPoints.points).map((key2) => game.i18n.localize(key2))]
     };
     if (armourPoints) {
       new Tagify(armourPoints, armourPointsSettings);
@@ -1979,6 +1985,20 @@ class AbbrewItemSheet extends ItemSheet {
         return this.removeDamageReduction(target);
     }
   }
+  /**
+   * Handle one of the add or remove damage reduction buttons.
+   * @param {Element} target  Button or context menu entry that triggered this action.
+   * @param {string} action   Action being triggered.
+   * @returns {Promise|void}
+   */
+  _onDamageAction(target, action) {
+    switch (action) {
+      case "add-damage":
+        return this.addDamage();
+      case "remove-damage":
+        return this.removeDamage(target);
+    }
+  }
   // TODO: Potentially had the wrong item.mjs...
   addDamageReduction() {
     const damageReduction = this.item.system.defense.damageReduction;
@@ -1989,6 +2009,17 @@ class AbbrewItemSheet extends ItemSheet {
     const defense = foundry.utils.deepClone(this.item.system.defense);
     defense.damageReduction.splice(Number(id), 1);
     return this.item.update({ "system.defense.damageReduction": defense.damageReduction });
+  }
+  // TODO: Potentially had the wrong item.mjs...
+  addDamage() {
+    const damage = this.item.system.damage;
+    return this.item.update({ "system.damage": [...damage, {}] });
+  }
+  removeDamage(target) {
+    const id = target.closest("li").dataset.id;
+    const damage = foundry.utils.deepClone(this.item.system.damage);
+    damage.splice(Number(id), 1);
+    return this.item.update({ "system.damage": damage });
   }
 }
 const preloadHandlebarsTemplates = async function() {
@@ -2005,7 +2036,8 @@ const preloadHandlebarsTemplates = async function() {
     "systems/abbrew/templates/actor/parts/actor-defenses.hbs",
     // Item partials
     "systems/abbrew/templates/item/parts/item-effects.hbs",
-    "systems/abbrew/templates/item/parts/item-defenses.hbs"
+    "systems/abbrew/templates/item/parts/item-defenses.hbs",
+    "systems/abbrew/templates/item/parts/item-damage.hbs"
   ]);
 };
 const ABBREW = {};
@@ -2031,6 +2063,10 @@ ABBREW.attributeAbbreviations = {
   wil: "ABBREW.Attribute.Wil.abbr"
 };
 ABBREW.SkillAttributeIncrease = "ABBREW.AttributeIncrease";
+ABBREW.Damage = "ABBREW.Damage";
+ABBREW.Defense = {
+  guard: "ABBREW.Defense.guard"
+};
 ABBREW.armourPoints = {
   label: "ABBREW.ArmourPoints.label",
   points: {
@@ -2067,22 +2103,19 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       healing: new fields.SchemaField({
         value: new fields.NumberField({ ...requiredInteger, initial: 0, max: 100 })
       }),
-      resilience: new fields.NumberField({ ...requiredInteger, initial: 1 }),
       blood: new fields.SchemaField({
         value: new fields.NumberField({ ...requiredInteger, initial: 100, min: 0, max: 100 }),
         max: new fields.NumberField({ ...requiredInteger, initial: 100, min: 0, max: 100 })
       })
     });
     schema.defense = new fields.SchemaField({
-      guard: new fields.SchemaField(Object.keys(CONFIG.ABBREW.facing).reduce((obj, facing) => {
-        obj[facing] = new fields.SchemaField({
-          value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-          base: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-          max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-          label: new fields.StringField({ required: true, blank: true })
-        });
-        return obj;
-      }, {})),
+      resilience: new fields.NumberField({ ...requiredInteger, initial: 1 }),
+      guard: new fields.SchemaField({
+        value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+        base: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+        max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+        label: new fields.StringField({ required: true, blank: true })
+      }),
       damageReduction: new fields.ArrayField(
         new fields.SchemaField({
           type: new fields.StringField({ required: true, blank: true }),
@@ -2093,7 +2126,10 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
           label: new fields.StringField({ required: true, blank: true })
         })
       ),
-      dodge: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 })
+      dodge: new fields.SchemaField({
+        value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+        max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 })
+      })
     });
     schema.biography = new fields.StringField({ required: true, blank: true });
     schema.meta = new fields.SchemaField({
@@ -2115,34 +2151,63 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   // Prior to Active Effects
   prepareBaseData() {
     console.log("base");
-    for (const key in this.attributes) {
-      this.attributes[key].rank = this.attributes[key].value;
+    for (const key2 in this.attributes) {
+      this.attributes[key2].rank = this.attributes[key2].value;
     }
   }
   // Post Active Effects
   prepareDerivedData() {
-    for (const key in this.attributes) {
-      const rankBonus = this.attributes[key].rank;
-      this.attributes[key].label = game.i18n.localize(CONFIG.ABBREW.attributes[key]) ?? key;
-      this.attributes[key].rank = rankBonus + this.parent.items.filter((i) => i.type === "skill" && i.system.attributeIncrease === key).length;
-      this.attributes[key].tier = 1 + Math.floor(this.attributes[key].rank / 10);
+    for (const key2 in this.attributes) {
+      const rankBonus = this.attributes[key2].rank;
+      this.attributes[key2].label = game.i18n.localize(CONFIG.ABBREW.attributes[key2]) ?? key2;
+      this.attributes[key2].rank = rankBonus + this.parent.items.filter((i) => i.type === "skill" && i.system.attributeIncrease === key2).length;
+      this.attributes[key2].tier = 1 + Math.floor(this.attributes[key2].rank / 10);
     }
-    for (const key in this.defense.damageTypes) {
+    for (const key2 in this.defense.damageTypes) {
     }
-    for (const key in this.defense.guard) {
-      this.defense.guard[key].label = game.i18n.localize(CONFIG.ABBREW.facing[key]) ?? key;
-    }
-    this._prepareGuard();
+    this._prepareDefenses();
   }
-  _prepareGuard() {
-    const guardBonus = this.parent.items.filter((i) => i.type === "armour").map((a) => a.system.defense.guard).reduce((a, b) => a + b, 0);
-    Object.keys(this.defense.guard).map((k) => {
-      this.defense.guard[k].max = this.defense.guard[k].base + guardBonus;
-      if (this.defense.guard[k].value > this.defense.guard[k].max) {
-        this.defense.guard[k].value = this.defense.guard[k].max;
-      }
-    });
-    this.defense.dodge = this.attributes.agi.value - guardBonus;
+  _prepareDefenses() {
+    const armour = this.parent.items.filter((i) => i.type === "armour");
+    this._prepareDamageReduction(armour);
+    this._prepareGuard(armour);
+  }
+  _prepareDamageReduction(armour) {
+    console.log("ARMOUR");
+    const damageReduction = armour.map((a) => a.system.defense.damageReduction).flat(1);
+    const flatDR = damageReduction.reduce(
+      (result, dr) => {
+        const drType = dr.type;
+        if (Object.keys(result).includes(drType)) {
+          if (result[drType].value < dr.value) {
+            result[drType].value = dr.value;
+          }
+          if (result[drType].resistance < dr.resistance) {
+            result[drType].resistance = dr.resistance;
+          }
+          if (result[drType].immunity < dr.immunity) {
+            result[drType].immunity = dr.immunity;
+          }
+          if (result[drType].weakness < dr.weakness) {
+            result[drType].weakness = dr.weakness;
+          }
+        } else {
+          result[drType] = { type: dr.type, value: dr.value, resistance: dr.resistance, immunity: dr.immunity, weakness: dr.weakness, label: dr.label };
+        }
+        return result;
+      },
+      {}
+    );
+    Object.values(flatDR).map((v) => this.defense.damageReduction.push(v));
+  }
+  _prepareGuard(armour) {
+    this.defense.guard.label = game.i18n.localize(CONFIG.ABBREW.Defense.guard) ?? key;
+    const guardBonus = armour.map((a) => a.system.defense.guard).reduce((a, b) => a + b, 0);
+    this.defense.guard.max = this.defense.guard.base + guardBonus;
+    if (this.defense.guard.value > this.defense.guard.max) {
+      this.defense.guard.value = this.defense.guard.max;
+    }
+    this.defense.dodge.max = Math.max(this.attributes.agi.value - armour.length, 0);
   }
   getRollData() {
     let data = {};
@@ -2192,6 +2257,7 @@ class AbbrewItemBase extends foundry.abstract.TypeDataModel {
     const fields = foundry.data.fields;
     const schema = {};
     schema.description = new fields.StringField({ required: true, blank: true });
+    schema.traits = new fields.StringField({ required: true, blank: true });
     return schema;
   }
 }
@@ -2273,8 +2339,17 @@ let AbbrewArmour$1 = class AbbrewArmour extends AbbrewItemBase {
 };
 class AbbrewArmour2 extends AbbrewItemBase {
   static defineSchema() {
-    foundry.data.fields;
+    const fields = foundry.data.fields;
+    const requiredInteger = { required: true, nullable: false, integer: true };
     const schema = super.defineSchema();
+    schema.hands = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
+    schema.attributeModifier = new fields.StringField({ required: true, blank: true });
+    schema.damage = new fields.ArrayField(
+      new fields.SchemaField({
+        type: new fields.StringField({ required: true, blank: true }),
+        value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 })
+      })
+    );
     return schema;
   }
   prepareDerivedData() {

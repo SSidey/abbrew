@@ -31,8 +31,12 @@
       "abbreviation": "DR",
       "full": "Damage Reduction"
     },
+    "Defense": {
+      "guard": "Guard"
+    },
     "AttributeIncrease": "Attribute Increase",
     "Resistance": "Resistance",
+    "Damage": "Damage",
     "Immunity": "Immunity",
     "Weakness": "Weakness",
     "Guard": "Guard",

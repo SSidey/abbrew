@@ -28,6 +28,12 @@ ABBREW.attributeAbbreviations = {
 };
 
 ABBREW.SkillAttributeIncrease = "ABBREW.AttributeIncrease";
+ABBREW.Damage = "ABBREW.Damage";
+
+ABBREW.Defense = {
+  guard: 'ABBREW.Defense.guard'
+}
+
 ABBREW.armourPoints = {
   label: "ABBREW.ArmourPoints.label",
   points: {

@@ -18,5 +18,6 @@ export const preloadHandlebarsTemplates = async function () {
     // Item partials
     'systems/abbrew/templates/item/parts/item-effects.hbs',
     'systems/abbrew/templates/item/parts/item-defenses.hbs',
+    'systems/abbrew/templates/item/parts/item-damage.hbs',
   ]);
 };

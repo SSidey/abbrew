@@ -241,6 +241,7 @@ export class AbbrewActorSheet extends ActorSheet {
    * @private
    */
   _onRoll(event) {
+    console.log('actor roll');
     event.preventDefault();
     const element = event.currentTarget;
     const dataset = element.dataset;
