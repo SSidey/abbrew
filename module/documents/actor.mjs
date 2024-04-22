@@ -42,4 +42,35 @@ export default class AbbrewActor extends Actor {
     return { ...super.getRollData(), ...this.system.getRollData?.() ?? null };
   }
 
+  takeDamage(rolls, data) {
+    console.log('Got me');
+    let guard = this.system.defense.guard.value;
+    let activeWounds = this.system.wounds.active.value;
+    const maxGuardDamage = this.system.defense.damageReduction.reduce((a, b) => {
+      if (b.value > a) {
+        a = b.value;
+      }
+      return a;
+    }, 1);
+    // TODO: Do we want guard damage to scale with weapon damage?
+    // const guardDamage = Math.min(maxGuardDamage, damage);
+
+    // TODO: Pass Damage Types
+    // TODO: Determine DRs by damage type
+
+    const guardBreak = rolls[0].dice[0].results[0].result > guard;
+    if (guardBreak) {
+      data.totalSuccesses += 1;
+    }
+
+    const damageReduction = data.totalSuccesses === 0 ? this.system.defense.damageReduction.filter(dr => dr.type === 'physical')[0].value : 0;
+
+    const wounds = data.totalSuccesses >= 0 ? activeWounds + Math.max(0, data.damage - damageReduction) : 0;
+
+    guard = Math.max(0, guard - maxGuardDamage);
+
+    const updates = { "system.wounds.active.value": wounds, "system.defense.guard.value": guard };
+    this.update(updates);
+  }
+
 }

@@ -77,7 +77,6 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     for (const key in this.attributes) {
       this.attributes[key].rank = this.attributes[key].value;
     }
-
   }
 
   // Post Active Effects

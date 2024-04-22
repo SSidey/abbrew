@@ -2360,6 +2360,26 @@ class AbbrewActor extends Actor {
     var _a, _b;
     return { ...super.getRollData(), ...((_b = (_a = this.system).getRollData) == null ? void 0 : _b.call(_a)) ?? null };
   }
+  takeDamage(rolls, data) {
+    console.log("Got me");
+    let guard = this.system.defense.guard.value;
+    let activeWounds = this.system.wounds.active.value;
+    const maxGuardDamage = this.system.defense.damageReduction.reduce((a, b) => {
+      if (b.value > a) {
+        a = b.value;
+      }
+      return a;
+    }, 1);
+    const guardBreak = rolls[0].dice[0].results[0].result > guard;
+    if (guardBreak) {
+      data.totalSuccesses += 1;
+    }
+    const damageReduction = data.totalSuccesses === 0 ? this.system.defense.damageReduction.filter((dr) => dr.type === "physical")[0].value : 0;
+    const wounds = data.totalSuccesses >= 0 ? activeWounds + Math.max(0, data.damage - damageReduction) : 0;
+    guard = Math.max(0, guard - maxGuardDamage);
+    const updates = { "system.wounds.active.value": wounds, "system.defense.guard.value": guard };
+    this.update(updates);
+  }
 }
 class AbbrewItem2 extends Item {
   /**
@@ -2383,14 +2403,21 @@ class AbbrewItem2 extends Item {
     html.on("click", ".card-buttons button[data-action]", this._onChatCardAction.bind(this));
   }
   static async _onChatCardAction(event) {
-    event.preventDefault();
     console.log("chat");
     const button = event.currentTarget;
-    button.disabled = true;
     const card = button.closest(".chat-card");
     const messageId = card.closest(".message").dataset.messageId;
-    game.messages.get(messageId);
-    button.dataset.action;
+    const message = game.messages.get(messageId);
+    const action = button.dataset.action;
+    const actor = game.actors.get(card.dataset.actorId);
+    const item = game.items.get(card.dataset.itemId);
+    switch (action) {
+      case "damage":
+        this._onAcceptDamageAction(actor, item, message.rolls, message.flags.data);
+    }
+  }
+  static _onAcceptDamageAction(actor, item, rolls, data) {
+    actor.takeDamage(rolls, data);
   }
   /**
    * Handle clickable rolls.
@@ -2414,11 +2441,30 @@ class AbbrewItem2 extends Item {
       const roll = new Roll(rollData.formula, rollData.actor);
       const result = await roll.evaluate();
       const token = this.actor.token;
+      const damage = this.actor.system.attributes[item.system.attributeModifier].value + item.system.damage[0].value;
+      const resultDice = result.dice[0].results.map((die) => {
+        let baseClasses = "roll die d10";
+        if (die.success) {
+          baseClasses = baseClasses.concat(" ", "success");
+        }
+        if (die.exploded) {
+          baseClasses = baseClasses.concat(" ", "exploded");
+        }
+        return { result: die.result, classes: baseClasses };
+      });
+      const totalSuccesses = result.dice[0].results.reduce((total, r) => {
+        if (r.success) {
+          total += 1;
+        }
+        return total;
+      }, 0);
       const templateData = {
-        rollData,
+        totalSuccesses,
+        resultDice,
         actor: this.actor,
         item: this,
-        tokenId: (token == null ? void 0 : token.uuid) || null
+        tokenId: (token == null ? void 0 : token.uuid) || null,
+        damage
       };
       const html = await renderTemplate("systems/abbrew/templates/chat/attack-card.hbs", templateData);
       result.toMessage({
@@ -2426,7 +2472,7 @@ class AbbrewItem2 extends Item {
         rollMode,
         flavor: label,
         content: html,
-        data: rollData
+        flags: { data: { totalSuccesses, damage } }
       });
       return result;
     }

@@ -1,9 +1,31 @@
-<div class="abbrew chat-card item-card" data-actor-id="{{actor._id}}" data-item-id="{{item._id}}" data-token-id="{{tokenId}}">
+<div class="abbrew chat-message chat-card flexcol " data-actor-id="{{actor._id}}" data-item-id="{{item._id}}"
+    data-token-id="{{tokenId}}" data-message-id="{{messageId}}">
     <header>
         <h3 class="item-name">{{item.name}}</h3>
     </header>
 
-    <div class="card-content">{{{item.system.description}}}</div>
+    <div class="message-content">
+        <div>{{{item.system.description}}}</div>
+        <div class="dice-roll">
+            <div class="dice-result">
+                <div class="dice-formula">{{totalSuccesses}}</div>
+                <div class="dice-tooltip">
+                    <section class="tooltip-part">
+                        <div class="dice">
+                            <ol class="dice-rolls">
+                                {{#each resultDice as |die id|}}
+                                <li class="{{die.classes}}">
+                                    {{die.result}}
+                                </li>
+                                {{/each}}
+                            </ol>
+                        </div>
+                    </section>
+                </div>
+                <h4 class="dice-total">{{damage}}</h4>
+            </div>
+        </div>
+    </div>
 
     <div class="card-buttons">
         <button data-action="damage">Damage</button>

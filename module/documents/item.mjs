@@ -34,20 +34,28 @@ export default class AbbrewItem extends Item {
   }
 
   static async _onChatCardAction(event) {
-    event.preventDefault();
+    // event.preventDefault();
 
     console.log('chat');
 
     // Extract card data
     const button = event.currentTarget;
-    button.disabled = true;
+    // TODO: Might want to do this for targeted effects?
+    // button.disabled = true;
     const card = button.closest(".chat-card");
     const messageId = card.closest(".message").dataset.messageId;
     const message = game.messages.get(messageId);
     const action = button.dataset.action;
+    const actor = game.actors.get(card.dataset.actorId);
+    const item = game.items.get(card.dataset.itemId);
 
-    // switch on damage
-    // get item from data on message
+    switch (action) {
+      case 'damage': this._onAcceptDamageAction(actor, item, message.rolls, message.flags.data)
+    }
+  }
+
+  static _onAcceptDamageAction(actor, item, rolls, data) {
+    actor.takeDamage(rolls, data);
   }
 
   /**
@@ -82,11 +90,34 @@ export default class AbbrewItem extends Item {
       // If you need to store the value first, uncomment the next line.
       const result = await roll.evaluate();
       const token = this.actor.token;
+      const damage = this.actor.system.attributes[item.system.attributeModifier].value + item.system.damage[0].value;
+      const resultDice = result.dice[0].results.map(die => {
+        let baseClasses = "roll die d10";
+        if (die.success) {
+          baseClasses = baseClasses.concat(' ', 'success')
+        }
+
+        if (die.exploded) {
+          baseClasses = baseClasses.concat(' ', 'exploded');
+        }
+
+        return { result: die.result, classes: baseClasses };
+      });
+
+      const totalSuccesses = result.dice[0].results.reduce((total, r) => {
+        if (r.success) {
+          total += 1;
+        }
+        return total;
+      }, 0);
+
       const templateData = {
-        rollData,
+        totalSuccesses,
+        resultDice,
         actor: this.actor,
         item: this,
         tokenId: token?.uuid || null,
+        damage
       };
       // TODO: Move this out of item and into a weapon.mjs
       const html = await renderTemplate("systems/abbrew/templates/chat/attack-card.hbs", templateData);
@@ -94,7 +125,8 @@ export default class AbbrewItem extends Item {
         speaker: speaker,
         rollMode: rollMode,
         flavor: label,
-        content: html
+        content: html,
+        flags: { data: { totalSuccesses, damage} }
       });
       return result;
     }
