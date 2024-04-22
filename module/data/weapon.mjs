@@ -21,8 +21,7 @@ export default class AbbrewArmour extends AbbrewItemBase {
 
   prepareDerivedData() {
     // Build the formula dynamically using string interpolation
-    const roll = this.roll;
 
-    // this.formula = `${roll.diceNum}${roll.diceSize}${roll.diceBonus}`
+    this.formula = `1d10x10cs10`;
   }
 }

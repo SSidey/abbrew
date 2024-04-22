@@ -1,4 +1,10 @@
 <ol class="form-list">
+    <div class="form-group">
+        <label>Attribute</label>
+        <select name="system.attributeModifier">
+            {{selectOptions config.attributes selected=system.attributeModifier blank="" localize=true}}
+        </select>
+    </div>
     {{#each system.damage as |damage i|}}
     <li class="item effect flexrow" data-id="{{i}}">
         <div>
@@ -9,8 +15,7 @@
         </div>
         <div>
             <label>{{ localize "ABBREW.Damage" }}</label>
-            <input type="text" name="system.defense.damage.{{i}}.value" value="{{damage.value}}"
-                data-dtype="Number" />
+            <input type="text" name="system.damage.{{i}}.value" value="{{damage.value}}" data-dtype="Number" />
         </div>
         <a class="damage-control remove-damage" data-action="remove-damage">
             <i class="fa-solid fa-minus"></i>

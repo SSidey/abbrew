@@ -45,6 +45,10 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
     schema.biography = new fields.StringField({ required: true, blank: true }); // equivalent to passing ({initial: ""}) for StringFields
 
+    schema.movement = new fields.SchemaField({
+      baseSpeed: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+    });
+
     schema.meta = new fields.SchemaField({
       tier: new fields.SchemaField({
         value: new fields.NumberField({ ...requiredInteger, initial: 1, min: 1, max: 10 })
@@ -94,16 +98,37 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       // this.defense.damageTypes[key].label = game.i18n.localize(CONFIG.ABBREW.damageTypes[key]) ?? key;
     }
 
-    this._prepareDefenses();
+    const anatomy = this._prepareAnatomy();
+
+    this._prepareMovement(anatomy);
+
+    this._prepareDefenses(anatomy);
   }
 
-  _prepareDefenses() {
+  _prepareAnatomy() {
+    console.log('anatomy');
+    const res = this.parent.items.filter(i => i.type == 'anatomy').reduce((result, a) => {
+      const values = a.system;
+      result.hands += values.hands;
+      result.speed += values.speed;
+      result.parts = result.parts.concat(JSON.parse(values.parts).map(a => a.value));
+      return result;
+    }, { hands: 0, speed: 0, parts: [] });
+    return res;
+  }
+
+  _prepareMovement(anatomy) {
+    console.log('movement');
+    this.movement.baseSpeed = this.attributes.agi.value * anatomy.speed;
+  }
+
+  _prepareDefenses(anatomy) {
     const armour = this.parent.items.filter(i => i.type === 'armour');
-    this._prepareDamageReduction(armour);
-    this._prepareGuard(armour);
+    this._prepareDamageReduction(armour, anatomy);
+    this._prepareGuard(armour, anatomy);
   }
 
-  _prepareDamageReduction(armour) {
+  _prepareDamageReduction(armour, anatomy) {
     console.log('ARMOUR');
     const damageReduction = armour.map(a => a.system.defense.damageReduction).flat(1);
 
@@ -133,7 +158,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     Object.values(flatDR).map(v => this.defense.damageReduction.push(v));
   }
 
-  _prepareGuard(armour) {
+  _prepareGuard(armour, anatomy) {
     // Handle damage type label localization.
     this.defense.guard.label = game.i18n.localize(CONFIG.ABBREW.Defense.guard) ?? key;
 

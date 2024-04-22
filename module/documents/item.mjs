@@ -2,7 +2,7 @@
  * Extend the basic Item with some very simple modifications.
  * @extends {Item}
  */
-export class AbbrewItem extends Item {
+export default class AbbrewItem extends Item {
   /**
    * Augment the basic Item data model with additional dynamic data.
    */
@@ -27,6 +27,27 @@ export class AbbrewItem extends Item {
     rollData.actor = this.actor.getRollData();
 
     return rollData;
+  }
+
+  static chatListeners(html) {
+    html.on('click', '.card-buttons button[data-action]', this._onChatCardAction.bind(this));
+  }
+
+  static async _onChatCardAction(event) {
+    event.preventDefault();
+
+    console.log('chat');
+
+    // Extract card data
+    const button = event.currentTarget;
+    button.disabled = true;
+    const card = button.closest(".chat-card");
+    const messageId = card.closest(".message").dataset.messageId;
+    const message = game.messages.get(messageId);
+    const action = button.dataset.action;
+
+    // switch on damage
+    // get item from data on message
   }
 
   /**
@@ -59,13 +80,23 @@ export class AbbrewItem extends Item {
       // Invoke the roll and submit it to chat.
       const roll = new Roll(rollData.formula, rollData.actor);
       // If you need to store the value first, uncomment the next line.
-      // const result = await roll.evaluate();
-      roll.toMessage({
+      const result = await roll.evaluate();
+      const token = this.actor.token;
+      const templateData = {
+        rollData,
+        actor: this.actor,
+        item: this,
+        tokenId: token?.uuid || null,
+      };
+      // TODO: Move this out of item and into a weapon.mjs
+      const html = await renderTemplate("systems/abbrew/templates/chat/attack-card.hbs", templateData);
+      result.toMessage({
         speaker: speaker,
         rollMode: rollMode,
         flavor: label,
+        content: html
       });
-      return roll;
+      return result;
     }
   }
 }

@@ -1,6 +1,3 @@
-// Import document classes.
-import { AbbrewActor } from './documents/actor.mjs';
-import { AbbrewItem } from './documents/item.mjs';
 // Import sheet classes.
 import { AbbrewActorSheet } from './sheets/actor-sheet.mjs';
 import { AbbrewItemSheet } from './sheets/item-sheet.mjs';
@@ -9,6 +6,8 @@ import { preloadHandlebarsTemplates } from './helpers/templates.mjs';
 import { ABBREW } from './helpers/config.mjs';
 // Import DataModel classes
 import * as models from './data/_module.mjs';
+// Import Documents Classes
+import * as documents from './documents/_module.mjs';
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -18,8 +17,8 @@ Hooks.once('init', function () {
   // Add utility classes to the global game object so that they're more easily
   // accessible in global contexts.
   game.abbrew = {
-    AbbrewActor,
-    AbbrewItem,
+    AbbrewActor: documents.AbbrewActor,
+    AbbrewItem: documents.AbbrewItem,
     rollItemMacro,
   };
 
@@ -31,12 +30,12 @@ Hooks.once('init', function () {
    * @type {String}
    */
   CONFIG.Combat.initiative = {
-    formula: '1d20 + @abilities.dex.mod',
+    formula: '1d10 + @attributes.agi.value + @attributes.wit.value',
     decimals: 2,
   };
 
   // Define custom Document and DataModel classes
-  CONFIG.Actor.documentClass = AbbrewActor;
+  CONFIG.Actor.documentClass = documents.AbbrewActor;
 
   // Note that you don't need to declare a DataModel
   // for the base actor/item classes - they are included
@@ -45,7 +44,7 @@ Hooks.once('init', function () {
     character: models.AbbrewCharacter,
     npc: models.AbbrewNPC
   }
-  CONFIG.Item.documentClass = AbbrewItem;
+  CONFIG.Item.documentClass = documents.AbbrewItem;
   CONFIG.Item.dataModels = {
     item: models.AbbrewItem,
     feature: models.AbbrewFeature,
@@ -93,6 +92,15 @@ Handlebars.registerHelper('toLowerCase', function (str) {
 Hooks.once('ready', function () {
   // Wait to register hotbar drop hook on ready so that modules could register earlier if they want to
   Hooks.on('hotbarDrop', (bar, data, slot) => createItemMacro(data, slot));
+});
+
+/* -------------------------------------------- */
+/*  Other Hooks                                 */
+/* -------------------------------------------- */
+Hooks.on("applyActiveEffect", applyCustomEffects);
+
+Hooks.on("renderChatLog", (app, html, data) => {
+  documents.AbbrewItem.chatListeners(html);
 });
 
 /* -------------------------------------------- */
@@ -160,8 +168,6 @@ function rollItemMacro(itemUuid) {
     item.roll();
   });
 }
-
-Hooks.on("applyActiveEffect", applyCustomEffects);
 
 function applyCustomEffects(actor, change) {
   console.log("CUSTOM");
