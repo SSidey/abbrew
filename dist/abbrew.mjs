@@ -2316,11 +2316,11 @@ class AbbrewArmour2 extends AbbrewItemBase {
     const requiredInteger = { required: true, nullable: false, integer: true };
     const schema = super.defineSchema();
     schema.hands = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
-    schema.attributeModifier = new fields.StringField({ required: true, blank: true });
     schema.damage = new fields.ArrayField(
       new fields.SchemaField({
         type: new fields.StringField({ required: true, blank: true }),
-        value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 })
+        value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+        attributeModifier: new fields.StringField({ required: true, blank: true })
       })
     );
     return schema;
@@ -2332,10 +2332,12 @@ class AbbrewArmour2 extends AbbrewItemBase {
 class AbbrewActor extends Actor {
   /** @override */
   prepareData() {
+    console.log("documentPrepareData");
     super.prepareData();
   }
   /** @override */
   prepareBaseData() {
+    console.log("documentPrepareBaseData");
   }
   /**
    * @override
@@ -2345,6 +2347,7 @@ class AbbrewActor extends Actor {
    * is queried and has a roll executed directly from it).
    */
   prepareDerivedData() {
+    console.log("documentPrepareDerivedData");
     const actorData = this;
     actorData.flags.abbrew || {};
   }
@@ -2360,8 +2363,9 @@ class AbbrewActor extends Actor {
     var _a, _b;
     return { ...super.getRollData(), ...((_b = (_a = this.system).getRollData) == null ? void 0 : _b.call(_a)) ?? null };
   }
-  takeDamage(rolls, data) {
+  async takeDamage(rolls, data) {
     console.log("Got me");
+    let totalSuccesses = data.totalSuccesses;
     let guard = this.system.defense.guard.value;
     let activeWounds = this.system.wounds.active.value;
     const maxGuardDamage = this.system.defense.damageReduction.reduce((a, b) => {
@@ -2372,13 +2376,15 @@ class AbbrewActor extends Actor {
     }, 1);
     const guardBreak = rolls[0].dice[0].results[0].result > guard;
     if (guardBreak) {
-      data.totalSuccesses += 1;
+      totalSuccesses += 1;
     }
-    const damageReduction = data.totalSuccesses === 0 ? this.system.defense.damageReduction.filter((dr) => dr.type === "physical")[0].value : 0;
-    const wounds = data.totalSuccesses >= 0 ? activeWounds + Math.max(0, data.damage - damageReduction) : 0;
+    const damageReduction = totalSuccesses === 0 ? this.system.defense.damageReduction.filter((dr) => dr.type === "physical")[0].value : 0;
+    const wounds = totalSuccesses >= 0 ? activeWounds + Math.max(0, data.damage - damageReduction) : 0;
     guard = Math.max(0, guard - maxGuardDamage);
     const updates = { "system.wounds.active.value": wounds, "system.defense.guard.value": guard };
-    this.update(updates);
+    await this.update(updates);
+    console.log("updated");
+    return this;
   }
 }
 class AbbrewItem2 extends Item {
@@ -2413,11 +2419,12 @@ class AbbrewItem2 extends Item {
     const item = game.items.get(card.dataset.itemId);
     switch (action) {
       case "damage":
-        this._onAcceptDamageAction(actor, item, message.rolls, message.flags.data);
+        await this._onAcceptDamageAction(actor, item, message.rolls, message.flags.data);
     }
   }
-  static _onAcceptDamageAction(actor, item, rolls, data) {
-    actor.takeDamage(rolls, data);
+  static async _onAcceptDamageAction(actor, item, rolls, data) {
+    const tokens = canvas.tokens.controlled.filter((token) => token.actor);
+    await tokens[0].actor.takeDamage(rolls, data);
   }
   /**
    * Handle clickable rolls.

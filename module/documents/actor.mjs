@@ -9,11 +9,13 @@ export default class AbbrewActor extends Actor {
     // the following, in order: data reset (to clear active effects),
     // prepareBaseData(), prepareEmbeddedDocuments() (including active effects),
     // prepareDerivedData().
+    console.log('documentPrepareData');
     super.prepareData();
   }
 
   /** @override */
   prepareBaseData() {
+    console.log('documentPrepareBaseData');
     // Data modifications in this step occur before processing embedded
     // documents or derived data.
   }
@@ -26,6 +28,7 @@ export default class AbbrewActor extends Actor {
    * is queried and has a roll executed directly from it).
    */
   prepareDerivedData() {
+    console.log('documentPrepareDerivedData');
     const actorData = this;
     const flags = actorData.flags.abbrew || {};
   }
@@ -42,8 +45,9 @@ export default class AbbrewActor extends Actor {
     return { ...super.getRollData(), ...this.system.getRollData?.() ?? null };
   }
 
-  takeDamage(rolls, data) {
+  async takeDamage(rolls, data) {
     console.log('Got me');
+    let totalSuccesses = data.totalSuccesses;
     let guard = this.system.defense.guard.value;
     let activeWounds = this.system.wounds.active.value;
     const maxGuardDamage = this.system.defense.damageReduction.reduce((a, b) => {
@@ -60,17 +64,19 @@ export default class AbbrewActor extends Actor {
 
     const guardBreak = rolls[0].dice[0].results[0].result > guard;
     if (guardBreak) {
-      data.totalSuccesses += 1;
+      totalSuccesses += 1;
     }
 
-    const damageReduction = data.totalSuccesses === 0 ? this.system.defense.damageReduction.filter(dr => dr.type === 'physical')[0].value : 0;
+    const damageReduction = totalSuccesses === 0 ? this.system.defense.damageReduction.filter(dr => dr.type === 'physical')[0].value : 0;
 
-    const wounds = data.totalSuccesses >= 0 ? activeWounds + Math.max(0, data.damage - damageReduction) : 0;
+    const wounds = totalSuccesses >= 0 ? activeWounds + Math.max(0, data.damage - damageReduction) : 0;
 
     guard = Math.max(0, guard - maxGuardDamage);
 
     const updates = { "system.wounds.active.value": wounds, "system.defense.guard.value": guard };
-    this.update(updates);
+    await this.update(updates);
+    console.log('updated');
+    return this;
   }
 
 }
