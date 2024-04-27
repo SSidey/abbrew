@@ -8,11 +8,16 @@ export default class AbbrewArmour extends AbbrewItemBase {
     const schema = super.defineSchema();
 
     schema.hands = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
-    schema.damage = new fields.ArrayField(
+    schema.attackProfiles = new fields.ArrayField(
       new fields.SchemaField({
-        type: new fields.StringField({ required: true, blank: true }),
-        value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-        attributeModifier: new fields.StringField({ required: true, blank: true }),
+        name: new fields.StringField({ required: true, blank: true }),
+        damage: new fields.ArrayField(
+          new fields.SchemaField({
+            type: new fields.StringField({ required: true, blank: true }),
+            value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+            attributeModifier: new fields.StringField({ required: true, blank: true }),
+          })
+        )
       })
     );
 

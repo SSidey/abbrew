@@ -1868,6 +1868,11 @@ class AbbrewItemSheet extends ItemSheet {
       if (t.dataset.action)
         this._onDamageAction(t, t.dataset.action);
     });
+    html.find(".attack-profile-control").click((event) => {
+      const t = event.currentTarget;
+      if (t.dataset.action)
+        this._onAttackProfileAction(t, t.dataset.action);
+    });
     this._activateArmourPoints(html);
     this._activateAnatomyParts(html);
   }
@@ -1944,14 +1949,37 @@ class AbbrewItemSheet extends ItemSheet {
   _onDamageAction(target, action) {
     switch (action) {
       case "add-damage":
-        return this.addDamage();
+        return this.addDamage(target);
       case "remove-damage":
         return this.removeDamage(target);
     }
   }
-  // TODO: Potentially had the wrong item.mjs...
+  /**
+   * Handle one of the add or remove damage reduction buttons.
+   * @param {Element} target  Button or context menu entry that triggered this action.
+   * @param {string} action   Action being triggered.
+   * @returns {Promise|void}
+   */
+  _onAttackProfileAction(target, action) {
+    switch (action) {
+      case "add-attack-profile":
+        return this.addAttackProfile();
+      case "remove-attack-profile":
+        return this.removeAttackProfile(target);
+    }
+  }
+  addAttackProfile() {
+    const attackProfiles = this.item.system.attackProfiles;
+    return this.item.update({ "system.attackProfiles": [...attackProfiles, {}] });
+  }
+  removeAttackProfile(target) {
+    const id = target.closest("li").dataset.id;
+    const attackProfiles = foundry.utils.deepClone(this.item.system.attackProfiles);
+    attackProfiles.splice(Number(id), 1);
+    return this.item.update({ "system.attackProfiles": attackProfiles });
+  }
   addDamageReduction() {
-    const damageReduction = this.item.system.defense.damageReduction;
+    const damageReduction = this.item.system.defense.damageReductions;
     return this.item.update({ "system.defense.damageReduction": [...damageReduction, {}] });
   }
   removeDamageReduction(target) {
@@ -1960,16 +1988,19 @@ class AbbrewItemSheet extends ItemSheet {
     defense.damageReduction.splice(Number(id), 1);
     return this.item.update({ "system.defense.damageReduction": defense.damageReduction });
   }
-  // TODO: Potentially had the wrong item.mjs...
-  addDamage() {
-    const damage = this.item.system.damage;
-    return this.item.update({ "system.damage": [...damage, {}] });
+  addDamage(target) {
+    const attackProfileId = target.closest(".attackProfile").dataset.id;
+    const attackProfiles = foundry.utils.deepClone(this.item.system.attackProfiles);
+    const damage = attackProfiles[attackProfileId].damage;
+    attackProfiles[attackProfileId].damage = [...damage, {}];
+    return this.item.update({ "system.attackProfiles": attackProfiles });
   }
   removeDamage(target) {
-    const id = target.closest("li").dataset.id;
-    const damage = foundry.utils.deepClone(this.item.system.damage);
-    damage.splice(Number(id), 1);
-    return this.item.update({ "system.damage": damage });
+    const damageId = target.closest("li").dataset.id;
+    const attackProfileId = target.closest(".attackProfile").dataset.id;
+    const attackProfiles = foundry.utils.deepClone(this.item.system.attackProfiles);
+    attackProfiles[attackProfileId].damage.splice(Number(damageId), 1);
+    return this.item.update({ "system.attackProfiles": attackProfiles });
   }
 }
 const preloadHandlebarsTemplates = async function() {
@@ -2316,11 +2347,16 @@ class AbbrewArmour2 extends AbbrewItemBase {
     const requiredInteger = { required: true, nullable: false, integer: true };
     const schema = super.defineSchema();
     schema.hands = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
-    schema.damage = new fields.ArrayField(
+    schema.attackProfiles = new fields.ArrayField(
       new fields.SchemaField({
-        type: new fields.StringField({ required: true, blank: true }),
-        value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-        attributeModifier: new fields.StringField({ required: true, blank: true })
+        name: new fields.StringField({ required: true, blank: true }),
+        damage: new fields.ArrayField(
+          new fields.SchemaField({
+            type: new fields.StringField({ required: true, blank: true }),
+            value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+            attributeModifier: new fields.StringField({ required: true, blank: true })
+          })
+        )
       })
     );
     return schema;

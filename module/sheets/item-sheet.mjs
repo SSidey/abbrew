@@ -87,13 +87,18 @@ export class AbbrewItemSheet extends ItemSheet {
       if (t.dataset.action) this._onDamageAction(t, t.dataset.action);
     });
 
+    html.find(".attack-profile-control").click(event => {
+      const t = event.currentTarget;
+      if (t.dataset.action) this._onAttackProfileAction(t, t.dataset.action);
+    });
+
     this._activateArmourPoints(html);
     this._activateAnatomyParts(html);
   }
 
   _activateArmourPoints(html) {
     const armourPoints = html[0].querySelector('input[name="system.armourPoints"]');
-    const armourPointsSettings = {      
+    const armourPointsSettings = {
       dropdown: {
         maxItems: 20,               // <- mixumum allowed rendered suggestions
         classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
@@ -112,7 +117,7 @@ export class AbbrewItemSheet extends ItemSheet {
 
   _activateAnatomyParts(html) {
     const anatomyParts = html[0].querySelector('input[name="system.parts"]');
-    const anatomyPartsSettings = {      
+    const anatomyPartsSettings = {
       dropdown: {
         maxItems: 20,               // <- mixumum allowed rendered suggestions
         classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
@@ -154,16 +159,44 @@ export class AbbrewItemSheet extends ItemSheet {
   _onDamageAction(target, action) {
     switch (action) {
       case 'add-damage':
-        return this.addDamage();
+        return this.addDamage(target);
       case 'remove-damage':
         return this.removeDamage(target);
         break;
     }
   }
 
-  // TODO: Potentially had the wrong item.mjs...
+  /**
+   * Handle one of the add or remove damage reduction buttons.
+   * @param {Element} target  Button or context menu entry that triggered this action.
+   * @param {string} action   Action being triggered.
+   * @returns {Promise|void}
+   */
+  _onAttackProfileAction(target, action) {
+    switch (action) {
+      case 'add-attack-profile':
+        return this.addAttackProfile();
+      case 'remove-attack-profile':
+        return this.removeAttackProfile(target);
+        break;
+    }
+
+  }
+
+  addAttackProfile() {
+    const attackProfiles = this.item.system.attackProfiles;
+    return this.item.update({ "system.attackProfiles": [...attackProfiles, {}] });
+  }
+
+  removeAttackProfile(target) {
+    const id = target.closest("li").dataset.id;
+    const attackProfiles = foundry.utils.deepClone(this.item.system.attackProfiles);
+    attackProfiles.splice(Number(id), 1);
+    return this.item.update({ "system.attackProfiles": attackProfiles });
+  }
+
   addDamageReduction() {
-    const damageReduction = this.item.system.defense.damageReduction;
+    const damageReduction = this.item.system.defense.damageReductions;
     return this.item.update({ "system.defense.damageReduction": [...damageReduction, {}] });
   }
 
@@ -174,16 +207,19 @@ export class AbbrewItemSheet extends ItemSheet {
     return this.item.update({ "system.defense.damageReduction": defense.damageReduction });
   }
 
-  // TODO: Potentially had the wrong item.mjs...
-  addDamage() {
-    const damage = this.item.system.damage;    
-    return this.item.update({ "system.damage": [...damage, {}] });
+  addDamage(target) {
+    const attackProfileId = target.closest(".attackProfile").dataset.id;
+    const attackProfiles = foundry.utils.deepClone(this.item.system.attackProfiles);
+    const damage = attackProfiles[attackProfileId].damage;
+    attackProfiles[attackProfileId].damage = [...damage, {}];
+    return this.item.update({ "system.attackProfiles": attackProfiles });
   }
 
   removeDamage(target) {
-    const id = target.closest("li").dataset.id;
-    const damage = foundry.utils.deepClone(this.item.system.damage);
-    damage.splice(Number(id), 1);
-    return this.item.update({ "system.damage": damage });
+    const damageId = target.closest("li").dataset.id;
+    const attackProfileId = target.closest(".attackProfile").dataset.id;    
+    const attackProfiles = foundry.utils.deepClone(this.item.system.attackProfiles);
+    attackProfiles[attackProfileId].damage.splice(Number(damageId), 1);
+    return this.item.update({ "system.attackProfiles": attackProfiles });
   }
 }

@@ -1,32 +1,58 @@
 <ol class="form-list">
-    {{#each system.damage as |damage i|}}
-    <li class="item effect flexrow" data-id="{{i}}">
+    {{#each system.attackProfiles as |attackProfile i|}}
+    <li class="item attackProfile flexrow" data-id="{{i}}">
         <div>
-            <label>{{ localize "ABBREW.Type" }}</label>
-            <select name="system.damage.{{i}}.type">
-                {{selectOptions ../config.concepts selected=damage.type blank="" localize=true}}
-            </select>
+            <label>Name</label>
+            <input type="text" name="system.attackProfiles.{{i}}.name" value="{{attackProfile.name}}"
+                data-dtype="String" />
         </div>
-        <div>
-            <label>{{ localize "ABBREW.Damage" }}</label>
-            <input type="text" name="system.damage.{{i}}.value" value="{{damage.value}}" data-dtype="Number" />
-        </div>
-        <div>
-            <label>Attribute</label>
-            <select name="system.damage.{{i}}.attributeModifier">
-                {{selectOptions ../config.attributes selected=damage.attributeModifier blank="" localize=true}}
-            </select>
-        </div>
-        <a class="damage-control remove-damage" data-action="remove-damage">
+        <ol class="form-list">
+            {{#each attackProfile.damage as |damage j|}}
+            <li class="item effect flexrow" data-id="{{j}}">
+                <div>
+                    <label>{{ localize "ABBREW.Type" }}</label>
+                    <select name="system.attackProfiles.{{i}}.damage.{{j}}.type">
+                        {{selectOptions ../../config.concepts selected=damage.type blank="" localize=true}}
+                    </select>
+                </div>
+                <div>
+                    <label>{{ localize "ABBREW.Damage" }}</label>
+                    <input type="text" name="system.attackProfiles.{{i}}.damage.{{j}}.value" value="{{damage.value}}"
+                        data-dtype="Number" />
+                </div>
+                <div>
+                    <label>Attribute</label>
+                    <select name="system.attackProfiles.{{i}}.damage.{{j}}.attributeModifier">
+                        {{selectOptions ../../config.attributes selected=damage.attributeModifier blank=""
+                        localize=true}}
+                    </select>
+                </div>
+                <a class="damage-control remove-damage" data-action="remove-damage">
+                    <i class="fa-solid fa-minus"></i>
+                </a>
+            </li>
+            {{/each}}
+            <li class="damage add">
+                <div class="form-group">
+                    <label>
+                        <a class="damage-control" data-action="add-damage">
+                            Add Damage
+                            <i class="fa-solid fa-plus"></i>
+                        </a>
+                    </label>
+                </div>
+            </li>
+        </ol>
+        <a class="attack-profile-control remove-attack-profile" data-action="remove-attack-profile">
             <i class="fa-solid fa-minus"></i>
         </a>
     </li>
     {{/each}}
-    <li class="damage add">
+    <li class="attackProfile add">
         <div class="form-group">
             <label>
-                <a class="damage-control" data-action="add-damage">
-                    Add Damage
+                <a class="attack-profile-control" data-action="add-attack-profile">
+                    Add Attack Profile
                     <i class="fa-solid fa-plus"></i>
                 </a>
             </label>
