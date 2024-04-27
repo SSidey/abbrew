@@ -66,6 +66,9 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       return obj;
     }, {}));
 
+    schema.resolve = new fields.NumberField({ ...requiredInteger, initial: 0, max: 20 });
+    schema.momentum = new fields.NumberField({ ...requiredInteger, initial: 0 });
+
     return schema;
   }
 

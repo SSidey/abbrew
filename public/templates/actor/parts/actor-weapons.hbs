@@ -20,8 +20,9 @@
       <div class="weapon-attack-profiles">
         {{#each item.system.attackProfiles as |attackProfile attackProfileId|}}
         <ol>
-          <li data-attack-profile-id="{{attackProfileId}}">
-            <button class="weapon-damage-button">{{attackProfile.name}}</button>
+          <li class="attackProfile" data-attack-profile-id="{{attackProfileId}}">
+            <button class="attack-damage-button">{{attackProfile.name}}</button>
+            <label>{{attackProfile.attackType}}</label>
           </li>
         </ol>
         {{/each}}

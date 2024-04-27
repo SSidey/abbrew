@@ -195,7 +195,12 @@ export class AbbrewActorSheet extends ActorSheet {
     });
 
     // Rollable abilities.
-    html.on('click', '.rollable', this._onRoll.bind(this));
+    html.on('click', '.rollable', this._onRoll.bind(this));    
+
+    html.on('click', '.attack-damage-button', async (event) => {
+      const t = event.currentTarget;
+      await this._onAttackDamageAction(t);
+    });
 
     // Drag events for macros.
     if (this.actor.isOwner) {
@@ -206,6 +211,75 @@ export class AbbrewActorSheet extends ActorSheet {
         li.addEventListener('dragstart', handler, false);
       });
     }
+  }
+  
+  async _onAttackDamageAction(target) {
+
+    const itemId = target.closest('li.item').dataset.itemId;
+    const attackProfileId = target.closest('li .attackProfile').dataset.attackProfileId;
+    const item = this.actor.items.get(itemId);
+    const attackProfile = item.system.attackProfiles[attackProfileId];
+
+    // Invoke the roll and submit it to chat.
+    const roll = new Roll(item.system.formula, item.actor);
+    // If you need to store the value first, uncomment the next line.
+    const result = await roll.evaluate();
+    const token = this.actor.token;
+    const damage = attackProfile.damage.map(d => {
+      let attributeModifier = 0;
+      if(d.attributeModifier) {
+        attributeModifier = this.actor.system.attributes[d.attributeModifier].value;
+      }
+
+      const finalDamage = attributeModifier + d.value;
+
+      return { damageType: d.type, value: finalDamage };
+    });
+    //this.actor.system.attributes[item.system.attributeModifier].value + item.system.damage[0].value;
+    const resultDice = result.dice[0].results.map(die => {
+      let baseClasses = "roll die d10";
+      if (die.success) {
+        baseClasses = baseClasses.concat(' ', 'success')
+      }
+
+      if (die.exploded) {
+        baseClasses = baseClasses.concat(' ', 'exploded');
+      }
+
+      return { result: die.result, classes: baseClasses };
+    });
+
+    const totalSuccesses = result.dice[0].results.reduce((total, r) => {
+      if (r.success) {
+        total += 1;
+      }
+      return total;
+    }, 0);
+
+    const templateData = {
+      attackProfile,
+      totalSuccesses,
+      resultDice,
+      damage,
+      actor: this.actor,
+      item: this.item,
+      tokenId: token?.uuid || null,
+    };
+    // TODO: Move this out of item and into a weapon.mjs
+    const html = await renderTemplate("systems/abbrew/templates/chat/attack-card.hbs", templateData);
+    
+    // Initialize chat data.
+    const speaker = ChatMessage.getSpeaker({ actor: this.actor });
+    const rollMode = game.settings.get('core', 'rollMode');
+    const label = `[${item.type}] ${item.name}`;
+    result.toMessage({
+      speaker: speaker,
+      rollMode: rollMode,
+      flavor: label,
+      content: html,
+      flags: { data: { totalSuccesses, damage } }
+    });
+    return result;
   }
 
   /**

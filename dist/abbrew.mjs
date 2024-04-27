@@ -182,6 +182,10 @@ class AbbrewActorSheet extends ActorSheet {
       onManageActiveEffect(ev, document2);
     });
     html.on("click", ".rollable", this._onRoll.bind(this));
+    html.on("click", ".attack-damage-button", async (event) => {
+      const t = event.currentTarget;
+      await this._onAttackDamageAction(t);
+    });
     if (this.actor.isOwner) {
       let handler = (ev) => this._onDragStart(ev);
       html.find("li.item").each((i, li) => {
@@ -191,6 +195,60 @@ class AbbrewActorSheet extends ActorSheet {
         li.addEventListener("dragstart", handler, false);
       });
     }
+  }
+  async _onAttackDamageAction(target) {
+    const itemId = target.closest("li.item").dataset.itemId;
+    const attackProfileId = target.closest("li .attackProfile").dataset.attackProfileId;
+    const item = this.actor.items.get(itemId);
+    const attackProfile = item.system.attackProfiles[attackProfileId];
+    const roll = new Roll(item.system.formula, item.actor);
+    const result = await roll.evaluate();
+    const token = this.actor.token;
+    const damage = attackProfile.damage.map((d) => {
+      let attributeModifier = 0;
+      if (d.attributeModifier) {
+        attributeModifier = this.actor.system.attributes[d.attributeModifier].value;
+      }
+      const finalDamage = attributeModifier + d.value;
+      return { damageType: d.type, value: finalDamage };
+    });
+    const resultDice = result.dice[0].results.map((die) => {
+      let baseClasses = "roll die d10";
+      if (die.success) {
+        baseClasses = baseClasses.concat(" ", "success");
+      }
+      if (die.exploded) {
+        baseClasses = baseClasses.concat(" ", "exploded");
+      }
+      return { result: die.result, classes: baseClasses };
+    });
+    const totalSuccesses = result.dice[0].results.reduce((total, r) => {
+      if (r.success) {
+        total += 1;
+      }
+      return total;
+    }, 0);
+    const templateData = {
+      attackProfile,
+      totalSuccesses,
+      resultDice,
+      damage,
+      actor: this.actor,
+      item: this.item,
+      tokenId: (token == null ? void 0 : token.uuid) || null
+    };
+    const html = await renderTemplate("systems/abbrew/templates/chat/attack-card.hbs", templateData);
+    const speaker = ChatMessage.getSpeaker({ actor: this.actor });
+    const rollMode = game.settings.get("core", "rollMode");
+    const label = `[${item.type}] ${item.name}`;
+    result.toMessage({
+      speaker,
+      rollMode,
+      flavor: label,
+      content: html,
+      flags: { data: { totalSuccesses, damage } }
+    });
+    return result;
   }
   /**
    * Handle creating a new Owned Item for the actor using initial data defined in the HTML dataset
@@ -2137,6 +2195,8 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       });
       return obj;
     }, {}));
+    schema.resolve = new fields.NumberField({ ...requiredInteger, initial: 0, max: 20 });
+    schema.momentum = new fields.NumberField({ ...requiredInteger, initial: 0 });
     return schema;
   }
   // Prior to Active Effects
@@ -2420,10 +2480,24 @@ class AbbrewActor extends Actor {
     if (guardBreak) {
       totalSuccesses += 1;
     }
-    const damageReduction = totalSuccesses === 0 ? this.system.defense.damageReduction.filter((dr) => dr.type === "physical")[0].value : 0;
-    const wounds = totalSuccesses >= 0 ? activeWounds + Math.max(0, data.damage - damageReduction) : 0;
+    const damage = data.damage.reduce((result, d) => {
+      const damageReduction = this.system.defense.damageReduction.some((dr) => dr.type === d.damageType) ? this.system.defense.damageReduction.filter((dr) => dr.type === d.damageType)[0] : { immunity: 0, resistance: 0, weakness: 0, value: 0 };
+      if (damageReduction.immunity > 0) {
+        return result;
+      }
+      const firstRoll = rolls[0].dice[0].results[0].result ?? 0;
+      const dodge2 = this.system.defense.dodge.value;
+      const damageTypeSuccesses = firstRoll > dodge2 ? totalSuccesses + damageReduction.weakness - damageReduction.resistance : -1;
+      if (damageTypeSuccesses < 0) {
+        return result;
+      }
+      const dmg = damageTypeSuccesses == 0 ? Math.max(0, d.value - damageReduction.value) : d.value;
+      return result += dmg;
+    }, 0);
+    const wounds = activeWounds + damage;
     guard = Math.max(0, guard - maxGuardDamage);
-    const updates = { "system.wounds.active.value": wounds, "system.defense.guard.value": guard };
+    const dodge = Math.max(0, this.system.defense.dodge.value - 1);
+    const updates = { "system.wounds.active.value": wounds, "system.defense.guard.value": guard, "system.defense.dodge.value": dodge };
     await this.update(updates);
     console.log("updated");
     return this;
@@ -2457,14 +2531,14 @@ class AbbrewItem2 extends Item {
     const messageId = card.closest(".message").dataset.messageId;
     const message = game.messages.get(messageId);
     const action = button.dataset.action;
-    const actor = game.actors.get(card.dataset.actorId);
-    const item = game.items.get(card.dataset.itemId);
+    game.actors.get(card.dataset.actorId);
+    game.items.get(card.dataset.itemId);
     switch (action) {
       case "damage":
-        await this._onAcceptDamageAction(actor, item, message.rolls, message.flags.data);
+        await this._onAcceptDamageAction(message.rolls, message.flags.data);
     }
   }
-  static async _onAcceptDamageAction(actor, item, rolls, data) {
+  static async _onAcceptDamageAction(rolls, data) {
     const tokens = canvas.tokens.controlled.filter((token) => token.actor);
     await tokens[0].actor.takeDamage(rolls, data);
   }
@@ -2486,44 +2560,7 @@ class AbbrewItem2 extends Item {
         content: item.system.description ?? ""
       });
     } else {
-      const rollData = this.getRollData();
-      const roll = new Roll(rollData.formula, rollData.actor);
-      const result = await roll.evaluate();
-      const token = this.actor.token;
-      const damage = this.actor.system.attributes[item.system.attributeModifier].value + item.system.damage[0].value;
-      const resultDice = result.dice[0].results.map((die) => {
-        let baseClasses = "roll die d10";
-        if (die.success) {
-          baseClasses = baseClasses.concat(" ", "success");
-        }
-        if (die.exploded) {
-          baseClasses = baseClasses.concat(" ", "exploded");
-        }
-        return { result: die.result, classes: baseClasses };
-      });
-      const totalSuccesses = result.dice[0].results.reduce((total, r) => {
-        if (r.success) {
-          total += 1;
-        }
-        return total;
-      }, 0);
-      const templateData = {
-        totalSuccesses,
-        resultDice,
-        actor: this.actor,
-        item: this,
-        tokenId: (token == null ? void 0 : token.uuid) || null,
-        damage
-      };
-      const html = await renderTemplate("systems/abbrew/templates/chat/attack-card.hbs", templateData);
-      result.toMessage({
-        speaker,
-        rollMode,
-        flavor: label,
-        content: html,
-        flags: { data: { totalSuccesses, damage } }
-      });
-      return result;
+      console.log("general roll");
     }
   }
 }

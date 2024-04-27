@@ -67,13 +67,32 @@ export default class AbbrewActor extends Actor {
       totalSuccesses += 1;
     }
 
-    const damageReduction = totalSuccesses === 0 ? this.system.defense.damageReduction.filter(dr => dr.type === 'physical')[0].value : 0;
+    const damage = data.damage.reduce((result, d) => {
+      const damageReduction = this.system.defense.damageReduction.some(dr => dr.type === d.damageType) ? this.system.defense.damageReduction.filter(dr => dr.type === d.damageType)[0] : { immunity: 0, resistance: 0, weakness: 0, value: 0 };
+      if (damageReduction.immunity > 0) {
+        return result;
+      }
 
-    const wounds = totalSuccesses >= 0 ? activeWounds + Math.max(0, data.damage - damageReduction) : 0;
+      const firstRoll = rolls[0].dice[0].results[0].result ?? 0;
+      const dodge = this.system.defense.dodge.value;
+      const damageTypeSuccesses = firstRoll > dodge ? totalSuccesses + damageReduction.weakness - damageReduction.resistance : -1;
+
+      if (damageTypeSuccesses < 0) {
+        return result;
+      }
+
+      const dmg = damageTypeSuccesses == 0 ? Math.max(0, d.value - damageReduction.value) : d.value;
+
+      return result += dmg;
+    }, 0);
+
+    const wounds = activeWounds + damage;
 
     guard = Math.max(0, guard - maxGuardDamage);
 
-    const updates = { "system.wounds.active.value": wounds, "system.defense.guard.value": guard };
+    const dodge = Math.max(0, this.system.defense.dodge.value - 1);
+
+    const updates = { "system.wounds.active.value": wounds, "system.defense.guard.value": guard, "system.defense.dodge.value": dodge };
     await this.update(updates);
     console.log('updated');
     return this;
