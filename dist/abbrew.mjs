@@ -2073,6 +2073,11 @@ ABBREW.facing = {
   right: "ABBREW.Facing.right",
   back: "ABBREW.Facing.back"
 };
+ABBREW.attackTypes = {
+  arc: "ABBREW.AttackTypes.arc",
+  thrust: "ABBREW.AttackTypes.thrust",
+  static: "ABBREW.AttackTypes.static"
+};
 class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   static defineSchema() {
     const fields = foundry.data.fields;
@@ -2350,6 +2355,7 @@ class AbbrewArmour2 extends AbbrewItemBase {
     schema.attackProfiles = new fields.ArrayField(
       new fields.SchemaField({
         name: new fields.StringField({ required: true, blank: true }),
+        attackType: new fields.StringField({ required: true, blank: true }),
         damage: new fields.ArrayField(
           new fields.SchemaField({
             type: new fields.StringField({ required: true, blank: true }),

@@ -65,7 +65,12 @@
       "right": "right",
       "back": "back"
     },
-    "Type": "Type"
+    "Type": "Type",
+    "AttackTypes": {
+      "arc": "Arc",
+      "thrust": "Thrust",
+      "static": "Static"
+    }
   },
 
   "TYPES": {

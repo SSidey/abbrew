@@ -6,6 +6,12 @@
             <input type="text" name="system.attackProfiles.{{i}}.name" value="{{attackProfile.name}}"
                 data-dtype="String" />
         </div>
+        <div>
+            <label>Attack Type</label>
+            <select name="system.attackProfiles.{{i}}.attackType">
+                {{selectOptions ../config.attackTypes selected=attackProfile.attackType blank="" localize=true}}
+            </select>
+        </div>
         <ol class="form-list">
             {{#each attackProfile.damage as |damage j|}}
             <li class="item effect flexrow" data-id="{{j}}">

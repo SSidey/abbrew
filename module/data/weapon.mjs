@@ -11,6 +11,7 @@ export default class AbbrewArmour extends AbbrewItemBase {
     schema.attackProfiles = new fields.ArrayField(
       new fields.SchemaField({
         name: new fields.StringField({ required: true, blank: true }),
+        attackType: new fields.StringField({ required: true, blank: true }),
         damage: new fields.ArrayField(
           new fields.SchemaField({
             type: new fields.StringField({ required: true, blank: true }),

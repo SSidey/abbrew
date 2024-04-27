@@ -59,3 +59,9 @@ ABBREW.facing = {
   right: "ABBREW.Facing.right",
   back: "ABBREW.Facing.back",
 }
+
+ABBREW.attackTypes = {
+  arc: "ABBREW.AttackTypes.arc",
+  thrust: "ABBREW.AttackTypes.thrust",
+  static: "ABBREW.AttackTypes.static"
+}
