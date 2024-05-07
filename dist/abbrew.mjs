@@ -93,6 +93,7 @@ class AbbrewActorSheet extends ActorSheet {
       this.actor.allApplicableEffects()
     );
     context.config = CONFIG.ABBREW;
+    context.skillSections = Object.keys(CONFIG.ABBREW.skillTypes).filter((s) => s !== "path");
     return context;
   }
   /**
@@ -114,7 +115,7 @@ class AbbrewActorSheet extends ActorSheet {
   _prepareItems(context) {
     const gear = [];
     const features = [];
-    const skills = [];
+    const skills = { background: [], basic: [], path: [], temporary: [], untyped: [] };
     const spells = {
       0: [],
       1: [],
@@ -137,7 +138,22 @@ class AbbrewActorSheet extends ActorSheet {
       } else if (i.type === "feature") {
         features.push(i);
       } else if (i.type === "skill") {
-        skills.push(i);
+        switch (i.system.skillType) {
+          case "background":
+            skills.background.push(i);
+            break;
+          case "basic":
+            skills.basic.push(i);
+            break;
+          case "path":
+            skills.path.push(i);
+            break;
+          case "temporary":
+            skills.temporary.push(i);
+            break;
+          default:
+            skills.untyped.push(i);
+        }
       } else if (i.type === "anatomy") {
         anatomy.push(i);
       } else if (i.type === "armour") {
@@ -186,6 +202,7 @@ class AbbrewActorSheet extends ActorSheet {
       const t = event.currentTarget;
       await this._onAttackDamageAction(t);
     });
+    html.on("click", ".skill-header", this._onToggleSkillHeader.bind(this));
     if (this.actor.isOwner) {
       let handler = (ev) => this._onDragStart(ev);
       html.find("li.item").each((i, li) => {
@@ -194,6 +211,14 @@ class AbbrewActorSheet extends ActorSheet {
         li.setAttribute("draggable", true);
         li.addEventListener("dragstart", handler, false);
       });
+    }
+  }
+  async _onToggleSkillHeader(target) {
+    const skillSection = target.target.parentNode.nextElementSibling;
+    if (skillSection.style.display === "grid" || skillSection.style.display === "") {
+      skillSection.style.display = "none";
+    } else {
+      skillSection.style.display = "grid";
     }
   }
   async _onAttackDamageAction(target) {
@@ -2136,6 +2161,23 @@ ABBREW.attackTypes = {
   thrust: "ABBREW.AttackTypes.thrust",
   static: "ABBREW.AttackTypes.static"
 };
+ABBREW.equipState = {
+  held: "ABBREW.EquipState.held",
+  worn: "ABBREW.EquipState.worn",
+  stowed: "ABBREW.EquipState.stowed",
+  dropped: "ABBREW.EquipState.dropped"
+};
+ABBREW.skillTypes = {
+  background: "ABBREW.SkillTypes.background",
+  basic: "ABBREW.SkillTypes.basic",
+  path: "ABBREW.SkillTypes.path",
+  temporary: "ABBREW.SkillTypes.temporary",
+  untyped: "ABBREW.SkillTypes.untyped"
+};
+ABBREW.activationTypes = {
+  passive: "ABBREW.ActivationTypes.passive",
+  active: "ABBREW.ActivationTypes.actve"
+};
 class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   static defineSchema() {
     const fields = foundry.data.fields;
@@ -2203,6 +2245,7 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   prepareBaseData() {
     console.log("base");
     for (const key2 in this.attributes) {
+      this.attributes[key2].value = 1 + this.parent.items.filter((i) => i.type === "skill" && i.system.skillType === "background" && i.system.attributeIncrease === key2).length;
       this.attributes[key2].rank = this.attributes[key2].value;
     }
   }
@@ -2211,7 +2254,7 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     for (const key2 in this.attributes) {
       const rankBonus = this.attributes[key2].rank;
       this.attributes[key2].label = game.i18n.localize(CONFIG.ABBREW.attributes[key2]) ?? key2;
-      this.attributes[key2].rank = rankBonus + this.parent.items.filter((i) => i.type === "skill" && i.system.attributeIncrease === key2).length;
+      this.attributes[key2].rank = rankBonus + this.parent.items.filter((i) => i.type === "skill" && i.system.skillType === "path" && i.system.attributeRankIncrease === key2).length;
       this.attributes[key2].tier = 1 + Math.floor(this.attributes[key2].rank / 10);
     }
     for (const key2 in this.defense.damageTypes) {
@@ -2326,6 +2369,7 @@ class AbbrewItemBase extends foundry.abstract.TypeDataModel {
     const schema = {};
     schema.description = new fields.StringField({ required: true, blank: true });
     schema.traits = new fields.StringField({ required: true, blank: true });
+    schema.equipState = new fields.StringField({ required: true, blank: true });
     return schema;
   }
 }
@@ -2363,7 +2407,15 @@ class AbbrewSkill extends AbbrewItemBase {
   static defineSchema() {
     const fields = foundry.data.fields;
     const schema = super.defineSchema();
-    schema.attributeIncrease = new fields.StringField({ initial: "" });
+    const blankString = { required: true, blank: true };
+    schema.activationType = new fields.StringField({ ...blankString });
+    schema.skillType = new fields.StringField({ ...blankString });
+    schema.path = new fields.SchemaField({
+      value: new fields.StringField({ ...blankString }),
+      archetype: new fields.StringField({ ...blankString })
+    });
+    schema.attributeIncrease = new fields.StringField({ ...blankString });
+    schema.attributeRankIncrease = new fields.StringField({ ...blankString });
     return schema;
   }
 }
@@ -2381,7 +2433,7 @@ class AbbrewAnatomy extends AbbrewItemBase {
     this.roll;
   }
 }
-let AbbrewArmour$1 = class AbbrewArmour extends AbbrewItemBase {
+class AbbrewArmour extends AbbrewItemBase {
   static defineSchema() {
     const fields = foundry.data.fields;
     const requiredInteger = { required: true, nullable: false, integer: true };
@@ -2405,13 +2457,16 @@ let AbbrewArmour$1 = class AbbrewArmour extends AbbrewItemBase {
   prepareDerivedData() {
     this.roll;
   }
-};
-class AbbrewArmour2 extends AbbrewItemBase {
+}
+class AbbrewAttackBase extends foundry.abstract.TypeDataModel {
   static defineSchema() {
+    const schema = super.defineSchema();
+    addAttackSchema(schema);
+    return schema;
+  }
+  static addAttackSchema(schema) {
     const fields = foundry.data.fields;
     const requiredInteger = { required: true, nullable: false, integer: true };
-    const schema = super.defineSchema();
-    schema.hands = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
     schema.attackProfiles = new fields.ArrayField(
       new fields.SchemaField({
         name: new fields.StringField({ required: true, blank: true }),
@@ -2425,6 +2480,22 @@ class AbbrewArmour2 extends AbbrewItemBase {
         )
       })
     );
+  }
+  prepareDerivedData() {
+  }
+}
+class AbbrewWeapon extends AbbrewItemBase {
+  static defineSchema() {
+    const fields = foundry.data.fields;
+    const requiredInteger = { required: true, nullable: false, integer: true };
+    const schema = super.defineSchema();
+    schema.hands = new fields.SchemaField(
+      {
+        required: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+        occupied: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 })
+      }
+    );
+    AbbrewAttackBase.addAttackSchema(schema);
     return schema;
   }
   prepareDerivedData() {
@@ -2587,8 +2658,8 @@ Hooks.once("init", function() {
     spell: AbbrewSpell,
     skill: AbbrewSkill,
     anatomy: AbbrewAnatomy,
-    armour: AbbrewArmour$1,
-    weapon: AbbrewArmour2
+    armour: AbbrewArmour,
+    weapon: AbbrewWeapon
   };
   CONFIG.ActiveEffect.legacyTransferral = false;
   Actors.unregisterSheet("core", ActorSheet);
@@ -2605,6 +2676,17 @@ Hooks.once("init", function() {
 });
 Handlebars.registerHelper("toLowerCase", function(str) {
   return str.toLowerCase();
+});
+Handlebars.registerHelper("eq", function(arg1, arg2) {
+  return arg1 === arg2;
+});
+Handlebars.registerHelper("getProperty", function(parent, child) {
+  const preparedChild = child.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function(match, index) {
+    if (+match === 0)
+      return "";
+    return index === 0 ? match.toLowerCase() : match.toUpperCase();
+  });
+  return parent[preparedChild];
 });
 Hooks.once("ready", function() {
   Hooks.on("hotbarDrop", (bar, data, slot) => createItemMacro(data, slot));

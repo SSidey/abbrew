@@ -65,3 +65,23 @@ ABBREW.attackTypes = {
   thrust: "ABBREW.AttackTypes.thrust",
   static: "ABBREW.AttackTypes.static"
 }
+
+ABBREW.equipState = {
+  held: "ABBREW.EquipState.held",
+  worn: "ABBREW.EquipState.worn",
+  stowed: "ABBREW.EquipState.stowed",
+  dropped: "ABBREW.EquipState.dropped"
+}
+
+ABBREW.skillTypes = {
+  background: "ABBREW.SkillTypes.background",
+  basic: "ABBREW.SkillTypes.basic",
+  path: "ABBREW.SkillTypes.path",
+  temporary: "ABBREW.SkillTypes.temporary",
+  untyped: "ABBREW.SkillTypes.untyped"
+}
+
+ABBREW.activationTypes = {
+  passive: "ABBREW.ActivationTypes.passive",
+  active: "ABBREW.ActivationTypes.actve"
+}

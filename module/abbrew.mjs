@@ -85,6 +85,18 @@ Handlebars.registerHelper('toLowerCase', function (str) {
   return str.toLowerCase();
 });
 
+Handlebars.registerHelper('eq', function (arg1, arg2) {
+  return (arg1 === arg2);
+});
+
+Handlebars.registerHelper('getProperty', function (parent, child) {
+  const preparedChild = child.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function (match, index) {
+    if (+match === 0) return "";
+    return index === 0 ? match.toLowerCase() : match.toUpperCase();
+  });
+  return parent[preparedChild];
+});
+
 /* -------------------------------------------- */
 /*  Ready Hook                                  */
 /* -------------------------------------------- */

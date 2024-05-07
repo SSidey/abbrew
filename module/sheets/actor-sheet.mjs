@@ -68,6 +68,7 @@ export class AbbrewActorSheet extends ActorSheet {
     );
 
     context.config = CONFIG.ABBREW;
+    context.skillSections = Object.keys(CONFIG.ABBREW.skillTypes).filter(s => s !== 'path');
 
     return context;
   }
@@ -97,7 +98,7 @@ export class AbbrewActorSheet extends ActorSheet {
     // Initialize containers.    
     const gear = [];
     const features = [];
-    const skills = [];
+    const skills = { background: [], basic: [], path: [], temporary: [], untyped: [] };
     const spells = {
       0: [],
       1: [],
@@ -126,16 +127,31 @@ export class AbbrewActorSheet extends ActorSheet {
         features.push(i);
       }
       // Append to skills.
-      else if(i.type === 'skill') {
-        skills.push(i);
+      else if (i.type === 'skill') {
+        switch (i.system.skillType) {
+          case 'background':
+            skills.background.push(i);
+            break;
+          case 'basic':
+            skills.basic.push(i);
+            break;
+          case 'path':
+            skills.path.push(i)
+            break;
+          case 'temporary':
+            skills.temporary.push(i)
+            break;
+          default:
+            skills.untyped.push(i);
+        }
       }
-      else if(i.type === 'anatomy') {
+      else if (i.type === 'anatomy') {
         anatomy.push(i);
       }
-      else if(i.type === 'armour') {
+      else if (i.type === 'armour') {
         armour.push(i);
       }
-      else if(i.type === 'weapon') {
+      else if (i.type === 'weapon') {
         weapons.push(i);
       }
       // Append to spells.
@@ -195,12 +211,14 @@ export class AbbrewActorSheet extends ActorSheet {
     });
 
     // Rollable abilities.
-    html.on('click', '.rollable', this._onRoll.bind(this));    
+    html.on('click', '.rollable', this._onRoll.bind(this));
 
     html.on('click', '.attack-damage-button', async (event) => {
       const t = event.currentTarget;
       await this._onAttackDamageAction(t);
     });
+
+    html.on('click', '.skill-header', this._onToggleSkillHeader.bind(this));
 
     // Drag events for macros.
     if (this.actor.isOwner) {
@@ -212,7 +230,16 @@ export class AbbrewActorSheet extends ActorSheet {
       });
     }
   }
-  
+
+  async _onToggleSkillHeader(target) {
+    const skillSection = target.target.parentNode.nextElementSibling;
+    if (skillSection.style.display === "grid" || skillSection.style.display === '') {
+      skillSection.style.display = "none";
+    } else {
+      skillSection.style.display = "grid";
+    }
+  }
+
   async _onAttackDamageAction(target) {
 
     const itemId = target.closest('li.item').dataset.itemId;
@@ -227,7 +254,7 @@ export class AbbrewActorSheet extends ActorSheet {
     const token = this.actor.token;
     const damage = attackProfile.damage.map(d => {
       let attributeModifier = 0;
-      if(d.attributeModifier) {
+      if (d.attributeModifier) {
         attributeModifier = this.actor.system.attributes[d.attributeModifier].value;
       }
 
@@ -267,7 +294,7 @@ export class AbbrewActorSheet extends ActorSheet {
     };
     // TODO: Move this out of item and into a weapon.mjs
     const html = await renderTemplate("systems/abbrew/templates/chat/attack-card.hbs", templateData);
-    
+
     // Initialize chat data.
     const speaker = ChatMessage.getSpeaker({ actor: this.actor });
     const rollMode = game.settings.get('core', 'rollMode');

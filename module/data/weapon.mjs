@@ -1,26 +1,21 @@
+import AbbrewAttackBase from "./attack-base.mjs";
 import AbbrewItemBase from "./item-base.mjs";
 
-export default class AbbrewArmour extends AbbrewItemBase {
+export default class AbbrewWeapon extends AbbrewItemBase {
 
   static defineSchema() {
     const fields = foundry.data.fields;
     const requiredInteger = { required: true, nullable: false, integer: true };
     const schema = super.defineSchema();
 
-    schema.hands = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
-    schema.attackProfiles = new fields.ArrayField(
-      new fields.SchemaField({
-        name: new fields.StringField({ required: true, blank: true }),
-        attackType: new fields.StringField({ required: true, blank: true }),
-        damage: new fields.ArrayField(
-          new fields.SchemaField({
-            type: new fields.StringField({ required: true, blank: true }),
-            value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-            attributeModifier: new fields.StringField({ required: true, blank: true }),
-          })
-        )
-      })
+    schema.hands = new fields.SchemaField(
+      {
+        required: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+        occupied: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+      }
     );
+    
+    AbbrewAttackBase.addAttackSchema(schema);
 
     return schema;
   }

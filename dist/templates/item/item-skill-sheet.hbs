@@ -18,13 +18,6 @@
 
     {{!-- Description Tab --}}
     <div class="tab" data-group="primary" data-tab="description">
-      {{!-- Ability Rank --}}
-      <div class="form-group">
-        <label>{{ localize "ABBREW.AttributeIncrease" }}</label>
-        <select name="system.attributeIncrease">
-          {{selectOptions config.attributes selected=system.attributeIncrease blank="" localize=true}}
-        </select>
-      </div>
       {{editor system.description target="system.description" rollData=rollData button=true owner=owner
       editable=editable}}
     </div>
@@ -32,6 +25,31 @@
     {{!-- Attributes Tab --}}
     <div class="tab attributes" data-group="primary" data-tab="attributes">
       {{!-- As you add new fields, add them in here! --}}
+      {{!-- Skill Type --}}
+      <div class="form-group">
+        <label>{{ localize "ABBREW.SkillType" }}</label>
+        <select name="system.skillType">
+          {{selectOptions config.skillTypes selected=system.skillType blank="" localize=true}}
+        </select>
+      </div>
+      {{#if (eq system.skillType "background")}}
+      {{!-- Ability Increase --}}
+      <div class="form-group">
+        <label>{{ localize "ABBREW.AttributeIncrease" }}</label>
+        <select name="system.attributeIncrease">
+          {{selectOptions config.attributes selected=system.attributeIncrease blank="" localize=true}}
+        </select>
+      </div>
+      {{/if}}
+      {{#if (eq system.skillType "path")}}
+      {{!-- Ability Rank --}}
+      <div class="form-group">
+        <label>{{ localize "ABBREW.AttributeRankIncrease" }}</label>
+        <select name="system.attributeRankIncrease">
+          {{selectOptions config.attributes selected=system.attributeRankIncrease blank="" localize=true}}
+        </select>
+      </div>
+      {{/if}}
     </div>
 
     {{!-- Effects Tab --}}

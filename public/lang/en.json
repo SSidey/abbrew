@@ -35,6 +35,8 @@
       "guard": "Guard"
     },
     "AttributeIncrease": "Attribute Increase",
+    "AttributeRankIncrease": "Attribute Rank Increase",
+    "SkillType": "Skill Type",
     "Resistance": "Resistance",
     "Damage": "Damage",
     "Immunity": "Immunity",
@@ -70,6 +72,23 @@
       "arc": "Arc",
       "thrust": "Thrust",
       "static": "Static"
+    },
+    "EquipState": {
+      "held": "Held",
+      "worn": "Worn",
+      "stowed": "Stowed",
+      "dropped": "Dropped"
+    },
+    "SkillTypes": {
+      "background": "Background",
+      "basic": "Basic",
+      "path": "Path",
+      "temporary": "Temporary",
+      "untyped": "Untyped"
+    },    
+    "ActivationTypes": {
+      "passive": "Passive",
+      "active": "Active"
     }
   },
 

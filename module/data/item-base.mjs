@@ -6,6 +6,7 @@ export default class AbbrewItemBase extends foundry.abstract.TypeDataModel {
 
     schema.description = new fields.StringField({ required: true, blank: true });
     schema.traits = new fields.StringField({ required: true, blank: true });
+    schema.equipState = new fields.StringField({ required: true, blank: true });
 
     return schema;
   }

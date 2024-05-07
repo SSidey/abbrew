@@ -74,6 +74,7 @@
   {{!-- Sheet Tab Navigation --}}
   <nav class="sheet-tabs tabs" data-group="primary">
     {{!-- Default tab is specified in actor-sheet.mjs --}}
+    <a class="item" data-tab="overview">Overview</a>
     <a class="item" data-tab="skills">Skills</a>
     <a class="item" data-tab="defenses">Defenses</a>
     <a class="item" data-tab="description">Description</a>
@@ -85,8 +86,8 @@
   {{!-- Sheet Body --}}
   <section class="sheet-body">
 
-    {{!-- Owned Skills Tab --}}
-    <div class="tab skills" data-group="primary" data-tab="skills">
+    {{!-- Overview Tab --}}
+    <div class="tab overview" data-group="primary" data-tab="overview">
       <section class="grid grid-4col">
         <aside class="sidebar grid-span-2">
 
@@ -113,12 +114,19 @@
         <section class="main grid-span-2">
           {{!-- This is a Handlebars partial. They're stored in the `/parts` folder next to this sheet, and defined in
           module/helpers/templates.mjs --}}
-          {{> "systems/abbrew/templates/actor/parts/actor-skills.hbs"}}
           {{> "systems/abbrew/templates/actor/parts/actor-anatomy.hbs"}}
           {{> "systems/abbrew/templates/actor/parts/actor-armour.hbs"}}
           {{> "systems/abbrew/templates/actor/parts/actor-weapons.hbs"}}
         </section>
 
+      </section>
+    </div>
+
+    {{!-- Owned Skills Tab --}}
+    <div class="tab skills" data-group="primary" data-tab="skills">
+      <section>
+          {{!-- TODO: 25 total skills for background? Grid of 5--}}
+          {{> "systems/abbrew/templates/actor/parts/actor-skills.hbs"}}
       </section>
     </div>
 

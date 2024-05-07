@@ -78,6 +78,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     console.log('base');
     // Loop through attribute scores, and determine their base rank.
     for (const key in this.attributes) {
+      this.attributes[key].value = 1 + this.parent.items.filter(i => i.type === 'skill' && i.system.skillType === 'background' && i.system.attributeIncrease === key).length;
       this.attributes[key].rank = this.attributes[key].value;
     }
   }
@@ -90,7 +91,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       // Handle attribute label localization.
       this.attributes[key].label = game.i18n.localize(CONFIG.ABBREW.attributes[key]) ?? key;
       // // Rank total for the attribute
-      this.attributes[key].rank = rankBonus + this.parent.items.filter(i => i.type === 'skill' && i.system.attributeIncrease === key).length;
+      this.attributes[key].rank = rankBonus + this.parent.items.filter(i => i.type === 'skill' && i.system.skillType === 'path' && i.system.attributeRankIncrease === key).length;
       // Tier of the attribute
       this.attributes[key].tier = 1 + Math.floor(this.attributes[key].rank / 10);
     }
