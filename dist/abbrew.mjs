@@ -57,7 +57,7 @@ class AbbrewActorSheet extends ActorSheet {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       classes: ["abbrew", "sheet", "actor"],
-      width: 600,
+      width: 750,
       height: 600,
       tabs: [
         {
@@ -115,7 +115,7 @@ class AbbrewActorSheet extends ActorSheet {
   _prepareItems(context) {
     const gear = [];
     const features = [];
-    const skills = { background: [], basic: [], path: [], temporary: [], untyped: [] };
+    const skills = { background: [], basic: [], path: [], resource: [], temporary: [], untyped: [] };
     const spells = {
       0: [],
       1: [],
@@ -213,9 +213,11 @@ class AbbrewActorSheet extends ActorSheet {
       });
     }
   }
-  async _onToggleSkillHeader(target) {
-    const skillSection = target.target.parentNode.nextElementSibling;
-    if (skillSection.style.display === "grid" || skillSection.style.display === "") {
+  _onToggleSkillHeader(event) {
+    event.preventDefault();
+    const target = event.currentTarget;
+    const skillSection = target.nextElementSibling;
+    if (skillSection.children.length === 0 || skillSection.style.display === "grid" || skillSection.style.display === "") {
       skillSection.style.display = "none";
     } else {
       skillSection.style.display = "grid";
@@ -2171,12 +2173,21 @@ ABBREW.skillTypes = {
   background: "ABBREW.SkillTypes.background",
   basic: "ABBREW.SkillTypes.basic",
   path: "ABBREW.SkillTypes.path",
+  resource: "ABBREW.SkillTypes.resource",
   temporary: "ABBREW.SkillTypes.temporary",
   untyped: "ABBREW.SkillTypes.untyped"
 };
 ABBREW.activationTypes = {
   passive: "ABBREW.ActivationTypes.passive",
   active: "ABBREW.ActivationTypes.actve"
+};
+ABBREW.actionCosts = {
+  passive: "",
+  one: "",
+  two: "",
+  three: "",
+  reaction: "",
+  other: ""
 };
 class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   static defineSchema() {
@@ -2408,7 +2419,20 @@ class AbbrewSkill extends AbbrewItemBase {
     const fields = foundry.data.fields;
     const schema = super.defineSchema();
     const blankString = { required: true, blank: true };
-    schema.activationType = new fields.StringField({ ...blankString });
+    const requiredInteger = { required: true, nullable: false, integer: true };
+    schema.activatable = new fields.BooleanField({ required: true, label: "ABBREW.Activatable" });
+    schema.actions = new fields.ArrayField(
+      new fields.SchemaField({
+        activation: new fields.SchemaField({
+          type: new fields.StringField({ ...blankString }),
+          actionCost: new fields.SchemaField({
+            description: new fields.StringField({ ...blankString }),
+            value: new fields.NumberField({ ...requiredInteger })
+          }),
+          resourceCosts: new fields.SetField(new fields.StringField({ required: true }))
+        })
+      })
+    );
     schema.skillType = new fields.StringField({ ...blankString });
     schema.path = new fields.SchemaField({
       value: new fields.StringField({ ...blankString }),
@@ -2687,6 +2711,12 @@ Handlebars.registerHelper("getProperty", function(parent, child) {
     return index === 0 ? match.toLowerCase() : match.toUpperCase();
   });
   return parent[preparedChild];
+});
+Handlebars.registerHelper("empty", function(collection) {
+  if (!collection) {
+    return false;
+  }
+  return collection.length === 0;
 });
 Hooks.once("ready", function() {
   Hooks.on("hotbarDrop", (bar, data, slot) => createItemMacro(data, slot));

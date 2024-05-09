@@ -1,6 +1,8 @@
 <ol class='items-list'>
   {{#each skillSections as |skillType i|}}
   <li>
+    {{!-- TODO: Add count of cards? --}}
+    {{!-- TODO: Need to add paths section where each path has the block below to add skills --}}
   <li class='item flexrow items-header skill-header' data-skill-section="{{localize (skillType)}}">
     <div class='item-name'>{{localize (skillType)}}</div>
     <div class='item-controls'>
@@ -10,9 +12,11 @@
       </a>
     </div>
   </li>
-  <ol class='skill-container' data-skill-section="{{localize (skillType)}}">
+  <ol class='skill-container'
+    style="display:  {{#if (empty (getProperty ../skills (localize (skillType))))}}none{{else}}grid{{/if}};"
+    data-skill-section="{{localize (skillType)}}">
     {{#each (getProperty ../skills (localize (skillType))) as |item id|}}
-    <li class='item flexrow' data-item-id='{{item._id}}'>
+    <li class='item flexrow skill-card' data-item-id='{{item._id}}'>
       <div class='item-name'>
         <div class='item-image'>
           <a class='rollable' data-roll-type='item'>

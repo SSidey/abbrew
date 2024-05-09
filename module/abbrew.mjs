@@ -97,6 +97,14 @@ Handlebars.registerHelper('getProperty', function (parent, child) {
   return parent[preparedChild];
 });
 
+Handlebars.registerHelper('empty', function (collection) {
+  if (!collection) {
+    return false;
+  }
+
+  return collection.length === 0;
+});
+
 /* -------------------------------------------- */
 /*  Ready Hook                                  */
 /* -------------------------------------------- */

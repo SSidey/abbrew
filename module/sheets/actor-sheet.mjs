@@ -12,7 +12,7 @@ export class AbbrewActorSheet extends ActorSheet {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       classes: ['abbrew', 'sheet', 'actor'],
-      width: 600,
+      width: 750,
       height: 600,
       tabs: [
         {
@@ -98,7 +98,7 @@ export class AbbrewActorSheet extends ActorSheet {
     // Initialize containers.    
     const gear = [];
     const features = [];
-    const skills = { background: [], basic: [], path: [], temporary: [], untyped: [] };
+    const skills = { background: [], basic: [], path: [], resource: [], temporary: [], untyped: [] };
     const spells = {
       0: [],
       1: [],
@@ -231,9 +231,11 @@ export class AbbrewActorSheet extends ActorSheet {
     }
   }
 
-  async _onToggleSkillHeader(target) {
-    const skillSection = target.target.parentNode.nextElementSibling;
-    if (skillSection.style.display === "grid" || skillSection.style.display === '') {
+  _onToggleSkillHeader(event) {
+    event.preventDefault();
+    const target = event.currentTarget;
+    const skillSection = target.nextElementSibling;
+    if (skillSection.children.length === 0 || skillSection.style.display === "grid" || skillSection.style.display === '') {
       skillSection.style.display = "none";
     } else {
       skillSection.style.display = "grid";

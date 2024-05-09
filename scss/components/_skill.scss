@@ -3,3 +3,11 @@ ol.skill-container {
     grid-template-columns: repeat(5, 1fr);
     list-style-type: none;
 }
+
+li.skill-card {
+    height: 200px;
+    border: thin solid rgb(0, 0, 0);
+    border-radius: 2%;
+    padding: 1em;
+    margin: 2px;
+}

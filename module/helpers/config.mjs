@@ -77,6 +77,7 @@ ABBREW.skillTypes = {
   background: "ABBREW.SkillTypes.background",
   basic: "ABBREW.SkillTypes.basic",
   path: "ABBREW.SkillTypes.path",
+  resource: "ABBREW.SkillTypes.resource",
   temporary: "ABBREW.SkillTypes.temporary",
   untyped: "ABBREW.SkillTypes.untyped"
 }
@@ -84,4 +85,13 @@ ABBREW.skillTypes = {
 ABBREW.activationTypes = {
   passive: "ABBREW.ActivationTypes.passive",
   active: "ABBREW.ActivationTypes.actve"
+}
+
+ABBREW.actionCosts = {
+  passive: "",
+  one: "",
+  two: "",
+  three: "",
+  reaction: "",
+  other: ""
 }

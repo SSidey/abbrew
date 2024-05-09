@@ -83,13 +83,15 @@
       "background": "Background",
       "basic": "Basic",
       "path": "Path",
-      "temporary": "Temporary",
+      "resource": "Resource",
+      "temporary": "Temporary",      
       "untyped": "Untyped"
-    },    
+    },
     "ActivationTypes": {
       "passive": "Passive",
       "active": "Active"
-    }
+    },
+    "Activatable": "Activatable"
   },
 
   "TYPES": {
