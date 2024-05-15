@@ -87,11 +87,17 @@
       "temporary": "Temporary",      
       "untyped": "Untyped"
     },
-    "ActivationTypes": {
+    "ActionCosts": {
       "passive": "Passive",
-      "active": "Active"
+      "one": "One",
+      "two": "Two",
+      "three": "Three",
+      "reaction": "Reaction",
+      "other": "Other"
     },
-    "Activatable": "Activatable"
+    "Activatable": "Activatable",
+    "HasRequirement": "Has Requirement",
+    "EquippedWeapon": "Equipped Weapon"
   },
 
   "TYPES": {

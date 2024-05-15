@@ -27,7 +27,9 @@ ABBREW.attributeAbbreviations = {
   wil: 'ABBREW.Attribute.Wil.abbr',
 };
 
+ABBREW.HasRequirement = "ABBREW.HasRequirement";
 ABBREW.SkillAttributeIncrease = "ABBREW.AttributeIncrease";
+ABBREW.EquippedWeapon = "ABBREW.EquippedWeapon";
 ABBREW.Damage = "ABBREW.Damage";
 
 ABBREW.Defense = {
@@ -88,10 +90,10 @@ ABBREW.activationTypes = {
 }
 
 ABBREW.actionCosts = {
-  passive: "",
-  one: "",
-  two: "",
-  three: "",
-  reaction: "",
-  other: ""
+  passive: "ABBREW.ActionCosts.passive",
+  one: "ABBREW.ActionCosts.one",
+  two: "ABBREW.ActionCosts.two",
+  three: "ABBREW.ActionCosts.three",
+  reaction: "ABBREW.ActionCosts.reaction",
+  other: "ABBREW.ActionCosts.other"
 }

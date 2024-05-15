@@ -1927,6 +1927,7 @@ class AbbrewItemSheet extends ItemSheet {
     const itemData = context.data;
     context.rollData = this.item.getRollData();
     context.system = itemData.system;
+    context.actions = this.prepareActions(itemData.system);
     context.flags = itemData.flags;
     context.effects = prepareActiveEffectCategories(this.item.effects);
     context.config = CONFIG.ABBREW;
@@ -1958,8 +1959,17 @@ class AbbrewItemSheet extends ItemSheet {
       if (t.dataset.action)
         this._onAttackProfileAction(t, t.dataset.action);
     });
+    html.find(".skill-action-control").click((event) => {
+      const t = event.currentTarget;
+      if (t.dataset.action)
+        this._onSkillActionAction(t, t.dataset.action);
+    });
     this._activateArmourPoints(html);
     this._activateAnatomyParts(html);
+  }
+  prepareActions(system) {
+    let actions = system.actions;
+    return actions;
   }
   _activateArmourPoints(html) {
     const armourPoints = html[0].querySelector('input[name="system.armourPoints"]');
@@ -2053,6 +2063,30 @@ class AbbrewItemSheet extends ItemSheet {
         return this.removeAttackProfile(target);
     }
   }
+  /**
+   * Handle one of the add or remove damage reduction buttons.
+   * @param {Element} target  Button or context menu entry that triggered this action.
+   * @param {string} action   Action being triggered.
+   * @returns {Promise|void}
+   */
+  _onSkillActionAction(target, action) {
+    switch (action) {
+      case "add-skill-action":
+        return this.addSkillAction();
+      case "remove-skill-action":
+        return this.removeSkillAction(target);
+    }
+  }
+  addSkillAction() {
+    const actions = this.item.system.actions;
+    return this.item.update({ "system.actions": [...actions, {}] });
+  }
+  removeSkillAction(target) {
+    const id = target.closest("li").dataset.id;
+    const actions = foundry.utils.deepClone(this.item.system.actions);
+    actions.splice(Number(id), 1);
+    return this.item.update({ "system.actions": actions });
+  }
   addAttackProfile() {
     const attackProfiles = this.item.system.attackProfiles;
     return this.item.update({ "system.attackProfiles": [...attackProfiles, {}] });
@@ -2104,6 +2138,9 @@ const preloadHandlebarsTemplates = async function() {
     "systems/abbrew/templates/item/parts/item-effects.hbs",
     "systems/abbrew/templates/item/parts/item-defenses.hbs",
     "systems/abbrew/templates/item/parts/item-damage.hbs",
+    "systems/abbrew/templates/item/parts/skill-type.hbs",
+    "systems/abbrew/templates/item/parts/skill-actions.hbs",
+    "systems/abbrew/templates/item/parts/skill-damage.hbs",
     // Chat Cards.
     "systems/abbrew/templates/chat/attack-card.hbs"
   ]);
@@ -2130,7 +2167,9 @@ ABBREW.attributeAbbreviations = {
   vis: "ABBREW.Attribute.Vis.abbr",
   wil: "ABBREW.Attribute.Wil.abbr"
 };
+ABBREW.HasRequirement = "ABBREW.HasRequirement";
 ABBREW.SkillAttributeIncrease = "ABBREW.AttributeIncrease";
+ABBREW.EquippedWeapon = "ABBREW.EquippedWeapon";
 ABBREW.Damage = "ABBREW.Damage";
 ABBREW.Defense = {
   guard: "ABBREW.Defense.guard"
@@ -2182,12 +2221,12 @@ ABBREW.activationTypes = {
   active: "ABBREW.ActivationTypes.actve"
 };
 ABBREW.actionCosts = {
-  passive: "",
-  one: "",
-  two: "",
-  three: "",
-  reaction: "",
-  other: ""
+  passive: "ABBREW.ActionCosts.passive",
+  one: "ABBREW.ActionCosts.one",
+  two: "ABBREW.ActionCosts.two",
+  three: "ABBREW.ActionCosts.three",
+  reaction: "ABBREW.ActionCosts.reaction",
+  other: "ABBREW.ActionCosts.other"
 };
 class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   static defineSchema() {
@@ -2420,16 +2459,37 @@ class AbbrewSkill extends AbbrewItemBase {
     const schema = super.defineSchema();
     const blankString = { required: true, blank: true };
     const requiredInteger = { required: true, nullable: false, integer: true };
+    schema.configurable = new fields.BooleanField({ required: true });
     schema.activatable = new fields.BooleanField({ required: true, label: "ABBREW.Activatable" });
     schema.actions = new fields.ArrayField(
       new fields.SchemaField({
-        activation: new fields.SchemaField({
-          type: new fields.StringField({ ...blankString }),
-          actionCost: new fields.SchemaField({
-            description: new fields.StringField({ ...blankString }),
-            value: new fields.NumberField({ ...requiredInteger })
+        requirements: new fields.SchemaField({
+          actionCost: new fields.StringField({ ...blankString }),
+          attackType: new fields.StringField({ ...blankString }),
+          concepts: new fields.StringField({ ...blankString }),
+          hands: new fields.NumberField({ required: true, initial: null, integer: true }),
+          momentum: new fields.SchemaField({
+            hasRequirement: new fields.BooleanField({ required: true, label: "ABBREW.HasRequirement" }),
+            requirement: new fields.NumberField({ ...requiredInteger, initial: 0, min: -10, max: 10 }),
+            change: new fields.NumberField({ ...requiredInteger, initial: 0, min: -20, max: 20 })
           }),
-          resourceCosts: new fields.SetField(new fields.StringField({ required: true }))
+          resources: new fields.ArrayField(
+            new fields.SchemaField({
+              name: new fields.StringField({ ...blankString }),
+              value: new fields.NumberField({ ...requiredInteger })
+            })
+          ),
+          weapon: new fields.BooleanField({ required: true, label: "ABBREW.EquippedWeapon" })
+        }),
+        modifiers: new fields.SchemaField({
+          damage: new fields.ArrayField(
+            new fields.SchemaField({
+              type: new fields.StringField({ ...blankString }),
+              value: new fields.NumberField({ ...requiredInteger, initial: 0 })
+            })
+          ),
+          guard: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+          successes: new fields.NumberField({ ...requiredInteger, initial: 0 })
         })
       })
     );
@@ -2702,6 +2762,7 @@ Handlebars.registerHelper("toLowerCase", function(str) {
   return str.toLowerCase();
 });
 Handlebars.registerHelper("eq", function(arg1, arg2) {
+  console.log("eq");
   return arg1 === arg2;
 });
 Handlebars.registerHelper("getProperty", function(parent, child) {

@@ -8,19 +8,38 @@ export default class AbbrewSkill extends AbbrewItemBase {
         const blankString = { required: true, blank: true }
         const requiredInteger = { required: true, nullable: false, integer: true };
 
-        // TODO: Revisit this, collection of actions underneath as some will have e.g. 2action to activate vs 1action and 2 momentum
-        // Likely just want to have an 'activatable' flag for any actions that can be used in that way.
+        schema.configurable = new fields.BooleanField({ required: true });
         schema.activatable = new fields.BooleanField({ required: true, label: "ABBREW.Activatable" });
         schema.actions = new fields.ArrayField(
             new fields.SchemaField({
-                activation: new fields.SchemaField({
-                    type: new fields.StringField({ ...blankString }),
-                    actionCost: new fields.SchemaField({
-                        description: new fields.StringField({ ...blankString }),
-                        value: new fields.NumberField({ ...requiredInteger })
+                requirements: new fields.SchemaField({
+                    actionCost: new fields.StringField({ ...blankString }),
+                    attackType: new fields.StringField({ ...blankString }),
+                    concepts: new fields.StringField({ ...blankString }),
+                    hands: new fields.NumberField({ required: true, initial: null, integer: true }),
+                    momentum: new fields.SchemaField({
+                        hasRequirement: new fields.BooleanField({ required: true, label: "ABBREW.HasRequirement" }),
+                        requirement: new fields.NumberField({ ...requiredInteger, initial: 0, min: -10, max: 10 }),
+                        change: new fields.NumberField({ ...requiredInteger, initial: 0, min: -20, max: 20 })
                     }),
-                    resourceCosts: new fields.SetField(new fields.StringField({required: true}))
-                })
+                    resources: new fields.ArrayField(
+                        new fields.SchemaField({
+                            name: new fields.StringField({ ...blankString }),
+                            value: new fields.NumberField({ ...requiredInteger })
+                        })
+                    ),
+                    weapon: new fields.BooleanField({ required: true, label: "ABBREW.EquippedWeapon" })
+                }),
+                modifiers: new fields.SchemaField({
+                    damage: new fields.ArrayField(
+                        new fields.SchemaField({
+                            type: new fields.StringField({ ...blankString }),
+                            value: new fields.NumberField({ ...requiredInteger, initial: 0 })
+                        })
+                    ),
+                    guard: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                    successes: new fields.NumberField({ ...requiredInteger, initial: 0 })
+                }),
             })
         );
         schema.skillType = new fields.StringField({ ...blankString });
@@ -29,7 +48,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
             archetype: new fields.StringField({ ...blankString })
         });
         schema.attributeIncrease = new fields.StringField({ ...blankString });
-        schema.attributeRankIncrease = new fields.StringField({ ...blankString });        
+        schema.attributeRankIncrease = new fields.StringField({ ...blankString });
 
         return schema;
     }

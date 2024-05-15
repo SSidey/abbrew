@@ -11,3 +11,7 @@ li.skill-card {
     padding: 1em;
     margin: 2px;
 }
+
+label.slide-toggle > input {
+    display: none;
+}

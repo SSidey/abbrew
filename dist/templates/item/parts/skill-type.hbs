@@ -1,0 +1,25 @@
+{{!-- Skill Type --}}
+<div class="form-group">
+    <label>{{ localize "ABBREW.SkillType" }}</label>
+    <select name="system.skillType">
+        {{selectOptions config.skillTypes selected=system.skillType blank="" localize=true}}
+    </select>
+</div>
+{{#if (eq system.skillType "background")}}
+{{!-- Ability Increase --}}
+<div class="form-group">
+    <label>{{ localize "ABBREW.AttributeIncrease" }}</label>
+    <select name="system.attributeIncrease">
+        {{selectOptions config.attributes selected=system.attributeIncrease blank="" localize=true}}
+    </select>
+</div>
+{{/if}}
+{{#if (eq system.skillType "path")}}
+{{!-- Ability Rank --}}
+<div class="form-group">
+    <label>{{ localize "ABBREW.AttributeRankIncrease" }}</label>
+    <select name="system.attributeRankIncrease">
+        {{selectOptions config.attributes selected=system.attributeRankIncrease blank="" localize=true}}
+    </select>
+</div>
+{{/if}}

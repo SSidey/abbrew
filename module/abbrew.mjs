@@ -86,6 +86,7 @@ Handlebars.registerHelper('toLowerCase', function (str) {
 });
 
 Handlebars.registerHelper('eq', function (arg1, arg2) {
+  console.log('eq');
   return (arg1 === arg2);
 });
 

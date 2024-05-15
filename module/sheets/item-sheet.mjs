@@ -51,6 +51,7 @@ export class AbbrewItemSheet extends ItemSheet {
 
     // Add the item's data to context.data for easier access, as well as flags.
     context.system = itemData.system;
+    context.actions = this.prepareActions(itemData.system);
     context.flags = itemData.flags;
 
     // Prepare active effects for easier access
@@ -92,8 +93,19 @@ export class AbbrewItemSheet extends ItemSheet {
       if (t.dataset.action) this._onAttackProfileAction(t, t.dataset.action);
     });
 
+    html.find(".skill-action-control").click(event => {
+      const t = event.currentTarget;
+      if (t.dataset.action) this._onSkillActionAction(t, t.dataset.action);
+    });
+
     this._activateArmourPoints(html);
     this._activateAnatomyParts(html);
+  }
+
+  prepareActions(system) {
+    let actions = system.actions;
+
+    return actions;
   }
 
   _activateArmourPoints(html) {
@@ -180,7 +192,34 @@ export class AbbrewItemSheet extends ItemSheet {
         return this.removeAttackProfile(target);
         break;
     }
+  }
 
+  /**
+   * Handle one of the add or remove damage reduction buttons.
+   * @param {Element} target  Button or context menu entry that triggered this action.
+   * @param {string} action   Action being triggered.
+   * @returns {Promise|void}
+   */
+  _onSkillActionAction(target, action) {
+    switch (action) {
+      case 'add-skill-action':
+        return this.addSkillAction();
+      case 'remove-skill-action':
+        return this.removeSkillAction(target);
+        break;
+    }
+  }
+
+  addSkillAction() {
+    const actions = this.item.system.actions;
+    return this.item.update({ "system.actions": [...actions, {}] });
+  }
+
+  removeSkillAction(target) {
+    const id = target.closest("li").dataset.id;
+    const actions = foundry.utils.deepClone(this.item.system.actions);
+    actions.splice(Number(id), 1);
+    return this.item.update({ "system.actions": actions });
   }
 
   addAttackProfile() {

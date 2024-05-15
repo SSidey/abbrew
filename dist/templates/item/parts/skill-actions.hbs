@@ -1,0 +1,63 @@
+<label class="slide-toggle roboto-upper">
+    <input type="checkbox" class="action-activatable" name="system.activatable" {{ checked system.activatable }}>
+    <span>{{localize "ABBREW.Activatable"}}</span>
+    {{#if system.activatable}}
+    <i class="fa fa-toggle-on"></i>
+    {{else}}
+    <i class="fa fa-toggle-off"></i>
+    {{/if}}
+</label>
+{{#if system.activatable}}
+<ol class="form-list">
+    {{#each system.actions as |action i|}}
+    <li class="item action flexrow" data-id="{{i}}">
+        <div>
+            <label>Action Cost</label>
+            <input type="text" name="system.actions.{{i}}.requirements.actionCost"
+                value="{{action.requirements.actionCost}}" data-dtype="String" />
+        </div>
+        <div>
+            <label>Momentum</label>
+            <label class="slide-toggle roboto-upper">
+                <input type="checkbox" class="momentum-requirement"
+                    name="system.actions.{{i}}.requirements.momentum.hasRequirement" {{ checked
+                    action.requirements.momentum.hasRequirement }}>
+                <span>{{localize "ABBREW.HasRequirement"}}</span>
+                {{#if action.requirements.momentum.hasRequirement}}
+                <i class="fa fa-toggle-on"></i>
+                {{else}}
+                <i class="fa fa-toggle-off"></i>
+                {{/if}}
+            </label>
+            {{#if action.requirements.momentum.hasRequirement}}
+            <div>
+                <label>Requirement</label>
+                <input type="text" name="system.actions.{{i}}.requirements.momentum.requirement"
+                    value="{{action.requirements.momentum.requirement}}" data-dtype="Number" />
+            </div>
+            {{/if}}
+            <div>
+                <label>Change</label>
+                <input type="text" name="system.actions.{{i}}.requirements.momentum.change"
+                    value="{{action.requirements.momentum.change}}" data-dtype="Number" />
+            </div>
+        </div>
+        <ol class="form-list">
+        </ol>
+        <a class="skill-action-control remove-skill-action" data-action="remove-skill-action">
+            <i class="fa-solid fa-minus"></i>
+        </a>
+    </li>
+    {{/each}}
+    <li class="skillAction add">
+        <div class="form-group">
+            <label>
+                <a class="skill-action-control" data-action="add-skill-action">
+                    Add Action
+                    <i class="fa-solid fa-plus"></i>
+                </a>
+            </label>
+        </div>
+    </li>
+</ol>
+{{/if}}
