@@ -14,9 +14,13 @@ export default class AbbrewSkill extends AbbrewItemBase {
             new fields.SchemaField({
                 requirements: new fields.SchemaField({
                     actionCost: new fields.StringField({ ...blankString }),
-                    attackType: new fields.StringField({ ...blankString }),
-                    concepts: new fields.StringField({ ...blankString }),
-                    hands: new fields.NumberField({ required: true, initial: null, integer: true }),
+                    weapon: new fields.SchemaField({
+                        attackType: new fields.StringField({ ...blankString }),
+                        damageType: new fields.StringField({ ...blankString }),
+                        hands: new fields.NumberField({ required: true, initial: null, integer: true }),
+                        traits: new fields.StringField({ ...blankString })
+                    }),
+                    freeHands: new fields.NumberField({ required: true, initial: 0, integer: true }),
                     momentum: new fields.SchemaField({
                         hasRequirement: new fields.BooleanField({ required: true, label: "ABBREW.HasRequirement" }),
                         requirement: new fields.NumberField({ ...requiredInteger, initial: 0, min: -10, max: 10 }),
@@ -25,21 +29,23 @@ export default class AbbrewSkill extends AbbrewItemBase {
                     resources: new fields.ArrayField(
                         new fields.SchemaField({
                             name: new fields.StringField({ ...blankString }),
-                            value: new fields.NumberField({ ...requiredInteger })
+                            value: new fields.NumberField({ ...requiredInteger, initial: 0 })
                         })
                     ),
-                    weapon: new fields.BooleanField({ required: true, label: "ABBREW.EquippedWeapon" })
+                    weaponEquipped: new fields.BooleanField({ required: true, label: "ABBREW.EquippedWeapon" })
                 }),
                 modifiers: new fields.SchemaField({
                     damage: new fields.ArrayField(
                         new fields.SchemaField({
                             type: new fields.StringField({ ...blankString }),
-                            value: new fields.NumberField({ ...requiredInteger, initial: 0 })
+                            value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                            attribute: new fields.StringField({ ...blankString })
                         })
                     ),
                     guard: new fields.NumberField({ ...requiredInteger, initial: 0 }),
                     successes: new fields.NumberField({ ...requiredInteger, initial: 0 })
                 }),
+                description: new fields.StringField({ ...blankString })
             })
         );
         schema.skillType = new fields.StringField({ ...blankString });

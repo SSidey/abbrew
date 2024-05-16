@@ -26,16 +26,18 @@
     <div class="tab attributes" data-group="primary" data-tab="attributes">
       {{!-- As you add new fields, add them in here! --}}
       <label class="slide-toggle roboto-upper">
-        <input type="checkbox" name="system.configurable" {{ checked system.configurable }}>
+        <input type="checkbox" id="configurable" name="system.configurable" {{ checked system.configurable }}>
         {{#if system.configurable}}
-        <i class="fa fa-duotone fa-gear"></i>
-        {{else}}
         <i class="fa fa-thin fa-gear"></i>
+        {{else}}
+        <i class="fa fa-duotone fa-gear"></i>
         {{/if}}
       </label>
-      {{> "systems/abbrew/templates/item/parts/skill-type.hbs"}}
-      </br>
-      {{> "systems/abbrew/templates/item/parts/skill-actions.hbs"}}
+      <div class="skill-configuration-section">
+        {{> "systems/abbrew/templates/item/parts/skill-type.hbs"}}
+        </br>
+        {{> "systems/abbrew/templates/item/parts/skill-actions.hbs"}}
+      </div>
     </div>
 
     {{!-- Effects Tab --}}

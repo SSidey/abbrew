@@ -98,6 +98,13 @@ export class AbbrewItemSheet extends ItemSheet {
       if (t.dataset.action) this._onSkillActionAction(t, t.dataset.action);
     });
 
+    html.find(".skill-action-resource-control").click(event => {
+      const t = event.currentTarget;
+      if (t.dataset.action) this._onSkillActionResourceRequirementAction(t, t.dataset.action);
+    });
+
+    html.find(".skill-configuration-section :input").prop("disabled", !this.item.system.configurable);
+
     this._activateArmourPoints(html);
     this._activateAnatomyParts(html);
   }
@@ -201,13 +208,48 @@ export class AbbrewItemSheet extends ItemSheet {
    * @returns {Promise|void}
    */
   _onSkillActionAction(target, action) {
-    switch (action) {
-      case 'add-skill-action':
-        return this.addSkillAction();
-      case 'remove-skill-action':
-        return this.removeSkillAction(target);
-        break;
+    if (this.item.system.configurable) {
+      switch (action) {
+        case 'add-skill-action':
+          return this.addSkillAction();
+        case 'remove-skill-action':
+          return this.removeSkillAction(target);
+          break;
+      }
     }
+  }
+
+  /**
+    * Handle one of the add or remove damage reduction buttons.
+    * @param {Element} target  Button or context menu entry that triggered this action.
+    * @param {string} action   Action being triggered.
+    * @returns {Promise|void}
+    */
+  _onSkillActionResourceRequirementAction(target, action) {
+    if (this.item.system.configurable) {
+      switch (action) {
+        case 'add-skill-action-resource-requirement':
+          return this.addSkillActionResourceRequirement(target);
+        case 'remove-skill-action-resource-requirement':
+          return this.removeSkillActionResourceRequirement(target);
+          break;
+      }
+    }
+  }
+
+  addSkillActionResourceRequirement(target) {
+    const actionId = target.closest(".action").dataset.id;
+    let actions = foundry.utils.deepClone(this.item.system.actions);
+    actions[actionId].requirements.resources = [...actions[actionId].requirements.resources, {}];
+    return this.item.update({ "system.actions": actions });
+  }
+
+  removeSkillActionResourceRequirement(target) {
+    const id = target.closest("li").dataset.id;
+    const actionId = target.closest(".action").dataset.id;
+    const actions = foundry.utils.deepClone(this.item.system.actions);
+    actions[actionId].requirements.resources.splice(Number(id), 1);
+    return this.item.update({ "system.actions": actions });
   }
 
   addSkillAction() {

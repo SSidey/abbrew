@@ -1964,6 +1964,12 @@ class AbbrewItemSheet extends ItemSheet {
       if (t.dataset.action)
         this._onSkillActionAction(t, t.dataset.action);
     });
+    html.find(".skill-action-resource-control").click((event) => {
+      const t = event.currentTarget;
+      if (t.dataset.action)
+        this._onSkillActionResourceRequirementAction(t, t.dataset.action);
+    });
+    html.find(".skill-configuration-section :input").prop("disabled", !this.item.system.configurable);
     this._activateArmourPoints(html);
     this._activateAnatomyParts(html);
   }
@@ -2070,12 +2076,43 @@ class AbbrewItemSheet extends ItemSheet {
    * @returns {Promise|void}
    */
   _onSkillActionAction(target, action) {
-    switch (action) {
-      case "add-skill-action":
-        return this.addSkillAction();
-      case "remove-skill-action":
-        return this.removeSkillAction(target);
+    if (this.item.system.configurable) {
+      switch (action) {
+        case "add-skill-action":
+          return this.addSkillAction();
+        case "remove-skill-action":
+          return this.removeSkillAction(target);
+      }
     }
+  }
+  /**
+    * Handle one of the add or remove damage reduction buttons.
+    * @param {Element} target  Button or context menu entry that triggered this action.
+    * @param {string} action   Action being triggered.
+    * @returns {Promise|void}
+    */
+  _onSkillActionResourceRequirementAction(target, action) {
+    if (this.item.system.configurable) {
+      switch (action) {
+        case "add-skill-action-resource-requirement":
+          return this.addSkillActionResourceRequirement(target);
+        case "remove-skill-action-resource-requirement":
+          return this.removeSkillActionResourceRequirement(target);
+      }
+    }
+  }
+  addSkillActionResourceRequirement(target) {
+    const actionId = target.closest(".action").dataset.id;
+    let actions = foundry.utils.deepClone(this.item.system.actions);
+    actions[actionId].requirements.resources = [...actions[actionId].requirements.resources, {}];
+    return this.item.update({ "system.actions": actions });
+  }
+  removeSkillActionResourceRequirement(target) {
+    const id = target.closest("li").dataset.id;
+    const actionId = target.closest(".action").dataset.id;
+    const actions = foundry.utils.deepClone(this.item.system.actions);
+    actions[actionId].requirements.resources.splice(Number(id), 1);
+    return this.item.update({ "system.actions": actions });
   }
   addSkillAction() {
     const actions = this.item.system.actions;
@@ -2465,9 +2502,13 @@ class AbbrewSkill extends AbbrewItemBase {
       new fields.SchemaField({
         requirements: new fields.SchemaField({
           actionCost: new fields.StringField({ ...blankString }),
-          attackType: new fields.StringField({ ...blankString }),
-          concepts: new fields.StringField({ ...blankString }),
-          hands: new fields.NumberField({ required: true, initial: null, integer: true }),
+          weapon: new fields.SchemaField({
+            attackType: new fields.StringField({ ...blankString }),
+            damageType: new fields.StringField({ ...blankString }),
+            hands: new fields.NumberField({ required: true, initial: null, integer: true }),
+            traits: new fields.StringField({ ...blankString })
+          }),
+          freeHands: new fields.NumberField({ required: true, initial: 0, integer: true }),
           momentum: new fields.SchemaField({
             hasRequirement: new fields.BooleanField({ required: true, label: "ABBREW.HasRequirement" }),
             requirement: new fields.NumberField({ ...requiredInteger, initial: 0, min: -10, max: 10 }),
@@ -2476,21 +2517,23 @@ class AbbrewSkill extends AbbrewItemBase {
           resources: new fields.ArrayField(
             new fields.SchemaField({
               name: new fields.StringField({ ...blankString }),
-              value: new fields.NumberField({ ...requiredInteger })
+              value: new fields.NumberField({ ...requiredInteger, initial: 0 })
             })
           ),
-          weapon: new fields.BooleanField({ required: true, label: "ABBREW.EquippedWeapon" })
+          weaponEquipped: new fields.BooleanField({ required: true, label: "ABBREW.EquippedWeapon" })
         }),
         modifiers: new fields.SchemaField({
           damage: new fields.ArrayField(
             new fields.SchemaField({
               type: new fields.StringField({ ...blankString }),
-              value: new fields.NumberField({ ...requiredInteger, initial: 0 })
+              value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+              attribute: new fields.StringField({ ...blankString })
             })
           ),
           guard: new fields.NumberField({ ...requiredInteger, initial: 0 }),
           successes: new fields.NumberField({ ...requiredInteger, initial: 0 })
-        })
+        }),
+        description: new fields.StringField({ ...blankString })
       })
     );
     schema.skillType = new fields.StringField({ ...blankString });

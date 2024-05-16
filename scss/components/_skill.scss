@@ -12,6 +12,16 @@ li.skill-card {
     margin: 2px;
 }
 
-label.slide-toggle > input {
+label.slide-toggle>input {
     display: none;
+}
+
+ol.action-container {
+    list-style-type: none;
+}
+
+li.action {
+    display: flex;
+    flex-direction: column;
+    list-style-type: none;
 }
