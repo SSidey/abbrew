@@ -50,8 +50,8 @@ export default class AbbrewItem extends Item {
     const item = game.items.get(card.dataset.itemId);
 
     switch (action) {
-      case 'damage': await this._onAcceptDamageAction(message.rolls, message.flags.data)
-      case 'finisher': await this._onAcceptFinisherAction(message.rolls, message.flags.data)
+      case 'damage': await this._onAcceptDamageAction(message.rolls, message.flags.data); break;
+      case 'finisher': await this._onAcceptFinisherAction(message.rolls, message.flags.data); break;
     }
   }
 

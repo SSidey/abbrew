@@ -5,19 +5,12 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     const requiredInteger = { required: true, nullable: false, integer: true };
     const schema = {};
 
-    schema.wounds = new fields.SchemaField({
-      active: new fields.SchemaField({
-        value: new fields.NumberField({ ...requiredInteger, initial: 0, max: 100 }),
-        suppressed: new fields.NumberField({ ...requiredInteger, initial: 0, max: 100 }),
-      }),
-      healing: new fields.SchemaField({
+    schema.wounds = new fields.ArrayField(
+      new fields.SchemaField({
+        type: new fields.StringField({ required: true }),
         value: new fields.NumberField({ ...requiredInteger, initial: 0, max: 100 })
-      }),
-      blood: new fields.SchemaField({
-        value: new fields.NumberField({ ...requiredInteger, initial: 100, min: 0, max: 100 }),
-        max: new fields.NumberField({ ...requiredInteger, initial: 100, min: 0, max: 100 })
       })
-    });
+    );
 
     schema.defense = new fields.SchemaField({      
       guard: new fields.SchemaField({

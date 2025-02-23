@@ -1,9 +1,3 @@
-var __defProp = Object.defineProperty;
-var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
-var __publicField = (obj, key2, value) => {
-  __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
-  return value;
-};
 function onManageActiveEffect(event, owner) {
   event.preventDefault();
   const a = event.currentTarget;
@@ -2310,19 +2304,12 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     const fields = foundry.data.fields;
     const requiredInteger = { required: true, nullable: false, integer: true };
     const schema = {};
-    schema.wounds = new fields.SchemaField({
-      active: new fields.SchemaField({
-        value: new fields.NumberField({ ...requiredInteger, initial: 0, max: 100 }),
-        suppressed: new fields.NumberField({ ...requiredInteger, initial: 0, max: 100 })
-      }),
-      healing: new fields.SchemaField({
+    schema.wounds = new fields.ArrayField(
+      new fields.SchemaField({
+        type: new fields.StringField({ required: true }),
         value: new fields.NumberField({ ...requiredInteger, initial: 0, max: 100 })
-      }),
-      blood: new fields.SchemaField({
-        value: new fields.NumberField({ ...requiredInteger, initial: 100, min: 0, max: 100 }),
-        max: new fields.NumberField({ ...requiredInteger, initial: 100, min: 0, max: 100 })
       })
-    });
+    );
     schema.defense = new fields.SchemaField({
       guard: new fields.SchemaField({
         value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
@@ -2677,7 +2664,27 @@ class AbbrewWeapon extends AbbrewItemBase {
     this.formula = `1d10x10cs10`;
   }
 }
-const _AbbrewActor = class _AbbrewActor extends Actor {
+const FINISHERS = {
+  "piercing": {
+    1: { "type": "piercing", "wounds": [{ "type": "bleed", "value": 1 }], "text": "Target bleeds lesser" },
+    2: { "type": "piercing", "wounds": [{ "type": "bleed", "value": 2 }], "text": "Target bleeds moderate" },
+    4: { "type": "piercing", "wounds": [{ "type": "bleed", "value": 3 }], "text": "Target bleeds greater" },
+    8: { "type": "piercing", "wounds": [{ "type": "bleed", "value": 5 }], "text": "Target bleeds critically" }
+  },
+  "slashing": {
+    1: { "type": "slashing", "wounds": [{ "type": "general", "value": 1 }], "text": "Target is cut" },
+    2: { "type": "slashing", "wounds": [{ "type": "bleed", "value": 1 }], "text": "Target bleeds lesser" },
+    4: { "type": "slashing", "wounds": [{ "type": "bleed", "value": 2 }], "text": "Target bleeds moderate" },
+    8: { "type": "slashing", "wounds": [{ "type": "general", "value": 4 }], "text": "Target loses a limb" }
+  },
+  "general": {
+    1: { "type": "general", "wounds": [{ "type": "general", "value": 1 }], "text": "Target is wounded" },
+    2: { "type": "general", "wounds": [{ "type": "general", "value": 2 }], "text": "Target is wounded" },
+    4: { "type": "general", "wounds": [{ "type": "general", "value": 3 }], "text": "Target is wounded" },
+    8: { "type": "general", "wounds": [{ "type": "general", "value": 4 }], "text": "Target is wounded" }
+  }
+};
+class AbbrewActor extends Actor {
   /** @override */
   prepareData() {
     console.log("documentPrepareData");
@@ -2729,6 +2736,7 @@ const _AbbrewActor = class _AbbrewActor extends Actor {
     const finisherCost = this.getFinisherCost(availableFinishers, totalRisk);
     const finisher = this.getFinisher(availableFinishers, finisherCost);
     console.log(finisher);
+    await this.sendFinisherToChat(finisher, finisherCost);
     return await this.applyFinisher(risk, finisher, finisherCost);
   }
   applyModifiersToRisk(rolls, data) {
@@ -2736,7 +2744,7 @@ const _AbbrewActor = class _AbbrewActor extends Actor {
     return 0 + this.system.defense.risk.value + rollSuccesses;
   }
   getAvailableFinishersForDamageType(data) {
-    return data.damage[0].damageType in _AbbrewActor.FINISHERS ? _AbbrewActor.FINISHERS[data.damage[0].damageType] : _AbbrewActor.FINISHERS["general"];
+    return data.damage[0].damageType in FINISHERS ? FINISHERS[data.damage[0].damageType] : FINISHERS["general"];
   }
   getFinisherCost(availableFinishers, risk) {
     const keys = Object.keys(availableFinishers);
@@ -2745,14 +2753,36 @@ const _AbbrewActor = class _AbbrewActor extends Actor {
   getFinisher(availableFinishers, finisherKey) {
     return availableFinishers[finisherKey];
   }
-  async applyFinisher(risk, finisher, finisherCost) {
-    const updates = {
-      /* TODO: WOUNDS HERE ,*/
-      "system.defense.risk.raw": this.reduceRiskForFinisher(risk, finisherCost)
+  // TODO: Move to another module?
+  async sendFinisherToChat(finisher, finisherCost) {
+    var _a;
+    const templateData = {
+      finisherCost,
+      finisher,
+      actor: this,
+      tokenId: ((_a = this.token) == null ? void 0 : _a.uuid) || null
     };
+    const html = await renderTemplate("systems/abbrew/templates/chat/finisher-card.hbs", templateData);
+    const speaker = ChatMessage.getSpeaker({ actor: this.actor });
+    const label = `${finisher.name}`;
+    ChatMessage.create({
+      speaker,
+      // rollMode: rollMode,
+      flavor: label,
+      content: html,
+      flags: { data: { finisher, finisherCost } }
+    });
+  }
+  async applyFinisher(risk, finisher, finisherCost) {
+    const updates = { "system.wounds": this.applyWoundsForFinisher(finisher), "system.defense.risk.raw": this.reduceRiskForFinisher(risk, finisherCost) };
     await this.update(updates);
     console.log("updated");
     return this;
+  }
+  applyWoundsForFinisher(finisher) {
+    const wounds = this.system.wounds;
+    const result = [...wounds, ...finisher.wounds].reduce((a, { type, value }) => ({ ...a, [type]: a[type] ? { type, value: a[type].value + value } : { type, value } }), {});
+    return Object.values(result);
   }
   reduceRiskForFinisher(risk, finisherCost) {
     return risk - finisherCost * 10;
@@ -2787,28 +2817,7 @@ const _AbbrewActor = class _AbbrewActor extends Actor {
     const riskIncrease = damage - damageToGuard;
     return risk + riskIncrease;
   }
-};
-__publicField(_AbbrewActor, "FINISHERS", {
-  "piercing": {
-    1: { "wounds": [{ "type": "general", "value": 1 }], "text": "Target is wounded" },
-    2: { "wounds": [{ "type": "general", "value": 2 }], "text": "Target is wounded" },
-    4: { "wounds": [{ "type": "general", "value": 3 }], "text": "Target is wounded" },
-    8: { "wounds": [{ "type": "general", "value": 4 }], "text": "Target is wounded" }
-  },
-  "slashing": {
-    1: { "wounds": [{ "type": "general", "value": 1 }], "text": "Target is cut" },
-    2: { "wounds": [{ "type": "bleed", "value": 1 }], "text": "Target bleeds lesser" },
-    4: { "wounds": [{ "type": "bleed", "value": 2 }], "text": "Target bleeds moderate" },
-    8: { "wounds": [{ "type": "general", "value": 1 }], "text": "Target loses a limb" }
-  },
-  "general": {
-    1: { "wounds": [{ "type": "general", "value": 1 }], "text": "Target is wounded" },
-    2: { "wounds": [{ "type": "general", "value": 2 }], "text": "Target is wounded" },
-    4: { "wounds": [{ "type": "general", "value": 3 }], "text": "Target is wounded" },
-    8: { "wounds": [{ "type": "general", "value": 4 }], "text": "Target is wounded" }
-  }
-});
-let AbbrewActor = _AbbrewActor;
+}
 class AbbrewItem2 extends Item {
   /**
    * Augment the basic Item data model with additional dynamic data.
@@ -2842,8 +2851,10 @@ class AbbrewItem2 extends Item {
     switch (action) {
       case "damage":
         await this._onAcceptDamageAction(message.rolls, message.flags.data);
+        break;
       case "finisher":
         await this._onAcceptFinisherAction(message.rolls, message.flags.data);
+        break;
     }
   }
   static async _onAcceptDamageAction(rolls, data) {

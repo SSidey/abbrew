@@ -1,3 +1,5 @@
+import { FINISHERS } from "../static/finishers.mjs";
+
 /**
  * Extend the base Actor document by defining a custom roll data structure which is ideal for the Simple system.
  * @extends {Actor}
@@ -87,6 +89,7 @@ export default class AbbrewActor extends Actor {
     const finisherCost = this.getFinisherCost(availableFinishers, totalRisk);
     const finisher = this.getFinisher(availableFinishers, finisherCost);
     console.log(finisher);
+    await this.sendFinisherToChat(finisher, finisherCost);
     return await this.applyFinisher(risk, finisher, finisherCost);
   }
 
@@ -100,7 +103,7 @@ export default class AbbrewActor extends Actor {
   }
 
   getAvailableFinishersForDamageType(data) {
-    return data.damage[0].damageType in AbbrewActor.FINISHERS ? AbbrewActor.FINISHERS[data.damage[0].damageType] : AbbrewActor.FINISHERS['general'];
+    return data.damage[0].damageType in FINISHERS ? FINISHERS[data.damage[0].damageType] : FINISHERS['general'];
   }
 
   getFinisherCost(availableFinishers, risk) {
@@ -113,39 +116,46 @@ export default class AbbrewActor extends Actor {
     return availableFinishers[finisherKey];
   }
 
+  // TODO: Move to another module?
+  async sendFinisherToChat(finisher, finisherCost) {
+    const templateData = {
+      finisherCost,
+      finisher,
+      actor: this,
+      tokenId: this.token?.uuid || null,
+    };
+
+    const html = await renderTemplate("systems/abbrew/templates/chat/finisher-card.hbs", templateData);
+
+    // Initialize chat data.
+    const speaker = ChatMessage.getSpeaker({ actor: this.actor });
+    // const rollMode = game.settings.get('core', 'rollMode');
+    const label = `${finisher.name}`;
+    ChatMessage.create({
+      speaker: speaker,
+      // rollMode: rollMode,
+      flavor: label,
+      content: html,
+      flags: { data: { finisher, finisherCost } }
+    });
+  }
+
   async applyFinisher(risk, finisher, finisherCost) {
-    const updates = { /* TODO: WOUNDS HERE ,*/ "system.defense.risk.raw": this.reduceRiskForFinisher(risk, finisherCost) };
+    const updates = { "system.wounds": this.applyWoundsForFinisher(finisher), "system.defense.risk.raw": this.reduceRiskForFinisher(risk, finisherCost) };
     await this.update(updates);
     console.log('updated');
     return this;
   }
 
+  applyWoundsForFinisher(finisher) {
+    const wounds = this.system.wounds;
+    const result = [...wounds, ...finisher.wounds].reduce((a, { type, value }) => ({ ...a, [type]: a[type] ? { type, value: a[type].value + value } : { type, value } }), {});
+    return Object.values(result);
+  }
+
   reduceRiskForFinisher(risk, finisherCost) {
     return risk - (finisherCost * 10);
   }
-
-  static FINISHERS = {
-    "piercing": {
-      1: { "wounds": [{ "type": "general", "value": 1 }], "text": "Target is wounded" },
-      2: { "wounds": [{ "type": "general", "value": 2 }], "text": "Target is wounded" },
-      4: { "wounds": [{ "type": "general", "value": 3 }], "text": "Target is wounded" },
-      8: { "wounds": [{ "type": "general", "value": 4 }], "text": "Target is wounded" }
-    },
-    "slashing": {
-      1: { "wounds": [{ "type": "general", "value": 1 }], "text": "Target is cut" },
-      2: { "wounds": [{ "type": "bleed", "value": 1 }], "text": "Target bleeds lesser" },
-      4: { "wounds": [{ "type": "bleed", "value": 2 }], "text": "Target bleeds moderate" },
-      8: { "wounds": [{ "type": "general", "value": 1 }], "text": "Target loses a limb" }
-    },
-    "general": {
-      1: { "wounds": [{ "type": "general", "value": 1 }], "text": "Target is wounded" },
-      2: { "wounds": [{ "type": "general", "value": 2 }], "text": "Target is wounded" },
-      4: { "wounds": [{ "type": "general", "value": 3 }], "text": "Target is wounded" },
-      8: { "wounds": [{ "type": "general", "value": 4 }], "text": "Target is wounded" }
-    }
-  }
-
-
 
   applyModifiersToDamage(rolls, data) {
     let rollSuccesses = data.totalSuccesses;
