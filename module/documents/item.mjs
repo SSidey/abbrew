@@ -51,12 +51,18 @@ export default class AbbrewItem extends Item {
 
     switch (action) {
       case 'damage': await this._onAcceptDamageAction(message.rolls, message.flags.data)
+      case 'finisher': await this._onAcceptFinisherAction(message.rolls, message.flags.data)
     }
   }
 
   static async _onAcceptDamageAction(rolls, data) {
     const tokens = canvas.tokens.controlled.filter((token) => token.actor);
     await tokens[0].actor.takeDamage(rolls, data);
+  }
+
+  static async _onAcceptFinisherAction(rolls, data) {
+    const tokens = canvas.tokens.controlled.filter((token) => token.actor);
+    await tokens[0].actor.takeFinisher(rolls, data);
   }
 
   /**

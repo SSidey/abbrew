@@ -1,7 +1,6 @@
 import * as path from 'path';
 
 const config = {
-    root: "src/",
     base: "/systems/abbrew/",
     publicDir: path.resolve(__dirname, "public"),
     server: {

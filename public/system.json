@@ -20,10 +20,10 @@
       "thumbnail": "systems/abbrew/assets/anvil-impact.png"
     }
   ],
-  "version": "2.0.0",
+  "version": "3.0.0",
   "compatibility": {
-    "minimum": 11,
-    "verified": "11.315"
+    "minimum": 12,
+    "verified": "12.331"
   },
   "esmodules": ["./abbrew.mjs"],
   "styles": ["css/abbrew.css"],
@@ -40,8 +40,10 @@
   "manifest": "",
   "download": "",
   "background": "systems/abbrew/assets/anvil-impact.png",
-  "gridDistance": 1,
-  "gridUnits": "m",
-  "primaryTokenAttribute": "blood",
-  "secondaryTokenAttribute": "guard"
+  "grid": {
+    "distance": 1,
+    "units": "m"
+  },
+  "primaryTokenAttribute": "guard",
+  "secondaryTokenAttribute": "risk"
 }

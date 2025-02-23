@@ -103,6 +103,11 @@ export class AbbrewItemSheet extends ItemSheet {
       if (t.dataset.action) this._onSkillActionResourceRequirementAction(t, t.dataset.action);
     });
 
+    html.find(".skill-action-modifier-damage-control").click(event => {
+      const t = event.currentTarget;
+      if (t.dataset.action) this._onSkillActionModifierDamageAction(t, t.dataset.action);
+    });
+
     html.find(".skill-configuration-section :input").prop("disabled", !this.item.system.configurable);
 
     this._activateArmourPoints(html);
@@ -237,6 +242,40 @@ export class AbbrewItemSheet extends ItemSheet {
     }
   }
 
+  /**
+    * Handle one of the add or remove damage reduction buttons.
+    * @param {Element} target  Button or context menu entry that triggered this action.
+    * @param {string} action   Action being triggered.
+    * @returns {Promise|void}
+    */
+  _onSkillActionModifierDamageAction(target, action) {
+    if (this.item.system.configurable) {
+      switch (action) {
+        case 'add-skill-action-modifier-damage':
+          return this.addSkillActionModifierDamage(target);
+        case 'remove-skill-action-modifier-damage':
+          return this.removeSkillActionModifierDamage(target);
+          break;
+      }
+    }
+  }
+
+  addSkillActionModifierDamage(target) {
+    const actionId = target.closest(".action").dataset.id;
+    let actions = foundry.utils.deepClone(this.item.system.actions);
+    actions[actionId].modifiers.damage = [...actions[actionId].modifiers.damage, {}];
+    return this.item.update({ "system.actions": actions });
+
+  }
+
+  removeSkillActionModifierDamage(target) {
+    const id = target.closest("li").dataset.id;
+    const actionId = target.closest(".action").dataset.id;
+    const actions = foundry.utils.deepClone(this.item.system.actions);
+    actions[actionId].modifiers.damage.splice(Number(id), 1);
+    return this.item.update({ "system.actions": actions });
+  }
+
   addSkillActionResourceRequirement(target) {
     const actionId = target.closest(".action").dataset.id;
     let actions = foundry.utils.deepClone(this.item.system.actions);
@@ -277,7 +316,7 @@ export class AbbrewItemSheet extends ItemSheet {
   }
 
   addDamageReduction() {
-    const damageReduction = this.item.system.defense.damageReductions;
+    const damageReduction = this.item.system.defense.damageReduction;
     return this.item.update({ "system.defense.damageReduction": [...damageReduction, {}] });
   }
 

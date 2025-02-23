@@ -31,11 +31,6 @@
                     data-dtype="Number" readonly />
             </div>
         </div>
-        <div class="resilience">
-            <label class="resilience-label">Resilience</label>
-            <input type="text" name="system.defense.resilience" value="{{system.defense.resilience}}"
-                data-dtype="Number" />
-        </div>
     </div>
     {{#each system.defense.damageReduction as |damageReduction key|}}
     <li class="item effect flexrow" data-id="{{key}}">

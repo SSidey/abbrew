@@ -90,6 +90,11 @@ Handlebars.registerHelper('eq', function (arg1, arg2) {
   return (arg1 === arg2);
 });
 
+Handlebars.registerHelper('pos', function (arg1) {
+  console.log('pos');
+  return (arg1 > 0);
+});
+
 Handlebars.registerHelper('getProperty', function (parent, child) {
   const preparedChild = child.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function (match, index) {
     if (+match === 0) return "";

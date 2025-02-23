@@ -85,7 +85,7 @@
                 value="{{action.requirements.freeHands}}" data-dtype="Number" />
         </div>
         <div>
-            <ol class="form-list">
+            <ol class="form-list resource-requirement-container">
                 {{#each action.requirements.resources as |resource j|}}
                 <li class="item resource grid-3col" data-id="{{j}}">
                     <div>
@@ -117,6 +117,92 @@
                     </div>
                 </li>
             </ol>
+        </div>
+        <div>
+            <div>
+                <label>Guard</label>
+                <input type="text" name="system.actions.{{i}}.modifiers.guard"
+                    value="{{action.modifiers.guard}}" data-dtype="String" />
+            </div>
+            <div>
+                <label>Dodge</label>
+                <input type="text" name="system.actions.{{i}}.modifiers.dodge"
+                    value="{{action.modifiers.dodge}}" data-dtype="String" />
+            </div>
+            <div>
+                <label>Block</label>
+                <input type="text" name="system.actions.{{i}}.modifiers.block"
+                    value="{{action.modifiers.block}}" data-dtype="String" />
+            </div>
+            <div>
+                <label>Successes</label>
+                <input type="text" name="system.actions.{{i}}.modifiers.successes"
+                    value="{{action.modifiers.successes}}" data-dtype="Number" />
+            </div>
+            <ol class="form-list damage-modifier-container">
+                {{#each action.modifiers.damage as |damageModifier k|}}
+                <li class="item resource grid-3col" data-id="{{k}}">
+                    <div>
+                        <label>Value</label>
+                        <input type="text" name="system.actions.{{i}}.modifiers.damage.{{k}}.value"
+                            value="{{damageModifier.value}}" data-dtype="Number" />
+                    </div>
+                    <div>
+                        <label>Attack Type</label>
+                        <select name="system.actions.{{i}}.modifiers.damage.{{k}}.type">
+                            {{selectOptions ../../config.concepts selected=damageModifier.type
+                            blank=""
+                            localize=true}}
+                        </select>
+                    </div>
+                    <div>
+                        <a class="skill-action-modifier-damage-control"
+                            data-action="remove-skill-action-modifier-damage">
+                            <i class="fa-solid fa-minus"></i>
+                        </a>
+                    </div>
+                </li>
+                {{/each}}
+                <li class="skillModifierDamage add">
+                    <div class="form-group">
+                        <label>
+                            <a class="skill-action-modifier-damage-control"
+                                data-action="add-skill-action-modifier-damage">
+                                Add Damage Modifier
+                                <i class="fa-solid fa-plus"></i>
+                            </a>
+                        </label>
+                    </div>
+                </li>
+            </ol>
+        </div>
+        <div class="restores">
+            <label>Restores</label>
+            <div>
+                <label>Active Wounds</label>
+                <input type="text" name="system.actions.{{i}}.restores.wounds.active"
+                    value="{{action.restores.wounds.active}}" data-dtype="String" />
+            </div>
+            <div>
+                <label>Healing Wounds</label>
+                <input type="text" name="system.actions.{{i}}.restores.healing"
+                    value="{{action.restores.wounds.healing}}" data-dtype="String" />
+            </div>
+            <div>
+                <label>Guard</label>
+                <input type="text" name="system.actions.{{i}}.restores.guard"
+                    value="{{action.restores.guard}}" data-dtype="String" />
+            </div>
+            <div>
+                <label>Dodge</label>
+                <input type="text" name="system.actions.{{i}}.restores.dodge"
+                    value="{{action.restores.dodge}}" data-dtype="String" />
+            </div>
+            <div>
+                <label>Block</label>
+                <input type="text" name="system.actions.{{i}}.restores.block"
+                    value="{{action.restores.block}}" data-dtype="String" />
+            </div>
         </div>
         <div>
             <a class="skill-action-control remove-skill-action" data-action="remove-skill-action">

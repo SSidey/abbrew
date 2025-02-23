@@ -37,13 +37,23 @@ export default class AbbrewSkill extends AbbrewItemBase {
                 modifiers: new fields.SchemaField({
                     damage: new fields.ArrayField(
                         new fields.SchemaField({
-                            type: new fields.StringField({ ...blankString }),
                             value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-                            attribute: new fields.StringField({ ...blankString })
+                            type: new fields.StringField({ ...blankString })
                         })
                     ),
-                    guard: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                    guard: new fields.StringField({ ...blankString }),
+                    dodge: new fields.StringField({ ...blankString }),
+                    block: new fields.StringField({ ...blankString }),
                     successes: new fields.NumberField({ ...requiredInteger, initial: 0 })
+                }),
+                restores: new fields.SchemaField({
+                    wounds: new fields.SchemaField({
+                        active: new fields.StringField({ ...blankString }),
+                        healing: new fields.StringField({ ...blankString })
+                    }),
+                    guard: new fields.StringField({ ...blankString }),
+                    dodge: new fields.StringField({ ...blankString }),
+                    block: new fields.StringField({ ...blankString })
                 }),
                 description: new fields.StringField({ ...blankString })
             })

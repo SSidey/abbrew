@@ -1,3 +1,9 @@
+var __defProp = Object.defineProperty;
+var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
+var __publicField = (obj, key2, value) => {
+  __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
+  return value;
+};
 function onManageActiveEffect(event, owner) {
   event.preventDefault();
   const a = event.currentTarget;
@@ -1969,6 +1975,11 @@ class AbbrewItemSheet extends ItemSheet {
       if (t.dataset.action)
         this._onSkillActionResourceRequirementAction(t, t.dataset.action);
     });
+    html.find(".skill-action-modifier-damage-control").click((event) => {
+      const t = event.currentTarget;
+      if (t.dataset.action)
+        this._onSkillActionModifierDamageAction(t, t.dataset.action);
+    });
     html.find(".skill-configuration-section :input").prop("disabled", !this.item.system.configurable);
     this._activateArmourPoints(html);
     this._activateAnatomyParts(html);
@@ -2101,6 +2112,35 @@ class AbbrewItemSheet extends ItemSheet {
       }
     }
   }
+  /**
+    * Handle one of the add or remove damage reduction buttons.
+    * @param {Element} target  Button or context menu entry that triggered this action.
+    * @param {string} action   Action being triggered.
+    * @returns {Promise|void}
+    */
+  _onSkillActionModifierDamageAction(target, action) {
+    if (this.item.system.configurable) {
+      switch (action) {
+        case "add-skill-action-modifier-damage":
+          return this.addSkillActionModifierDamage(target);
+        case "remove-skill-action-modifier-damage":
+          return this.removeSkillActionModifierDamage(target);
+      }
+    }
+  }
+  addSkillActionModifierDamage(target) {
+    const actionId = target.closest(".action").dataset.id;
+    let actions = foundry.utils.deepClone(this.item.system.actions);
+    actions[actionId].modifiers.damage = [...actions[actionId].modifiers.damage, {}];
+    return this.item.update({ "system.actions": actions });
+  }
+  removeSkillActionModifierDamage(target) {
+    const id = target.closest("li").dataset.id;
+    const actionId = target.closest(".action").dataset.id;
+    const actions = foundry.utils.deepClone(this.item.system.actions);
+    actions[actionId].modifiers.damage.splice(Number(id), 1);
+    return this.item.update({ "system.actions": actions });
+  }
   addSkillActionResourceRequirement(target) {
     const actionId = target.closest(".action").dataset.id;
     let actions = foundry.utils.deepClone(this.item.system.actions);
@@ -2135,7 +2175,7 @@ class AbbrewItemSheet extends ItemSheet {
     return this.item.update({ "system.attackProfiles": attackProfiles });
   }
   addDamageReduction() {
-    const damageReduction = this.item.system.defense.damageReductions;
+    const damageReduction = this.item.system.defense.damageReduction;
     return this.item.update({ "system.defense.damageReduction": [...damageReduction, {}] });
   }
   removeDamageReduction(target) {
@@ -2284,7 +2324,6 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       })
     });
     schema.defense = new fields.SchemaField({
-      resilience: new fields.NumberField({ ...requiredInteger, initial: 1 }),
       guard: new fields.SchemaField({
         value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
         base: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
@@ -2304,6 +2343,11 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       dodge: new fields.SchemaField({
         value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
         max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 })
+      }),
+      risk: new fields.SchemaField({
+        raw: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 100 }),
+        value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 10 }),
+        max: new fields.NumberField({ ...requiredInteger, initial: 10, min: 10, max: 10 })
       })
     });
     schema.biography = new fields.StringField({ required: true, blank: true });
@@ -2332,9 +2376,10 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   prepareBaseData() {
     console.log("base");
     for (const key2 in this.attributes) {
-      this.attributes[key2].value = 1 + this.parent.items.filter((i) => i.type === "skill" && i.system.skillType === "background" && i.system.attributeIncrease === key2).length;
+      this.attributes[key2].value = 0 + this.parent.items.filter((i) => i.type === "skill" && i.system.skillType === "background" && i.system.attributeIncrease === key2).length;
       this.attributes[key2].rank = this.attributes[key2].value;
     }
+    this.defense.risk.value = Math.floor(this.defense.risk.raw / 10);
   }
   // Post Active Effects
   prepareDerivedData() {
@@ -2377,18 +2422,10 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       (result, dr) => {
         const drType = dr.type;
         if (Object.keys(result).includes(drType)) {
-          if (result[drType].value < dr.value) {
-            result[drType].value = dr.value;
-          }
-          if (result[drType].resistance < dr.resistance) {
-            result[drType].resistance = dr.resistance;
-          }
-          if (result[drType].immunity < dr.immunity) {
-            result[drType].immunity = dr.immunity;
-          }
-          if (result[drType].weakness < dr.weakness) {
-            result[drType].weakness = dr.weakness;
-          }
+          result[drType].value += dr.value;
+          result[drType].resistance += dr.resistance;
+          result[drType].immunity += dr.immunity;
+          result[drType].weakness += dr.weakness;
         } else {
           result[drType] = { type: dr.type, value: dr.value, resistance: dr.resistance, immunity: dr.immunity, weakness: dr.weakness, label: dr.label };
         }
@@ -2396,6 +2433,7 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       },
       {}
     );
+    this.defense.damageReduction.length = 0;
     Object.values(flatDR).map((v) => this.defense.damageReduction.push(v));
   }
   _prepareGuard(armour, anatomy) {
@@ -2525,13 +2563,23 @@ class AbbrewSkill extends AbbrewItemBase {
         modifiers: new fields.SchemaField({
           damage: new fields.ArrayField(
             new fields.SchemaField({
-              type: new fields.StringField({ ...blankString }),
               value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-              attribute: new fields.StringField({ ...blankString })
+              type: new fields.StringField({ ...blankString })
             })
           ),
-          guard: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+          guard: new fields.StringField({ ...blankString }),
+          dodge: new fields.StringField({ ...blankString }),
+          block: new fields.StringField({ ...blankString }),
           successes: new fields.NumberField({ ...requiredInteger, initial: 0 })
+        }),
+        restores: new fields.SchemaField({
+          wounds: new fields.SchemaField({
+            active: new fields.StringField({ ...blankString }),
+            healing: new fields.StringField({ ...blankString })
+          }),
+          guard: new fields.StringField({ ...blankString }),
+          dodge: new fields.StringField({ ...blankString }),
+          block: new fields.StringField({ ...blankString })
         }),
         description: new fields.StringField({ ...blankString })
       })
@@ -2629,7 +2677,7 @@ class AbbrewWeapon extends AbbrewItemBase {
     this.formula = `1d10x10cs10`;
   }
 }
-class AbbrewActor extends Actor {
+const _AbbrewActor = class _AbbrewActor extends Actor {
   /** @override */
   prepareData() {
     console.log("documentPrepareData");
@@ -2665,42 +2713,102 @@ class AbbrewActor extends Actor {
   }
   async takeDamage(rolls, data) {
     console.log("Got me");
-    let totalSuccesses = data.totalSuccesses;
     let guard = this.system.defense.guard.value;
-    let activeWounds = this.system.wounds.active.value;
-    const maxGuardDamage = this.system.defense.damageReduction.reduce((a, b) => {
-      if (b.value > a) {
-        a = b.value;
-      }
-      return a;
-    }, 1);
-    const guardBreak = rolls[0].dice[0].results[0].result > guard;
-    if (guardBreak) {
-      totalSuccesses += 1;
-    }
-    const damage = data.damage.reduce((result, d) => {
-      const damageReduction = this.system.defense.damageReduction.some((dr) => dr.type === d.damageType) ? this.system.defense.damageReduction.filter((dr) => dr.type === d.damageType)[0] : { immunity: 0, resistance: 0, weakness: 0, value: 0 };
-      if (damageReduction.immunity > 0) {
-        return result;
-      }
-      const firstRoll = rolls[0].dice[0].results[0].result ?? 0;
-      const dodge2 = this.system.defense.dodge.value;
-      const damageTypeSuccesses = firstRoll > dodge2 ? totalSuccesses + damageReduction.weakness - damageReduction.resistance : -1;
-      if (damageTypeSuccesses < 0) {
-        return result;
-      }
-      const dmg = damageTypeSuccesses == 0 ? Math.max(0, d.value - damageReduction.value) : d.value;
-      return result += dmg;
-    }, 0);
-    const wounds = activeWounds + damage;
-    guard = Math.max(0, guard - maxGuardDamage);
-    const dodge = Math.max(0, this.system.defense.dodge.value - 1);
-    const updates = { "system.wounds.active.value": wounds, "system.defense.guard.value": guard, "system.defense.dodge.value": dodge };
+    let risk = this.system.defense.risk.raw;
+    const damage = this.applyModifiersToDamage(rolls, data);
+    const updates = { "system.defense.guard.value": this.calculateGuard(damage, guard), "system.defense.risk.raw": this.calculateRisk(damage, guard, risk) };
     await this.update(updates);
     console.log("updated");
     return this;
   }
-}
+  async takeFinisher(rolls, data) {
+    const risk = this.system.defense.risk.raw;
+    console.log("Finisher");
+    const totalRisk = this.applyModifiersToRisk(rolls, data);
+    const availableFinishers = this.getAvailableFinishersForDamageType(data);
+    const finisherCost = this.getFinisherCost(availableFinishers, totalRisk);
+    const finisher = this.getFinisher(availableFinishers, finisherCost);
+    console.log(finisher);
+    return await this.applyFinisher(risk, finisher, finisherCost);
+  }
+  applyModifiersToRisk(rolls, data) {
+    const rollSuccesses = data.totalSuccesses;
+    return 0 + this.system.defense.risk.value + rollSuccesses;
+  }
+  getAvailableFinishersForDamageType(data) {
+    return data.damage[0].damageType in _AbbrewActor.FINISHERS ? _AbbrewActor.FINISHERS[data.damage[0].damageType] : _AbbrewActor.FINISHERS["general"];
+  }
+  getFinisherCost(availableFinishers, risk) {
+    const keys = Object.keys(availableFinishers);
+    return keys.filter((value) => value <= risk).pop();
+  }
+  getFinisher(availableFinishers, finisherKey) {
+    return availableFinishers[finisherKey];
+  }
+  async applyFinisher(risk, finisher, finisherCost) {
+    const updates = {
+      /* TODO: WOUNDS HERE ,*/
+      "system.defense.risk.raw": this.reduceRiskForFinisher(risk, finisherCost)
+    };
+    await this.update(updates);
+    console.log("updated");
+    return this;
+  }
+  reduceRiskForFinisher(risk, finisherCost) {
+    return risk - finisherCost * 10;
+  }
+  applyModifiersToDamage(rolls, data) {
+    let rollSuccesses = data.totalSuccesses;
+    return data.damage.reduce((result, d) => {
+      rolls[0].dice[0].results[0].result ?? 0;
+      const damageTypeSuccesses = (
+        /* firstRoll > dodge ? */
+        rollSuccesses
+      );
+      if (damageTypeSuccesses < 0) {
+        return result;
+      }
+      const dmg = (
+        /* damageTypeSuccesses == 0 ? Math.max(0, d.value - damageReduction.value) : */
+        d.value
+      );
+      return result += dmg;
+    }, 0);
+  }
+  calculateGuard(damage, guard) {
+    this.calculateDamageToGuard(damage, guard);
+    return Math.max(0, guard - damage);
+  }
+  calculateDamageToGuard(damage, guard) {
+    return Math.min(damage, guard);
+  }
+  calculateRisk(damage, guard, risk) {
+    const damageToGuard = this.calculateDamageToGuard(damage, guard);
+    const riskIncrease = damage - damageToGuard;
+    return risk + riskIncrease;
+  }
+};
+__publicField(_AbbrewActor, "FINISHERS", {
+  "piercing": {
+    1: { "wounds": [{ "type": "general", "value": 1 }], "text": "Target is wounded" },
+    2: { "wounds": [{ "type": "general", "value": 2 }], "text": "Target is wounded" },
+    4: { "wounds": [{ "type": "general", "value": 3 }], "text": "Target is wounded" },
+    8: { "wounds": [{ "type": "general", "value": 4 }], "text": "Target is wounded" }
+  },
+  "slashing": {
+    1: { "wounds": [{ "type": "general", "value": 1 }], "text": "Target is cut" },
+    2: { "wounds": [{ "type": "bleed", "value": 1 }], "text": "Target bleeds lesser" },
+    4: { "wounds": [{ "type": "bleed", "value": 2 }], "text": "Target bleeds moderate" },
+    8: { "wounds": [{ "type": "general", "value": 1 }], "text": "Target loses a limb" }
+  },
+  "general": {
+    1: { "wounds": [{ "type": "general", "value": 1 }], "text": "Target is wounded" },
+    2: { "wounds": [{ "type": "general", "value": 2 }], "text": "Target is wounded" },
+    4: { "wounds": [{ "type": "general", "value": 3 }], "text": "Target is wounded" },
+    8: { "wounds": [{ "type": "general", "value": 4 }], "text": "Target is wounded" }
+  }
+});
+let AbbrewActor = _AbbrewActor;
 class AbbrewItem2 extends Item {
   /**
    * Augment the basic Item data model with additional dynamic data.
@@ -2734,11 +2842,17 @@ class AbbrewItem2 extends Item {
     switch (action) {
       case "damage":
         await this._onAcceptDamageAction(message.rolls, message.flags.data);
+      case "finisher":
+        await this._onAcceptFinisherAction(message.rolls, message.flags.data);
     }
   }
   static async _onAcceptDamageAction(rolls, data) {
     const tokens = canvas.tokens.controlled.filter((token) => token.actor);
     await tokens[0].actor.takeDamage(rolls, data);
+  }
+  static async _onAcceptFinisherAction(rolls, data) {
+    const tokens = canvas.tokens.controlled.filter((token) => token.actor);
+    await tokens[0].actor.takeFinisher(rolls, data);
   }
   /**
    * Handle clickable rolls.
@@ -2807,6 +2921,10 @@ Handlebars.registerHelper("toLowerCase", function(str) {
 Handlebars.registerHelper("eq", function(arg1, arg2) {
   console.log("eq");
   return arg1 === arg2;
+});
+Handlebars.registerHelper("pos", function(arg1) {
+  console.log("pos");
+  return arg1 > 0;
 });
 Handlebars.registerHelper("getProperty", function(parent, child) {
   const preparedChild = child.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function(match, index) {

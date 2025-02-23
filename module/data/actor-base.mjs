@@ -19,8 +19,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       })
     });
 
-    schema.defense = new fields.SchemaField({
-      resilience: new fields.NumberField({ ...requiredInteger, initial: 1 }),
+    schema.defense = new fields.SchemaField({      
       guard: new fields.SchemaField({
         value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
         base: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
@@ -40,6 +39,11 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       dodge: new fields.SchemaField({
         value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
         max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 })
+      }),
+      risk: new fields.SchemaField({
+        raw: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 100}),
+        value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 10 }),
+        max: new fields.NumberField({ ...requiredInteger, initial: 10, min: 10, max: 10 })
       })
     });
 
@@ -78,9 +82,11 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     console.log('base');
     // Loop through attribute scores, and determine their base rank.
     for (const key in this.attributes) {
-      this.attributes[key].value = 1 + this.parent.items.filter(i => i.type === 'skill' && i.system.skillType === 'background' && i.system.attributeIncrease === key).length;
+      this.attributes[key].value = 0 + this.parent.items.filter(i => i.type === 'skill' && i.system.skillType === 'background' && i.system.attributeIncrease === key).length;
       this.attributes[key].rank = this.attributes[key].value;
     }
+
+    this.defense.risk.value = Math.floor(this.defense.risk.raw / 10);
   }
 
   // Post Active Effects
@@ -138,18 +144,18 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     const flatDR = damageReduction.reduce((result, dr) => {
       const drType = dr.type;
       if (Object.keys(result).includes(drType)) {
-        if (result[drType].value < dr.value) {
-          result[drType].value = dr.value;
-        }
-        if (result[drType].resistance < dr.resistance) {
-          result[drType].resistance = dr.resistance;
-        }
-        if (result[drType].immunity < dr.immunity) {
-          result[drType].immunity = dr.immunity;
-        }
-        if (result[drType].weakness < dr.weakness) {
-          result[drType].weakness = dr.weakness;
-        }
+        // if (result[drType].value < dr.value) {
+          result[drType].value += dr.value;
+        // }
+        // if (result[drType].resistance < dr.resistance) {
+          result[drType].resistance += dr.resistance;
+        // }
+        // if (result[drType].immunity < dr.immunity) {
+          result[drType].immunity += dr.immunity;
+        // }
+        // if (result[drType].weakness < dr.weakness) {
+          result[drType].weakness += dr.weakness;
+        // }
       }
       else {
         result[drType] = { type: dr.type, value: dr.value, resistance: dr.resistance, immunity: dr.immunity, weakness: dr.weakness, label: dr.label };
@@ -158,6 +164,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     }, {}
     );
 
+    this.defense.damageReduction.length = 0;
     Object.values(flatDR).map(v => this.defense.damageReduction.push(v));
   }
 

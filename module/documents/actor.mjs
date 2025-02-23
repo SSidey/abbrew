@@ -47,55 +47,142 @@ export default class AbbrewActor extends Actor {
 
   async takeDamage(rolls, data) {
     console.log('Got me');
-    let totalSuccesses = data.totalSuccesses;
     let guard = this.system.defense.guard.value;
-    let activeWounds = this.system.wounds.active.value;
-    const maxGuardDamage = this.system.defense.damageReduction.reduce((a, b) => {
-      if (b.value > a) {
-        a = b.value;
-      }
-      return a;
-    }, 1);
-    // TODO: Do we want guard damage to scale with weapon damage?
-    // const guardDamage = Math.min(maxGuardDamage, damage);
+    let risk = this.system.defense.risk.raw;
+    // let activeWounds = this.system.wounds.active.value;
+    // const maxGuardDamage = this.system.defense.damageReduction.reduce((a, b) => {
+    //   if (b.value > a) {
+    //     a = b.value;
+    //   }
+    //   return a;
+    // }, 1);
 
     // TODO: Pass Damage Types
     // TODO: Determine DRs by damage type
 
-    const guardBreak = rolls[0].dice[0].results[0].result > guard;
-    if (guardBreak) {
-      totalSuccesses += 1;
-    }
+    // TODO: Do we still want this?
+    // const guardBreak = rolls[0].dice[0].results[0].result > guard;
+    // if (guardBreak) {
+    //   totalSuccesses += 1;
+    // }
 
-    const damage = data.damage.reduce((result, d) => {
-      const damageReduction = this.system.defense.damageReduction.some(dr => dr.type === d.damageType) ? this.system.defense.damageReduction.filter(dr => dr.type === d.damageType)[0] : { immunity: 0, resistance: 0, weakness: 0, value: 0 };
+    const damage = this.applyModifiersToDamage(rolls, data);
+
+    // const wounds = activeWounds + damage;
+
+
+    // const dodge = Math.max(0, this.system.defense.dodge.value - 1);
+
+    const updates = { "system.defense.guard.value": this.calculateGuard(damage, guard), "system.defense.risk.raw": this.calculateRisk(damage, guard, risk) };
+    await this.update(updates);
+    console.log('updated');
+    return this;
+  }
+
+  async takeFinisher(rolls, data) {
+    const risk = this.system.defense.risk.raw;
+    console.log('Finisher');
+    const totalRisk = this.applyModifiersToRisk(rolls, data);
+    const availableFinishers = this.getAvailableFinishersForDamageType(data);
+    const finisherCost = this.getFinisherCost(availableFinishers, totalRisk);
+    const finisher = this.getFinisher(availableFinishers, finisherCost);
+    console.log(finisher);
+    return await this.applyFinisher(risk, finisher, finisherCost);
+  }
+
+  applyModifiersToRisk(rolls, data) {
+    const rollSuccesses = data.totalSuccesses;
+    // TODO: Size Diff
+    // TODO: Tier Diff
+    // TODO: Lethal Diff
+    // TODO: Material Tier Diff
+    return 0 + this.system.defense.risk.value + rollSuccesses;
+  }
+
+  getAvailableFinishersForDamageType(data) {
+    return data.damage[0].damageType in AbbrewActor.FINISHERS ? AbbrewActor.FINISHERS[data.damage[0].damageType] : AbbrewActor.FINISHERS['general'];
+  }
+
+  getFinisherCost(availableFinishers, risk) {
+    // TODO: Apply weapon size limit
+    const keys = Object.keys(availableFinishers);
+    return keys.filter((value) => value <= risk).pop();
+  }
+
+  getFinisher(availableFinishers, finisherKey) {
+    return availableFinishers[finisherKey];
+  }
+
+  async applyFinisher(risk, finisher, finisherCost) {
+    const updates = { /* TODO: WOUNDS HERE ,*/ "system.defense.risk.raw": this.reduceRiskForFinisher(risk, finisherCost) };
+    await this.update(updates);
+    console.log('updated');
+    return this;
+  }
+
+  reduceRiskForFinisher(risk, finisherCost) {
+    return risk - (finisherCost * 10);
+  }
+
+  static FINISHERS = {
+    "piercing": {
+      1: { "wounds": [{ "type": "general", "value": 1 }], "text": "Target is wounded" },
+      2: { "wounds": [{ "type": "general", "value": 2 }], "text": "Target is wounded" },
+      4: { "wounds": [{ "type": "general", "value": 3 }], "text": "Target is wounded" },
+      8: { "wounds": [{ "type": "general", "value": 4 }], "text": "Target is wounded" }
+    },
+    "slashing": {
+      1: { "wounds": [{ "type": "general", "value": 1 }], "text": "Target is cut" },
+      2: { "wounds": [{ "type": "bleed", "value": 1 }], "text": "Target bleeds lesser" },
+      4: { "wounds": [{ "type": "bleed", "value": 2 }], "text": "Target bleeds moderate" },
+      8: { "wounds": [{ "type": "general", "value": 1 }], "text": "Target loses a limb" }
+    },
+    "general": {
+      1: { "wounds": [{ "type": "general", "value": 1 }], "text": "Target is wounded" },
+      2: { "wounds": [{ "type": "general", "value": 2 }], "text": "Target is wounded" },
+      4: { "wounds": [{ "type": "general", "value": 3 }], "text": "Target is wounded" },
+      8: { "wounds": [{ "type": "general", "value": 4 }], "text": "Target is wounded" }
+    }
+  }
+
+
+
+  applyModifiersToDamage(rolls, data) {
+    let rollSuccesses = data.totalSuccesses;
+    return data.damage.reduce((result, d) => {
+      // TODO: Do we do damage reduction, or just give negations per DR?
+      const damageReduction = /* this.system.defense.damageReduction.some(dr => dr.type === d.damageType) ? this.system.defense.damageReduction.filter(dr => dr.type === d.damageType)[0] : */ { immunity: 0, resistance: 0, weakness: 0, value: 0 };
       if (damageReduction.immunity > 0) {
         return result;
       }
 
       const firstRoll = rolls[0].dice[0].results[0].result ?? 0;
-      const dodge = this.system.defense.dodge.value;
-      const damageTypeSuccesses = firstRoll > dodge ? totalSuccesses + damageReduction.weakness - damageReduction.resistance : -1;
+      // const dodge = this.system.defense.dodge.value;
+      const damageTypeSuccesses = /* firstRoll > dodge ? */ rollSuccesses/*  + damageReduction.weakness - damageReduction.resistance : -1 */;
 
       if (damageTypeSuccesses < 0) {
         return result;
       }
 
-      const dmg = damageTypeSuccesses == 0 ? Math.max(0, d.value - damageReduction.value) : d.value;
+      const dmg = /* damageTypeSuccesses == 0 ? Math.max(0, d.value - damageReduction.value) : */ d.value;
 
       return result += dmg;
     }, 0);
+  }
 
-    const wounds = activeWounds + damage;
+  calculateGuard(damage, guard) {
+    const damageToGuard = this.calculateDamageToGuard(damage, guard);
+    return Math.max(0, guard - damage);/* Math.max(0, guard - maxGuardDamage); */
+  }
 
-    guard = Math.max(0, guard - maxGuardDamage);
+  calculateDamageToGuard(damage, guard) {
+    return Math.min(damage, guard);
+  }
 
-    const dodge = Math.max(0, this.system.defense.dodge.value - 1);
-
-    const updates = { "system.wounds.active.value": wounds, "system.defense.guard.value": guard, "system.defense.dodge.value": dodge };
-    await this.update(updates);
-    console.log('updated');
-    return this;
+  calculateRisk(damage, guard, risk) {
+    const damageToGuard = this.calculateDamageToGuard(damage, guard);
+    const riskIncrease = damage - damageToGuard;
+    return risk + riskIncrease;
   }
 
 }
