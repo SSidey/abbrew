@@ -29,8 +29,18 @@ ABBREW.attributeAbbreviations = {
 
 ABBREW.HasRequirement = "ABBREW.HasRequirement";
 ABBREW.SkillAttributeIncrease = "ABBREW.AttributeIncrease";
+ABBREW.skillActivationType = "ABBREW.SkillActivationType";
+ABBREW.skillActivationTypes = {
+  standalone: 'ABBREW.SkillActivationTypes.standalone',
+  synergy: 'ABBREW.SkillActivationTypes.synergy'
+}
 ABBREW.EquippedWeapon = "ABBREW.EquippedWeapon";
 ABBREW.Damage = "ABBREW.Damage";
+ABBREW.operator = "ABBREW.Operator"
+ABBREW.operators = {
+  equal: "ABBREW.Operators.equal",
+  add: "ABBREW.Operators.add",  
+}
 
 ABBREW.Defense = {
   guard: 'ABBREW.Defense.guard'

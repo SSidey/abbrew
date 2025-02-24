@@ -35,6 +35,16 @@
       "guard": "Guard"
     },
     "AttributeIncrease": "Attribute Increase",
+    "SkillActivationType": "Activation Type",
+    "SkillActivationTypes": {
+      "standalone": "Standalone",
+      "synergy": "synergy"
+    },
+    "Operator": "Operator",
+    "Operators": {
+      "equal": "=",
+      "add": "+="
+    },
     "AttributeRankIncrease": "Attribute Rank Increase",
     "SkillType": "Skill Type",
     "Resistance": "Resistance",

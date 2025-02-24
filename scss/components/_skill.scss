@@ -4,12 +4,43 @@ ol.skill-container {
     list-style-type: none;
 }
 
-li.skill-card {
+.skill {
+    position: relative;
+}
+
+div.skill-card {
     height: 200px;
     border: thin solid rgb(0, 0, 0);
     border-radius: 2%;
-    padding: 1em;
+    padding: 0.2em;
     margin: 2px;
+    display: grid;
+    grid-template-rows: repeat(8, 1fr)
+}
+
+.skill-name {
+    justify-self: center;
+}
+
+.skill-image {
+    display: grid;
+    grid-row: span 2;
+    width: 80%;
+    justify-self: center;
+}
+
+.skill-controls {
+    // display: inline;
+    // grid-row: 8;
+    float: right;
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    z-index: 1000;
+    background-color: #c91111;
+    padding: 5px;
+    color: #FFFFFF;
+    font-weight: bold;
 }
 
 label.slide-toggle>input {

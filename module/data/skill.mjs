@@ -12,48 +12,105 @@ export default class AbbrewSkill extends AbbrewItemBase {
         schema.activatable = new fields.BooleanField({ required: true, label: "ABBREW.Activatable" });
         schema.actions = new fields.ArrayField(
             new fields.SchemaField({
-                requirements: new fields.SchemaField({
-                    actionCost: new fields.StringField({ ...blankString }),
-                    weapon: new fields.SchemaField({
-                        attackType: new fields.StringField({ ...blankString }),
-                        damageType: new fields.StringField({ ...blankString }),
-                        hands: new fields.NumberField({ required: true, initial: null, integer: true }),
-                        traits: new fields.StringField({ ...blankString })
+                activationType: new fields.StringField({ ...blankString }), // Standalone, Synergy
+                actionCost: new fields.StringField({ ...blankString }),
+                modifiers: new fields.SchemaField({
+                    damage:
+                        new fields.SchemaField({
+                            self: new fields.ArrayField(
+                                new fields.SchemaField({
+                                    value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                                    type: new fields.StringField({ ...blankString }),
+                                    operator: new fields.StringField({ ...blankString })
+                                })
+                            ),
+                            target: new fields.ArrayField(
+                                new fields.SchemaField({
+                                    value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                                    type: new fields.StringField({ ...blankString }),
+                                    operator: new fields.StringField({ ...blankString })
+                                })
+                            )
+                        }),
+                    guard: new fields.SchemaField({
+                        self: new fields.SchemaField({
+                            value: new fields.NumberField({ required: true, nullable: true, integer: true, initial: 0 }),
+                            operator: new fields.StringField({ ...blankString })
+                        }),
+                        target: new fields.SchemaField({
+                            value: new fields.NumberField({ required: true, nullable: true, integer: true, initial: 0 }),
+                            operator: new fields.StringField({ ...blankString })
+                        })
                     }),
-                    freeHands: new fields.NumberField({ required: true, initial: 0, integer: true }),
-                    momentum: new fields.SchemaField({
-                        hasRequirement: new fields.BooleanField({ required: true, label: "ABBREW.HasRequirement" }),
-                        requirement: new fields.NumberField({ ...requiredInteger, initial: 0, min: -10, max: 10 }),
-                        change: new fields.NumberField({ ...requiredInteger, initial: 0, min: -20, max: 20 })
+                    successes: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                    risk: new fields.SchemaField({
+                        self: new fields.SchemaField({
+                            value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                            operator: new fields.StringField({ ...blankString })
+                        }),
+                        target: new fields.SchemaField({
+                            value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                            operator: new fields.StringField({ ...blankString })
+                        })
+                    }),
+                    wounds: new fields.SchemaField({
+                        self: new fields.ArrayField(
+                            new fields.SchemaField({
+                                type: new fields.StringField({ ...blankString }),
+                                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                                operator: new fields.StringField({ ...blankString })
+                            })
+                        ),
+                        target: new fields.ArrayField(
+                            new fields.SchemaField({
+                                type: new fields.StringField({ ...blankString }),
+                                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                                operator: new fields.StringField({ ...blankString })
+                            })
+                        )
+                    }),
+                    resolve: new fields.SchemaField({
+                        self: new fields.SchemaField({
+                            value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                            operator: new fields.StringField({ ...blankString })
+                        }),
+                        target: new fields.SchemaField({
+                            value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                            operator: new fields.StringField({ ...blankString })
+                        })
                     }),
                     resources: new fields.ArrayField(
                         new fields.SchemaField({
-                            name: new fields.StringField({ ...blankString }),
-                            value: new fields.NumberField({ ...requiredInteger, initial: 0 })
+                            self: new fields.SchemaField({
+                                name: new fields.StringField({ ...blankString }),
+                                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                                operator: new fields.StringField({ ...blankString }),
+                            }),
+                            target: new fields.SchemaField({
+                                name: new fields.StringField({ ...blankString }),
+                                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                                operator: new fields.StringField({ ...blankString }),
+                            })
                         })
                     ),
-                    weaponEquipped: new fields.BooleanField({ required: true, label: "ABBREW.EquippedWeapon" })
-                }),
-                modifiers: new fields.SchemaField({
-                    damage: new fields.ArrayField(
-                        new fields.SchemaField({
-                            value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-                            type: new fields.StringField({ ...blankString })
-                        })
-                    ),
-                    guard: new fields.StringField({ ...blankString }),
-                    dodge: new fields.StringField({ ...blankString }),
-                    block: new fields.StringField({ ...blankString }),
-                    successes: new fields.NumberField({ ...requiredInteger, initial: 0 })
-                }),
-                restores: new fields.SchemaField({
-                    wounds: new fields.SchemaField({
-                        active: new fields.StringField({ ...blankString }),
-                        healing: new fields.StringField({ ...blankString })
-                    }),
-                    guard: new fields.StringField({ ...blankString }),
-                    dodge: new fields.StringField({ ...blankString }),
-                    block: new fields.StringField({ ...blankString })
+                    concepts: new fields.SchemaField({
+                        self: new fields.ArrayField(
+                            new fields.SchemaField({
+                                type: new fields.StringField({ ...blankString }),
+                                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                                comparator: new fields.StringField({ ...blankString }),
+                                operator: new fields.StringField({ ...blankString })
+                            })
+                        ),
+                        target: new fields.ArrayField(
+                            new fields.SchemaField({
+                                type: new fields.StringField({ ...blankString }),
+                                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                                comparator: new fields.StringField({ ...blankString }),
+                                operator: new fields.StringField({ ...blankString })
+                            })
+                        )
+                    })
                 }),
                 description: new fields.StringField({ ...blankString })
             })

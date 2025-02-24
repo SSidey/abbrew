@@ -2240,8 +2240,18 @@ ABBREW.attributeAbbreviations = {
 };
 ABBREW.HasRequirement = "ABBREW.HasRequirement";
 ABBREW.SkillAttributeIncrease = "ABBREW.AttributeIncrease";
+ABBREW.skillActivationType = "ABBREW.SkillActivationType";
+ABBREW.skillActivationTypes = {
+  standalone: "ABBREW.SkillActivationTypes.standalone",
+  synergy: "ABBREW.SkillActivationTypes.synergy"
+};
 ABBREW.EquippedWeapon = "ABBREW.EquippedWeapon";
 ABBREW.Damage = "ABBREW.Damage";
+ABBREW.operator = "ABBREW.Operator";
+ABBREW.operators = {
+  equal: "ABBREW.Operators.equal",
+  add: "ABBREW.Operators.add"
+};
 ABBREW.Defense = {
   guard: "ABBREW.Defense.guard"
 };
@@ -2335,7 +2345,14 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         raw: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 100 }),
         value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 10 }),
         max: new fields.NumberField({ ...requiredInteger, initial: 10, min: 10, max: 10 })
-      })
+      }),
+      resolve: new fields.SchemaField({
+        value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 20 }),
+        base: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 20 }),
+        max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 20 }),
+        label: new fields.StringField({ required: true, blank: true })
+      }),
+      canBleed: new fields.BooleanField({ required: true, nullable: false, initial: false })
     });
     schema.biography = new fields.StringField({ required: true, blank: true });
     schema.movement = new fields.SchemaField({
@@ -2355,7 +2372,6 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       });
       return obj;
     }, {}));
-    schema.resolve = new fields.NumberField({ ...requiredInteger, initial: 0, max: 20 });
     schema.momentum = new fields.NumberField({ ...requiredInteger, initial: 0 });
     return schema;
   }
@@ -2367,6 +2383,8 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       this.attributes[key2].rank = this.attributes[key2].value;
     }
     this.defense.risk.value = Math.floor(this.defense.risk.raw / 10);
+    this.defense.canBleed = true;
+    this.defense.resolve.max = 2 + this.attributes["con"].value + this.attributes["wil"].value;
   }
   // Post Active Effects
   prepareDerivedData() {
@@ -2525,48 +2543,105 @@ class AbbrewSkill extends AbbrewItemBase {
     schema.activatable = new fields.BooleanField({ required: true, label: "ABBREW.Activatable" });
     schema.actions = new fields.ArrayField(
       new fields.SchemaField({
-        requirements: new fields.SchemaField({
-          actionCost: new fields.StringField({ ...blankString }),
-          weapon: new fields.SchemaField({
-            attackType: new fields.StringField({ ...blankString }),
-            damageType: new fields.StringField({ ...blankString }),
-            hands: new fields.NumberField({ required: true, initial: null, integer: true }),
-            traits: new fields.StringField({ ...blankString })
+        activationType: new fields.StringField({ ...blankString }),
+        // Standalone, Synergy
+        actionCost: new fields.StringField({ ...blankString }),
+        modifiers: new fields.SchemaField({
+          damage: new fields.SchemaField({
+            self: new fields.ArrayField(
+              new fields.SchemaField({
+                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                type: new fields.StringField({ ...blankString }),
+                operator: new fields.StringField({ ...blankString })
+              })
+            ),
+            target: new fields.ArrayField(
+              new fields.SchemaField({
+                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                type: new fields.StringField({ ...blankString }),
+                operator: new fields.StringField({ ...blankString })
+              })
+            )
           }),
-          freeHands: new fields.NumberField({ required: true, initial: 0, integer: true }),
-          momentum: new fields.SchemaField({
-            hasRequirement: new fields.BooleanField({ required: true, label: "ABBREW.HasRequirement" }),
-            requirement: new fields.NumberField({ ...requiredInteger, initial: 0, min: -10, max: 10 }),
-            change: new fields.NumberField({ ...requiredInteger, initial: 0, min: -20, max: 20 })
+          guard: new fields.SchemaField({
+            self: new fields.SchemaField({
+              value: new fields.NumberField({ required: true, nullable: true, integer: true, initial: 0 }),
+              operator: new fields.StringField({ ...blankString })
+            }),
+            target: new fields.SchemaField({
+              value: new fields.NumberField({ required: true, nullable: true, integer: true, initial: 0 }),
+              operator: new fields.StringField({ ...blankString })
+            })
+          }),
+          successes: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+          risk: new fields.SchemaField({
+            self: new fields.SchemaField({
+              value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+              operator: new fields.StringField({ ...blankString })
+            }),
+            target: new fields.SchemaField({
+              value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+              operator: new fields.StringField({ ...blankString })
+            })
+          }),
+          wounds: new fields.SchemaField({
+            self: new fields.ArrayField(
+              new fields.SchemaField({
+                type: new fields.StringField({ ...blankString }),
+                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                operator: new fields.StringField({ ...blankString })
+              })
+            ),
+            target: new fields.ArrayField(
+              new fields.SchemaField({
+                type: new fields.StringField({ ...blankString }),
+                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                operator: new fields.StringField({ ...blankString })
+              })
+            )
+          }),
+          resolve: new fields.SchemaField({
+            self: new fields.SchemaField({
+              value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+              operator: new fields.StringField({ ...blankString })
+            }),
+            target: new fields.SchemaField({
+              value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+              operator: new fields.StringField({ ...blankString })
+            })
           }),
           resources: new fields.ArrayField(
             new fields.SchemaField({
-              name: new fields.StringField({ ...blankString }),
-              value: new fields.NumberField({ ...requiredInteger, initial: 0 })
+              self: new fields.SchemaField({
+                name: new fields.StringField({ ...blankString }),
+                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                operator: new fields.StringField({ ...blankString })
+              }),
+              target: new fields.SchemaField({
+                name: new fields.StringField({ ...blankString }),
+                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                operator: new fields.StringField({ ...blankString })
+              })
             })
           ),
-          weaponEquipped: new fields.BooleanField({ required: true, label: "ABBREW.EquippedWeapon" })
-        }),
-        modifiers: new fields.SchemaField({
-          damage: new fields.ArrayField(
-            new fields.SchemaField({
-              value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-              type: new fields.StringField({ ...blankString })
-            })
-          ),
-          guard: new fields.StringField({ ...blankString }),
-          dodge: new fields.StringField({ ...blankString }),
-          block: new fields.StringField({ ...blankString }),
-          successes: new fields.NumberField({ ...requiredInteger, initial: 0 })
-        }),
-        restores: new fields.SchemaField({
-          wounds: new fields.SchemaField({
-            active: new fields.StringField({ ...blankString }),
-            healing: new fields.StringField({ ...blankString })
-          }),
-          guard: new fields.StringField({ ...blankString }),
-          dodge: new fields.StringField({ ...blankString }),
-          block: new fields.StringField({ ...blankString })
+          concepts: new fields.SchemaField({
+            self: new fields.ArrayField(
+              new fields.SchemaField({
+                type: new fields.StringField({ ...blankString }),
+                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                comparator: new fields.StringField({ ...blankString }),
+                operator: new fields.StringField({ ...blankString })
+              })
+            ),
+            target: new fields.ArrayField(
+              new fields.SchemaField({
+                type: new fields.StringField({ ...blankString }),
+                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                comparator: new fields.StringField({ ...blankString }),
+                operator: new fields.StringField({ ...blankString })
+              })
+            )
+          })
         }),
         description: new fields.StringField({ ...blankString })
       })
@@ -2664,7 +2739,36 @@ class AbbrewWeapon extends AbbrewItemBase {
     this.formula = `1d10x10cs10`;
   }
 }
+async function handleTurnStart(combat, updateData, updateOptions) {
+  if (updateData.round < combat.round || updateData.round == combat.round && updateData.turn < combat.turn) {
+    return;
+  }
+  let nextActor = combat.current.combatantId ? combat.nextCombatant.actor : combat.turns[0].actor;
+  await turnStart(nextActor);
+}
+function mergeActorWounds(actor, incomingWounds) {
+  const wounds = actor.system.wounds;
+  const result = [...wounds, ...incomingWounds].reduce((a, { type, value }) => ({ ...a, [type]: a[type] ? { type, value: a[type].value + value } : { type, value } }), {});
+  return Object.values(result);
+}
+async function turnStart(actor) {
+  ChatMessage.create({ content: `${actor.name} starts their turn`, speaker: ChatMessage.getSpeaker({ actor }) });
+  if (actor.system.defense.canBleed) {
+    const filteredWounds = actor.system.wounds.filter((wound) => wound.type === "bleed");
+    const bleedingWounds = filteredWounds.length > 0 ? filteredWounds[0].value : 0;
+    if (bleedingWounds > 0) {
+      const vitalWounds = [{ type: "vital", value: bleedingWounds }];
+      await actor.update({ "system.wounds": mergeActorWounds(actor, vitalWounds) });
+    }
+  }
+}
 const FINISHERS = {
+  "bludgeoning": {
+    1: { "type": "bludgeoning", "wounds": [{ "type": "general", "value": 1 }], "text": "Target is wounded" },
+    2: { "type": "bludgeoning", "wounds": [{ "type": "general", "value": 2 }], "text": "Target is wounded" },
+    4: { "type": "bludgeoning", "wounds": [{ "type": "general", "value": 3 }], "text": "Target is wounded" },
+    8: { "type": "bludgeoning", "wounds": [{ "type": "general", "value": 5 }], "text": "Target limb is broken" }
+  },
   "piercing": {
     1: { "type": "piercing", "wounds": [{ "type": "bleed", "value": 1 }], "text": "Target bleeds lesser" },
     2: { "type": "piercing", "wounds": [{ "type": "bleed", "value": 2 }], "text": "Target bleeds moderate" },
@@ -2774,15 +2878,10 @@ class AbbrewActor extends Actor {
     });
   }
   async applyFinisher(risk, finisher, finisherCost) {
-    const updates = { "system.wounds": this.applyWoundsForFinisher(finisher), "system.defense.risk.raw": this.reduceRiskForFinisher(risk, finisherCost) };
+    const updates = { "system.wounds": mergeActorWounds(this, finisher.wounds), "system.defense.risk.raw": this.reduceRiskForFinisher(risk, finisherCost) };
     await this.update(updates);
     console.log("updated");
     return this;
-  }
-  applyWoundsForFinisher(finisher) {
-    const wounds = this.system.wounds;
-    const result = [...wounds, ...finisher.wounds].reduce((a, { type, value }) => ({ ...a, [type]: a[type] ? { type, value: a[type].value + value } : { type, value } }), {});
-    return Object.values(result);
   }
   reduceRiskForFinisher(risk, finisherCost) {
     return risk - finisherCost * 10;
@@ -2953,6 +3052,15 @@ Handlebars.registerHelper("empty", function(collection) {
 });
 Hooks.once("ready", function() {
   Hooks.on("hotbarDrop", (bar, data, slot) => createItemMacro(data, slot));
+});
+Hooks.on("combatStart", async (combat, updateData, updateOptions) => {
+  await handleTurnStart(combat, updateData);
+});
+Hooks.on("combatRound", async (combat, updateData, updateOptions) => {
+  await handleTurnStart(combat, updateData);
+});
+Hooks.on("combatTurn", async (combat, updateData, updateOptions) => {
+  await handleTurnStart(combat, updateData);
 });
 Hooks.on("applyActiveEffect", applyCustomEffects);
 Hooks.on("renderChatLog", (app, html, data) => {

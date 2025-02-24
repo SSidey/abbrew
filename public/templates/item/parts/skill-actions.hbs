@@ -11,135 +11,45 @@
 <ol class="form-list action-container">
     {{#each system.actions as |action i|}}
     <li class="item action" data-id="{{i}}">
+        <div class="form-group">
+            <label>{{ localize "ABBREW.SkillActivationType" }}</label>
+            <select name="action.activationType">
+                {{selectOptions ../config.skillActivationTypes selected=action.activationType blank="" localize=true}}
+            </select>
+        </div>
         <div>
             <label>Action Cost</label>
             <input type="text" name="system.actions.{{i}}.requirements.actionCost"
                 value="{{action.requirements.actionCost}}" data-dtype="String" />
         </div>
         <div>
-            <label>Momentum</label>
-            </br>
-            <label class="slide-toggle roboto-upper">
-                <input type="checkbox" class="momentum-requirement"
-                    name="system.actions.{{i}}.requirements.momentum.hasRequirement" {{ checked
-                    action.requirements.momentum.hasRequirement }}>
-                <span>{{localize "ABBREW.HasRequirement"}}</span>
-                {{#if action.requirements.momentum.hasRequirement}}
-                <i class="fa fa-toggle-on"></i>
-                {{else}}
-                <i class="fa fa-toggle-off"></i>
-                {{/if}}
-            </label>
-            {{#if action.requirements.momentum.hasRequirement}}
-            <div>
-                <label>Requirement</label>
-                <input type="text" name="system.actions.{{i}}.requirements.momentum.requirement"
-                    value="{{action.requirements.momentum.requirement}}" data-dtype="Number" />
-            </div>
-            {{/if}}
-            <div>
-                <label>Change</label>
-                <input type="text" name="system.actions.{{i}}.requirements.momentum.change"
-                    value="{{action.requirements.momentum.change}}" data-dtype="Number" />
-            </div>
-        </div>
-        <label class="slide-toggle roboto-upper">
-            <input type="checkbox" class="action-activatable" name="system.actions.{{i}}.requirements.weaponEquipped" {{
-                checked action.requirements.weaponEquipped }}>
-            <span>{{localize "ABBREW.EquippedWeapon"}}</span>
-            {{#if action.requirements.weaponEquipped}}
-            <i class="fa fa-toggle-on"></i>
-            {{else}}
-            <i class="fa fa-toggle-off"></i>
-            {{/if}}
-        </label>
-        {{#if action.requirements.weaponEquipped}}
-        <div>
-            <label>Attack Type</label>
-            <select name="system.actions.{{i}}.requirements.weapon.attackType">
-                {{selectOptions ../config.attackTypes selected=action.requirements.weapon.attackType blank=""
-                localize=true}}
-            </select>
-        </div>
-        <div>
-            <label>Damage Type</label>
-            <select name="system.actions.{{i}}.requirements.weapon.damageType">
-                {{selectOptions ../config.concepts selected=action.requirements.weapon.damageType blank=""
-                localize=true}}
-            </select>
-        </div>
-        <div>
-            <label>Weapon Hands</label>
-            <input type="text" name="system.actions.{{i}}.requirements.weapon.hands"
-                value="{{action.requirements.weapon.hands}}" data-dtype="Number" />
-        </div>
-        <div>
-            <label>Traits</label>
-            <input type="text" name="system.actions.{{i}}.requirements.weapon.traits"
-                value="{{action.requirements.weapon.traits}}" data-dtype="String" />
-        </div>
-        {{/if}}
-        <div>
-            <label>Free Hands</label>
-            <input type="text" name="system.actions.{{i}}.requirements.freeHands"
-                value="{{action.requirements.freeHands}}" data-dtype="Number" />
-        </div>
-        <div>
-            <ol class="form-list resource-requirement-container">
-                {{#each action.requirements.resources as |resource j|}}
-                <li class="item resource grid-3col" data-id="{{j}}">
-                    <div>
-                        <label>Name</label>
-                        <input type="text" name="system.actions.{{i}}.requirements.resources.{{j}}.name"
-                            value="{{resource.name}}" data-dtype="String" />
-                    </div>
-                    <div>
-                        <label>Value</label>
-                        <input type="text" name="system.actions.{{i}}.requirements.resources.{{j}}.value"
-                            value="{{resource.value}}" data-dtype="Number" />
-                    </div>
-                    <div>
-                        <a class="skill-action-resource-control" data-action="remove-skill-action-resource-requirement">
-                            <i class="fa-solid fa-minus"></i>
-                        </a>
-                    </div>
-                </li>
-                {{/each}}
-                <li class="skillResourceRequirement add">
-                    <div class="form-group">
-                        <label>
-                            <a class="skill-action-resource-control"
-                                data-action="add-skill-action-resource-requirement">
-                                Add Resource
-                                <i class="fa-solid fa-plus"></i>
-                            </a>
-                        </label>
-                    </div>
-                </li>
-            </ol>
-        </div>
-        <div>
             <div>
                 <label>Guard</label>
-                <input type="text" name="system.actions.{{i}}.modifiers.guard"
-                    value="{{action.modifiers.guard}}" data-dtype="String" />
-            </div>
-            <div>
-                <label>Dodge</label>
-                <input type="text" name="system.actions.{{i}}.modifiers.dodge"
-                    value="{{action.modifiers.dodge}}" data-dtype="String" />
-            </div>
-            <div>
-                <label>Block</label>
-                <input type="text" name="system.actions.{{i}}.modifiers.block"
-                    value="{{action.modifiers.block}}" data-dtype="String" />
+                <div>
+                    <label>Self</label>
+                    <input type="text" name="action.modifiers.guard.self.value" value="{{action.modifiers.guard.value}}"
+                        data-dtype="String" />
+                    <label>{{ localize "ABBREW.Operator" }}</label>
+                    <select name="action.modifiers.guard.self.operator">
+                        {{selectOptions ../config.operators selected=action.modifiers.guard.self.value blank="" localize=true}}
+                    </select>
+                </div>
+                <div>
+                    <label>Target</label>
+                    <input type="text" name="action.modifiers.guard.target.value" value="{{action.modifiers.guard.value}}"
+                        data-dtype="String" />
+                    <label>{{ localize "ABBREW.Operator" }}</label>
+                    <select name="action.modifiers.guard.target.operator">
+                        {{selectOptions ../config.operators selected=action.modifiers.guard.target.value blank="" localize=true}}
+                    </select>
+                </div>
             </div>
             <div>
                 <label>Successes</label>
                 <input type="text" name="system.actions.{{i}}.modifiers.successes"
                     value="{{action.modifiers.successes}}" data-dtype="Number" />
             </div>
-            <ol class="form-list damage-modifier-container">
+            {{!-- <ol class="form-list damage-modifier-container">
                 {{#each action.modifiers.damage as |damageModifier k|}}
                 <li class="item resource grid-3col" data-id="{{k}}">
                     <div>
@@ -174,35 +84,7 @@
                         </label>
                     </div>
                 </li>
-            </ol>
-        </div>
-        <div class="restores">
-            <label>Restores</label>
-            <div>
-                <label>Active Wounds</label>
-                <input type="text" name="system.actions.{{i}}.restores.wounds.active"
-                    value="{{action.restores.wounds.active}}" data-dtype="String" />
-            </div>
-            <div>
-                <label>Healing Wounds</label>
-                <input type="text" name="system.actions.{{i}}.restores.healing"
-                    value="{{action.restores.wounds.healing}}" data-dtype="String" />
-            </div>
-            <div>
-                <label>Guard</label>
-                <input type="text" name="system.actions.{{i}}.restores.guard"
-                    value="{{action.restores.guard}}" data-dtype="String" />
-            </div>
-            <div>
-                <label>Dodge</label>
-                <input type="text" name="system.actions.{{i}}.restores.dodge"
-                    value="{{action.restores.dodge}}" data-dtype="String" />
-            </div>
-            <div>
-                <label>Block</label>
-                <input type="text" name="system.actions.{{i}}.restores.block"
-                    value="{{action.restores.block}}" data-dtype="String" />
-            </div>
+            </ol> --}}
         </div>
         <div>
             <a class="skill-action-control remove-skill-action" data-action="remove-skill-action">

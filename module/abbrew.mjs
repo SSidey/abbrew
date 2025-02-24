@@ -8,6 +8,7 @@ import { ABBREW } from './helpers/config.mjs';
 import * as models from './data/_module.mjs';
 // Import Documents Classes
 import * as documents from './documents/_module.mjs';
+import { handleTurnStart } from './helpers/combat.mjs';
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -119,6 +120,22 @@ Hooks.once('ready', function () {
   // Wait to register hotbar drop hook on ready so that modules could register earlier if they want to
   Hooks.on('hotbarDrop', (bar, data, slot) => createItemMacro(data, slot));
 });
+
+/* -------------------------------------------- */
+/*  Combat Hooks                                 */
+/* -------------------------------------------- */
+
+Hooks.on("combatStart", async (combat, updateData, updateOptions) => {
+  await handleTurnStart(combat, updateData, updateOptions);
+});
+
+Hooks.on("combatRound", async (combat, updateData, updateOptions) => {
+  await handleTurnStart(combat, updateData, updateOptions);
+})
+
+Hooks.on("combatTurn", async (combat, updateData, updateOptions) => {
+  await handleTurnStart(combat, updateData, updateOptions);
+})
 
 /* -------------------------------------------- */
 /*  Other Hooks                                 */

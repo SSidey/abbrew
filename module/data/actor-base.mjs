@@ -37,7 +37,14 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         raw: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 100}),
         value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 10 }),
         max: new fields.NumberField({ ...requiredInteger, initial: 10, min: 10, max: 10 })
-      })
+      }),
+      resolve: new fields.SchemaField({
+        value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 20 }),
+        base: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 20 }),
+        max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 20 }),
+        label: new fields.StringField({ required: true, blank: true })
+      }),
+      canBleed: new fields.BooleanField({ required: true, nullable: false, initial: false })
     });
 
     schema.biography = new fields.StringField({ required: true, blank: true }); // equivalent to passing ({initial: ""}) for StringFields
@@ -63,7 +70,6 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       return obj;
     }, {}));
 
-    schema.resolve = new fields.NumberField({ ...requiredInteger, initial: 0, max: 20 });
     schema.momentum = new fields.NumberField({ ...requiredInteger, initial: 0 });
 
     return schema;
@@ -80,6 +86,11 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     }
 
     this.defense.risk.value = Math.floor(this.defense.risk.raw / 10);
+    
+    // TODO: Set by tag
+    this.defense.canBleed = true;
+
+    this.defense.resolve.max = 2 + this.attributes['con'].value + this.attributes['wil'].value;
   }
 
   // Post Active Effects
