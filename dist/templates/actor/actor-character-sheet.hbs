@@ -19,7 +19,7 @@
           </div>
           <ol class="wound-container">
             {{#each system.wounds as |wound|}}
-            <li class="wound">
+            <li class="wound" data-wound-type="{{wound.type}}" data-wound-value="{{wound.value}}">
               <div class="wound-value">{{wound.value}}</div>
               <img src="systems/abbrew/assets/icons/wounds/{{wound.type}}.webp" alt="{{wound.type}} {{wound.value}}">
             </li>
@@ -55,6 +55,14 @@
         </div>
 
         <div class="resource flex-group-center">
+          <label for="system.defense.risk" class="resource-label">Risk</label>
+          <div class="resource-content flexrow flex-center flex-between">
+            <input type="text" name="system.defense.risk.raw" value="{{system.defense.risk.raw}}" data-dtype="Number"
+              {{!-- readonly --}} />
+          </div>
+        </div>
+
+        <div class="resource flex-group-center">
           <label for="system.defense.resolve" class="resource-label">Resolve</label>
           <div class="resource-content flexrow flex-center flex-between">
             <input type="text" name="system.defense.resolve.value" value="{{system.defense.resolve.value}}"
@@ -62,14 +70,6 @@
             <span> / </span>
             <input type="text" name="system.defense.resolve.max" value="{{system.defense.resolve.max}}"
               data-dtype="Number" />
-          </div>
-        </div>
-
-        <div class="resource flex-group-center">
-          <label for="system.defense.risk" class="resource-label">Risk</label>
-          <div class="resource-content flexrow flex-center flex-between">
-            <input type="text" name="system.defense.risk.raw" value="{{system.defense.risk.raw}}" data-dtype="Number"
-              {{!-- readonly --}} />
           </div>
         </div>
 

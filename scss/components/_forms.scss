@@ -78,7 +78,9 @@ ol.wound-container {
   bottom: 0px;
   z-index: 1000;
   background-color: #000000;
-  padding: 5px;
+  // padding: 5px;
   color: #FFFFFF;
   font-weight: bold;
+  text-shadow: #000000 0px 0px 10px;
+  font-size: 1rem;
 }

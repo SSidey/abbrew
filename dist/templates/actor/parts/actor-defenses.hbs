@@ -21,44 +21,39 @@
         </div>
     </div>
     <div class="grid grid-2col">
-        <div class="dodge">
-            <label class="dodge-label">Dodge</label>
+        <div class="inflexibility">
+            <label class="inflexibility-label">Inflexibility</label>
             <div class="flex-group-center">
-                <input type="text" name="system.defense.dodge.value" value="{{system.defense.dodge.value}}"
-                    data-dtype="Number" />
-                <span> / </span>
-                <input type="text" name="system.defense.dodge.max" value="{{system.defense.dodge.max}}"
-                    data-dtype="Number" readonly />
+                <input type="text" name="system.defense.inflexibility.value"
+                    value="{{system.defense.inflexibility.value}}" data-dtype="Number" readonly/>
             </div>
         </div>
     </div>
-    {{#each system.defense.damageReduction as |damageReduction key|}}
-    <li class="item effect flexrow" data-id="{{key}}">
-        <div>
-            <label>{{ localize "ABBREW.Type" }}</label>
-            <input type="text" name="system.defense.damageReduction.{{key}}.type" value="{{damageReduction.type}}"
-                data-dtype="Number" readonly />
-        </div>
-        <div>
-            <label>{{ localize "ABBREW.DamageReduction.abbreviation" }}</label>
-            <input type="text" name="system.defense.damageReduction.{{key}}.value" value="{{damageReduction.value}}"
-                data-dtype="Number" readonly />
-        </div>
-        <div>
-            <label>{{ localize "ABBREW.Resistance" }}</label>
-            <input type="text" name="system.defense.damageReduction.{{key}}.resistance"
-                value="{{damageReduction.resistance}}" data-dtype="Number" readonly />
-        </div>
-        <div>
-            <label>{{ localize "ABBREW.Immunity" }}</label>
-            <input type="text" name="system.defense.damageReduction.{{key}}.immunity"
-                value="{{damageReduction.immunity}}" data-dtype="Number" readonly />
-        </div>
-        <div>
-            <label>{{ localize "ABBREW.Weakness" }}</label>
-            <input type="text" name="system.defense.damageReduction.{{key}}.weakness"
-                value="{{damageReduction.weakness}}" data-dtype="Number" readonly />
-        </div>
-    </li>
-    {{/each}}
+    <div class="protection-container">
+        <h4>Protection</h4>
+        {{#each system.defense.protection as |protection key|}}
+        <li class="item effect flexrow" data-id="{{key}}">
+            <div>
+                <label>{{ localize "ABBREW.Type" }}</label>
+                <input type="text" name="system.defense.protection.{{key}}.type" value="{{protection.type}}"
+                    data-dtype="Number" readonly />
+            </div>
+            <div>
+                <label>{{ localize "ABBREW.Resistance" }}</label>
+                <input type="text" name="system.defense.protection.{{key}}.resistance" value="{{protection.resistance}}"
+                    data-dtype="Number" readonly />
+            </div>
+            <div>
+                <label>{{ localize "ABBREW.Immunity" }}</label>
+                <input type="text" name="system.defense.protection.{{key}}.immunity" value="{{protection.immunity}}"
+                    data-dtype="Number" readonly />
+            </div>
+            <div>
+                <label>{{ localize "ABBREW.Weakness" }}</label>
+                <input type="text" name="system.defense.protection.{{key}}.weakness" value="{{protection.weakness}}"
+                    data-dtype="Number" readonly />
+            </div>
+        </li>
+        {{/each}}
+    </div>
 </div>

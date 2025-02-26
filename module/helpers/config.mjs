@@ -107,3 +107,11 @@ ABBREW.actionCosts = {
   reaction: "ABBREW.ActionCosts.reaction",
   other: "ABBREW.ActionCosts.other"
 }
+
+ABBREW.wounds = {
+  general: "ABBREW.Wounds.general",
+  bleed: "ABBREW.Wounds.bleed",
+  vital: "ABBREW.Wounds.vital",
+  fatigue: "ABBREW.Wounds.fatigue",
+  terror: "ABBREW.Wounds.terror"
+}

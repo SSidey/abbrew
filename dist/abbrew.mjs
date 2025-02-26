@@ -1,3 +1,51 @@
+var __defProp = Object.defineProperty;
+var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
+var __publicField = (obj, key2, value) => {
+  __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
+  return value;
+};
+function applyOperator(base, value, operator) {
+  switch (operator) {
+    case "add":
+      return base += value;
+    case "equal":
+      return value;
+    default:
+      return base;
+  }
+}
+async function handleTurnStart(combat, updateData, updateOptions) {
+  if (updateData.round < combat.round || updateData.round == combat.round && updateData.turn < combat.turn) {
+    return;
+  }
+  let nextActor = combat.current.combatantId ? combat.nextCombatant.actor : combat.turns[0].actor;
+  await turnStart(nextActor);
+}
+function mergeActorWounds(actor, incomingWounds) {
+  return mergeActorWoundsWithOperator(actor, incomingWounds, "add");
+}
+function mergeActorWoundsWithOperator(actor, incomingWounds, operator) {
+  const wounds = actor.system.wounds;
+  return mergeWoundsWithOperator(wounds, incomingWounds, operator);
+}
+function mergeWoundsWithOperator(wounds, incomingWounds, operator) {
+  const result = [...wounds, ...incomingWounds].reduce((a, { type, value }) => ({ ...a, [type]: a[type] ? { type, value: applyOperator(a[type].value, value, operator) } : { type, value } }), {});
+  return Object.values(result).filter((v) => v.value > 0);
+}
+async function updateActorWounds(actor, updateWounds) {
+  actor.update({ "system.wounds": updateWounds });
+}
+async function turnStart(actor) {
+  ChatMessage.create({ content: `${actor.name} starts their turn`, speaker: ChatMessage.getSpeaker({ actor }) });
+  if (actor.system.defense.canBleed) {
+    const filteredWounds = actor.system.wounds.filter((wound) => wound.type === "bleed");
+    const bleedingWounds = filteredWounds.length > 0 ? filteredWounds[0].value : 0;
+    if (bleedingWounds > 0) {
+      const vitalWounds = [{ type: "vital", value: bleedingWounds }];
+      await updateActorWounds(actor, mergeActorWounds(actor, vitalWounds));
+    }
+  }
+}
 function onManageActiveEffect(event, owner) {
   event.preventDefault();
   const a = event.currentTarget;
@@ -52,7 +100,38 @@ function prepareActiveEffectCategories(effects) {
   }
   return categories;
 }
+async function activateSkill(actor, skill) {
+  let updates = {};
+  if (skill.action.modifiers.guard.self.value) {
+    const guard = applyOperator(
+      actor.system.defense.guard.value,
+      skill.action.modifiers.guard.self.value,
+      skill.action.modifiers.guard.self.operator
+    );
+    updates["system.defense.guard.value"] = guard;
+  }
+  if (skill.action.modifiers.wounds.self.length > 0) {
+    let updateWounds = actor.system.wounds;
+    skill.action.modifiers.wounds.self.filter((w) => w.value && w.type && w.operator).forEach((w) => updateWounds = mergeWoundsWithOperator(updateWounds, [{ type: w.type, value: w.value }], w.operator));
+    updates["system.wounds"] = updateWounds;
+  }
+  await actor.update(updates);
+}
 class AbbrewActorSheet extends ActorSheet {
+  constructor() {
+    super(...arguments);
+    __publicField(this, "skillSectionDisplay", {});
+    /* -------------------------------------------- */
+    __publicField(this, "updateObjectValueByKey", (obj1, obj2) => {
+      var destination = Object.assign({}, obj1);
+      Object.keys(obj2).forEach((k) => {
+        if (k in destination && k in obj2) {
+          destination[k] = obj2[k];
+        }
+      });
+      return destination;
+    });
+  }
   /** @override */
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
@@ -93,7 +172,6 @@ class AbbrewActorSheet extends ActorSheet {
       this.actor.allApplicableEffects()
     );
     context.config = CONFIG.ABBREW;
-    context.skillSections = Object.keys(CONFIG.ABBREW.skillTypes).filter((s) => s !== "path");
     return context;
   }
   /**
@@ -148,6 +226,9 @@ class AbbrewActorSheet extends ActorSheet {
           case "path":
             skills.path.push(i);
             break;
+          case "resource":
+            skills.resource.push(i);
+            break;
           case "temporary":
             skills.temporary.push(i);
             break;
@@ -169,10 +250,21 @@ class AbbrewActorSheet extends ActorSheet {
     context.gear = gear;
     context.features = features;
     context.spells = spells;
+    context.skillSections = this.updateObjectValueByKey(this.getSkillSectionDisplays(CONFIG.ABBREW.skillTypes, skills), this.skillSectionDisplay);
     context.skills = skills;
     context.anatomy = anatomy;
     context.armour = armour;
     context.weapons = weapons;
+  }
+  /* -------------------------------------------- */
+  getSkillSectionDisplays(skillTypes, skills) {
+    return Object.fromEntries(this.getSkillSectionKeys(skillTypes).map((s) => {
+      return { "type": s, "display": skills[s].length > 0 ? "grid" : "none" };
+    }).map((x) => [x.type, x.display]));
+  }
+  /* -------------------------------------------- */
+  getSkillSectionKeys(skillTypes) {
+    return Object.keys(skillTypes).filter((s) => s !== "path");
   }
   /* -------------------------------------------- */
   /** @override */
@@ -183,6 +275,12 @@ class AbbrewActorSheet extends ActorSheet {
       const item = this.actor.items.get(li.data("itemId"));
       item.sheet.render(true);
     });
+    html.on("click", ".skill-edit", (ev) => {
+      const li = $(ev.currentTarget).parents(".skill");
+      const skill = this.actor.items.get(li.data("skillId"));
+      skill.sheet.render(true);
+    });
+    html.on("click", ".skill-activate", this._onSkillActivate.bind(this));
     if (!this.isEditable)
       return;
     html.on("click", ".item-create", this._onItemCreate.bind(this));
@@ -190,6 +288,12 @@ class AbbrewActorSheet extends ActorSheet {
       const li = $(ev.currentTarget).parents(".item");
       const item = this.actor.items.get(li.data("itemId"));
       item.delete();
+      li.slideUp(200, () => this.render(false));
+    });
+    html.on("click", ".skill-delete", (ev) => {
+      const li = $(ev.currentTarget).parents(".skill");
+      const skill = this.actor.items.get(li.data("skillId"));
+      skill.delete();
       li.slideUp(200, () => this.render(false));
     });
     html.on("click", ".effect-control", (ev) => {
@@ -203,6 +307,8 @@ class AbbrewActorSheet extends ActorSheet {
       await this._onAttackDamageAction(t);
     });
     html.on("click", ".skill-header", this._onToggleSkillHeader.bind(this));
+    html.on("click", ".wound", this._onWoundClick.bind(this));
+    html.on("contextmenu", ".wound", this._onWoundRightClick.bind(this));
     if (this.actor.isOwner) {
       let handler = (ev) => this._onDragStart(ev);
       html.find("li.item").each((i, li) => {
@@ -213,15 +319,36 @@ class AbbrewActorSheet extends ActorSheet {
       });
     }
   }
+  async _onSkillActivate(event) {
+    event.preventDefault();
+    const target = event.target.closest(".skill");
+    const id = target.dataset.skillId;
+    const skill = this.actor.items.get(id).system;
+    if (skill.activatable && skill.action.activationType === "standalone") {
+      await activateSkill(this.actor, skill);
+    }
+  }
   _onToggleSkillHeader(event) {
     event.preventDefault();
     const target = event.currentTarget;
     const skillSection = target.nextElementSibling;
     if (skillSection.children.length === 0 || skillSection.style.display === "grid" || skillSection.style.display === "") {
+      this.skillSectionDisplay[target.dataset.skillSection] = "none";
       skillSection.style.display = "none";
     } else {
+      this.skillSectionDisplay[target.dataset.skillSection] = "grid";
       skillSection.style.display = "grid";
     }
+  }
+  _onWoundClick(event) {
+    this.handleWoundClick(event, 1);
+  }
+  _onWoundRightClick(event) {
+    this.handleWoundClick(event, -1);
+  }
+  handleWoundClick(event, modification) {
+    const woundType = event.currentTarget.dataset.woundType;
+    updateActorWounds(this.actor, mergeActorWounds(this.actor, [{ type: woundType, value: modification }]));
   }
   async _onAttackDamageAction(target) {
     const itemId = target.closest("li.item").dataset.itemId;
@@ -284,6 +411,7 @@ class AbbrewActorSheet extends ActorSheet {
    */
   async _onItemCreate(event) {
     event.preventDefault();
+    event.stopPropagation();
     const header = event.currentTarget;
     const type = header.dataset.type;
     const data = duplicate(header.dataset);
@@ -1969,6 +2097,11 @@ class AbbrewItemSheet extends ItemSheet {
       if (t.dataset.action)
         this._onSkillActionResourceRequirementAction(t, t.dataset.action);
     });
+    html.find(".skill-action-modifier-wound-control").click((event) => {
+      const t = event.currentTarget;
+      if (t.dataset.action)
+        this._onSkillActionModifierWoundAction(t, t.dataset.action);
+    });
     html.find(".skill-action-modifier-damage-control").click((event) => {
       const t = event.currentTarget;
       if (t.dataset.action)
@@ -2107,6 +2240,33 @@ class AbbrewItemSheet extends ItemSheet {
     }
   }
   /**
+    * Handle one of the add or remove wound reduction buttons.
+    * @param {Element} target  Button or context menu entry that triggered this action.
+    * @param {string} action   Action being triggered.
+    * @returns {Promise|void}
+    */
+  _onSkillActionModifierWoundAction(target, action) {
+    if (this.item.system.configurable) {
+      switch (action) {
+        case "add-skill-action-modifier-wound":
+          return this.addSkillActionModifierWound(target);
+        case "remove-skill-action-modifier-wound":
+          return this.removeSkillActionModifierWound(target);
+      }
+    }
+  }
+  addSkillActionModifierWound(target) {
+    let action = foundry.utils.deepClone(this.item.system.action);
+    action.modifiers.wounds.self = [...action.modifiers.wounds.self, {}];
+    return this.item.update({ "system.action": action });
+  }
+  removeSkillActionModifierWound(target) {
+    const id = target.closest("li").dataset.id;
+    const action = foundry.utils.deepClone(this.item.system.action);
+    action.modifiers.wounds.self.splice(Number(id), 1);
+    return this.item.update({ "system.action": action });
+  }
+  /**
     * Handle one of the add or remove damage reduction buttons.
     * @param {Element} target  Button or context menu entry that triggered this action.
     * @param {string} action   Action being triggered.
@@ -2169,14 +2329,14 @@ class AbbrewItemSheet extends ItemSheet {
     return this.item.update({ "system.attackProfiles": attackProfiles });
   }
   addDamageReduction() {
-    const damageReduction = this.item.system.defense.damageReduction;
-    return this.item.update({ "system.defense.damageReduction": [...damageReduction, {}] });
+    const protection = this.item.system.defense.protection;
+    return this.item.update({ "system.defense.protection": [...protection, {}] });
   }
   removeDamageReduction(target) {
     const id = target.closest("li").dataset.id;
     const defense = foundry.utils.deepClone(this.item.system.defense);
-    defense.damageReduction.splice(Number(id), 1);
-    return this.item.update({ "system.defense.damageReduction": defense.damageReduction });
+    defense.protection.splice(Number(id), 1);
+    return this.item.update({ "system.defense.protection": defense.protection });
   }
   addDamage(target) {
     const attackProfileId = target.closest(".attackProfile").dataset.id;
@@ -2309,6 +2469,13 @@ ABBREW.actionCosts = {
   reaction: "ABBREW.ActionCosts.reaction",
   other: "ABBREW.ActionCosts.other"
 };
+ABBREW.wounds = {
+  general: "ABBREW.Wounds.general",
+  bleed: "ABBREW.Wounds.bleed",
+  vital: "ABBREW.Wounds.vital",
+  fatigue: "ABBREW.Wounds.fatigue",
+  terror: "ABBREW.Wounds.terror"
+};
 class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   static defineSchema() {
     const fields = foundry.data.fields;
@@ -2327,7 +2494,7 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
         label: new fields.StringField({ required: true, blank: true })
       }),
-      damageReduction: new fields.ArrayField(
+      protection: new fields.ArrayField(
         new fields.SchemaField({
           type: new fields.StringField({ required: true, blank: true }),
           value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
@@ -2337,9 +2504,8 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
           label: new fields.StringField({ required: true, blank: true })
         })
       ),
-      dodge: new fields.SchemaField({
-        value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-        max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 })
+      inflexibility: new fields.SchemaField({
+        value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 })
       }),
       risk: new fields.SchemaField({
         raw: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 100 }),
@@ -2419,11 +2585,12 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     const armour = this.parent.items.filter((i) => i.type === "armour");
     this._prepareDamageReduction(armour, anatomy);
     this._prepareGuard(armour, anatomy);
+    this._prepareInflexibility(armour);
   }
   _prepareDamageReduction(armour, anatomy) {
     console.log("ARMOUR");
-    const damageReduction = armour.map((a) => a.system.defense.damageReduction).flat(1);
-    const flatDR = damageReduction.reduce(
+    const protection = armour.map((a) => a.system.defense.protection).flat(1);
+    const flatDR = protection.reduce(
       (result, dr) => {
         const drType = dr.type;
         if (Object.keys(result).includes(drType)) {
@@ -2438,8 +2605,8 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       },
       {}
     );
-    this.defense.damageReduction.length = 0;
-    Object.values(flatDR).map((v) => this.defense.damageReduction.push(v));
+    this.defense.protection.length = 0;
+    Object.values(flatDR).map((v) => this.defense.protection.push(v));
   }
   _prepareGuard(armour, anatomy) {
     this.defense.guard.label = game.i18n.localize(CONFIG.ABBREW.Defense.guard) ?? key;
@@ -2448,7 +2615,10 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     if (this.defense.guard.value > this.defense.guard.max) {
       this.defense.guard.value = this.defense.guard.max;
     }
-    this.defense.dodge.max = Math.max(this.attributes.agi.value - armour.length, 0);
+  }
+  _prepareInflexibility(armour) {
+    const inflexibility = armour.map((a) => a.system.defense.inflexibility).reduce((a, b) => a + b, 0);
+    this.defense.inflexibility.value = inflexibility;
   }
   getRollData() {
     let data = {};
@@ -2541,111 +2711,109 @@ class AbbrewSkill extends AbbrewItemBase {
     const requiredInteger = { required: true, nullable: false, integer: true };
     schema.configurable = new fields.BooleanField({ required: true });
     schema.activatable = new fields.BooleanField({ required: true, label: "ABBREW.Activatable" });
-    schema.actions = new fields.ArrayField(
-      new fields.SchemaField({
-        activationType: new fields.StringField({ ...blankString }),
-        // Standalone, Synergy
-        actionCost: new fields.StringField({ ...blankString }),
-        modifiers: new fields.SchemaField({
-          damage: new fields.SchemaField({
-            self: new fields.ArrayField(
-              new fields.SchemaField({
-                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-                type: new fields.StringField({ ...blankString }),
-                operator: new fields.StringField({ ...blankString })
-              })
-            ),
-            target: new fields.ArrayField(
-              new fields.SchemaField({
-                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-                type: new fields.StringField({ ...blankString }),
-                operator: new fields.StringField({ ...blankString })
-              })
-            )
-          }),
-          guard: new fields.SchemaField({
-            self: new fields.SchemaField({
-              value: new fields.NumberField({ required: true, nullable: true, integer: true, initial: 0 }),
-              operator: new fields.StringField({ ...blankString })
-            }),
-            target: new fields.SchemaField({
-              value: new fields.NumberField({ required: true, nullable: true, integer: true, initial: 0 }),
-              operator: new fields.StringField({ ...blankString })
-            })
-          }),
-          successes: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-          risk: new fields.SchemaField({
-            self: new fields.SchemaField({
-              value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-              operator: new fields.StringField({ ...blankString })
-            }),
-            target: new fields.SchemaField({
-              value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-              operator: new fields.StringField({ ...blankString })
-            })
-          }),
-          wounds: new fields.SchemaField({
-            self: new fields.ArrayField(
-              new fields.SchemaField({
-                type: new fields.StringField({ ...blankString }),
-                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-                operator: new fields.StringField({ ...blankString })
-              })
-            ),
-            target: new fields.ArrayField(
-              new fields.SchemaField({
-                type: new fields.StringField({ ...blankString }),
-                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-                operator: new fields.StringField({ ...blankString })
-              })
-            )
-          }),
-          resolve: new fields.SchemaField({
-            self: new fields.SchemaField({
-              value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-              operator: new fields.StringField({ ...blankString })
-            }),
-            target: new fields.SchemaField({
-              value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-              operator: new fields.StringField({ ...blankString })
-            })
-          }),
-          resources: new fields.ArrayField(
+    schema.action = new fields.SchemaField({
+      activationType: new fields.StringField({ ...blankString }),
+      // Standalone, Synergy
+      actionCost: new fields.StringField({ ...blankString }),
+      modifiers: new fields.SchemaField({
+        damage: new fields.SchemaField({
+          self: new fields.ArrayField(
             new fields.SchemaField({
-              self: new fields.SchemaField({
-                name: new fields.StringField({ ...blankString }),
-                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-                operator: new fields.StringField({ ...blankString })
-              }),
-              target: new fields.SchemaField({
-                name: new fields.StringField({ ...blankString }),
-                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-                operator: new fields.StringField({ ...blankString })
-              })
+              value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+              type: new fields.StringField({ ...blankString }),
+              operator: new fields.StringField({ ...blankString })
             })
           ),
-          concepts: new fields.SchemaField({
-            self: new fields.ArrayField(
-              new fields.SchemaField({
-                type: new fields.StringField({ ...blankString }),
-                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-                comparator: new fields.StringField({ ...blankString }),
-                operator: new fields.StringField({ ...blankString })
-              })
-            ),
-            target: new fields.ArrayField(
-              new fields.SchemaField({
-                type: new fields.StringField({ ...blankString }),
-                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-                comparator: new fields.StringField({ ...blankString }),
-                operator: new fields.StringField({ ...blankString })
-              })
-            )
+          target: new fields.ArrayField(
+            new fields.SchemaField({
+              value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+              type: new fields.StringField({ ...blankString }),
+              operator: new fields.StringField({ ...blankString })
+            })
+          )
+        }),
+        guard: new fields.SchemaField({
+          self: new fields.SchemaField({
+            value: new fields.NumberField({ required: true, nullable: true, integer: true, initial: 0 }),
+            operator: new fields.StringField({ ...blankString })
+          }),
+          target: new fields.SchemaField({
+            value: new fields.NumberField({ required: true, nullable: true, integer: true, initial: 0 }),
+            operator: new fields.StringField({ ...blankString })
           })
         }),
-        description: new fields.StringField({ ...blankString })
-      })
-    );
+        successes: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+        risk: new fields.SchemaField({
+          self: new fields.SchemaField({
+            value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+            operator: new fields.StringField({ ...blankString })
+          }),
+          target: new fields.SchemaField({
+            value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+            operator: new fields.StringField({ ...blankString })
+          })
+        }),
+        wounds: new fields.SchemaField({
+          self: new fields.ArrayField(
+            new fields.SchemaField({
+              type: new fields.StringField({ ...blankString }),
+              value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+              operator: new fields.StringField({ ...blankString })
+            })
+          ),
+          target: new fields.ArrayField(
+            new fields.SchemaField({
+              type: new fields.StringField({ ...blankString }),
+              value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+              operator: new fields.StringField({ ...blankString })
+            })
+          )
+        }),
+        resolve: new fields.SchemaField({
+          self: new fields.SchemaField({
+            value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+            operator: new fields.StringField({ ...blankString })
+          }),
+          target: new fields.SchemaField({
+            value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+            operator: new fields.StringField({ ...blankString })
+          })
+        }),
+        resources: new fields.ArrayField(
+          new fields.SchemaField({
+            self: new fields.SchemaField({
+              name: new fields.StringField({ ...blankString }),
+              value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+              operator: new fields.StringField({ ...blankString })
+            }),
+            target: new fields.SchemaField({
+              name: new fields.StringField({ ...blankString }),
+              value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+              operator: new fields.StringField({ ...blankString })
+            })
+          })
+        ),
+        concepts: new fields.SchemaField({
+          self: new fields.ArrayField(
+            new fields.SchemaField({
+              type: new fields.StringField({ ...blankString }),
+              value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+              comparator: new fields.StringField({ ...blankString }),
+              operator: new fields.StringField({ ...blankString })
+            })
+          ),
+          target: new fields.ArrayField(
+            new fields.SchemaField({
+              type: new fields.StringField({ ...blankString }),
+              value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+              comparator: new fields.StringField({ ...blankString }),
+              operator: new fields.StringField({ ...blankString })
+            })
+          )
+        })
+      }),
+      description: new fields.StringField({ ...blankString })
+    });
     schema.skillType = new fields.StringField({ ...blankString });
     schema.path = new fields.SchemaField({
       value: new fields.StringField({ ...blankString }),
@@ -2678,7 +2846,8 @@ class AbbrewArmour extends AbbrewItemBase {
     schema.armourPoints = new fields.StringField({ required: true, blank: true });
     schema.defense = new fields.SchemaField({
       guard: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-      damageReduction: new fields.ArrayField(
+      inflexibility: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+      protection: new fields.ArrayField(
         new fields.SchemaField({
           type: new fields.StringField({ required: true, blank: true }),
           value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
@@ -2737,29 +2906,6 @@ class AbbrewWeapon extends AbbrewItemBase {
   }
   prepareDerivedData() {
     this.formula = `1d10x10cs10`;
-  }
-}
-async function handleTurnStart(combat, updateData, updateOptions) {
-  if (updateData.round < combat.round || updateData.round == combat.round && updateData.turn < combat.turn) {
-    return;
-  }
-  let nextActor = combat.current.combatantId ? combat.nextCombatant.actor : combat.turns[0].actor;
-  await turnStart(nextActor);
-}
-function mergeActorWounds(actor, incomingWounds) {
-  const wounds = actor.system.wounds;
-  const result = [...wounds, ...incomingWounds].reduce((a, { type, value }) => ({ ...a, [type]: a[type] ? { type, value: a[type].value + value } : { type, value } }), {});
-  return Object.values(result);
-}
-async function turnStart(actor) {
-  ChatMessage.create({ content: `${actor.name} starts their turn`, speaker: ChatMessage.getSpeaker({ actor }) });
-  if (actor.system.defense.canBleed) {
-    const filteredWounds = actor.system.wounds.filter((wound) => wound.type === "bleed");
-    const bleedingWounds = filteredWounds.length > 0 ? filteredWounds[0].value : 0;
-    if (bleedingWounds > 0) {
-      const vitalWounds = [{ type: "vital", value: bleedingWounds }];
-      await actor.update({ "system.wounds": mergeActorWounds(actor, vitalWounds) });
-    }
   }
 }
 const FINISHERS = {
@@ -2826,8 +2972,9 @@ class AbbrewActor extends Actor {
     console.log("Got me");
     let guard = this.system.defense.guard.value;
     let risk = this.system.defense.risk.raw;
+    const inflexibility = this.system.defense.inflexibility.value;
     const damage = this.applyModifiersToDamage(rolls, data);
-    const updates = { "system.defense.guard.value": this.calculateGuard(damage, guard), "system.defense.risk.raw": this.calculateRisk(damage, guard, risk) };
+    const updates = { "system.defense.guard.value": this.calculateGuard(damage, guard), "system.defense.risk.raw": this.calculateRisk(damage, guard, risk, inflexibility) };
     await this.update(updates);
     console.log("updated");
     return this;
@@ -2898,22 +3045,17 @@ class AbbrewActor extends Actor {
         return result;
       }
       const dmg = (
-        /* damageTypeSuccesses == 0 ? Math.max(0, d.value - damageReduction.value) : */
+        /* damageTypeSuccesses == 0 ? Math.max(0, d.value - protection.value) : */
         d.value
       );
       return result += dmg;
     }, 0);
   }
   calculateGuard(damage, guard) {
-    this.calculateDamageToGuard(damage, guard);
     return Math.max(0, guard - damage);
   }
-  calculateDamageToGuard(damage, guard) {
-    return Math.min(damage, guard);
-  }
-  calculateRisk(damage, guard, risk) {
-    const damageToGuard = this.calculateDamageToGuard(damage, guard);
-    const riskIncrease = damage - damageToGuard;
+  calculateRisk(damage, guard, risk, inflexibility) {
+    const riskIncrease = guard > 0 ? Math.min(damage, inflexibility) : damage;
     return risk + riskIncrease;
   }
 }

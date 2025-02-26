@@ -1,5 +1,5 @@
 <ol class='items-list'>
-  {{#each skillSections as |skillType i|}}
+  {{#each skillSections as |display skillType|}}
   <li>
     {{!-- TODO: Add count of cards, this would be pretty nice considering we can collapse the sections now --}}
     {{!-- TODO: Need to add paths section where each path has the block below to add skills --}}
@@ -8,17 +8,15 @@
   <li class='item flexrow items-header skill-header' data-skill-section="{{localize (skillType)}}">
     <div class='item-name'>{{localize (skillType)}}</div>
     <div class='item-controls'>
-      <a class='item-control item-create' title='Create item' data-type='skill'>
+      <a class='item-control item-create' title='Create item' data-type='skill' data-skill-type={{skillType}}>
         <i class='fas fa-plus'></i>
         {{localize 'DOCUMENT.New' type='skill'}}
       </a>
     </div>
   </li>
-  <ol class='skill-container'
-    style="display:  {{#if (empty (getProperty ../skills (localize (skillType))))}}none{{else}}grid{{/if}};"
-    data-skill-section="{{localize (skillType)}}">
+  <ol class='skill-container' style="display: {{display}}" data-skill-section="{{localize (skillType)}}">
     {{#each (getProperty ../skills (localize (skillType))) as |item id|}}
-    <li class='skill' data-item-id='{{item._id}}'>
+    <li class='skill' data-skill-id='{{item._id}}'>
       <div class="skill-card">
         <h4 class="skill-name">{{item.name}}</h4>
         <div class='skill-image'>
@@ -26,11 +24,14 @@
             <img src='{{item.img}}' title='{{item.name}}' />
           </a>
         </div>
+        {{#if item.system.activatable}}
+        <button class="skill-activate">Activate</button>
+        {{/if}}
         <div class='skill-controls'>
-          <a class='item-control item-edit' title='{{localize "DOCUMENT.Edit" type=' skill'}}'>
+          <a class='skill-control skill-edit' title='{{localize "DOCUMENT.Edit" type=' skill'}}'>
             <i class='fas fa-edit'></i>
           </a>
-          <a class='item-control item-delete' title='{{localize "DOCUMENT.Delete" type=' skill'}}'>
+          <a class='skill-control skill-delete' title='{{localize "DOCUMENT.Delete" type=' skill'}}'>
             <i class='fas fa-trash'></i>
           </a>
         </div>

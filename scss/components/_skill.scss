@@ -24,7 +24,7 @@ div.skill-card {
 
 .skill-image {
     display: grid;
-    grid-row: span 2;
+    grid-row: span 4;
     width: 80%;
     justify-self: center;
 }
@@ -37,10 +37,11 @@ div.skill-card {
     right: 0px;
     bottom: 0px;
     z-index: 1000;
-    background-color: #c91111;
     padding: 5px;
-    color: #FFFFFF;
+    color: #383131;
     font-weight: bold;
+    margin: 2px;
+    border-radius: 2%;
 }
 
 label.slide-toggle>input {
@@ -62,5 +63,9 @@ ol.damage-modifier-container {
 li.action {
     display: flex;
     flex-direction: column;
+    list-style-type: none;
+}
+
+.wound-modifier-container {
     list-style-type: none;
 }

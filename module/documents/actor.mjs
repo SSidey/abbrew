@@ -52,8 +52,9 @@ export default class AbbrewActor extends Actor {
     console.log('Got me');
     let guard = this.system.defense.guard.value;
     let risk = this.system.defense.risk.raw;
+    const inflexibility = this.system.defense.inflexibility.value;
     // let activeWounds = this.system.wounds.active.value;
-    // const maxGuardDamage = this.system.defense.damageReduction.reduce((a, b) => {
+    // const maxGuardDamage = this.system.defense.protection.reduce((a, b) => {
     //   if (b.value > a) {
     //     a = b.value;
     //   }
@@ -73,10 +74,7 @@ export default class AbbrewActor extends Actor {
 
     // const wounds = activeWounds + damage;
 
-
-    // const dodge = Math.max(0, this.system.defense.dodge.value - 1);
-
-    const updates = { "system.defense.guard.value": this.calculateGuard(damage, guard), "system.defense.risk.raw": this.calculateRisk(damage, guard, risk) };
+    const updates = { "system.defense.guard.value": this.calculateGuard(damage, guard), "system.defense.risk.raw": this.calculateRisk(damage, guard, risk, inflexibility) };
     await this.update(updates);
     console.log('updated');
     return this;
@@ -96,6 +94,7 @@ export default class AbbrewActor extends Actor {
 
   applyModifiersToRisk(rolls, data) {
     const rollSuccesses = data.totalSuccesses;
+    // Plate less guard, more risk reduction, leather more guard, less risk reduction
     // TODO: Size Diff
     // TODO: Tier Diff
     // TODO: Lethal Diff
@@ -156,38 +155,31 @@ export default class AbbrewActor extends Actor {
     let rollSuccesses = data.totalSuccesses;
     return data.damage.reduce((result, d) => {
       // TODO: Do we do damage reduction, or just give negations per DR?
-      const damageReduction = /* this.system.defense.damageReduction.some(dr => dr.type === d.damageType) ? this.system.defense.damageReduction.filter(dr => dr.type === d.damageType)[0] : */ { immunity: 0, resistance: 0, weakness: 0, value: 0 };
-      if (damageReduction.immunity > 0) {
+      const protection = /* this.system.defense.protection.some(dr => dr.type === d.damageType) ? this.system.defense.protection.filter(dr => dr.type === d.damageType)[0] : */ { immunity: 0, resistance: 0, weakness: 0, value: 0 };
+      if (protection.immunity > 0) {
         return result;
       }
 
       const firstRoll = rolls[0].dice[0].results[0].result ?? 0;
       // const dodge = this.system.defense.dodge.value;
-      const damageTypeSuccesses = /* firstRoll > dodge ? */ rollSuccesses/*  + damageReduction.weakness - damageReduction.resistance : -1 */;
+      const damageTypeSuccesses = /* firstRoll > dodge ? */ rollSuccesses/*  + protection.weakness - protection.resistance : -1 */;
 
       if (damageTypeSuccesses < 0) {
         return result;
       }
 
-      const dmg = /* damageTypeSuccesses == 0 ? Math.max(0, d.value - damageReduction.value) : */ d.value;
+      const dmg = /* damageTypeSuccesses == 0 ? Math.max(0, d.value - protection.value) : */ d.value;
 
       return result += dmg;
     }, 0);
   }
 
   calculateGuard(damage, guard) {
-    const damageToGuard = this.calculateDamageToGuard(damage, guard);
     return Math.max(0, guard - damage);/* Math.max(0, guard - maxGuardDamage); */
   }
 
-  calculateDamageToGuard(damage, guard) {
-    return Math.min(damage, guard);
-  }
-
-  calculateRisk(damage, guard, risk) {
-    const damageToGuard = this.calculateDamageToGuard(damage, guard);
-    const riskIncrease = damage - damageToGuard;
+  calculateRisk(damage, guard, risk, inflexibility) {
+    const riskIncrease = guard > 0 ? Math.min(damage, inflexibility) : damage;
     return risk + riskIncrease;
   }
-
 }

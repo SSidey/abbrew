@@ -38,7 +38,7 @@
     "SkillActivationType": "Activation Type",
     "SkillActivationTypes": {
       "standalone": "Standalone",
-      "synergy": "synergy"
+      "synergy": "Synergy"
     },
     "Operator": "Operator",
     "Operators": {
@@ -94,7 +94,7 @@
       "basic": "Basic",
       "path": "Path",
       "resource": "Resource",
-      "temporary": "Temporary",      
+      "temporary": "Temporary",
       "untyped": "Untyped"
     },
     "ActionCosts": {
@@ -107,7 +107,14 @@
     },
     "Activatable": "Activatable",
     "HasRequirement": "Has Requirement",
-    "EquippedWeapon": "Equipped Weapon"
+    "EquippedWeapon": "Equipped Weapon",
+    "Wounds": {
+      "general": "General",
+      "bleed": "Bleed",
+      "vital": "Vital",
+      "fatigue": "Fatigue",
+      "terror": "Terror"
+    }
   },
 
   "TYPES": {

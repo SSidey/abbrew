@@ -1,7 +1,9 @@
+import { mergeActorWounds, updateActorWounds } from '../helpers/combat.mjs';
 import {
   onManageActiveEffect,
   prepareActiveEffectCategories,
 } from '../helpers/effects.mjs';
+import { activateSkill } from '../helpers/skill.mjs';
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -68,7 +70,6 @@ export class AbbrewActorSheet extends ActorSheet {
     );
 
     context.config = CONFIG.ABBREW;
-    context.skillSections = Object.keys(CONFIG.ABBREW.skillTypes).filter(s => s !== 'path');
 
     return context;
   }
@@ -138,6 +139,9 @@ export class AbbrewActorSheet extends ActorSheet {
           case 'path':
             skills.path.push(i)
             break;
+          case 'resource':
+            skills.resource.push(i)
+            break;
           case 'temporary':
             skills.temporary.push(i)
             break;
@@ -166,10 +170,37 @@ export class AbbrewActorSheet extends ActorSheet {
     context.gear = gear;
     context.features = features;
     context.spells = spells;
+    context.skillSections = this.updateObjectValueByKey(this.getSkillSectionDisplays(CONFIG.ABBREW.skillTypes, skills), this.skillSectionDisplay);
     context.skills = skills;
     context.anatomy = anatomy;
     context.armour = armour;
     context.weapons = weapons;
+  }
+
+  skillSectionDisplay = {};
+
+  /* -------------------------------------------- */
+
+  getSkillSectionDisplays(skillTypes, skills) {
+    return Object.fromEntries(this.getSkillSectionKeys(skillTypes).map(s => { return { "type": s, "display": skills[s].length > 0 ? 'grid' : 'none' } }).map(x => [x.type, x.display]));
+  }
+
+  /* -------------------------------------------- */
+
+  updateObjectValueByKey = (obj1, obj2) => {
+    var destination = Object.assign({}, obj1);
+    Object.keys(obj2).forEach(k => {
+      if(k in destination && k in obj2) {
+        destination[k] = obj2[k];
+      } 
+    });
+    return destination;
+  }
+
+  /* -------------------------------------------- */
+
+  getSkillSectionKeys(skillTypes) {
+    return Object.keys(skillTypes).filter(s => s !== 'path');
   }
 
   /* -------------------------------------------- */
@@ -185,6 +216,15 @@ export class AbbrewActorSheet extends ActorSheet {
       item.sheet.render(true);
     });
 
+    // Render the skill sheet for viewing/editing prior to the editable check.
+    html.on('click', '.skill-edit', (ev) => {
+      const li = $(ev.currentTarget).parents('.skill');
+      const skill = this.actor.items.get(li.data('skillId'));
+      skill.sheet.render(true);
+    });
+
+    html.on('click', '.skill-activate', this._onSkillActivate.bind(this))
+
     // -------------------------------------------------------------
     // Everything below here is only needed if the sheet is editable
     if (!this.isEditable) return;
@@ -197,6 +237,14 @@ export class AbbrewActorSheet extends ActorSheet {
       const li = $(ev.currentTarget).parents('.item');
       const item = this.actor.items.get(li.data('itemId'));
       item.delete();
+      li.slideUp(200, () => this.render(false));
+    });
+
+    // Delete Skill Item
+    html.on('click', '.skill-delete', (ev) => {
+      const li = $(ev.currentTarget).parents('.skill');
+      const skill = this.actor.items.get(li.data('skillId'));
+      skill.delete();
       li.slideUp(200, () => this.render(false));
     });
 
@@ -220,6 +268,10 @@ export class AbbrewActorSheet extends ActorSheet {
 
     html.on('click', '.skill-header', this._onToggleSkillHeader.bind(this));
 
+    html.on('click', '.wound', this._onWoundClick.bind(this));
+
+    html.on('contextmenu', '.wound', this._onWoundRightClick.bind(this));
+
     // Drag events for macros.
     if (this.actor.isOwner) {
       let handler = (ev) => this._onDragStart(ev);
@@ -231,15 +283,40 @@ export class AbbrewActorSheet extends ActorSheet {
     }
   }
 
+  async _onSkillActivate(event) {
+    event.preventDefault();
+    const target = event.target.closest('.skill');
+    const id = target.dataset.skillId;
+    const skill = this.actor.items.get(id).system;
+    if (skill.activatable && skill.action.activationType === 'standalone') {
+      await activateSkill(this.actor, skill);
+    }
+  }
+
   _onToggleSkillHeader(event) {
     event.preventDefault();
     const target = event.currentTarget;
     const skillSection = target.nextElementSibling;
     if (skillSection.children.length === 0 || skillSection.style.display === "grid" || skillSection.style.display === '') {
+      this.skillSectionDisplay[target.dataset.skillSection] = "none"
       skillSection.style.display = "none";
     } else {
+      this.skillSectionDisplay[target.dataset.skillSection] = "grid"
       skillSection.style.display = "grid";
     }
+  }
+
+  _onWoundClick(event) {
+    this.handleWoundClick(event, 1)
+  }
+
+  _onWoundRightClick(event) {
+    this.handleWoundClick(event, -1)
+  }
+
+  handleWoundClick(event, modification) {
+    const woundType = event.currentTarget.dataset.woundType;
+    updateActorWounds(this.actor, mergeActorWounds(this.actor, [{ type: woundType, value: modification }]));
   }
 
   async _onAttackDamageAction(target) {
@@ -318,6 +395,7 @@ export class AbbrewActorSheet extends ActorSheet {
    */
   async _onItemCreate(event) {
     event.preventDefault();
+    event.stopPropagation();
     const header = event.currentTarget;
     // Get the type of item to create.
     const type = header.dataset.type;

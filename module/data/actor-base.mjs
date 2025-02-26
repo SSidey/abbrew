@@ -12,14 +12,14 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       })
     );
 
-    schema.defense = new fields.SchemaField({      
+    schema.defense = new fields.SchemaField({
       guard: new fields.SchemaField({
         value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
         base: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
         max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
         label: new fields.StringField({ required: true, blank: true })
       }),
-      damageReduction: new fields.ArrayField(
+      protection: new fields.ArrayField(
         new fields.SchemaField({
           type: new fields.StringField({ required: true, blank: true }),
           value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
@@ -29,12 +29,11 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
           label: new fields.StringField({ required: true, blank: true })
         })
       ),
-      dodge: new fields.SchemaField({
-        value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-        max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 })
+      inflexibility: new fields.SchemaField({
+        value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 })
       }),
       risk: new fields.SchemaField({
-        raw: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 100}),
+        raw: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 100 }),
         value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 10 }),
         max: new fields.NumberField({ ...requiredInteger, initial: 10, min: 10, max: 10 })
       }),
@@ -86,7 +85,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     }
 
     this.defense.risk.value = Math.floor(this.defense.risk.raw / 10);
-    
+
     // TODO: Set by tag
     this.defense.canBleed = true;
 
@@ -139,26 +138,27 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     const armour = this.parent.items.filter(i => i.type === 'armour');
     this._prepareDamageReduction(armour, anatomy);
     this._prepareGuard(armour, anatomy);
+    this._prepareInflexibility(armour);
   }
 
   _prepareDamageReduction(armour, anatomy) {
     console.log('ARMOUR');
-    const damageReduction = armour.map(a => a.system.defense.damageReduction).flat(1);
+    const protection = armour.map(a => a.system.defense.protection).flat(1);
 
-    const flatDR = damageReduction.reduce((result, dr) => {
+    const flatDR = protection.reduce((result, dr) => {
       const drType = dr.type;
       if (Object.keys(result).includes(drType)) {
         // if (result[drType].value < dr.value) {
-          result[drType].value += dr.value;
+        result[drType].value += dr.value;
         // }
         // if (result[drType].resistance < dr.resistance) {
-          result[drType].resistance += dr.resistance;
+        result[drType].resistance += dr.resistance;
         // }
         // if (result[drType].immunity < dr.immunity) {
-          result[drType].immunity += dr.immunity;
+        result[drType].immunity += dr.immunity;
         // }
         // if (result[drType].weakness < dr.weakness) {
-          result[drType].weakness += dr.weakness;
+        result[drType].weakness += dr.weakness;
         // }
       }
       else {
@@ -168,8 +168,8 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     }, {}
     );
 
-    this.defense.damageReduction.length = 0;
-    Object.values(flatDR).map(v => this.defense.damageReduction.push(v));
+    this.defense.protection.length = 0;
+    Object.values(flatDR).map(v => this.defense.protection.push(v));
   }
 
   _prepareGuard(armour, anatomy) {
@@ -182,8 +182,11 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     if (this.defense.guard.value > this.defense.guard.max) {
       this.defense.guard.value = this.defense.guard.max;
     }
+  }
 
-    this.defense.dodge.max = Math.max(this.attributes.agi.value - armour.length, 0);
+  _prepareInflexibility(armour) {
+    const inflexibility = armour.map(a => a.system.defense.inflexibility).reduce((a, b) => a + b, 0);
+    this.defense.inflexibility.value = inflexibility;
   }
 
   getRollData() {

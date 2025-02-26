@@ -103,6 +103,11 @@ export class AbbrewItemSheet extends ItemSheet {
       if (t.dataset.action) this._onSkillActionResourceRequirementAction(t, t.dataset.action);
     });
 
+    html.find(".skill-action-modifier-wound-control").click(event => {
+      const t = event.currentTarget;
+      if (t.dataset.action) this._onSkillActionModifierWoundAction(t, t.dataset.action);
+    });
+
     html.find(".skill-action-modifier-damage-control").click(event => {
       const t = event.currentTarget;
       if (t.dataset.action) this._onSkillActionModifierDamageAction(t, t.dataset.action);
@@ -243,6 +248,37 @@ export class AbbrewItemSheet extends ItemSheet {
   }
 
   /**
+    * Handle one of the add or remove wound reduction buttons.
+    * @param {Element} target  Button or context menu entry that triggered this action.
+    * @param {string} action   Action being triggered.
+    * @returns {Promise|void}
+    */
+  _onSkillActionModifierWoundAction(target, action) {
+    if (this.item.system.configurable) {
+      switch (action) {
+        case 'add-skill-action-modifier-wound':
+          return this.addSkillActionModifierWound(target);
+        case 'remove-skill-action-modifier-wound':
+          return this.removeSkillActionModifierWound(target);
+      }
+    }
+  }
+
+  addSkillActionModifierWound(target) {
+    let action = foundry.utils.deepClone(this.item.system.action);
+    action.modifiers.wounds.self = [...action.modifiers.wounds.self, {}];
+    return this.item.update({ "system.action": action });
+
+  }
+
+  removeSkillActionModifierWound(target) {
+    const id = target.closest("li").dataset.id;
+    const action = foundry.utils.deepClone(this.item.system.action);
+    action.modifiers.wounds.self.splice(Number(id), 1);
+    return this.item.update({ "system.action": action });
+  }
+
+  /**
     * Handle one of the add or remove damage reduction buttons.
     * @param {Element} target  Button or context menu entry that triggered this action.
     * @param {string} action   Action being triggered.
@@ -250,12 +286,11 @@ export class AbbrewItemSheet extends ItemSheet {
     */
   _onSkillActionModifierDamageAction(target, action) {
     if (this.item.system.configurable) {
-      switch (action) {
+      switch (action) {        
         case 'add-skill-action-modifier-damage':
           return this.addSkillActionModifierDamage(target);
         case 'remove-skill-action-modifier-damage':
           return this.removeSkillActionModifierDamage(target);
-          break;
       }
     }
   }
@@ -316,15 +351,15 @@ export class AbbrewItemSheet extends ItemSheet {
   }
 
   addDamageReduction() {
-    const damageReduction = this.item.system.defense.damageReduction;
-    return this.item.update({ "system.defense.damageReduction": [...damageReduction, {}] });
+    const protection = this.item.system.defense.protection;
+    return this.item.update({ "system.defense.protection": [...protection, {}] });
   }
 
   removeDamageReduction(target) {
     const id = target.closest("li").dataset.id;
     const defense = foundry.utils.deepClone(this.item.system.defense);
-    defense.damageReduction.splice(Number(id), 1);
-    return this.item.update({ "system.defense.damageReduction": defense.damageReduction });
+    defense.protection.splice(Number(id), 1);
+    return this.item.update({ "system.defense.protection": defense.protection });
   }
 
   addDamage(target) {
