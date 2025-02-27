@@ -84,7 +84,8 @@
       "static": "Static"
     },
     "EquipState": {
-      "held": "Held",
+      "heldOne": "Held 1H",
+      "heldTwo": "Held 2H",
       "worn": "Worn",
       "stowed": "Stowed",
       "dropped": "Dropped"

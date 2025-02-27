@@ -4,9 +4,16 @@ import AbbrewItemBase from "./item-base.mjs";
 export default class AbbrewWeapon extends AbbrewItemBase {
 
   static defineSchema() {
+    const schema = super.defineSchema();
+
+    AbbrewWeapon.addWeaponSchema(schema);
+
+    return schema;
+  }
+
+  static addWeaponSchema(schema) {
     const fields = foundry.data.fields;
     const requiredInteger = { required: true, nullable: false, integer: true };
-    const schema = super.defineSchema();
 
     schema.hands = new fields.SchemaField(
       {
@@ -14,10 +21,8 @@ export default class AbbrewWeapon extends AbbrewItemBase {
         occupied: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
       }
     );
-    
-    AbbrewAttackBase.addAttackSchema(schema);
 
-    return schema;
+    AbbrewAttackBase.addAttackSchema(schema);
   }
 
   prepareDerivedData() {

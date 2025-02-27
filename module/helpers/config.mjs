@@ -79,7 +79,8 @@ ABBREW.attackTypes = {
 }
 
 ABBREW.equipState = {
-  held: "ABBREW.EquipState.held",
+  held1H: "ABBREW.EquipState.heldOne",
+  held2H: "ABBREW.EquipState.heldTwo",
   worn: "ABBREW.EquipState.worn",
   stowed: "ABBREW.EquipState.stowed",
   dropped: "ABBREW.EquipState.dropped"

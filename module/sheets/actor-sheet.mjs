@@ -115,6 +115,7 @@ export class AbbrewActorSheet extends ActorSheet {
     const anatomy = [];
     const armour = [];
     const weapons = [];
+    const equippedWeapons = [];
 
     // Iterate through items, allocating to containers
     for (let i of context.items) {
@@ -157,6 +158,9 @@ export class AbbrewActorSheet extends ActorSheet {
       }
       else if (i.type === 'weapon') {
         weapons.push(i);
+        if (['held1H', 'held2H'].includes(i.system.equipState)) {
+          equippedWeapons.push(i);
+        }
       }
       // Append to spells.
       else if (i.type === 'spell') {
@@ -175,6 +179,7 @@ export class AbbrewActorSheet extends ActorSheet {
     context.anatomy = anatomy;
     context.armour = armour;
     context.weapons = weapons;
+    context.equippedWeapons = equippedWeapons;
   }
 
   skillSectionDisplay = {};
@@ -190,9 +195,9 @@ export class AbbrewActorSheet extends ActorSheet {
   updateObjectValueByKey = (obj1, obj2) => {
     var destination = Object.assign({}, obj1);
     Object.keys(obj2).forEach(k => {
-      if(k in destination && k in obj2) {
+      if (k in destination && k in obj2) {
         destination[k] = obj2[k];
-      } 
+      }
     });
     return destination;
   }
@@ -258,6 +263,8 @@ export class AbbrewActorSheet extends ActorSheet {
       onManageActiveEffect(ev, document);
     });
 
+    html.on('change', '.item-select', this._onItemSelectChange.bind(this));
+
     // Rollable abilities.
     html.on('click', '.rollable', this._onRoll.bind(this));
 
@@ -281,6 +288,17 @@ export class AbbrewActorSheet extends ActorSheet {
         li.addEventListener('dragstart', handler, false);
       });
     }
+  }
+
+  async _onItemSelectChange(event) {
+    const target = event.target;
+    const itemId = target.closest('.item').dataset.itemId;
+    const itemValuePath = target.name;
+    const item = this.actor.items.get(itemId);
+    const value = target.value;
+    const updates = {};
+    updates[itemValuePath] = value;
+    await item.update(updates);
   }
 
   async _onSkillActivate(event) {

@@ -3,7 +3,7 @@ export default class AbbrewAttackBase extends foundry.abstract.TypeDataModel {
     static defineSchema() {
         const schema = super.defineSchema();
 
-        addAttackSchema(schema);
+        AbbrewAttackBase.addAttackSchema(schema);
 
         return schema;
     }

@@ -19,10 +19,14 @@ export const preloadHandlebarsTemplates = async function () {
     'systems/abbrew/templates/item/parts/item-effects.hbs',
     'systems/abbrew/templates/item/parts/item-defenses.hbs',
     'systems/abbrew/templates/item/parts/item-damage.hbs',
+    'systems/abbrew/templates/item/parts/item-equipstate.hbs',
+    // Skill partials.
     'systems/abbrew/templates/item/parts/skill-type.hbs',
     'systems/abbrew/templates/item/parts/skill-actions.hbs',
     'systems/abbrew/templates/item/parts/skill-damage.hbs',
     // Chat Cards.
     'systems/abbrew/templates/chat/attack-card.hbs',
+    'systems/abbrew/templates/chat/finisher-card.hbs',
+    'systems/abbrew/templates/chat/lost-resolve-card.hbs',
   ]);
 };

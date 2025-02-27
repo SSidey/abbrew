@@ -1,4 +1,4 @@
-import { mergeActorWounds } from "../helpers/combat.mjs";
+import { mergeActorWounds, renderLostResolveCard } from "../helpers/combat.mjs";
 import { FINISHERS } from "../static/finishers.mjs";
 
 /**
@@ -143,7 +143,9 @@ export default class AbbrewActor extends Actor {
   async applyFinisher(risk, finisher, finisherCost) {
     const updates = { "system.wounds": mergeActorWounds(this, finisher.wounds), "system.defense.risk.raw": this.reduceRiskForFinisher(risk, finisherCost) };
     await this.update(updates);
-    console.log('updated');
+    if (this.system.wounds.reduce((total, wound) => total += wound.value, 0) >= this.system.defense.resolve.value) {
+      await renderLostResolveCard(this);
+    }
     return this;
   }
 

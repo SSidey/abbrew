@@ -96,7 +96,6 @@
     <div class="tab overview" data-group="primary" data-tab="overview">
       <section class="grid grid-4col">
         <aside class="sidebar grid-span-2">
-
           {{!-- The grid classes are defined in scss/global/_grid.scss. To use,
           use both the "grid" and "grid-Ncol" class where "N" can be any number
           from 1 to 12 and will create that number of columns. --}}
@@ -122,7 +121,7 @@
           module/helpers/templates.mjs --}}
           {{> "systems/abbrew/templates/actor/parts/actor-anatomy.hbs"}}
           {{> "systems/abbrew/templates/actor/parts/actor-armour.hbs"}}
-          {{> "systems/abbrew/templates/actor/parts/actor-weapons.hbs"}}
+          {{> "systems/abbrew/templates/actor/parts/actor-weapons.hbs" weaponsList=equippedWeapons showAttacks=true showEquipState=false}}
         </section>
 
       </section>

@@ -112,6 +112,10 @@ Handlebars.registerHelper('empty', function (collection) {
   return collection.length === 0;
 });
 
+Handlebars.registerHelper('json', function (context) {
+  return JSON.stringify(context, undefined, 2);
+});
+
 /* -------------------------------------------- */
 /*  Ready Hook                                  */
 /* -------------------------------------------- */

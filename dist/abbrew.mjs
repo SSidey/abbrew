@@ -33,17 +33,34 @@ function mergeWoundsWithOperator(wounds, incomingWounds, operator) {
   return Object.values(result).filter((v) => v.value > 0);
 }
 async function updateActorWounds(actor, updateWounds) {
-  actor.update({ "system.wounds": updateWounds });
+  await actor.update({ "system.wounds": updateWounds });
+}
+async function renderLostResolveCard(actor) {
+  const templateData = {
+    actor
+  };
+  const html = await renderTemplate("systems/abbrew/templates/chat/lost-resolve-card.hbs", templateData);
+  const speaker = ChatMessage.getSpeaker({ actor });
+  ChatMessage.create({
+    speaker,
+    content: html
+  });
 }
 async function turnStart(actor) {
   ChatMessage.create({ content: `${actor.name} starts their turn`, speaker: ChatMessage.getSpeaker({ actor }) });
+  const previousWoundTotal = actor.system.wounds.reduce((total, wound) => total += wound.value, 0);
   if (actor.system.defense.canBleed) {
     const filteredWounds = actor.system.wounds.filter((wound) => wound.type === "bleed");
     const bleedingWounds = filteredWounds.length > 0 ? filteredWounds[0].value : 0;
     if (bleedingWounds > 0) {
-      const vitalWounds = [{ type: "vital", value: bleedingWounds }];
+      const bleedModifier = bleedingWounds > 1 ? -1 : 0;
+      const vitalWounds = [{ type: "vital", value: bleedingWounds }, { type: "bleed", value: bleedModifier }];
       await updateActorWounds(actor, mergeActorWounds(actor, vitalWounds));
     }
+  }
+  const updatedWoundTotal = actor.system.wounds.reduce((total, wound) => total += wound.value, 0);
+  if (previousWoundTotal < actor.system.defense.resolve.value && actor.system.defense.resolve.value <= updatedWoundTotal) {
+    await renderLostResolveCard(actor);
   }
 }
 function onManageActiveEffect(event, owner) {
@@ -209,6 +226,7 @@ class AbbrewActorSheet extends ActorSheet {
     const anatomy = [];
     const armour = [];
     const weapons = [];
+    const equippedWeapons = [];
     for (let i of context.items) {
       i.img = i.img || Item.DEFAULT_ICON;
       if (i.type === "item") {
@@ -241,6 +259,9 @@ class AbbrewActorSheet extends ActorSheet {
         armour.push(i);
       } else if (i.type === "weapon") {
         weapons.push(i);
+        if (["held1H", "held2H"].includes(i.system.equipState)) {
+          equippedWeapons.push(i);
+        }
       } else if (i.type === "spell") {
         if (i.system.spellLevel != void 0) {
           spells[i.system.spellLevel].push(i);
@@ -255,6 +276,7 @@ class AbbrewActorSheet extends ActorSheet {
     context.anatomy = anatomy;
     context.armour = armour;
     context.weapons = weapons;
+    context.equippedWeapons = equippedWeapons;
   }
   /* -------------------------------------------- */
   getSkillSectionDisplays(skillTypes, skills) {
@@ -301,6 +323,7 @@ class AbbrewActorSheet extends ActorSheet {
       const document2 = row.dataset.parentId === this.actor.id ? this.actor : this.actor.items.get(row.dataset.parentId);
       onManageActiveEffect(ev, document2);
     });
+    html.on("change", ".item-select", this._onItemSelectChange.bind(this));
     html.on("click", ".rollable", this._onRoll.bind(this));
     html.on("click", ".attack-damage-button", async (event) => {
       const t = event.currentTarget;
@@ -318,6 +341,16 @@ class AbbrewActorSheet extends ActorSheet {
         li.addEventListener("dragstart", handler, false);
       });
     }
+  }
+  async _onItemSelectChange(event) {
+    const target = event.target;
+    const itemId = target.closest(".item").dataset.itemId;
+    const itemValuePath = target.name;
+    const item = this.actor.items.get(itemId);
+    const value = target.value;
+    const updates = {};
+    updates[itemValuePath] = value;
+    await item.update(updates);
   }
   async _onSkillActivate(event) {
     event.preventDefault();
@@ -2369,11 +2402,15 @@ const preloadHandlebarsTemplates = async function() {
     "systems/abbrew/templates/item/parts/item-effects.hbs",
     "systems/abbrew/templates/item/parts/item-defenses.hbs",
     "systems/abbrew/templates/item/parts/item-damage.hbs",
+    "systems/abbrew/templates/item/parts/item-equipstate.hbs",
+    // Skill partials.
     "systems/abbrew/templates/item/parts/skill-type.hbs",
     "systems/abbrew/templates/item/parts/skill-actions.hbs",
     "systems/abbrew/templates/item/parts/skill-damage.hbs",
     // Chat Cards.
-    "systems/abbrew/templates/chat/attack-card.hbs"
+    "systems/abbrew/templates/chat/attack-card.hbs",
+    "systems/abbrew/templates/chat/finisher-card.hbs",
+    "systems/abbrew/templates/chat/lost-resolve-card.hbs"
   ]);
 };
 const ABBREW = {};
@@ -2444,7 +2481,8 @@ ABBREW.attackTypes = {
   static: "ABBREW.AttackTypes.static"
 };
 ABBREW.equipState = {
-  held: "ABBREW.EquipState.held",
+  held1H: "ABBREW.EquipState.heldOne",
+  held2H: "ABBREW.EquipState.heldTwo",
   worn: "ABBREW.EquipState.worn",
   stowed: "ABBREW.EquipState.stowed",
   dropped: "ABBREW.EquipState.dropped"
@@ -2665,12 +2703,15 @@ class AbbrewNPC extends AbbrewActorBase {
 }
 class AbbrewItemBase extends foundry.abstract.TypeDataModel {
   static defineSchema() {
-    const fields = foundry.data.fields;
     const schema = {};
+    AbbrewItemBase.addItemSchema(schema);
+    return schema;
+  }
+  static addItemSchema(schema) {
+    const fields = foundry.data.fields;
     schema.description = new fields.StringField({ required: true, blank: true });
     schema.traits = new fields.StringField({ required: true, blank: true });
-    schema.equipState = new fields.StringField({ required: true, blank: true });
-    return schema;
+    schema.equipState = new fields.StringField({ required: true, blank: false, initial: "stowed" });
   }
 }
 let AbbrewItem$1 = class AbbrewItem extends AbbrewItemBase {
@@ -2867,7 +2908,7 @@ class AbbrewArmour extends AbbrewItemBase {
 class AbbrewAttackBase extends foundry.abstract.TypeDataModel {
   static defineSchema() {
     const schema = super.defineSchema();
-    addAttackSchema(schema);
+    AbbrewAttackBase.addAttackSchema(schema);
     return schema;
   }
   static addAttackSchema(schema) {
@@ -2892,9 +2933,13 @@ class AbbrewAttackBase extends foundry.abstract.TypeDataModel {
 }
 class AbbrewWeapon extends AbbrewItemBase {
   static defineSchema() {
+    const schema = super.defineSchema();
+    AbbrewWeapon.addWeaponSchema(schema);
+    return schema;
+  }
+  static addWeaponSchema(schema) {
     const fields = foundry.data.fields;
     const requiredInteger = { required: true, nullable: false, integer: true };
-    const schema = super.defineSchema();
     schema.hands = new fields.SchemaField(
       {
         required: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
@@ -2902,7 +2947,6 @@ class AbbrewWeapon extends AbbrewItemBase {
       }
     );
     AbbrewAttackBase.addAttackSchema(schema);
-    return schema;
   }
   prepareDerivedData() {
     this.formula = `1d10x10cs10`;
@@ -3027,7 +3071,9 @@ class AbbrewActor extends Actor {
   async applyFinisher(risk, finisher, finisherCost) {
     const updates = { "system.wounds": mergeActorWounds(this, finisher.wounds), "system.defense.risk.raw": this.reduceRiskForFinisher(risk, finisherCost) };
     await this.update(updates);
-    console.log("updated");
+    if (this.system.wounds.reduce((total, wound) => total += wound.value, 0) >= this.system.defense.resolve.value) {
+      await renderLostResolveCard(this);
+    }
     return this;
   }
   reduceRiskForFinisher(risk, finisherCost) {
@@ -3191,6 +3237,9 @@ Handlebars.registerHelper("empty", function(collection) {
     return false;
   }
   return collection.length === 0;
+});
+Handlebars.registerHelper("json", function(context) {
+  return JSON.stringify(context, void 0, 2);
 });
 Hooks.once("ready", function() {
   Hooks.on("hotbarDrop", (bar, data, slot) => createItemMacro(data, slot));
