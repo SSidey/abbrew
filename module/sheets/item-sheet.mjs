@@ -363,7 +363,7 @@ export class AbbrewItemSheet extends ItemSheet {
   }
 
   addDamage(target) {
-    const attackProfileId = target.closest(".attackProfile").dataset.id;
+    const attackProfileId = target.closest(".attack-profile").dataset.id;
     const attackProfiles = foundry.utils.deepClone(this.item.system.attackProfiles);
     const damage = attackProfiles[attackProfileId].damage;
     attackProfiles[attackProfileId].damage = [...damage, {}];
@@ -372,7 +372,7 @@ export class AbbrewItemSheet extends ItemSheet {
 
   removeDamage(target) {
     const damageId = target.closest("li").dataset.id;
-    const attackProfileId = target.closest(".attackProfile").dataset.id;
+    const attackProfileId = target.closest(".attack-profile").dataset.id;
     const attackProfiles = foundry.utils.deepClone(this.item.system.attackProfiles);
     attackProfiles[attackProfileId].damage.splice(Number(damageId), 1);
     return this.item.update({ "system.attackProfiles": attackProfiles });

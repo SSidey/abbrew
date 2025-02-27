@@ -17,13 +17,15 @@
         </a>
       </div>
       <h4 class="rollable" data-roll-type="item">{{item.name}}</h4>
-      {{#if ../showAttacks}}
+      {{#if ../showAttackProfiles}}
       <div class="weapon-attack-profiles">
         {{#each item.system.attackProfiles as |attackProfile attackProfileId|}}
         <ol>
-          <li class="attackProfile" data-attack-profile-id="{{attackProfileId}}">
+          <li class="attack-profile" data-attack-profile-id="{{attackProfileId}}">
             <button type="button" class="attack-damage-button">{{attackProfile.name}}</button>
             <label>{{attackProfile.attackType}}</label>
+            <button type="button" class="attack-feint-button">Feint</button>
+            <button type="button" class="attack-finisher-button">Finisher</button>
           </li>
         </ol>
         {{/each}}

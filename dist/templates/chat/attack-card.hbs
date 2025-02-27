@@ -24,11 +24,11 @@
                 </div>
                 <h4 class="dice-total">
                     <ol>
-                    {{#each damage as |dmg id|}}
+                        {{#each damage as |dmg id|}}
                         <div>
                             <label>{{dmg.value}} {{dmg.damageType}}</label>
                         </div>
-                    {{/each}}
+                        {{/each}}
                     </ol>
                 </h4>
             </div>
@@ -36,9 +36,14 @@
     </div>
 
     <div class="card-buttons">
+        {{#if showAttack}}
         <button data-action="damage">Damage</button>
-        {{#if totalSuccesses}} 
-            <button data-action="finisher">Finisher</button>
+        {{/if}}
+        {{#if showAttack}}
+        <button data-action="parry">Parry</button>
+        {{/if}}
+        {{#if showFinisher}}
+        <button data-action="finisher">Finisher</button>
         {{/if}}
     </div>
 </div>

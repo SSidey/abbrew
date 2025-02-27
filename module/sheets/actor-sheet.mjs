@@ -270,7 +270,17 @@ export class AbbrewActorSheet extends ActorSheet {
 
     html.on('click', '.attack-damage-button', async (event) => {
       const t = event.currentTarget;
-      await this._onAttackDamageAction(t);
+      await this._onAttackDamageAction(t, 'attack');
+    });
+
+    html.on('click', '.attack-feint-button', async (event) => {
+      const t = event.currentTarget;
+      await this._onAttackDamageAction(t, 'feint');
+    });
+
+    html.on('click', '.attack-finisher-button', async (event) => {
+      const t = event.currentTarget;
+      await this._onAttackDamageAction(t, 'finisher');
     });
 
     html.on('click', '.skill-header', this._onToggleSkillHeader.bind(this));
@@ -337,10 +347,10 @@ export class AbbrewActorSheet extends ActorSheet {
     updateActorWounds(this.actor, mergeActorWounds(this.actor, [{ type: woundType, value: modification }]));
   }
 
-  async _onAttackDamageAction(target) {
+  async _onAttackDamageAction(target, attackMode) {
 
     const itemId = target.closest('li.item').dataset.itemId;
-    const attackProfileId = target.closest('li .attackProfile').dataset.attackProfileId;
+    const attackProfileId = target.closest('li .attack-profile').dataset.attackProfileId;
     const item = this.actor.items.get(itemId);
     const attackProfile = item.system.attackProfiles[attackProfileId];
 
@@ -380,6 +390,10 @@ export class AbbrewActorSheet extends ActorSheet {
       return total;
     }, 0);
 
+
+    const showAttack = ['attack', 'feint'].includes(attackMode);
+    const isFeint = attackMode === 'feint';
+    const showFinisher = attackMode === 'finisher' || totalSuccesses > 0;
     const templateData = {
       attackProfile,
       totalSuccesses,
@@ -388,7 +402,10 @@ export class AbbrewActorSheet extends ActorSheet {
       actor: this.actor,
       item: this.item,
       tokenId: token?.uuid || null,
+      showAttack,
+      showFinisher
     };
+
     // TODO: Move this out of item and into a weapon.mjs
     const html = await renderTemplate("systems/abbrew/templates/chat/attack-card.hbs", templateData);
 
@@ -401,7 +418,7 @@ export class AbbrewActorSheet extends ActorSheet {
       rollMode: rollMode,
       flavor: label,
       content: html,
-      flags: { data: { totalSuccesses, damage } }
+      flags: { data: { totalSuccesses, damage, isFeint, attackingActor: this.actor } }
     });
     return result;
   }

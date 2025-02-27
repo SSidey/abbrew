@@ -1,0 +1,26 @@
+<div class="abbrew chat-message chat-card flexcol " data-actor-id="{{actor._id}}" data-token-id="{{tokenId}}"
+    data-message-id="{{messageId}}">
+    <header>
+        {{#if attackerAdvantage}}
+        <h3 class="attack-result">Result: {{attackingActor.name}} Advantage</h3>
+        {{else}}
+            {{#if defenderAdvantage}}
+            <h3 class="attack-result">Result: {{defendingActor.name}} Advantage</h3>
+            {{else}}
+            <h3 class="attack-result">Result: Attacked</h3>
+            {{/if}}
+        {{/if}}
+    </header>
+
+    <div class="message-content">        
+        {{#if attackerAdvantage}}
+        <div>{{attackingActor.name}} successfully feints {{defendingActor.name}}</div>
+        {{else}}
+            {{#if defenderAdvantage}}
+            <div>{{defendingActor.name}} successfully parries {{attackingActor.name}}</div>
+            {{else}}
+            <div>{{attackingActor.name}} attacks {{defendingActor.name}}</div>
+            {{/if}}
+        {{/if}}
+    </div>
+</div>

@@ -48,35 +48,17 @@ export default class AbbrewActor extends Actor {
     return { ...super.getRollData(), ...this.system.getRollData?.() ?? null };
   }
 
-  async takeDamage(rolls, data) {
-    console.log('Got me');
+  async takeDamage(rolls, data, action) {
+    Hooks.call('actorTakesDamage', this);
     let guard = this.system.defense.guard.value;
     let risk = this.system.defense.risk.raw;
     const inflexibility = this.system.defense.inflexibility.value;
-    // let activeWounds = this.system.wounds.active.value;
-    // const maxGuardDamage = this.system.defense.protection.reduce((a, b) => {
-    //   if (b.value > a) {
-    //     a = b.value;
-    //   }
-    //   return a;
-    // }, 1);
 
-    // TODO: Pass Damage Types
-    // TODO: Determine DRs by damage type
+    const damage = this.applyModifiersToDamage(rolls, data, action);
 
-    // TODO: Do we still want this?
-    // const guardBreak = rolls[0].dice[0].results[0].result > guard;
-    // if (guardBreak) {
-    //   totalSuccesses += 1;
-    // }
-
-    const damage = this.applyModifiersToDamage(rolls, data);
-
-    // const wounds = activeWounds + damage;
-
-    const updates = { "system.defense.guard.value": this.calculateGuard(damage, guard), "system.defense.risk.raw": this.calculateRisk(damage, guard, risk, inflexibility) };
+    const updates = { "system.defense.guard.value": this.calculateGuard(damage, guard, data.isFeint, action), "system.defense.risk.raw": this.calculateRisk(damage, guard, risk, inflexibility, data.isFeint, action) };
     await this.update(updates);
-    console.log('updated');
+    await this.renderAttackResultCard(data, action);
     return this;
   }
 
@@ -113,6 +95,7 @@ export default class AbbrewActor extends Actor {
 
 
   getAvailableFinishersForDamageType(data) {
+    // TODO: Only looking at main damage type?
     return data.damage[0].damageType in FINISHERS ? FINISHERS[data.damage[0].damageType] : FINISHERS['general'];
   }
 
@@ -186,12 +169,60 @@ export default class AbbrewActor extends Actor {
     }, 0);
   }
 
-  calculateGuard(damage, guard) {
-    return Math.max(0, guard - damage);/* Math.max(0, guard - maxGuardDamage); */
+  calculateGuard(damage, guard, isFeint, action) {
+    let guardDamage = damage;
+    if (this.defenderGainsAdvantage(isFeint, action)) {
+      guardDamage = -10;
+    }
+
+    return Math.max(0, guard - guardDamage);
   }
 
-  calculateRisk(damage, guard, risk, inflexibility) {
-    const riskIncrease = guard > 0 ? Math.min(damage, inflexibility) : damage;
+  calculateRisk(damage, guard, risk, inflexibility, isFeint, action) {
+    let riskIncrease = guard > 0 ? Math.min(damage, inflexibility) : damage;
+    if (this.attackerGainsAdvantage(isFeint, action)) {
+      riskIncrease += damage;
+    } else if (this.defenderGainsAdvantage()) {
+      riskIncrease = 0;
+    }
+
     return risk + riskIncrease;
+  }
+
+  defenderGainsAdvantage(isFeint, action) {
+    return isFeint === false && action === 'parry';
+  }
+
+  attackerGainsAdvantage(isFeint, action) {
+    return isFeint === true && action === 'parry';
+  }
+
+  async renderAttackResultCard(data, action) {
+    const attackerAdvantage = this.attackerGainsAdvantage(data.isFeint, action);
+    const defenderAdvantage = this.defenderGainsAdvantage(data.isFeint, action);
+
+    if (attackerAdvantage || defenderAdvantage) {
+      const templateData = {
+        attackerAdvantage,
+        defenderAdvantage,
+        actor: this,
+        defendingActor: this,
+        attackingActor: data.attackingActor,
+        tokenId: this.token?.uuid || null,
+      };
+
+      const html = await renderTemplate("systems/abbrew/templates/chat/attack-result-card.hbs", templateData);
+
+      // Initialize chat data.
+      const speaker = ChatMessage.getSpeaker({ actor: this.actor });
+
+      ChatMessage.create({
+        speaker: speaker,
+        // rollMode: rollMode,
+        // flavor: label,
+        content: html,
+        flags: { /* data: { finisher, finisherCost } */ }
+      });
+    }
   }
 }

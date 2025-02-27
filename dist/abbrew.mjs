@@ -327,7 +327,15 @@ class AbbrewActorSheet extends ActorSheet {
     html.on("click", ".rollable", this._onRoll.bind(this));
     html.on("click", ".attack-damage-button", async (event) => {
       const t = event.currentTarget;
-      await this._onAttackDamageAction(t);
+      await this._onAttackDamageAction(t, "attack");
+    });
+    html.on("click", ".attack-feint-button", async (event) => {
+      const t = event.currentTarget;
+      await this._onAttackDamageAction(t, "feint");
+    });
+    html.on("click", ".attack-finisher-button", async (event) => {
+      const t = event.currentTarget;
+      await this._onAttackDamageAction(t, "finisher");
     });
     html.on("click", ".skill-header", this._onToggleSkillHeader.bind(this));
     html.on("click", ".wound", this._onWoundClick.bind(this));
@@ -383,9 +391,9 @@ class AbbrewActorSheet extends ActorSheet {
     const woundType = event.currentTarget.dataset.woundType;
     updateActorWounds(this.actor, mergeActorWounds(this.actor, [{ type: woundType, value: modification }]));
   }
-  async _onAttackDamageAction(target) {
+  async _onAttackDamageAction(target, attackMode) {
     const itemId = target.closest("li.item").dataset.itemId;
-    const attackProfileId = target.closest("li .attackProfile").dataset.attackProfileId;
+    const attackProfileId = target.closest("li .attack-profile").dataset.attackProfileId;
     const item = this.actor.items.get(itemId);
     const attackProfile = item.system.attackProfiles[attackProfileId];
     const roll = new Roll(item.system.formula, item.actor);
@@ -415,6 +423,9 @@ class AbbrewActorSheet extends ActorSheet {
       }
       return total;
     }, 0);
+    const showAttack = ["attack", "feint"].includes(attackMode);
+    const isFeint = attackMode === "feint";
+    const showFinisher = attackMode === "finisher" || totalSuccesses > 0;
     const templateData = {
       attackProfile,
       totalSuccesses,
@@ -422,7 +433,9 @@ class AbbrewActorSheet extends ActorSheet {
       damage,
       actor: this.actor,
       item: this.item,
-      tokenId: (token == null ? void 0 : token.uuid) || null
+      tokenId: (token == null ? void 0 : token.uuid) || null,
+      showAttack,
+      showFinisher
     };
     const html = await renderTemplate("systems/abbrew/templates/chat/attack-card.hbs", templateData);
     const speaker = ChatMessage.getSpeaker({ actor: this.actor });
@@ -433,7 +446,7 @@ class AbbrewActorSheet extends ActorSheet {
       rollMode,
       flavor: label,
       content: html,
-      flags: { data: { totalSuccesses, damage } }
+      flags: { data: { totalSuccesses, damage, isFeint, attackingActor: this.actor } }
     });
     return result;
   }
@@ -2372,7 +2385,7 @@ class AbbrewItemSheet extends ItemSheet {
     return this.item.update({ "system.defense.protection": defense.protection });
   }
   addDamage(target) {
-    const attackProfileId = target.closest(".attackProfile").dataset.id;
+    const attackProfileId = target.closest(".attack-profile").dataset.id;
     const attackProfiles = foundry.utils.deepClone(this.item.system.attackProfiles);
     const damage = attackProfiles[attackProfileId].damage;
     attackProfiles[attackProfileId].damage = [...damage, {}];
@@ -2380,7 +2393,7 @@ class AbbrewItemSheet extends ItemSheet {
   }
   removeDamage(target) {
     const damageId = target.closest("li").dataset.id;
-    const attackProfileId = target.closest(".attackProfile").dataset.id;
+    const attackProfileId = target.closest(".attack-profile").dataset.id;
     const attackProfiles = foundry.utils.deepClone(this.item.system.attackProfiles);
     attackProfiles[attackProfileId].damage.splice(Number(damageId), 1);
     return this.item.update({ "system.attackProfiles": attackProfiles });
@@ -2410,7 +2423,8 @@ const preloadHandlebarsTemplates = async function() {
     // Chat Cards.
     "systems/abbrew/templates/chat/attack-card.hbs",
     "systems/abbrew/templates/chat/finisher-card.hbs",
-    "systems/abbrew/templates/chat/lost-resolve-card.hbs"
+    "systems/abbrew/templates/chat/lost-resolve-card.hbs",
+    "systems/abbrew/templates/chat/attack-result-card.hbs"
   ]);
 };
 const ABBREW = {};
@@ -3012,15 +3026,15 @@ class AbbrewActor extends Actor {
     var _a, _b;
     return { ...super.getRollData(), ...((_b = (_a = this.system).getRollData) == null ? void 0 : _b.call(_a)) ?? null };
   }
-  async takeDamage(rolls, data) {
-    console.log("Got me");
+  async takeDamage(rolls, data, action) {
+    Hooks.call("actorTakesDamage", this);
     let guard = this.system.defense.guard.value;
     let risk = this.system.defense.risk.raw;
     const inflexibility = this.system.defense.inflexibility.value;
-    const damage = this.applyModifiersToDamage(rolls, data);
-    const updates = { "system.defense.guard.value": this.calculateGuard(damage, guard), "system.defense.risk.raw": this.calculateRisk(damage, guard, risk, inflexibility) };
+    const damage = this.applyModifiersToDamage(rolls, data, action);
+    const updates = { "system.defense.guard.value": this.calculateGuard(damage, guard, data.isFeint, action), "system.defense.risk.raw": this.calculateRisk(damage, guard, risk, inflexibility, data.isFeint, action) };
     await this.update(updates);
-    console.log("updated");
+    await this.renderAttackResultCard(data, action);
     return this;
   }
   async takeFinisher(rolls, data) {
@@ -3104,12 +3118,53 @@ class AbbrewActor extends Actor {
       return result += dmg;
     }, 0);
   }
-  calculateGuard(damage, guard) {
-    return Math.max(0, guard - damage);
+  calculateGuard(damage, guard, isFeint, action) {
+    let guardDamage = damage;
+    if (this.defenderGainsAdvantage(isFeint, action)) {
+      guardDamage = -10;
+    }
+    return Math.max(0, guard - guardDamage);
   }
-  calculateRisk(damage, guard, risk, inflexibility) {
-    const riskIncrease = guard > 0 ? Math.min(damage, inflexibility) : damage;
+  calculateRisk(damage, guard, risk, inflexibility, isFeint, action) {
+    let riskIncrease = guard > 0 ? Math.min(damage, inflexibility) : damage;
+    if (this.attackerGainsAdvantage(isFeint, action)) {
+      riskIncrease += damage;
+    } else if (this.defenderGainsAdvantage()) {
+      riskIncrease = 0;
+    }
     return risk + riskIncrease;
+  }
+  defenderGainsAdvantage(isFeint, action) {
+    return isFeint === false && action === "parry";
+  }
+  attackerGainsAdvantage(isFeint, action) {
+    return isFeint === true && action === "parry";
+  }
+  async renderAttackResultCard(data, action) {
+    var _a;
+    const attackerAdvantage = this.attackerGainsAdvantage(data.isFeint, action);
+    const defenderAdvantage = this.defenderGainsAdvantage(data.isFeint, action);
+    if (attackerAdvantage || defenderAdvantage) {
+      const templateData = {
+        attackerAdvantage,
+        defenderAdvantage,
+        actor: this,
+        defendingActor: this,
+        attackingActor: data.attackingActor,
+        tokenId: ((_a = this.token) == null ? void 0 : _a.uuid) || null
+      };
+      const html = await renderTemplate("systems/abbrew/templates/chat/attack-result-card.hbs", templateData);
+      const speaker = ChatMessage.getSpeaker({ actor: this.actor });
+      ChatMessage.create({
+        speaker,
+        // rollMode: rollMode,
+        // flavor: label,
+        content: html,
+        flags: {
+          /* data: { finisher, finisherCost } */
+        }
+      });
+    }
   }
 }
 class AbbrewItem2 extends Item {
@@ -3144,16 +3199,19 @@ class AbbrewItem2 extends Item {
     game.items.get(card.dataset.itemId);
     switch (action) {
       case "damage":
-        await this._onAcceptDamageAction(message.rolls, message.flags.data);
+        await this._onAcceptDamageAction(message.rolls, message.flags.data, action);
+        break;
+      case "parry":
+        await this._onAcceptDamageAction(message.rolls, message.flags.data, action);
         break;
       case "finisher":
         await this._onAcceptFinisherAction(message.rolls, message.flags.data);
         break;
     }
   }
-  static async _onAcceptDamageAction(rolls, data) {
+  static async _onAcceptDamageAction(rolls, data, action) {
     const tokens = canvas.tokens.controlled.filter((token) => token.actor);
-    await tokens[0].actor.takeDamage(rolls, data);
+    await tokens[0].actor.takeDamage(rolls, data, action);
   }
   static async _onAcceptFinisherAction(rolls, data) {
     const tokens = canvas.tokens.controlled.filter((token) => token.actor);
@@ -3247,6 +3305,13 @@ Handlebars.registerHelper("empty", function(collection) {
 });
 Handlebars.registerHelper("json", function(context) {
   return JSON.stringify(context, void 0, 2);
+});
+Handlebars.registerHelper("or", function(value, obj1, obj2, opts) {
+  if (value === obj1 || value === obj2) {
+    return opts.fn(this);
+  } else {
+    return opts.inverse(this);
+  }
 });
 Hooks.once("ready", function() {
   Hooks.on("hotbarDrop", (bar, data, slot) => createItemMacro(data, slot));

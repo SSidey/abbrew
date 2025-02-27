@@ -116,6 +116,14 @@ Handlebars.registerHelper('json', function (context) {
   return JSON.stringify(context, undefined, 2);
 });
 
+Handlebars.registerHelper('or', function (value, obj1, obj2, opts) {
+  if (value === obj1 || value === obj2) {
+    return opts.fn(this);
+  } else {
+    return opts.inverse(this);
+  }
+});
+
 /* -------------------------------------------- */
 /*  Ready Hook                                  */
 /* -------------------------------------------- */
