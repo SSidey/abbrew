@@ -88,8 +88,12 @@ export default class AbbrewActor extends Actor {
     const finisherCost = this.getFinisherCost(availableFinishers, totalRisk);
     const finisher = this.getFinisher(availableFinishers, finisherCost);
     console.log(finisher);
-    await this.sendFinisherToChat(finisher, finisherCost);
-    return await this.applyFinisher(risk, finisher, finisherCost);
+    if (finisher) {
+      await this.sendFinisherToChat(finisher, finisherCost);
+      return await this.applyFinisher(risk, finisher, finisherCost);
+    }
+    // TODO: Report to chat that the finisher failed?
+    console.log('No finisher was possible');
   }
 
   applyModifiersToRisk(rolls, data) {
@@ -99,8 +103,14 @@ export default class AbbrewActor extends Actor {
     // TODO: Tier Diff
     // TODO: Lethal Diff
     // TODO: Material Tier Diff
-    return 0 + this.system.defense.risk.value + rollSuccesses;
+    return 0 + this.system.defense.risk.value + rollSuccesses - this.getInflexibilityRiskModifier();
   }
+
+  getInflexibilityRiskModifier() {
+    const inflexibility = this.system.defense.inflexibility.value;
+    return Math.ceil(inflexibility / 10);
+  }
+
 
   getAvailableFinishersForDamageType(data) {
     return data.damage[0].damageType in FINISHERS ? FINISHERS[data.damage[0].damageType] : FINISHERS['general'];
