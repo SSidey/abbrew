@@ -36,12 +36,14 @@
     </div>
 
     <div class="card-buttons">
+        {{#unless showFinisher}}
         {{#if showAttack}}
         <button data-action="damage">Damage</button>
         {{/if}}
         {{#if showAttack}}
         <button data-action="parry">Parry</button>
         {{/if}}
+        {{/unless}}
         {{#if showFinisher}}
         <button data-action="finisher">Finisher</button>
         {{/if}}

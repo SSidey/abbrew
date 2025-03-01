@@ -32,19 +32,42 @@ export async function updateActorWounds(actor, updateWounds) {
 }
 
 export async function renderLostResolveCard(actor) {
-    const templateData = {
-        actor: actor
+    if (!actor.statuses.has('dead')) {
+        const templateData = {
+            actor: actor
+        };
+
+        await setActorToDefeated(actor);
+
+        const html = await renderTemplate("systems/abbrew/templates/chat/lost-resolve-card.hbs", templateData);
+
+        // Initialize chat data.
+        const speaker = ChatMessage.getSpeaker({ actor: actor });
+        // const rollMode = game.settings.get('core', 'rollMode');
+        ChatMessage.create({
+            speaker: speaker,
+            content: html
+        });
+    }
+}
+
+async function setActorToDefeated(actor) {
+    const defeatedEffectData = {
+        _id: actor._id,
+        name: "Defeated",
+        img: actor.img,
+        changes: [],
+        disabled: false,
+        duration: {},
+        description: "Increased movement speed and action economy",
+        origin: actor._id,
+        tint: '',
+        transfer: false,
+        statuses: new Set(['dead']),
+        flags: {}
     };
 
-    const html = await renderTemplate("systems/abbrew/templates/chat/lost-resolve-card.hbs", templateData);
-
-    // Initialize chat data.
-    const speaker = ChatMessage.getSpeaker({ actor: actor });
-    // const rollMode = game.settings.get('core', 'rollMode');
-    ChatMessage.create({
-        speaker: speaker,
-        content: html
-    });
+    await actor.createEmbeddedDocuments('ActiveEffect', [defeatedEffectData]);
 }
 
 async function turnStart(actor) {

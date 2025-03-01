@@ -36,15 +36,35 @@ async function updateActorWounds(actor, updateWounds) {
   await actor.update({ "system.wounds": updateWounds });
 }
 async function renderLostResolveCard(actor) {
-  const templateData = {
-    actor
+  if (!actor.statuses.has("dead")) {
+    const templateData = {
+      actor
+    };
+    await setActorToDefeated(actor);
+    const html = await renderTemplate("systems/abbrew/templates/chat/lost-resolve-card.hbs", templateData);
+    const speaker = ChatMessage.getSpeaker({ actor });
+    ChatMessage.create({
+      speaker,
+      content: html
+    });
+  }
+}
+async function setActorToDefeated(actor) {
+  const defeatedEffectData = {
+    _id: actor._id,
+    name: "Defeated",
+    img: actor.img,
+    changes: [],
+    disabled: false,
+    duration: {},
+    description: "Increased movement speed and action economy",
+    origin: actor._id,
+    tint: "",
+    transfer: false,
+    statuses: /* @__PURE__ */ new Set(["dead"]),
+    flags: {}
   };
-  const html = await renderTemplate("systems/abbrew/templates/chat/lost-resolve-card.hbs", templateData);
-  const speaker = ChatMessage.getSpeaker({ actor });
-  ChatMessage.create({
-    speaker,
-    content: html
-  });
+  await actor.createEmbeddedDocuments("ActiveEffect", [defeatedEffectData]);
 }
 async function turnStart(actor) {
   ChatMessage.create({ content: `${actor.name} starts their turn`, speaker: ChatMessage.getSpeaker({ actor }) });
@@ -75,7 +95,7 @@ function onManageActiveEffect(event, owner) {
           name: game.i18n.format("DOCUMENT.New", {
             type: game.i18n.localize("DOCUMENT.ActiveEffect")
           }),
-          icon: "icons/svg/aura.svg",
+          img: "icons/svg/aura.svg",
           origin: owner.uuid,
           "duration.rounds": li.dataset.effectType === "temporary" ? 1 : void 0,
           disabled: li.dataset.effectType === "inactive"
@@ -3038,6 +3058,8 @@ class AbbrewActor extends Actor {
     return this;
   }
   async takeFinisher(rolls, data) {
+    if (data.totalSuccesses < 1)
+      ;
     const risk = this.system.defense.risk.raw;
     console.log("Finisher");
     const totalRisk = this.applyModifiersToRisk(rolls, data);
@@ -3305,13 +3327,6 @@ Handlebars.registerHelper("empty", function(collection) {
 });
 Handlebars.registerHelper("json", function(context) {
   return JSON.stringify(context, void 0, 2);
-});
-Handlebars.registerHelper("or", function(value, obj1, obj2, opts) {
-  if (value === obj1 || value === obj2) {
-    return opts.fn(this);
-  } else {
-    return opts.inverse(this);
-  }
 });
 Hooks.once("ready", function() {
   Hooks.on("hotbarDrop", (bar, data, slot) => createItemMacro(data, slot));

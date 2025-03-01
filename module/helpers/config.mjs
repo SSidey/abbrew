@@ -1,3 +1,4 @@
+// Namespace Configuration Values
 export const ABBREW = {};
 
 /**
@@ -39,7 +40,7 @@ ABBREW.Damage = "ABBREW.Damage";
 ABBREW.operator = "ABBREW.Operator"
 ABBREW.operators = {
   equal: "ABBREW.Operators.equal",
-  add: "ABBREW.Operators.add",  
+  add: "ABBREW.Operators.add",
 }
 
 ABBREW.Defense = {

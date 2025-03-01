@@ -63,6 +63,8 @@ export default class AbbrewActor extends Actor {
   }
 
   async takeFinisher(rolls, data) {
+    // TODO: Check for successes or Off Guard
+    if (data.totalSuccesses < 1) { }
     const risk = this.system.defense.risk.raw;
     console.log('Finisher');
     const totalRisk = this.applyModifiersToRisk(rolls, data);
@@ -137,6 +139,7 @@ export default class AbbrewActor extends Actor {
     const updates = { "system.wounds": mergeActorWounds(this, finisher.wounds), "system.defense.risk.raw": this.reduceRiskForFinisher(risk, finisherCost) };
     await this.update(updates);
     if (this.system.wounds.reduce((total, wound) => total += wound.value, 0) >= this.system.defense.resolve.value) {
+      // TODO: Mark Actor as defeated
       await renderLostResolveCard(this);
     }
     return this;
