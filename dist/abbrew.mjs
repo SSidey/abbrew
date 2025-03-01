@@ -35,8 +35,18 @@ function mergeWoundsWithOperator(wounds, incomingWounds, operator) {
 async function updateActorWounds(actor, updateWounds) {
   await actor.update({ "system.wounds": updateWounds });
 }
+async function checkActorFatalWounds$1(actor) {
+  if (actor.system.defense.fatalWounds) {
+    const fatalWounds = JSON.parse(actor.system.defense.fatalWounds).map((w) => w.value.toLowerCase());
+    const activeFatalWounds = actor.system.wounds.filter((w) => fatalWounds.includes(w.type));
+    const exceededFatalWounds = activeFatalWounds.filter((w) => w.value > actor.system.defense.resolve.max);
+    if (exceededFatalWounds && exceededFatalWounds.length > 0) {
+      await setActorToDead(actor);
+    }
+  }
+}
 async function renderLostResolveCard(actor) {
-  if (!actor.statuses.has("dead")) {
+  if (!actor.statuses.has("defeated")) {
     const templateData = {
       actor
     };
@@ -57,11 +67,31 @@ async function setActorToDefeated(actor) {
     changes: [],
     disabled: false,
     duration: {},
-    description: "Increased movement speed and action economy",
+    description: "You resolve buckles as you are unable to continue the fight.",
     origin: actor._id,
     tint: "",
     transfer: false,
-    statuses: /* @__PURE__ */ new Set(["dead"]),
+    statuses: /* @__PURE__ */ new Set(["defeated"]),
+    flags: {}
+  };
+  await actor.createEmbeddedDocuments("ActiveEffect", [defeatedEffectData]);
+}
+async function setActorToDead(actor) {
+  const defeatedEffectData = {
+    _id: actor._id,
+    name: "Dead",
+    img: actor.img,
+    changes: [],
+    disabled: false,
+    duration: {},
+    description: "You have suffered fatal wounds, resulting in death.",
+    origin: actor._id,
+    tint: "",
+    transfer: false,
+    statuses: /* @__PURE__ */ new Set([
+      "dead"
+      /* , 'defeated' */
+    ]),
     flags: {}
   };
   await actor.createEmbeddedDocuments("ActiveEffect", [defeatedEffectData]);
@@ -82,6 +112,7 @@ async function turnStart(actor) {
   if (previousWoundTotal < actor.system.defense.resolve.value && actor.system.defense.resolve.value <= updatedWoundTotal) {
     await renderLostResolveCard(actor);
   }
+  await checkActorFatalWounds$1(actor);
 }
 function onManageActiveEffect(event, owner) {
   event.preventDefault();
@@ -153,372 +184,6 @@ async function activateSkill(actor, skill) {
     updates["system.wounds"] = updateWounds;
   }
   await actor.update(updates);
-}
-class AbbrewActorSheet extends ActorSheet {
-  constructor() {
-    super(...arguments);
-    __publicField(this, "skillSectionDisplay", {});
-    /* -------------------------------------------- */
-    __publicField(this, "updateObjectValueByKey", (obj1, obj2) => {
-      var destination = Object.assign({}, obj1);
-      Object.keys(obj2).forEach((k) => {
-        if (k in destination && k in obj2) {
-          destination[k] = obj2[k];
-        }
-      });
-      return destination;
-    });
-  }
-  /** @override */
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
-      classes: ["abbrew", "sheet", "actor"],
-      width: 750,
-      height: 600,
-      tabs: [
-        {
-          navSelector: ".sheet-tabs",
-          contentSelector: ".sheet-body",
-          initial: "skills"
-        }
-      ]
-    });
-  }
-  /** @override */
-  get template() {
-    return `systems/abbrew/templates/actor/actor-${this.actor.type}-sheet.hbs`;
-  }
-  /* -------------------------------------------- */
-  /** @override */
-  getData() {
-    const context = super.getData();
-    const actorData = context.data;
-    context.system = actorData.system;
-    context.flags = actorData.flags;
-    if (actorData.type == "character") {
-      this._prepareItems(context);
-      this._prepareCharacterData(context);
-    }
-    if (actorData.type == "npc") {
-      this._prepareItems(context);
-    }
-    context.rollData = context.actor.getRollData();
-    context.effects = prepareActiveEffectCategories(
-      // A generator that returns all effects stored on the actor
-      // as well as any items
-      this.actor.allApplicableEffects()
-    );
-    context.config = CONFIG.ABBREW;
-    return context;
-  }
-  /**
-   * Organize and classify Items for Character sheets.
-   *
-   * @param {Object} actorData The actor to prepare.
-   *
-   * @return {undefined}
-   */
-  _prepareCharacterData(context) {
-  }
-  /**
-   * Organize and classify Items for Character sheets.
-   *
-   * @param {Object} actorData The actor to prepare.
-   *
-   * @return {undefined}
-   */
-  _prepareItems(context) {
-    const gear = [];
-    const features = [];
-    const skills = { background: [], basic: [], path: [], resource: [], temporary: [], untyped: [] };
-    const spells = {
-      0: [],
-      1: [],
-      2: [],
-      3: [],
-      4: [],
-      5: [],
-      6: [],
-      7: [],
-      8: [],
-      9: []
-    };
-    const anatomy = [];
-    const armour = [];
-    const weapons = [];
-    const equippedWeapons = [];
-    for (let i of context.items) {
-      i.img = i.img || Item.DEFAULT_ICON;
-      if (i.type === "item") {
-        gear.push(i);
-      } else if (i.type === "feature") {
-        features.push(i);
-      } else if (i.type === "skill") {
-        switch (i.system.skillType) {
-          case "background":
-            skills.background.push(i);
-            break;
-          case "basic":
-            skills.basic.push(i);
-            break;
-          case "path":
-            skills.path.push(i);
-            break;
-          case "resource":
-            skills.resource.push(i);
-            break;
-          case "temporary":
-            skills.temporary.push(i);
-            break;
-          default:
-            skills.untyped.push(i);
-        }
-      } else if (i.type === "anatomy") {
-        anatomy.push(i);
-      } else if (i.type === "armour") {
-        armour.push(i);
-      } else if (i.type === "weapon") {
-        weapons.push(i);
-        if (["held1H", "held2H"].includes(i.system.equipState)) {
-          equippedWeapons.push(i);
-        }
-      } else if (i.type === "spell") {
-        if (i.system.spellLevel != void 0) {
-          spells[i.system.spellLevel].push(i);
-        }
-      }
-    }
-    context.gear = gear;
-    context.features = features;
-    context.spells = spells;
-    context.skillSections = this.updateObjectValueByKey(this.getSkillSectionDisplays(CONFIG.ABBREW.skillTypes, skills), this.skillSectionDisplay);
-    context.skills = skills;
-    context.anatomy = anatomy;
-    context.armour = armour;
-    context.weapons = weapons;
-    context.equippedWeapons = equippedWeapons;
-  }
-  /* -------------------------------------------- */
-  getSkillSectionDisplays(skillTypes, skills) {
-    return Object.fromEntries(this.getSkillSectionKeys(skillTypes).map((s) => {
-      return { "type": s, "display": skills[s].length > 0 ? "grid" : "none" };
-    }).map((x) => [x.type, x.display]));
-  }
-  /* -------------------------------------------- */
-  getSkillSectionKeys(skillTypes) {
-    return Object.keys(skillTypes).filter((s) => s !== "path");
-  }
-  /* -------------------------------------------- */
-  /** @override */
-  activateListeners(html) {
-    super.activateListeners(html);
-    html.on("click", ".item-edit", (ev) => {
-      const li = $(ev.currentTarget).parents(".item");
-      const item = this.actor.items.get(li.data("itemId"));
-      item.sheet.render(true);
-    });
-    html.on("click", ".skill-edit", (ev) => {
-      const li = $(ev.currentTarget).parents(".skill");
-      const skill = this.actor.items.get(li.data("skillId"));
-      skill.sheet.render(true);
-    });
-    html.on("click", ".skill-activate", this._onSkillActivate.bind(this));
-    if (!this.isEditable)
-      return;
-    html.on("click", ".item-create", this._onItemCreate.bind(this));
-    html.on("click", ".item-delete", (ev) => {
-      const li = $(ev.currentTarget).parents(".item");
-      const item = this.actor.items.get(li.data("itemId"));
-      item.delete();
-      li.slideUp(200, () => this.render(false));
-    });
-    html.on("click", ".skill-delete", (ev) => {
-      const li = $(ev.currentTarget).parents(".skill");
-      const skill = this.actor.items.get(li.data("skillId"));
-      skill.delete();
-      li.slideUp(200, () => this.render(false));
-    });
-    html.on("click", ".effect-control", (ev) => {
-      const row = ev.currentTarget.closest("li");
-      const document2 = row.dataset.parentId === this.actor.id ? this.actor : this.actor.items.get(row.dataset.parentId);
-      onManageActiveEffect(ev, document2);
-    });
-    html.on("change", ".item-select", this._onItemSelectChange.bind(this));
-    html.on("click", ".rollable", this._onRoll.bind(this));
-    html.on("click", ".attack-damage-button", async (event) => {
-      const t = event.currentTarget;
-      await this._onAttackDamageAction(t, "attack");
-    });
-    html.on("click", ".attack-feint-button", async (event) => {
-      const t = event.currentTarget;
-      await this._onAttackDamageAction(t, "feint");
-    });
-    html.on("click", ".attack-finisher-button", async (event) => {
-      const t = event.currentTarget;
-      await this._onAttackDamageAction(t, "finisher");
-    });
-    html.on("click", ".skill-header", this._onToggleSkillHeader.bind(this));
-    html.on("click", ".wound", this._onWoundClick.bind(this));
-    html.on("contextmenu", ".wound", this._onWoundRightClick.bind(this));
-    if (this.actor.isOwner) {
-      let handler = (ev) => this._onDragStart(ev);
-      html.find("li.item").each((i, li) => {
-        if (li.classList.contains("inventory-header"))
-          return;
-        li.setAttribute("draggable", true);
-        li.addEventListener("dragstart", handler, false);
-      });
-    }
-  }
-  async _onItemSelectChange(event) {
-    const target = event.target;
-    const itemId = target.closest(".item").dataset.itemId;
-    const itemValuePath = target.name;
-    const item = this.actor.items.get(itemId);
-    const value = target.value;
-    const updates = {};
-    updates[itemValuePath] = value;
-    await item.update(updates);
-  }
-  async _onSkillActivate(event) {
-    event.preventDefault();
-    const target = event.target.closest(".skill");
-    const id = target.dataset.skillId;
-    const skill = this.actor.items.get(id).system;
-    if (skill.activatable && skill.action.activationType === "standalone") {
-      await activateSkill(this.actor, skill);
-    }
-  }
-  _onToggleSkillHeader(event) {
-    event.preventDefault();
-    const target = event.currentTarget;
-    const skillSection = target.nextElementSibling;
-    if (skillSection.children.length === 0 || skillSection.style.display === "grid" || skillSection.style.display === "") {
-      this.skillSectionDisplay[target.dataset.skillSection] = "none";
-      skillSection.style.display = "none";
-    } else {
-      this.skillSectionDisplay[target.dataset.skillSection] = "grid";
-      skillSection.style.display = "grid";
-    }
-  }
-  _onWoundClick(event) {
-    this.handleWoundClick(event, 1);
-  }
-  _onWoundRightClick(event) {
-    this.handleWoundClick(event, -1);
-  }
-  handleWoundClick(event, modification) {
-    const woundType = event.currentTarget.dataset.woundType;
-    updateActorWounds(this.actor, mergeActorWounds(this.actor, [{ type: woundType, value: modification }]));
-  }
-  async _onAttackDamageAction(target, attackMode) {
-    const itemId = target.closest("li.item").dataset.itemId;
-    const attackProfileId = target.closest("li .attack-profile").dataset.attackProfileId;
-    const item = this.actor.items.get(itemId);
-    const attackProfile = item.system.attackProfiles[attackProfileId];
-    const roll = new Roll(item.system.formula, item.actor);
-    const result = await roll.evaluate();
-    const token = this.actor.token;
-    const damage = attackProfile.damage.map((d) => {
-      let attributeModifier = 0;
-      if (d.attributeModifier) {
-        attributeModifier = this.actor.system.attributes[d.attributeModifier].value;
-      }
-      const finalDamage = attributeModifier + d.value;
-      return { damageType: d.type, value: finalDamage };
-    });
-    const resultDice = result.dice[0].results.map((die) => {
-      let baseClasses = "roll die d10";
-      if (die.success) {
-        baseClasses = baseClasses.concat(" ", "success");
-      }
-      if (die.exploded) {
-        baseClasses = baseClasses.concat(" ", "exploded");
-      }
-      return { result: die.result, classes: baseClasses };
-    });
-    const totalSuccesses = result.dice[0].results.reduce((total, r) => {
-      if (r.success) {
-        total += 1;
-      }
-      return total;
-    }, 0);
-    const showAttack = ["attack", "feint"].includes(attackMode);
-    const isFeint = attackMode === "feint";
-    const showFinisher = attackMode === "finisher" || totalSuccesses > 0;
-    const templateData = {
-      attackProfile,
-      totalSuccesses,
-      resultDice,
-      damage,
-      actor: this.actor,
-      item: this.item,
-      tokenId: (token == null ? void 0 : token.uuid) || null,
-      showAttack,
-      showFinisher
-    };
-    const html = await renderTemplate("systems/abbrew/templates/chat/attack-card.hbs", templateData);
-    const speaker = ChatMessage.getSpeaker({ actor: this.actor });
-    const rollMode = game.settings.get("core", "rollMode");
-    const label = `[${item.type}] ${item.name}`;
-    result.toMessage({
-      speaker,
-      rollMode,
-      flavor: label,
-      content: html,
-      flags: { data: { totalSuccesses, damage, isFeint, attackingActor: this.actor } }
-    });
-    return result;
-  }
-  /**
-   * Handle creating a new Owned Item for the actor using initial data defined in the HTML dataset
-   * @param {Event} event   The originating click event
-   * @private
-   */
-  async _onItemCreate(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    const header = event.currentTarget;
-    const type = header.dataset.type;
-    const data = duplicate(header.dataset);
-    const name = `New ${type.capitalize()}`;
-    const itemData = {
-      name,
-      type,
-      system: data
-    };
-    delete itemData.system["type"];
-    return await Item.create(itemData, { parent: this.actor });
-  }
-  /**
-   * Handle clickable rolls.
-   * @param {Event} event   The originating click event
-   * @private
-   */
-  _onRoll(event) {
-    console.log("actor roll");
-    event.preventDefault();
-    const element = event.currentTarget;
-    const dataset = element.dataset;
-    if (dataset.rollType) {
-      if (dataset.rollType == "item") {
-        const itemId = element.closest(".item").dataset.itemId;
-        const item = this.actor.items.get(itemId);
-        if (item)
-          return item.roll();
-      }
-    }
-    if (dataset.roll) {
-      let label = dataset.label ? `[attribute] ${dataset.label}` : "";
-      let roll = new Roll(dataset.roll, this.actor.getRollData());
-      roll.toMessage({
-        speaker: ChatMessage.getSpeaker({ actor: this.actor }),
-        flavor: label,
-        rollMode: game.settings.get("core", "rollMode")
-      });
-      return roll;
-    }
-  }
 }
 var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
 function getDefaultExportFromCjs(x) {
@@ -2093,6 +1758,398 @@ var tagify_min = { exports: {} };
 })(tagify_min);
 var tagify_minExports = tagify_min.exports;
 const Tagify = /* @__PURE__ */ getDefaultExportFromCjs(tagify_minExports);
+class AbbrewActorSheet extends ActorSheet {
+  constructor() {
+    super(...arguments);
+    __publicField(this, "skillSectionDisplay", {});
+    /* -------------------------------------------- */
+    __publicField(this, "updateObjectValueByKey", (obj1, obj2) => {
+      var destination = Object.assign({}, obj1);
+      Object.keys(obj2).forEach((k) => {
+        if (k in destination && k in obj2) {
+          destination[k] = obj2[k];
+        }
+      });
+      return destination;
+    });
+  }
+  /** @override */
+  static get defaultOptions() {
+    return foundry.utils.mergeObject(super.defaultOptions, {
+      classes: ["abbrew", "sheet", "actor"],
+      width: 750,
+      height: 600,
+      tabs: [
+        {
+          navSelector: ".sheet-tabs",
+          contentSelector: ".sheet-body",
+          initial: "skills"
+        }
+      ]
+    });
+  }
+  /** @override */
+  get template() {
+    return `systems/abbrew/templates/actor/actor-${this.actor.type}-sheet.hbs`;
+  }
+  /* -------------------------------------------- */
+  /** @override */
+  getData() {
+    const context = super.getData();
+    const actorData = context.data;
+    context.system = actorData.system;
+    context.flags = actorData.flags;
+    if (actorData.type == "character") {
+      this._prepareItems(context);
+      this._prepareCharacterData(context);
+    }
+    if (actorData.type == "npc") {
+      this._prepareItems(context);
+    }
+    context.rollData = context.actor.getRollData();
+    context.effects = prepareActiveEffectCategories(
+      // A generator that returns all effects stored on the actor
+      // as well as any items
+      this.actor.allApplicableEffects()
+    );
+    context.config = CONFIG.ABBREW;
+    return context;
+  }
+  /**
+   * Organize and classify Items for Character sheets.
+   *
+   * @param {Object} actorData The actor to prepare.
+   *
+   * @return {undefined}
+   */
+  _prepareCharacterData(context) {
+  }
+  /**
+   * Organize and classify Items for Character sheets.
+   *
+   * @param {Object} actorData The actor to prepare.
+   *
+   * @return {undefined}
+   */
+  _prepareItems(context) {
+    const gear = [];
+    const features = [];
+    const skills = { background: [], basic: [], path: [], resource: [], temporary: [], untyped: [] };
+    const spells = {
+      0: [],
+      1: [],
+      2: [],
+      3: [],
+      4: [],
+      5: [],
+      6: [],
+      7: [],
+      8: [],
+      9: []
+    };
+    const anatomy = [];
+    const armour = [];
+    const weapons = [];
+    const equippedWeapons = [];
+    for (let i of context.items) {
+      i.img = i.img || Item.DEFAULT_ICON;
+      if (i.type === "item") {
+        gear.push(i);
+      } else if (i.type === "feature") {
+        features.push(i);
+      } else if (i.type === "skill") {
+        switch (i.system.skillType) {
+          case "background":
+            skills.background.push(i);
+            break;
+          case "basic":
+            skills.basic.push(i);
+            break;
+          case "path":
+            skills.path.push(i);
+            break;
+          case "resource":
+            skills.resource.push(i);
+            break;
+          case "temporary":
+            skills.temporary.push(i);
+            break;
+          default:
+            skills.untyped.push(i);
+        }
+      } else if (i.type === "anatomy") {
+        anatomy.push(i);
+      } else if (i.type === "armour") {
+        armour.push(i);
+      } else if (i.type === "weapon") {
+        weapons.push(i);
+        if (["held1H", "held2H"].includes(i.system.equipState)) {
+          equippedWeapons.push(i);
+        }
+      } else if (i.type === "spell") {
+        if (i.system.spellLevel != void 0) {
+          spells[i.system.spellLevel].push(i);
+        }
+      }
+    }
+    context.gear = gear;
+    context.features = features;
+    context.spells = spells;
+    context.skillSections = this.updateObjectValueByKey(this.getSkillSectionDisplays(CONFIG.ABBREW.skillTypes, skills), this.skillSectionDisplay);
+    context.skills = skills;
+    context.anatomy = anatomy;
+    context.armour = armour;
+    context.weapons = weapons;
+    context.equippedWeapons = equippedWeapons;
+  }
+  /* -------------------------------------------- */
+  getSkillSectionDisplays(skillTypes, skills) {
+    return Object.fromEntries(this.getSkillSectionKeys(skillTypes).map((s) => {
+      return { "type": s, "display": skills[s].length > 0 ? "grid" : "none" };
+    }).map((x) => [x.type, x.display]));
+  }
+  /* -------------------------------------------- */
+  getSkillSectionKeys(skillTypes) {
+    return Object.keys(skillTypes).filter((s) => s !== "path");
+  }
+  /* -------------------------------------------- */
+  _activateFatalWounds(html) {
+    const fatalWounds = html[0].querySelector('input[name="system.defense.fatalWounds"]');
+    const fatalWoundsSettings = {
+      dropdown: {
+        maxItems: 20,
+        // <- mixumum allowed rendered suggestions
+        classname: "tags-look",
+        // <- custom classname for this dropdown, so it could be targeted
+        enabled: 0,
+        // <- show suggestions on focus
+        closeOnSelect: false,
+        // <- do not hide the suggestions dropdown once an item has been selected
+        includeSelectedTags: true
+        // <- Should the suggestions list Include already-selected tags (after filtering)
+      },
+      userInput: false,
+      // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+      duplicates: false,
+      // <- Should duplicate tags be allowed or not
+      whitelist: [...Object.values(CONFIG.ABBREW.wounds).map((wound) => game.i18n.localize(wound.name))]
+    };
+    if (fatalWounds) {
+      new Tagify(fatalWounds, fatalWoundsSettings);
+    }
+  }
+  /** @override */
+  activateListeners(html) {
+    super.activateListeners(html);
+    html.on("click", ".item-edit", (ev) => {
+      const li = $(ev.currentTarget).parents(".item");
+      const item = this.actor.items.get(li.data("itemId"));
+      item.sheet.render(true);
+    });
+    html.on("click", ".skill-edit", (ev) => {
+      const li = $(ev.currentTarget).parents(".skill");
+      const skill = this.actor.items.get(li.data("skillId"));
+      skill.sheet.render(true);
+    });
+    html.on("click", ".skill-activate", this._onSkillActivate.bind(this));
+    if (!this.isEditable)
+      return;
+    html.on("click", ".item-create", this._onItemCreate.bind(this));
+    html.on("click", ".item-delete", (ev) => {
+      const li = $(ev.currentTarget).parents(".item");
+      const item = this.actor.items.get(li.data("itemId"));
+      item.delete();
+      li.slideUp(200, () => this.render(false));
+    });
+    html.on("click", ".skill-delete", (ev) => {
+      const li = $(ev.currentTarget).parents(".skill");
+      const skill = this.actor.items.get(li.data("skillId"));
+      skill.delete();
+      li.slideUp(200, () => this.render(false));
+    });
+    html.on("click", ".effect-control", (ev) => {
+      const row = ev.currentTarget.closest("li");
+      const document2 = row.dataset.parentId === this.actor.id ? this.actor : this.actor.items.get(row.dataset.parentId);
+      onManageActiveEffect(ev, document2);
+    });
+    html.on("change", ".item-select", this._onItemSelectChange.bind(this));
+    html.on("click", ".rollable", this._onRoll.bind(this));
+    html.on("click", ".attack-damage-button", async (event) => {
+      const t = event.currentTarget;
+      await this._onAttackDamageAction(t, "attack");
+    });
+    html.on("click", ".attack-feint-button", async (event) => {
+      const t = event.currentTarget;
+      await this._onAttackDamageAction(t, "feint");
+    });
+    html.on("click", ".attack-finisher-button", async (event) => {
+      const t = event.currentTarget;
+      await this._onAttackDamageAction(t, "finisher");
+    });
+    html.on("click", ".skill-header", this._onToggleSkillHeader.bind(this));
+    html.on("click", ".wound", this._onWoundClick.bind(this));
+    html.on("contextmenu", ".wound", this._onWoundRightClick.bind(this));
+    this._activateFatalWounds(html);
+    if (this.actor.isOwner) {
+      let handler = (ev) => this._onDragStart(ev);
+      html.find("li.item").each((i, li) => {
+        if (li.classList.contains("inventory-header"))
+          return;
+        li.setAttribute("draggable", true);
+        li.addEventListener("dragstart", handler, false);
+      });
+    }
+  }
+  async _onItemSelectChange(event) {
+    const target = event.target;
+    const itemId = target.closest(".item").dataset.itemId;
+    const itemValuePath = target.name;
+    const item = this.actor.items.get(itemId);
+    const value = target.value;
+    const updates = {};
+    updates[itemValuePath] = value;
+    await item.update(updates);
+  }
+  async _onSkillActivate(event) {
+    event.preventDefault();
+    const target = event.target.closest(".skill");
+    const id = target.dataset.skillId;
+    const skill = this.actor.items.get(id).system;
+    if (skill.activatable && skill.action.activationType === "standalone") {
+      await activateSkill(this.actor, skill);
+    }
+  }
+  _onToggleSkillHeader(event) {
+    event.preventDefault();
+    const target = event.currentTarget;
+    const skillSection = target.nextElementSibling;
+    if (skillSection.children.length === 0 || skillSection.style.display === "grid" || skillSection.style.display === "") {
+      this.skillSectionDisplay[target.dataset.skillSection] = "none";
+      skillSection.style.display = "none";
+    } else {
+      this.skillSectionDisplay[target.dataset.skillSection] = "grid";
+      skillSection.style.display = "grid";
+    }
+  }
+  _onWoundClick(event) {
+    this.handleWoundClick(event, 1);
+  }
+  _onWoundRightClick(event) {
+    this.handleWoundClick(event, -1);
+  }
+  handleWoundClick(event, modification) {
+    const woundType = event.currentTarget.dataset.woundType;
+    updateActorWounds(this.actor, mergeActorWounds(this.actor, [{ type: woundType, value: modification }]));
+  }
+  async _onAttackDamageAction(target, attackMode) {
+    const itemId = target.closest("li.item").dataset.itemId;
+    const attackProfileId = target.closest("li .attack-profile").dataset.attackProfileId;
+    const item = this.actor.items.get(itemId);
+    const attackProfile = item.system.attackProfiles[attackProfileId];
+    const roll = new Roll(item.system.formula, item.actor);
+    const result = await roll.evaluate();
+    const token = this.actor.token;
+    const damage = attackProfile.damage.map((d) => {
+      let attributeModifier = 0;
+      if (d.attributeModifier) {
+        attributeModifier = this.actor.system.attributes[d.attributeModifier].value;
+      }
+      const finalDamage = attributeModifier + d.value;
+      return { damageType: d.type, value: finalDamage };
+    });
+    const resultDice = result.dice[0].results.map((die) => {
+      let baseClasses = "roll die d10";
+      if (die.success) {
+        baseClasses = baseClasses.concat(" ", "success");
+      }
+      if (die.exploded) {
+        baseClasses = baseClasses.concat(" ", "exploded");
+      }
+      return { result: die.result, classes: baseClasses };
+    });
+    const totalSuccesses = result.dice[0].results.reduce((total, r) => {
+      if (r.success) {
+        total += 1;
+      }
+      return total;
+    }, 0);
+    const showAttack = ["attack", "feint"].includes(attackMode);
+    const isFeint = attackMode === "feint";
+    const showFinisher = attackMode === "finisher" || totalSuccesses > 0;
+    const templateData = {
+      attackProfile,
+      totalSuccesses,
+      resultDice,
+      damage,
+      actor: this.actor,
+      item: this.item,
+      tokenId: (token == null ? void 0 : token.uuid) || null,
+      showAttack,
+      showFinisher
+    };
+    const html = await renderTemplate("systems/abbrew/templates/chat/attack-card.hbs", templateData);
+    const speaker = ChatMessage.getSpeaker({ actor: this.actor });
+    const rollMode = game.settings.get("core", "rollMode");
+    const label = `[${item.type}] ${item.name}`;
+    result.toMessage({
+      speaker,
+      rollMode,
+      flavor: label,
+      content: html,
+      flags: { data: { totalSuccesses, damage, isFeint, attackingActor: this.actor } }
+    });
+    return result;
+  }
+  /**
+   * Handle creating a new Owned Item for the actor using initial data defined in the HTML dataset
+   * @param {Event} event   The originating click event
+   * @private
+   */
+  async _onItemCreate(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const header = event.currentTarget;
+    const type = header.dataset.type;
+    const data = duplicate(header.dataset);
+    const name = `New ${type.capitalize()}`;
+    const itemData = {
+      name,
+      type,
+      system: data
+    };
+    delete itemData.system["type"];
+    return await Item.create(itemData, { parent: this.actor });
+  }
+  /**
+   * Handle clickable rolls.
+   * @param {Event} event   The originating click event
+   * @private
+   */
+  _onRoll(event) {
+    console.log("actor roll");
+    event.preventDefault();
+    const element = event.currentTarget;
+    const dataset = element.dataset;
+    if (dataset.rollType) {
+      if (dataset.rollType == "item") {
+        const itemId = element.closest(".item").dataset.itemId;
+        const item = this.actor.items.get(itemId);
+        if (item)
+          return item.roll();
+      }
+    }
+    if (dataset.roll) {
+      let label = dataset.label ? `[attribute] ${dataset.label}` : "";
+      let roll = new Roll(dataset.roll, this.actor.getRollData());
+      roll.toMessage({
+        speaker: ChatMessage.getSpeaker({ actor: this.actor }),
+        flavor: label,
+        rollMode: game.settings.get("core", "rollMode")
+      });
+      return roll;
+    }
+  }
+}
 class AbbrewItemSheet extends ItemSheet {
   /** @override */
   static get defaultOptions() {
@@ -2542,11 +2599,35 @@ ABBREW.actionCosts = {
   other: "ABBREW.ActionCosts.other"
 };
 ABBREW.wounds = {
-  general: "ABBREW.Wounds.general",
-  bleed: "ABBREW.Wounds.bleed",
-  vital: "ABBREW.Wounds.vital",
-  fatigue: "ABBREW.Wounds.fatigue",
-  terror: "ABBREW.Wounds.terror"
+  general: {
+    name: "ABBREW.Wounds.general"
+  },
+  bleed: {
+    name: "ABBREW.Wounds.bleed"
+  },
+  vital: {
+    name: "ABBREW.Wounds.vital"
+  },
+  fatigue: {
+    name: "ABBREW.Wounds.fatigue"
+  },
+  terror: {
+    name: "ABBREW.Wounds.terror"
+  }
+};
+ABBREW.statusEffects = {
+  defeated: {
+    name: "ABBREW.EFFECT.Status.defeated",
+    icon: "systems/abbrew/assets/icons/statuses/dead.svg",
+    special: "DEFEATED",
+    order: 1
+  },
+  dead: {
+    name: "ABBREW.EFFECT.Status.dead",
+    icon: "systems/abbrew/assets/icons/statuses/dead.svg",
+    order: 2,
+    statuses: ["defeated"]
+  }
 };
 class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   static defineSchema() {
@@ -2590,7 +2671,8 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 20 }),
         label: new fields.StringField({ required: true, blank: true })
       }),
-      canBleed: new fields.BooleanField({ required: true, nullable: false, initial: false })
+      canBleed: new fields.BooleanField({ required: true, nullable: false, initial: false }),
+      fatalWounds: new fields.StringField({ required: true, blank: true })
     });
     schema.biography = new fields.StringField({ required: true, blank: true });
     schema.movement = new fields.SchemaField({
@@ -3117,6 +3199,7 @@ class AbbrewActor extends Actor {
     if (this.system.wounds.reduce((total, wound) => total += wound.value, 0) >= this.system.defense.resolve.value) {
       await renderLostResolveCard(this);
     }
+    await checkActorFatalWounds(this);
     return this;
   }
   reduceRiskForFinisher(risk, finisherCost) {
@@ -3261,6 +3344,11 @@ class AbbrewItem2 extends Item {
     }
   }
 }
+function staticID(id) {
+  if (id.length >= 16)
+    return id.substring(0, 16);
+  return id.padEnd(16, "0");
+}
 Hooks.once("init", function() {
   game.abbrew = {
     AbbrewActor,
@@ -3298,8 +3386,25 @@ Hooks.once("init", function() {
     makeDefault: true,
     label: "ABBREW.SheetLabels.Item"
   });
+  _configureStatusEffects();
   return preloadHandlebarsTemplates();
 });
+function _configureStatusEffects() {
+  const addEffect = (effects, { special, ...data }) => {
+    data = foundry.utils.deepClone(data);
+    data._id = staticID(`abbrew${data.id}`);
+    data.img = data.icon ?? data.img;
+    delete data.icon;
+    effects.push(data);
+    if (special)
+      CONFIG.specialStatusEffects[special] = data.id;
+  };
+  CONFIG.statusEffects = Object.entries(CONFIG.ABBREW.statusEffects).reduce((arr, [id, data]) => {
+    const original = CONFIG.statusEffects.find((s) => s.id === id);
+    addEffect(arr, foundry.utils.mergeObject(original ?? {}, { id, ...data }, { inplace: false }));
+    return arr;
+  }, []);
+}
 Handlebars.registerHelper("toLowerCase", function(str) {
   return str.toLowerCase();
 });

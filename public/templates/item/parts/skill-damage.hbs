@@ -1,6 +1,6 @@
 <ol class="form-list">
     {{#each system.attackProfiles as |attackProfile i|}}
-    <li class="item attackProfile flexrow" data-id="{{i}}">
+    <li class="item attack-profile flexrow" data-id="{{i}}">
         <div>
             <label>Name</label>
             <input type="text" name="system.attackProfiles.{{i}}.name" value="{{attackProfile.name}}"
@@ -54,7 +54,7 @@
         </a>
     </li>
     {{/each}}
-    <li class="attackProfile add">
+    <li class="attack-profile add">
         <div class="form-group">
             <label>
                 <a class="attack-profile-control" data-action="add-attack-profile">

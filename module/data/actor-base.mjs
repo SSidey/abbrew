@@ -43,7 +43,8 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 20 }),
         label: new fields.StringField({ required: true, blank: true })
       }),
-      canBleed: new fields.BooleanField({ required: true, nullable: false, initial: false })
+      canBleed: new fields.BooleanField({ required: true, nullable: false, initial: false }),
+      fatalWounds: new fields.StringField({ required: true, blank: true })
     });
 
     schema.biography = new fields.StringField({ required: true, blank: true }); // equivalent to passing ({initial: ""}) for StringFields

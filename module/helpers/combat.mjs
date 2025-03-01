@@ -31,8 +31,19 @@ export async function updateActorWounds(actor, updateWounds) {
     await actor.update({ "system.wounds": updateWounds });
 }
 
+export async function checkActorFatalWounds(actor) {
+    if (actor.system.defense.fatalWounds) {
+        const fatalWounds = JSON.parse(actor.system.defense.fatalWounds).map(w => w.value.toLowerCase());
+        const activeFatalWounds = actor.system.wounds.filter(w => fatalWounds.includes(w.type));
+        const exceededFatalWounds = activeFatalWounds.filter(w => w.value > actor.system.defense.resolve.max);
+        if (exceededFatalWounds && exceededFatalWounds.length > 0) {
+            await setActorToDead(actor);
+        }
+    }
+}
+
 export async function renderLostResolveCard(actor) {
-    if (!actor.statuses.has('dead')) {
+    if (!actor.statuses.has('defeated')) {
         const templateData = {
             actor: actor
         };
@@ -59,11 +70,30 @@ async function setActorToDefeated(actor) {
         changes: [],
         disabled: false,
         duration: {},
-        description: "Increased movement speed and action economy",
+        description: "You resolve buckles as you are unable to continue the fight.",
         origin: actor._id,
         tint: '',
         transfer: false,
-        statuses: new Set(['dead']),
+        statuses: new Set(['defeated']),
+        flags: {}
+    };
+
+    await actor.createEmbeddedDocuments('ActiveEffect', [defeatedEffectData]);
+}
+
+async function setActorToDead(actor) {
+    const defeatedEffectData = {
+        _id: actor._id,
+        name: "Dead",
+        img: actor.img,
+        changes: [],
+        disabled: false,
+        duration: {},
+        description: "You have suffered fatal wounds, resulting in death.",
+        origin: actor._id,
+        tint: '',
+        transfer: false,
+        statuses: new Set(['dead'/* , 'defeated' */]),
         flags: {}
     };
 
@@ -88,4 +118,5 @@ async function turnStart(actor) {
     if (previousWoundTotal < actor.system.defense.resolve.value && actor.system.defense.resolve.value <= updatedWoundTotal) {
         await renderLostResolveCard(actor);
     }
+    await checkActorFatalWounds(actor);
 }

@@ -142,6 +142,7 @@ export default class AbbrewActor extends Actor {
       // TODO: Mark Actor as defeated
       await renderLostResolveCard(this);
     }
+    await checkActorFatalWounds(this);
     return this;
   }
 

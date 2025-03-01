@@ -115,6 +115,12 @@
       "vital": "Vital",
       "fatigue": "Fatigue",
       "terror": "Terror"
+    },
+    "EFFECT": {
+      "Status": {
+        "dead": "Dead",
+        "defeated": "Defeated"
+      }
     }
   },
 

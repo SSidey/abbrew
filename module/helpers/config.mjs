@@ -111,9 +111,34 @@ ABBREW.actionCosts = {
 }
 
 ABBREW.wounds = {
-  general: "ABBREW.Wounds.general",
-  bleed: "ABBREW.Wounds.bleed",
-  vital: "ABBREW.Wounds.vital",
-  fatigue: "ABBREW.Wounds.fatigue",
-  terror: "ABBREW.Wounds.terror"
+  general: {
+    name: "ABBREW.Wounds.general"
+  },
+  bleed: {
+    name: "ABBREW.Wounds.bleed"
+  },
+  vital: {
+    name: "ABBREW.Wounds.vital"
+  },
+  fatigue: {
+    name: "ABBREW.Wounds.fatigue"
+  },
+  terror: {
+    name: "ABBREW.Wounds.terror"
+  }
+}
+
+ABBREW.statusEffects = {
+  defeated: {
+    name: "ABBREW.EFFECT.Status.defeated",
+    icon: "systems/abbrew/assets/icons/statuses/dead.svg",
+    special: "DEFEATED",
+    order: 1
+  },
+  dead: {
+    name: "ABBREW.EFFECT.Status.dead",
+    icon: "systems/abbrew/assets/icons/statuses/dead.svg",
+    order: 2,
+    statuses: ['defeated']
+  }
 }

@@ -9,6 +9,7 @@ import * as models from './data/_module.mjs';
 // Import Documents Classes
 import * as documents from './documents/_module.mjs';
 import { handleTurnStart } from './helpers/combat.mjs';
+import { staticID } from './helpers/utils.mjs';
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -73,9 +74,38 @@ Hooks.once('init', function () {
     label: 'ABBREW.SheetLabels.Item',
   });
 
+  _configureStatusEffects();
+
   // Preload Handlebars templates.
   return preloadHandlebarsTemplates();
 });
+
+/* -------------------------------------------- */
+
+/**
+ * Configure system status effects.
+ */
+function _configureStatusEffects() {
+  const addEffect = (effects, {special, ...data}) => {
+    data = foundry.utils.deepClone(data);
+    data._id = staticID(`abbrew${data.id}`);
+    data.img = data.icon ?? data.img;
+    delete data.icon;
+    effects.push(data);
+    if ( special ) CONFIG.specialStatusEffects[special] = data.id;
+  };
+  CONFIG.statusEffects = Object.entries(CONFIG.ABBREW.statusEffects).reduce((arr, [id, data]) => {
+    const original = CONFIG.statusEffects.find(s => s.id === id);
+    addEffect(arr, foundry.utils.mergeObject(original ?? {}, { id, ...data }, { inplace: false }));
+    return arr;
+  }, []);
+  // for ( const [id, {label: name, ...data}] of Object.entries(CONFIG.DND5E.conditionTypes) ) {
+  //   addEffect(CONFIG.statusEffects, { id, name, ...data });
+  // }
+  // for ( const [id, data] of Object.entries(CONFIG.DND5E.encumbrance.effects) ) {
+  //   addEffect(CONFIG.statusEffects, { id, ...data, hud: false });
+  // }
+}
 
 /* -------------------------------------------- */
 /*  Handlebars Helpers                          */
