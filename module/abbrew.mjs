@@ -9,7 +9,7 @@ import * as models from './data/_module.mjs';
 // Import Documents Classes
 import * as documents from './documents/_module.mjs';
 import { handleTurnStart } from './helpers/combat.mjs';
-import { staticID } from './helpers/utils.mjs';
+import { staticID, doesNestedFieldExist } from './helpers/utils.mjs';
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -86,13 +86,13 @@ Hooks.once('init', function () {
  * Configure system status effects.
  */
 function _configureStatusEffects() {
-  const addEffect = (effects, {special, ...data}) => {
+  const addEffect = (effects, { special, ...data }) => {
     data = foundry.utils.deepClone(data);
     data._id = staticID(`abbrew${data.id}`);
     data.img = data.icon ?? data.img;
     delete data.icon;
     effects.push(data);
-    if ( special ) CONFIG.specialStatusEffects[special] = data.id;
+    if (special) CONFIG.specialStatusEffects[special] = data.id;
   };
   CONFIG.statusEffects = Object.entries(CONFIG.ABBREW.statusEffects).reduce((arr, [id, data]) => {
     const original = CONFIG.statusEffects.find(s => s.id === id);
@@ -178,6 +178,16 @@ Hooks.on("applyActiveEffect", applyCustomEffects);
 
 Hooks.on("renderChatLog", (app, html, data) => {
   documents.AbbrewItem.chatListeners(html);
+});
+
+Hooks.on("updateActor", (actor, updates) => {
+
+  if (doesNestedFieldExist(updates, "system.defense.guard.value")) {
+
+    console.log(`${actor.name}'s guard was updated to ${actor.system.defense.guard.value}`);
+
+  }
+
 });
 
 /* -------------------------------------------- */

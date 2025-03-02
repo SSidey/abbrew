@@ -46,11 +46,9 @@
         <div class="resource flex-group-center">
           <label for="system.defense.guard" class="resource-label">Guard</label>
           <div class="resource-content flexrow flex-center flex-between">
-            <input type="text" value="{{system.defense.guard.value}}"
-              data-dtype="Number" readonly/>
+            <input type="text" value="{{system.defense.guard.value}}" data-dtype="Number" readonly />
             <span> / </span>
-            <input type="text" value="{{system.defense.guard.max}}"
-              data-dtype="Number" readonly/>
+            <input type="text" value="{{system.defense.guard.max}}" data-dtype="Number" readonly />
           </div>
         </div>
 
@@ -66,7 +64,7 @@
           <label for="system.defense.resolve" class="resource-label">Resolve</label>
           <div class="resource-content flexrow flex-center flex-between">
             <input type="text" name="system.defense.resolve.value" value="{{system.defense.resolve.value}}"
-              data-dtype="Number" />
+              max="{{system.defense.resolve.max}}" data-dtype="Number" />
             <span> / </span>
             <input type="text" name="system.defense.resolve.max" value="{{system.defense.resolve.max}}"
               data-dtype="Number" />
@@ -121,7 +119,8 @@
           module/helpers/templates.mjs --}}
           {{> "systems/abbrew/templates/actor/parts/actor-anatomy.hbs"}}
           {{> "systems/abbrew/templates/actor/parts/actor-armour.hbs"}}
-          {{> "systems/abbrew/templates/actor/parts/actor-weapons.hbs" weaponsList=equippedWeapons showAttackProfiles=true showEquipState=false}}
+          {{> "systems/abbrew/templates/actor/parts/actor-weapons.hbs" weaponsList=equippedWeapons
+          showAttackProfiles=true showEquipState=false}}
         </section>
 
       </section>

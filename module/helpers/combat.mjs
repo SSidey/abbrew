@@ -66,7 +66,7 @@ async function setActorToDefeated(actor) {
     const defeatedEffectData = {
         _id: actor._id,
         name: "Defeated",
-        img: actor.img,
+        img: CONFIG.statusEffects.find(s => s.id === 'defeated').img,
         changes: [],
         disabled: false,
         duration: {},
@@ -85,7 +85,7 @@ async function setActorToDead(actor) {
     const defeatedEffectData = {
         _id: actor._id,
         name: "Dead",
-        img: actor.img,
+        img: CONFIG.statusEffects.find(s => s.id === 'dead').img,
         changes: [],
         disabled: false,
         duration: {},
@@ -93,11 +93,31 @@ async function setActorToDead(actor) {
         origin: actor._id,
         tint: '',
         transfer: false,
-        statuses: new Set(['dead'/* , 'defeated' */]),
+        statuses: new Set(['dead']),
         flags: {}
     };
 
     await actor.createEmbeddedDocuments('ActiveEffect', [defeatedEffectData]);
+}
+
+export async function setActorToOffGuard(actor) {
+    const offGuardEffectData = {
+        _id: actor._id,
+        name: "Off Guard",
+        img: CONFIG.statusEffects.find(s => s.id === 'offGuard').img,
+        changes: [],
+        disabled: false,
+        duration: {},
+        description: "Your guard is broken or otherwise compromised, your foes can directly capitalise on your weakpoints. You can be targeted by finishers",
+        origin: actor._id,
+        tint: '',
+        transfer: false,
+        statuses: new Set(['offGuard']),
+        flags: {}
+    };
+
+    await actor.createEmbeddedDocuments('ActiveEffect', [offGuardEffectData]);
+
 }
 
 async function turnStart(actor) {

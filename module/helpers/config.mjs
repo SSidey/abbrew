@@ -131,14 +131,18 @@ ABBREW.wounds = {
 ABBREW.statusEffects = {
   defeated: {
     name: "ABBREW.EFFECT.Status.defeated",
-    icon: "systems/abbrew/assets/icons/statuses/dead.svg",
+    img: "systems/abbrew/assets/icons/statuses/defeated.svg",
     special: "DEFEATED",
     order: 1
   },
   dead: {
     name: "ABBREW.EFFECT.Status.dead",
-    icon: "systems/abbrew/assets/icons/statuses/dead.svg",
+    img: "systems/abbrew/assets/icons/statuses/dead.svg",
     order: 2,
     statuses: ['defeated']
+  },
+  offGuard: {
+    name: "ABBREW.EFFECT.Status.offGuard",
+    img: "systems/abbrew/assets/icons/statuses/offGuard.svg"
   }
 }

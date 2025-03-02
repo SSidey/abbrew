@@ -11,3 +11,15 @@ export function staticID(id) {
     if (id.length >= 16) return id.substring(0, 16);
     return id.padEnd(16, "0");
 }
+
+/* -------------------------------------------- */
+
+export function doesNestedFieldExist(obj, props) {
+    var splited = props.split('.');
+    var temp = obj;
+    for (var index in splited) {
+        if (typeof temp[splited[index]] === 'undefined') return false;
+        temp = temp[splited[index]]
+    }
+    return true
+}

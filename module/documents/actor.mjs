@@ -1,4 +1,4 @@
-import { mergeActorWounds, renderLostResolveCard } from "../helpers/combat.mjs";
+import { mergeActorWounds, renderLostResolveCard, setActorToOffGuard, checkActorFatalWounds } from "../helpers/combat.mjs";
 import { FINISHERS } from "../static/finishers.mjs";
 
 /**
@@ -56,7 +56,7 @@ export default class AbbrewActor extends Actor {
 
     const damage = this.applyModifiersToDamage(rolls, data, action);
 
-    const updates = { "system.defense.guard.value": this.calculateGuard(damage, guard, data.isFeint, action), "system.defense.risk.raw": this.calculateRisk(damage, guard, risk, inflexibility, data.isFeint, action) };
+    const updates = { "system.defense.guard.value": await this.calculateGuard(damage, guard, data.isFeint, action), "system.defense.risk.raw": this.calculateRisk(damage, guard, risk, inflexibility, data.isFeint, action) };
     await this.update(updates);
     await this.renderAttackResultCard(data, action);
     return this;
@@ -64,7 +64,12 @@ export default class AbbrewActor extends Actor {
 
   async takeFinisher(rolls, data) {
     // TODO: Check for successes or Off Guard
-    if (data.totalSuccesses < 1) { }
+    if (data.totalSuccesses < 1 && !this.statuses.has('offGuard')) {
+      // TODO: Report to chat that the finisher failed?
+      console.log('No finisher was possible');
+      return;
+    }
+    
     const risk = this.system.defense.risk.raw;
     console.log('Finisher');
     const totalRisk = this.applyModifiersToRisk(rolls, data);
@@ -76,8 +81,6 @@ export default class AbbrewActor extends Actor {
       await this.sendFinisherToChat(finisher, finisherCost);
       return await this.applyFinisher(risk, finisher, finisherCost);
     }
-    // TODO: Report to chat that the finisher failed?
-    console.log('No finisher was possible');
   }
 
   applyModifiersToRisk(rolls, data) {
@@ -173,13 +176,18 @@ export default class AbbrewActor extends Actor {
     }, 0);
   }
 
-  calculateGuard(damage, guard, isFeint, action) {
+  async calculateGuard(damage, guard, isFeint, action) {
     let guardDamage = damage;
     if (this.defenderGainsAdvantage(isFeint, action)) {
       guardDamage = -10;
     }
 
-    return Math.max(0, guard - guardDamage);
+    const guardUpdate = Math.max(0, guard - guardDamage);
+    if (guardUpdate <= 0) {
+      await setActorToOffGuard(this);
+    }
+
+    return guardUpdate;
   }
 
   calculateRisk(damage, guard, risk, inflexibility, isFeint, action) {

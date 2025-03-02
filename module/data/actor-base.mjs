@@ -116,6 +116,8 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     this._prepareMovement(anatomy);
 
     this._prepareDefenses(anatomy);
+
+    this._prepareResolve();
   }
 
   _prepareAnatomy() {
@@ -140,6 +142,13 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     this._prepareDamageReduction(armour, anatomy);
     this._prepareGuard(armour, anatomy);
     this._prepareInflexibility(armour);
+  }
+
+  _prepareResolve() {
+    const currentResolve = this.defense.resolve.value;
+    if (currentResolve > this.defense.resolve.max) {
+      this.defense.resolve.value = this.defense.resolve.max;
+    }
   }
 
   _prepareDamageReduction(armour, anatomy) {

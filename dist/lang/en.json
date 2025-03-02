@@ -119,7 +119,8 @@
     "EFFECT": {
       "Status": {
         "dead": "Dead",
-        "defeated": "Defeated"
+        "defeated": "Defeated",
+        "offGuard": "Off Guard"
       }
     }
   },
