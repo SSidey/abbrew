@@ -45,6 +45,11 @@ async function checkActorFatalWounds(actor) {
     }
   }
 }
+async function handleActorGuardConditions(actor) {
+  if (actor.system.defense.guard.value <= 0) {
+    await setActorToOffGuard(actor);
+  }
+}
 async function handleActorWoundConditions(actor) {
   const updatedWoundTotal = actor.system.wounds.reduce((total, wound) => total += wound.value, 0);
   if (actor.system.defense.resolve.value <= updatedWoundTotal) {
@@ -95,6 +100,7 @@ async function setActorToDead(actor) {
   setActorCondition(actor, "dead");
 }
 async function setActorToOffGuard(actor) {
+  setActorCondition(actor, "offGuard");
 }
 async function turnStart(actor) {
   ChatMessage.create({ content: `${actor.name} starts their turn`, speaker: ChatMessage.getSpeaker({ actor }) });
@@ -1907,6 +1913,32 @@ class AbbrewActorSheet extends ActorSheet {
     return Object.keys(skillTypes).filter((s) => s !== "path");
   }
   /* -------------------------------------------- */
+  _activateTraits(html) {
+    const traits = html[0].querySelector('input[name="system.traits"]');
+    const traitsSettings = {
+      dropdown: {
+        maxItems: 20,
+        // <- mixumum allowed rendered suggestions
+        classname: "tags-look",
+        // <- custom classname for this dropdown, so it could be targeted
+        enabled: 0,
+        // <- show suggestions on focus
+        closeOnSelect: false,
+        // <- do not hide the suggestions dropdown once an item has been selected
+        includeSelectedTags: true
+        // <- Should the suggestions list Include already-selected tags (after filtering)
+      },
+      userInput: false,
+      // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+      duplicates: false,
+      // <- Should duplicate tags be allowed or not
+      whitelist: [...Object.values(CONFIG.ABBREW.traits).map((trait) => game.i18n.localize(trait.name))]
+    };
+    if (traits) {
+      new Tagify(traits, traitsSettings);
+    }
+  }
+  /* -------------------------------------------- */
   _activateFatalWounds(html) {
     const fatalWounds = html[0].querySelector('input[name="system.defense.fatalWounds"]');
     const fatalWoundsSettings = {
@@ -1932,6 +1964,7 @@ class AbbrewActorSheet extends ActorSheet {
       new Tagify(fatalWounds, fatalWoundsSettings);
     }
   }
+  /* -------------------------------------------- */
   /** @override */
   activateListeners(html) {
     super.activateListeners(html);
@@ -1984,6 +2017,7 @@ class AbbrewActorSheet extends ActorSheet {
     html.on("click", ".wound", this._onWoundClick.bind(this));
     html.on("contextmenu", ".wound", this._onWoundRightClick.bind(this));
     this._activateFatalWounds(html);
+    this._activateTraits(html);
     if (this.actor.isOwner) {
       let handler = (ev) => this._onDragStart(ev);
       html.find("li.item").each((i, li) => {
@@ -2647,11 +2681,17 @@ ABBREW.statusEffects = {
     img: "systems/abbrew/assets/icons/statuses/offGuard.svg"
   }
 };
+ABBREW.traits = {
+  canBleed: {
+    name: "ABBREW.Traits.CanBleed.name"
+  }
+};
 class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   static defineSchema() {
     const fields = foundry.data.fields;
     const requiredInteger = { required: true, nullable: false, integer: true };
     const schema = {};
+    schema.traits = new fields.StringField({ required: true, blank: true });
     schema.wounds = new fields.ArrayField(
       new fields.SchemaField({
         type: new fields.StringField({ required: true }),
@@ -2723,7 +2763,7 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       this.attributes[key2].rank = this.attributes[key2].value;
     }
     this.defense.risk.value = Math.floor(this.defense.risk.raw / 10);
-    this.defense.canBleed = true;
+    this.defense.canBleed = this.traits ? JSON.parse(this.traits).filter((t) => t.value === "Can Bleed").length : false;
     this.defense.resolve.max = 2 + this._getMaxFromPhysicalAttributes() + this._getMaxFromMentalAttributes();
   }
   _getMaxFromPhysicalAttributes() {
@@ -3267,9 +3307,6 @@ class AbbrewActor extends Actor {
       guardDamage = -10;
     }
     const guardUpdate = Math.max(0, guard - guardDamage);
-    if (guardUpdate <= 0) {
-      await setActorToOffGuard();
-    }
     return guardUpdate;
   }
   calculateRisk(damage, guard, risk, inflexibility, isFeint, action) {
@@ -3505,8 +3542,8 @@ Hooks.on("renderChatLog", (app, html, data) => {
   AbbrewItem2.chatListeners(html);
 });
 Hooks.on("updateActor", async (actor, updates, options, userId) => {
-  if (doesNestedFieldExist(updates, "system.wounds.guard.value")) {
-    console.log(`${actor.name}'s guard was updated to ${actor.system.defense.guard.value}`);
+  if (doesNestedFieldExist(updates, "system.defense.guard.value")) {
+    await handleActorGuardConditions(actor);
   }
   if (doesNestedFieldExist(updates, "system.wounds")) {
     await handleActorWoundConditions(actor);

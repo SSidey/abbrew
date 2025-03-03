@@ -211,6 +211,27 @@ export class AbbrewActorSheet extends ActorSheet {
 
   /* -------------------------------------------- */
 
+  _activateTraits(html) {
+    const traits = html[0].querySelector('input[name="system.traits"]');
+    const traitsSettings = {
+      dropdown: {
+        maxItems: 20,               // <- mixumum allowed rendered suggestions
+        classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
+        enabled: 0,                 // <- show suggestions on focus
+        closeOnSelect: false,       // <- do not hide the suggestions dropdown once an item has been selected
+        includeSelectedTags: true   // <- Should the suggestions list Include already-selected tags (after filtering)
+      },
+      userInput: false,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+      duplicates: false,             // <- Should duplicate tags be allowed or not
+      whitelist: [...Object.values(CONFIG.ABBREW.traits).map(trait => game.i18n.localize(trait.name))]
+    };
+    if (traits) {
+      var taggedTraits = new Tagify(traits, traitsSettings);
+    }
+  }
+
+  /* -------------------------------------------- */
+
   _activateFatalWounds(html) {
     const fatalWounds = html[0].querySelector('input[name="system.defense.fatalWounds"]');
     const fatalWoundsSettings = {
@@ -229,6 +250,8 @@ export class AbbrewActorSheet extends ActorSheet {
       var taggedFatalWounds = new Tagify(fatalWounds, fatalWoundsSettings);
     }
   }
+
+  /* -------------------------------------------- */
 
   /** @override */
   activateListeners(html) {
@@ -310,6 +333,7 @@ export class AbbrewActorSheet extends ActorSheet {
     html.on('contextmenu', '.wound', this._onWoundRightClick.bind(this));
 
     this._activateFatalWounds(html);
+    this._activateTraits(html);
 
     // Drag events for macros.
     if (this.actor.isOwner) {

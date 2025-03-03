@@ -167,3 +167,9 @@ ABBREW.statusEffects = {
     img: "systems/abbrew/assets/icons/statuses/offGuard.svg"
   }
 }
+
+ABBREW.traits = {
+  canBleed: {
+    name: "ABBREW.Traits.CanBleed.name"
+  }
+}

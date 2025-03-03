@@ -136,6 +136,11 @@
           "description": "Your guard is broken or otherwise compromised, your foes can directly capitalise on your weakpoints. You can be targeted by finishers."
         }
       }
+    },
+    "Traits": {
+      "CanBleed": {
+        "name": "Can Bleed"
+      }
     }
   },
 

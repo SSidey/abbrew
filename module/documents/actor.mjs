@@ -185,9 +185,6 @@ export default class AbbrewActor extends Actor {
     }
 
     const guardUpdate = Math.max(0, guard - guardDamage);
-    if (guardUpdate <= 0) {
-      await setActorToOffGuard(this);
-    }
 
     return guardUpdate;
   }

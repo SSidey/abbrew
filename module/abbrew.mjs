@@ -8,7 +8,7 @@ import { ABBREW } from './helpers/config.mjs';
 import * as models from './data/_module.mjs';
 // Import Documents Classes
 import * as documents from './documents/_module.mjs';
-import { handleTurnStart, handleActorWoundConditions } from './helpers/combat.mjs';
+import { handleTurnStart, handleActorWoundConditions, handleActorGuardConditions } from './helpers/combat.mjs';
 import { staticID, doesNestedFieldExist } from './helpers/utils.mjs';
 
 /* -------------------------------------------- */
@@ -182,9 +182,9 @@ Hooks.on("renderChatLog", (app, html, data) => {
 
 Hooks.on("updateActor", async (actor, updates, options, userId) => {
 
-  if (doesNestedFieldExist(updates, "system.wounds.guard.value")) {
+  if (doesNestedFieldExist(updates, "system.defense.guard.value")) {
 
-    console.log(`${actor.name}'s guard was updated to ${actor.system.defense.guard.value}`);
+    await handleActorGuardConditions(actor);
 
   }
 

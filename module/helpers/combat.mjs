@@ -47,6 +47,12 @@ export async function checkActorFatalWounds(actor) {
     }
 }
 
+export async function handleActorGuardConditions(actor) {
+    if(actor.system.defense.guard.value <= 0) {
+        await setActorToOffGuard(actor);
+    }
+}
+
 export async function handleActorWoundConditions(actor) {
     const updatedWoundTotal = actor.system.wounds.reduce((total, wound) => total += wound.value, 0);
     if (actor.system.defense.resolve.value <= updatedWoundTotal) {
@@ -151,7 +157,7 @@ async function setActorToDead(actor) {
 }
 
 export async function setActorToOffGuard(actor) {
-    // setActorCondition(actor, 'offGuard');
+    setActorCondition(actor, 'offGuard');
     // if (actor.statuses.has('offGuard')) {
     //     return;
     // }

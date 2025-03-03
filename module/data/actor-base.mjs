@@ -5,6 +5,8 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     const requiredInteger = { required: true, nullable: false, integer: true };
     const schema = {};
 
+    schema.traits = new fields.StringField({ required: true, blank: true });
+
     schema.wounds = new fields.ArrayField(
       new fields.SchemaField({
         type: new fields.StringField({ required: true }),
@@ -90,7 +92,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     this.defense.risk.value = Math.floor(this.defense.risk.raw / 10);
 
     // TODO: Set by tag
-    this.defense.canBleed = true;
+    this.defense.canBleed = this.traits ? JSON.parse(this.traits).filter(t => t.value === 'Can Bleed').length : false;
 
     // PLAYTEST: Does this feel good?
     this.defense.resolve.max = 2 + this._getMaxFromPhysicalAttributes() + this._getMaxFromMentalAttributes();
