@@ -39,80 +39,65 @@ async function checkActorFatalWounds(actor) {
   if (actor.system.defense.fatalWounds) {
     const fatalWounds = JSON.parse(actor.system.defense.fatalWounds).map((w) => w.value.toLowerCase());
     const activeFatalWounds = actor.system.wounds.filter((w) => fatalWounds.includes(w.type));
-    const exceededFatalWounds = activeFatalWounds.filter((w) => w.value > actor.system.defense.resolve.max);
-    if (exceededFatalWounds && exceededFatalWounds.length > 0) {
+    const totalActiveFatalWounds = activeFatalWounds.reduce((result, wound) => result += wound.value, 0);
+    if (totalActiveFatalWounds >= actor.system.defense.resolve.max) {
       await setActorToDead(actor);
     }
   }
 }
+async function handleActorWoundConditions(actor) {
+  const updatedWoundTotal = actor.system.wounds.reduce((total, wound) => total += wound.value, 0);
+  if (actor.system.defense.resolve.value <= updatedWoundTotal) {
+    await renderLostResolveCard(actor);
+  }
+  await checkActorFatalWounds(actor);
+}
 async function renderLostResolveCard(actor) {
-  if (!actor.statuses.has("defeated")) {
-    const templateData = {
-      actor
+  if (actor.statuses.has("defeated")) {
+    return;
+  }
+  const templateData = {
+    actor
+  };
+  await setActorToDefeated(actor);
+  const html = await renderTemplate("systems/abbrew/templates/chat/lost-resolve-card.hbs", templateData);
+  const speaker = ChatMessage.getSpeaker({ actor });
+  ChatMessage.create({
+    speaker,
+    content: html
+  });
+}
+async function setActorCondition(actor, conditionName) {
+  const condition = CONFIG.ABBREW.conditions[conditionName];
+  const statusSet = new Set(condition.statuses);
+  if (statusSet.difference(actor.statuses).size) {
+    const conditionEffectData = {
+      _id: actor._id,
+      name: game.i18n.localize(condition.name),
+      img: condition.img,
+      changes: [],
+      disabled: false,
+      duration: {},
+      description: game.i18n.localize(condition.description),
+      origin: actor._id,
+      tint: "",
+      transfer: false,
+      statuses: statusSet,
+      flags: {}
     };
-    await setActorToDefeated(actor);
-    const html = await renderTemplate("systems/abbrew/templates/chat/lost-resolve-card.hbs", templateData);
-    const speaker = ChatMessage.getSpeaker({ actor });
-    ChatMessage.create({
-      speaker,
-      content: html
-    });
+    await actor.createEmbeddedDocuments("ActiveEffect", [conditionEffectData]);
   }
 }
 async function setActorToDefeated(actor) {
-  const defeatedEffectData = {
-    _id: actor._id,
-    name: "Defeated",
-    img: CONFIG.statusEffects.find((s) => s.id === "defeated").img,
-    changes: [],
-    disabled: false,
-    duration: {},
-    description: "You resolve buckles as you are unable to continue the fight.",
-    origin: actor._id,
-    tint: "",
-    transfer: false,
-    statuses: /* @__PURE__ */ new Set(["defeated"]),
-    flags: {}
-  };
-  await actor.createEmbeddedDocuments("ActiveEffect", [defeatedEffectData]);
+  setActorCondition(actor, "defeated");
 }
 async function setActorToDead(actor) {
-  const defeatedEffectData = {
-    _id: actor._id,
-    name: "Dead",
-    img: CONFIG.statusEffects.find((s) => s.id === "dead").img,
-    changes: [],
-    disabled: false,
-    duration: {},
-    description: "You have suffered fatal wounds, resulting in death.",
-    origin: actor._id,
-    tint: "",
-    transfer: false,
-    statuses: /* @__PURE__ */ new Set(["dead"]),
-    flags: {}
-  };
-  await actor.createEmbeddedDocuments("ActiveEffect", [defeatedEffectData]);
+  setActorCondition(actor, "dead");
 }
 async function setActorToOffGuard(actor) {
-  const offGuardEffectData = {
-    _id: actor._id,
-    name: "Off Guard",
-    img: CONFIG.statusEffects.find((s) => s.id === "offGuard").img,
-    changes: [],
-    disabled: false,
-    duration: {},
-    description: "Your guard is broken or otherwise compromised, your foes can directly capitalise on your weakpoints. You can be targeted by finishers",
-    origin: actor._id,
-    tint: "",
-    transfer: false,
-    statuses: /* @__PURE__ */ new Set(["offGuard"]),
-    flags: {}
-  };
-  await actor.createEmbeddedDocuments("ActiveEffect", [offGuardEffectData]);
 }
 async function turnStart(actor) {
   ChatMessage.create({ content: `${actor.name} starts their turn`, speaker: ChatMessage.getSpeaker({ actor }) });
-  const previousWoundTotal = actor.system.wounds.reduce((total, wound) => total += wound.value, 0);
   if (actor.system.defense.canBleed) {
     const filteredWounds = actor.system.wounds.filter((wound) => wound.type === "bleed");
     const bleedingWounds = filteredWounds.length > 0 ? filteredWounds[0].value : 0;
@@ -122,11 +107,6 @@ async function turnStart(actor) {
       await updateActorWounds(actor, mergeActorWounds(actor, vitalWounds));
     }
   }
-  const updatedWoundTotal = actor.system.wounds.reduce((total, wound) => total += wound.value, 0);
-  if (previousWoundTotal < actor.system.defense.resolve.value && actor.system.defense.resolve.value <= updatedWoundTotal) {
-    await renderLostResolveCard(actor);
-  }
-  await checkActorFatalWounds(actor);
 }
 function onManageActiveEffect(event, owner) {
   event.preventDefault();
@@ -2629,6 +2609,26 @@ ABBREW.wounds = {
     name: "ABBREW.Wounds.terror"
   }
 };
+ABBREW.conditions = {
+  defeated: {
+    name: "ABBREW.EFFECT.Condition.Defeated.name",
+    img: "systems/abbrew/assets/icons/statuses/defeated.svg",
+    description: "ABBREW.EFFECT.Condition.Defeated.description",
+    statuses: ["defeated"]
+  },
+  dead: {
+    name: "ABBREW.EFFECT.Condition.Dead.name",
+    img: "systems/abbrew/assets/icons/statuses/dead.svg",
+    description: "ABBREW.EFFECT.Condition.Dead.description",
+    statuses: ["dead", "defeated"]
+  },
+  offGuard: {
+    name: "ABBREW.EFFECT.Condition.OffGuard.name",
+    img: "systems/abbrew/assets/icons/statuses/offGuard.svg",
+    description: "ABBREW.EFFECT.Condition.OffGuard.description",
+    statuses: ["offGuard"]
+  }
+};
 ABBREW.statusEffects = {
   defeated: {
     name: "ABBREW.EFFECT.Status.defeated",
@@ -2676,7 +2676,9 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         })
       ),
       inflexibility: new fields.SchemaField({
-        value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 })
+        raw: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+        value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+        max: new fields.NumberField({ ...requiredInteger, initial: 10, min: 10, max: 10 })
       }),
       risk: new fields.SchemaField({
         raw: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 100 }),
@@ -2722,7 +2724,16 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     }
     this.defense.risk.value = Math.floor(this.defense.risk.raw / 10);
     this.defense.canBleed = true;
-    this.defense.resolve.max = 2 + this.attributes["con"].value + this.attributes["wil"].value;
+    this.defense.resolve.max = 2 + this._getMaxFromPhysicalAttributes() + this._getMaxFromMentalAttributes();
+  }
+  _getMaxFromPhysicalAttributes() {
+    return this._getMaxFromAttributes(["str", "con", "dex", "agi"]);
+  }
+  _getMaxFromMentalAttributes() {
+    return this._getMaxFromAttributes(["int", "wil", "vis", "wit"]);
+  }
+  _getMaxFromAttributes(attributes) {
+    return Object.keys(this.attributes).filter((a) => attributes.includes(a)).reduce((result, attribute) => Math.max(result, this.attributes[attribute].value), 0);
   }
   // Post Active Effects
   prepareDerivedData() {
@@ -2797,7 +2808,8 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   }
   _prepareInflexibility(armour) {
     const inflexibility = armour.map((a) => a.system.defense.inflexibility).reduce((a, b) => a + b, 0);
-    this.defense.inflexibility.value = inflexibility;
+    this.defense.inflexibility.raw = inflexibility;
+    this.defense.inflexibility.value = Math.ceil(inflexibility / 10);
   }
   getRollData() {
     let data = {};
@@ -3157,7 +3169,7 @@ class AbbrewActor extends Actor {
     Hooks.call("actorTakesDamage", this);
     let guard = this.system.defense.guard.value;
     let risk = this.system.defense.risk.raw;
-    const inflexibility = this.system.defense.inflexibility.value;
+    const inflexibility = this.system.defense.inflexibility.raw;
     const damage = this.applyModifiersToDamage(rolls, data, action);
     const updates = { "system.defense.guard.value": await this.calculateGuard(damage, guard, data.isFeint, action), "system.defense.risk.raw": this.calculateRisk(damage, guard, risk, inflexibility, data.isFeint, action) };
     await this.update(updates);
@@ -3183,18 +3195,18 @@ class AbbrewActor extends Actor {
   }
   applyModifiersToRisk(rolls, data) {
     const rollSuccesses = data.totalSuccesses;
-    return 0 + this.system.defense.risk.value + rollSuccesses - this.getInflexibilityRiskModifier();
-  }
-  getInflexibilityRiskModifier() {
-    const inflexibility = this.system.defense.inflexibility.value;
-    return Math.ceil(inflexibility / 10);
+    return 0 + this.system.defense.risk.value + rollSuccesses - this.system.defense.inflexibility.value;
   }
   getAvailableFinishersForDamageType(data) {
     return data.damage[0].damageType in FINISHERS ? FINISHERS[data.damage[0].damageType] : FINISHERS["general"];
   }
   getFinisherCost(availableFinishers, risk) {
     const keys = Object.keys(availableFinishers);
-    return keys.filter((value) => value <= risk).pop();
+    const cost = keys.filter((value) => value <= risk).pop();
+    if (cost) {
+      return cost;
+    }
+    return 0;
   }
   getFinisher(availableFinishers, finisherKey) {
     return availableFinishers[finisherKey];
@@ -3256,7 +3268,7 @@ class AbbrewActor extends Actor {
     }
     const guardUpdate = Math.max(0, guard - guardDamage);
     if (guardUpdate <= 0) {
-      await setActorToOffGuard(this);
+      await setActorToOffGuard();
     }
     return guardUpdate;
   }
@@ -3350,6 +3362,9 @@ class AbbrewItem2 extends Item {
   }
   static async _onAcceptFinisherAction(rolls, data) {
     const tokens = canvas.tokens.controlled.filter((token) => token.actor);
+    if (tokens.length === 0) {
+      return;
+    }
     await tokens[0].actor.takeFinisher(rolls, data);
   }
   /**
@@ -3489,9 +3504,12 @@ Hooks.on("applyActiveEffect", applyCustomEffects);
 Hooks.on("renderChatLog", (app, html, data) => {
   AbbrewItem2.chatListeners(html);
 });
-Hooks.on("updateActor", (actor, updates) => {
-  if (doesNestedFieldExist(updates, "system.defense.guard.value")) {
+Hooks.on("updateActor", async (actor, updates, options, userId) => {
+  if (doesNestedFieldExist(updates, "system.wounds.guard.value")) {
     console.log(`${actor.name}'s guard was updated to ${actor.system.defense.guard.value}`);
+  }
+  if (doesNestedFieldExist(updates, "system.wounds")) {
+    await handleActorWoundConditions(actor);
   }
 });
 async function createItemMacro(data, slot) {

@@ -128,6 +128,27 @@ ABBREW.wounds = {
   }
 }
 
+ABBREW.conditions = {
+  defeated: {
+    name: "ABBREW.EFFECT.Condition.Defeated.name",
+    img: "systems/abbrew/assets/icons/statuses/defeated.svg",
+    description: "ABBREW.EFFECT.Condition.Defeated.description",
+    statuses: ['defeated']
+  },
+  dead: {
+    name: "ABBREW.EFFECT.Condition.Dead.name",
+    img: "systems/abbrew/assets/icons/statuses/dead.svg",
+    description: "ABBREW.EFFECT.Condition.Dead.description",
+    statuses: ['dead', 'defeated']
+  },
+  offGuard: {
+    name: "ABBREW.EFFECT.Condition.OffGuard.name",
+    img: "systems/abbrew/assets/icons/statuses/offGuard.svg",
+    description: "ABBREW.EFFECT.Condition.OffGuard.description",
+    statuses: ['offGuard']
+  }
+}
+
 ABBREW.statusEffects = {
   defeated: {
     name: "ABBREW.EFFECT.Status.defeated",

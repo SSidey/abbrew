@@ -63,6 +63,10 @@ export default class AbbrewItem extends Item {
 
   static async _onAcceptFinisherAction(rolls, data) {
     const tokens = canvas.tokens.controlled.filter((token) => token.actor);
+    if (tokens.length === 0) {
+      return;
+    }
+
     await tokens[0].actor.takeFinisher(rolls, data);
   }
 

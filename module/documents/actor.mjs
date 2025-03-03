@@ -52,7 +52,7 @@ export default class AbbrewActor extends Actor {
     Hooks.call('actorTakesDamage', this);
     let guard = this.system.defense.guard.value;
     let risk = this.system.defense.risk.raw;
-    const inflexibility = this.system.defense.inflexibility.value;
+    const inflexibility = this.system.defense.inflexibility.raw;
 
     const damage = this.applyModifiersToDamage(rolls, data, action);
 
@@ -65,11 +65,11 @@ export default class AbbrewActor extends Actor {
   async takeFinisher(rolls, data) {
     // TODO: Check for successes or Off Guard
     if (data.totalSuccesses < 1 && !this.statuses.has('offGuard')) {
-      // TODO: Report to chat that the finisher failed?
+      // TODO: Report to chat that the finisher failed for unable to use finisher?
       console.log('No finisher was possible');
       return;
     }
-    
+
     const risk = this.system.defense.risk.raw;
     console.log('Finisher');
     const totalRisk = this.applyModifiersToRisk(rolls, data);
@@ -81,6 +81,8 @@ export default class AbbrewActor extends Actor {
       await this.sendFinisherToChat(finisher, finisherCost);
       return await this.applyFinisher(risk, finisher, finisherCost);
     }
+
+    // TODO: Report to chat that the finisher failed for resistance?
   }
 
   applyModifiersToRisk(rolls, data) {
@@ -90,14 +92,8 @@ export default class AbbrewActor extends Actor {
     // TODO: Tier Diff
     // TODO: Lethal Diff
     // TODO: Material Tier Diff
-    return 0 + this.system.defense.risk.value + rollSuccesses - this.getInflexibilityRiskModifier();
+    return 0 + this.system.defense.risk.value + rollSuccesses - this.system.defense.inflexibility.value;
   }
-
-  getInflexibilityRiskModifier() {
-    const inflexibility = this.system.defense.inflexibility.value;
-    return Math.ceil(inflexibility / 10);
-  }
-
 
   getAvailableFinishersForDamageType(data) {
     // TODO: Only looking at main damage type?
@@ -107,7 +103,12 @@ export default class AbbrewActor extends Actor {
   getFinisherCost(availableFinishers, risk) {
     // TODO: Apply weapon size limit
     const keys = Object.keys(availableFinishers);
-    return keys.filter((value) => value <= risk).pop();
+    const cost = keys.filter((value) => value <= risk).pop();
+    if (cost) {
+      return cost;
+    }
+
+    return 0;
   }
 
   getFinisher(availableFinishers, finisherKey) {
@@ -140,6 +141,7 @@ export default class AbbrewActor extends Actor {
 
   async applyFinisher(risk, finisher, finisherCost) {
     const updates = { "system.wounds": mergeActorWounds(this, finisher.wounds), "system.defense.risk.raw": this.reduceRiskForFinisher(risk, finisherCost) };
+    // TODO: Pass through single update function? combat.updateActorWounds
     await this.update(updates);
     if (this.system.wounds.reduce((total, wound) => total += wound.value, 0) >= this.system.defense.resolve.value) {
       // TODO: Mark Actor as defeated

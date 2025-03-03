@@ -30,7 +30,9 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         })
       ),
       inflexibility: new fields.SchemaField({
-        value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 })
+        raw: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+        value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+        max: new fields.NumberField({ ...requiredInteger, initial: 10, min: 10, max: 10 }),
       }),
       risk: new fields.SchemaField({
         raw: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 100 }),
@@ -90,7 +92,20 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     // TODO: Set by tag
     this.defense.canBleed = true;
 
-    this.defense.resolve.max = 2 + this.attributes['con'].value + this.attributes['wil'].value;
+    // PLAYTEST: Does this feel good?
+    this.defense.resolve.max = 2 + this._getMaxFromPhysicalAttributes() + this._getMaxFromMentalAttributes();
+  }
+
+  _getMaxFromPhysicalAttributes() {
+    return this._getMaxFromAttributes(['str', 'con', 'dex', 'agi']);
+  }
+
+  _getMaxFromMentalAttributes() {
+    return this._getMaxFromAttributes(['int', 'wil', 'vis', 'wit']);
+  }
+
+  _getMaxFromAttributes(attributes) {
+    return Object.keys(this.attributes).filter(a => attributes.includes(a)).reduce((result, attribute) => Math.max(result, this.attributes[attribute].value), 0);
   }
 
   // Post Active Effects
@@ -196,7 +211,8 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
   _prepareInflexibility(armour) {
     const inflexibility = armour.map(a => a.system.defense.inflexibility).reduce((a, b) => a + b, 0);
-    this.defense.inflexibility.value = inflexibility;
+    this.defense.inflexibility.raw = inflexibility;
+    this.defense.inflexibility.value = Math.ceil(inflexibility / 10);
   }
 
   getRollData() {

@@ -121,6 +121,20 @@
         "dead": "Dead",
         "defeated": "Defeated",
         "offGuard": "Off Guard"
+      },
+      "Condition": {
+        "Dead": {
+          "name": "Dead",
+          "description": "You have suffered fatal wounds, resulting in death."
+        },
+        "Defeated": {
+          "name": "Defeated",
+          "description": "You resolve buckles as you are unable to continue the fight."
+        },
+        "OffGuard": {
+          "name": "Off Guard",
+          "description": "Your guard is broken or otherwise compromised, your foes can directly capitalise on your weakpoints. You can be targeted by finishers."
+        }
       }
     }
   },
