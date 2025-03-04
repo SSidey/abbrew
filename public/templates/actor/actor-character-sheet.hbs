@@ -47,7 +47,8 @@
         <div class="resource flex-group-center">
           <label for="system.defense.guard" class="resource-label">Guard</label>
           <div class="resource-content flexrow flex-center flex-between">
-            <input type="text" value="{{system.defense.guard.value}}" data-dtype="Number" readonly />
+            <input type="text" name="system.defense.guard.value" value="{{system.defense.guard.value}}"
+                    data-dtype="Number" />
             <span> / </span>
             <input type="text" value="{{system.defense.guard.max}}" data-dtype="Number" readonly />
           </div>
@@ -119,7 +120,7 @@
           {{!-- This is a Handlebars partial. They're stored in the `/parts` folder next to this sheet, and defined in
           module/helpers/templates.mjs --}}
           {{> "systems/abbrew/templates/actor/parts/actor-anatomy.hbs"}}
-          {{> "systems/abbrew/templates/actor/parts/actor-armour.hbs"}}
+          {{> "systems/abbrew/templates/actor/parts/actor-armour.hbs" showEquipState=false}}
           {{> "systems/abbrew/templates/actor/parts/actor-weapons.hbs" weaponsList=equippedWeapons
           showAttackProfiles=true showEquipState=false}}
         </section>

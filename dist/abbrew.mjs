@@ -2606,6 +2606,11 @@ ABBREW.equipState = {
   stowed: "ABBREW.EquipState.stowed",
   dropped: "ABBREW.EquipState.dropped"
 };
+ABBREW.armourEquipState = {
+  worn: "ABBREW.EquipState.worn",
+  stowed: "ABBREW.EquipState.stowed",
+  dropped: "ABBREW.EquipState.dropped"
+};
 ABBREW.skillTypes = {
   background: "ABBREW.SkillTypes.background",
   basic: "ABBREW.SkillTypes.basic",
@@ -2807,9 +2812,13 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   }
   _prepareDefenses(anatomy) {
     const armour = this.parent.items.filter((i) => i.type === "armour");
-    this._prepareDamageReduction(armour, anatomy);
-    this._prepareGuard(armour, anatomy);
-    this._prepareInflexibility(armour);
+    const wornArmour = this._getWornArmour(armour);
+    this._prepareDamageReduction(wornArmour, anatomy);
+    this._prepareGuard(wornArmour, anatomy);
+    this._prepareInflexibility(wornArmour);
+  }
+  _getWornArmour(armour) {
+    return armour.filter((a) => a.system.equipState === "worn");
   }
   _prepareResolve() {
     const currentResolve = this.defense.resolve.value;
@@ -2839,6 +2848,7 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     Object.values(flatDR).map((v) => this.defense.protection.push(v));
   }
   _prepareGuard(armour, anatomy) {
+    this.defense.guard.base = this.attributes["wit"].value;
     this.defense.guard.label = game.i18n.localize(CONFIG.ABBREW.Defense.guard) ?? key;
     const guardBonus = armour.map((a) => a.system.defense.guard).reduce((a, b) => a + b, 0);
     this.defense.guard.max = this.defense.guard.base + guardBonus;

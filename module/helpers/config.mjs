@@ -87,6 +87,12 @@ ABBREW.equipState = {
   dropped: "ABBREW.EquipState.dropped"
 }
 
+ABBREW.armourEquipState = {
+  worn: "ABBREW.EquipState.worn",
+  stowed: "ABBREW.EquipState.stowed",
+  dropped: "ABBREW.EquipState.dropped"
+}
+
 ABBREW.skillTypes = {
   background: "ABBREW.SkillTypes.background",
   basic: "ABBREW.SkillTypes.basic",

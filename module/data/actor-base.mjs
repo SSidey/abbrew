@@ -19,7 +19,8 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
         base: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
         max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-        label: new fields.StringField({ required: true, blank: true })
+        label: new fields.StringField({ required: true, blank: true }),
+        
       }),
       protection: new fields.ArrayField(
         new fields.SchemaField({
@@ -156,9 +157,14 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
   _prepareDefenses(anatomy) {
     const armour = this.parent.items.filter(i => i.type === 'armour');
-    this._prepareDamageReduction(armour, anatomy);
-    this._prepareGuard(armour, anatomy);
-    this._prepareInflexibility(armour);
+    const wornArmour = this._getWornArmour(armour);
+    this._prepareDamageReduction(wornArmour, anatomy);
+    this._prepareGuard(wornArmour, anatomy);
+    this._prepareInflexibility(wornArmour);
+  }
+
+  _getWornArmour(armour) {
+    return armour.filter(a => a.system.equipState === 'worn')
   }
 
   _prepareResolve() {
@@ -200,6 +206,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   }
 
   _prepareGuard(armour, anatomy) {
+    this.defense.guard.base = this.attributes['wit'].value;
     // Handle damage type label localization.
     this.defense.guard.label = game.i18n.localize(CONFIG.ABBREW.Defense.guard) ?? key;
 
