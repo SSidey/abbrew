@@ -2686,6 +2686,11 @@ ABBREW.statusEffects = {
     img: "systems/abbrew/assets/icons/statuses/offGuard.svg"
   }
 };
+ABBREW.equipTypes = {
+  none: "ABBREW.EquipTypes.none",
+  held: "ABBREW.EquipTypes.held",
+  worn: "ABBREW.EquipTypes.worn"
+};
 ABBREW.traits = {
   canBleed: {
     name: "ABBREW.Traits.CanBleed.name"
@@ -2722,8 +2727,11 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       ),
       inflexibility: new fields.SchemaField({
         raw: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-        value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-        max: new fields.NumberField({ ...requiredInteger, initial: 10, min: 10, max: 10 })
+        max: new fields.NumberField({ ...requiredInteger, initial: 10, min: 10, max: 10 }),
+        resistance: new fields.SchemaField({
+          raw: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+          value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 })
+        })
       }),
       risk: new fields.SchemaField({
         raw: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 100 }),
@@ -2812,13 +2820,15 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   }
   _prepareDefenses(anatomy) {
     const armour = this.parent.items.filter((i) => i.type === "armour");
-    const wornArmour = this._getWornArmour(armour);
+    const wornArmour = this._getAppliedArmour(armour);
     this._prepareDamageReduction(wornArmour, anatomy);
     this._prepareGuard(wornArmour, anatomy);
     this._prepareInflexibility(wornArmour);
   }
-  _getWornArmour(armour) {
-    return armour.filter((a) => a.system.equipState === "worn");
+  _getAppliedArmour(armour) {
+    const wornArmour = armour.filter((a) => ["worn", "none"].includes(a.system.equipState)).filter((a) => a.system.equipState === "worn");
+    const heldArmour = armour.filter((a) => a.system.equipType === "held").filter((a) => a.system.equipState.startsWith("held"));
+    return [...wornArmour, ...heldArmour];
   }
   _prepareResolve() {
     const currentResolve = this.defense.resolve.value;
@@ -2857,9 +2867,12 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     }
   }
   _prepareInflexibility(armour) {
-    const inflexibility = armour.map((a) => a.system.defense.inflexibility).reduce((a, b) => a + b, 0);
-    this.defense.inflexibility.raw = inflexibility;
-    this.defense.inflexibility.value = Math.ceil(inflexibility / 10);
+    const armourInflexibility = armour.map((a) => a.system.defense.inflexibility).reduce((a, b) => a + b, 0);
+    const weapons = this.parent.items.filter((i) => i.type === "weapon").filter((a) => a.system.equipType === "held").filter((a) => a.system.equipState.startsWith("held"));
+    const otherInflexibility = Math.max(0, weapons.reduce((result, w) => result += w.system.weapon.size, 0) - this.attributes["str"].value);
+    this.defense.inflexibility.resistance.raw = armourInflexibility;
+    this.defense.inflexibility.raw = 0 + armourInflexibility + otherInflexibility;
+    this.defense.inflexibility.resistance.value = Math.ceil(armourInflexibility / 10);
   }
   getRollData() {
     let data = {};
@@ -2912,9 +2925,34 @@ class AbbrewItemBase extends foundry.abstract.TypeDataModel {
   }
   static addItemSchema(schema) {
     const fields = foundry.data.fields;
+    const requiredInteger = { required: true, nullable: false, integer: true };
     schema.description = new fields.StringField({ required: true, blank: true });
     schema.traits = new fields.StringField({ required: true, blank: true });
+    schema.equipType = new fields.StringField({ required: true, blank: true });
+    schema.armourPoints = new fields.StringField({ required: true, blank: true });
+    schema.hands = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
     schema.equipState = new fields.StringField({ required: true, blank: false, initial: "stowed" });
+  }
+  // Prior to Active Effects
+  prepareBaseData() {
+    switch (this.equipType) {
+      case "none":
+        this.clearHeldDetails();
+        this.clearWornDetails();
+        break;
+      case "held":
+        this.clearWornDetails();
+        break;
+      case "worn":
+        this.clearHeldDetails();
+        break;
+    }
+  }
+  clearHeldDetails() {
+    this.hands = 0;
+  }
+  clearWornDetails() {
+    this.armourPoints = "[]";
   }
 }
 let AbbrewItem$1 = class AbbrewItem extends AbbrewItemBase {
@@ -3074,7 +3112,6 @@ class AbbrewAnatomy extends AbbrewItemBase {
     const requiredInteger = { required: true, nullable: false, integer: true };
     const schema = super.defineSchema();
     schema.parts = new fields.StringField({ required: true, blank: true });
-    schema.hands = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
     schema.speed = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
     return schema;
   }
@@ -3087,7 +3124,6 @@ class AbbrewArmour extends AbbrewItemBase {
     const fields = foundry.data.fields;
     const requiredInteger = { required: true, nullable: false, integer: true };
     const schema = super.defineSchema();
-    schema.armourPoints = new fields.StringField({ required: true, blank: true });
     schema.defense = new fields.SchemaField({
       guard: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
       inflexibility: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
@@ -3143,14 +3179,15 @@ class AbbrewWeapon extends AbbrewItemBase {
   static addWeaponSchema(schema) {
     const fields = foundry.data.fields;
     const requiredInteger = { required: true, nullable: false, integer: true };
-    schema.hands = new fields.SchemaField(
-      {
-        required: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-        occupied: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 })
-      }
-    );
+    schema.weapon = new fields.SchemaField({
+      size: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 9 })
+    });
     AbbrewAttackBase.addAttackSchema(schema);
   }
+  // Prior to Active Effects
+  prepareBaseData() {
+  }
+  // Post Active Effects
   prepareDerivedData() {
     this.formula = `1d10x10cs10`;
   }
@@ -3245,7 +3282,7 @@ class AbbrewActor extends Actor {
   }
   applyModifiersToRisk(rolls, data) {
     const rollSuccesses = data.totalSuccesses;
-    return 0 + this.system.defense.risk.value + rollSuccesses - this.system.defense.inflexibility.value;
+    return 0 + this.system.defense.risk.value + rollSuccesses - this.system.defense.inflexibility.resistance.value;
   }
   getAvailableFinishersForDamageType(data) {
     return data.damage[0].damageType in FINISHERS ? FINISHERS[data.damage[0].damageType] : FINISHERS["general"];
@@ -3360,6 +3397,37 @@ class AbbrewActor extends Actor {
       });
     }
   }
+  getActorWornArmour() {
+    const armour = this.items.filter((i) => i.type === "armour");
+    return armour.filter((a) => a.system.equipState === "worn");
+  }
+  getActorHeldItems() {
+    return this.items.filter((a) => a.system.equipType === "held").filter((a) => a.system.equipState.startsWith("held"));
+  }
+  getActorAnatomy() {
+    return this.items.filter((i) => i.type === "anatomy");
+  }
+}
+function staticID(id) {
+  if (id.length >= 16)
+    return id.substring(0, 16);
+  return id.padEnd(16, "0");
+}
+function doesNestedFieldExist(obj, props) {
+  var splited = props.split(".");
+  var temp = obj;
+  for (var index in splited) {
+    if (typeof temp[splited[index]] === "undefined")
+      return false;
+    temp = temp[splited[index]];
+  }
+  return true;
+}
+function arrayDifference(a, b) {
+  return [...b.reduce(
+    (acc, v) => acc.set(v, (acc.get(v) || 0) - 1),
+    a.reduce((acc, v) => acc.set(v, (acc.get(v) || 0) + 1), /* @__PURE__ */ new Map())
+  )].reduce((acc, [v, count]) => acc.concat(Array(Math.abs(count)).fill(v)), []);
 }
 class AbbrewItem2 extends Item {
   /**
@@ -3367,6 +3435,46 @@ class AbbrewItem2 extends Item {
    */
   prepareData() {
     super.prepareData();
+  }
+  _preUpdate(changed, options, userId) {
+    if (doesNestedFieldExist(changed, "system.equipState") && changed.system.equipState === "worn" && this.type === "armour") {
+      if (!this.isWornEquipStateChangePossible()) {
+        this.actor.sheet.render();
+        return false;
+      }
+    }
+    if (doesNestedFieldExist(changed, "system.equipState") && changed.system.equipState.startsWith("held")) {
+      if (!this.isHeldEquipStateChangePossible()) {
+        this.actor.sheet.render();
+        return false;
+      }
+    }
+    super._preUpdate(changed, options, userId);
+  }
+  isWornEquipStateChangePossible() {
+    const armourPoints = JSON.parse(this.system.armourPoints).map((ap) => ap.value);
+    const usedArmourPoints = this.actor.getActorWornArmour().flatMap((a) => JSON.parse(a.system.armourPoints).map((ap) => ap.value));
+    const actorArmourPoints = this.actor.getActorAnatomy().flatMap((a) => JSON.parse(a.system.parts).map((ap) => ap.value));
+    const availableArmourPoints = arrayDifference(actorArmourPoints, usedArmourPoints);
+    if (!armourPoints.every((ap) => availableArmourPoints.includes(ap))) {
+      return false;
+    }
+    let requiredArmourPoints = availableArmourPoints.filter((ap) => armourPoints.includes(ap));
+    const allRequiredAvailable = armourPoints.reduce((result, a) => {
+      if (requiredArmourPoints.length > 0 && requiredArmourPoints.includes(a)) {
+        requiredArmourPoints.pop(a);
+      } else {
+        result = false;
+      }
+      return result;
+    }, true);
+    return allRequiredAvailable;
+  }
+  isHeldEquipStateChangePossible() {
+    const actorHands = this.actor.getActorAnatomy().reduce((result, a) => result += a.system.hands, 0);
+    const equippedHeldItemHands = this.actor.getActorHeldItems().reduce((result, a) => result += a.system.hands, 0);
+    const requiredHands = equippedHeldItemHands + this.system.hands;
+    return actorHands >= requiredHands;
   }
   /**
    * Prepare a data object which defines the data schema used by dice roll commands against this Item
@@ -3435,21 +3543,6 @@ class AbbrewItem2 extends Item {
       console.log("general roll");
     }
   }
-}
-function staticID(id) {
-  if (id.length >= 16)
-    return id.substring(0, 16);
-  return id.padEnd(16, "0");
-}
-function doesNestedFieldExist(obj, props) {
-  var splited = props.split(".");
-  var temp = obj;
-  for (var index in splited) {
-    if (typeof temp[splited[index]] === "undefined")
-      return false;
-    temp = temp[splited[index]];
-  }
-  return true;
 }
 Hooks.once("init", function() {
   game.abbrew = {
@@ -3555,7 +3648,7 @@ Hooks.on("updateActor", async (actor, updates, options, userId) => {
   if (doesNestedFieldExist(updates, "system.defense.guard.value")) {
     await handleActorGuardConditions(actor);
   }
-  if (doesNestedFieldExist(updates, "system.wounds")) {
+  if (doesNestedFieldExist(updates, "system.wounds") || doesNestedFieldExist(updates, "system.defense.resolve")) {
     await handleActorWoundConditions(actor);
   }
 });

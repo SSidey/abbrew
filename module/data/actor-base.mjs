@@ -20,7 +20,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         base: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
         max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
         label: new fields.StringField({ required: true, blank: true }),
-        
+
       }),
       protection: new fields.ArrayField(
         new fields.SchemaField({
@@ -34,8 +34,11 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       ),
       inflexibility: new fields.SchemaField({
         raw: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-        value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
         max: new fields.NumberField({ ...requiredInteger, initial: 10, min: 10, max: 10 }),
+        resistance: new fields.SchemaField({
+          raw: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+          value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+        })
       }),
       risk: new fields.SchemaField({
         raw: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 100 }),
@@ -157,14 +160,16 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
   _prepareDefenses(anatomy) {
     const armour = this.parent.items.filter(i => i.type === 'armour');
-    const wornArmour = this._getWornArmour(armour);
+    const wornArmour = this._getAppliedArmour(armour);
     this._prepareDamageReduction(wornArmour, anatomy);
     this._prepareGuard(wornArmour, anatomy);
     this._prepareInflexibility(wornArmour);
   }
 
-  _getWornArmour(armour) {
-    return armour.filter(a => a.system.equipState === 'worn')
+  _getAppliedArmour(armour) {
+    const wornArmour = armour.filter(a => ['worn', 'none'].includes(a.system.equipState)).filter(a => a.system.equipState === 'worn');
+    const heldArmour = armour.filter(a => a.system.equipType === 'held').filter(a => a.system.equipState.startsWith('held'));
+    return [...wornArmour, ...heldArmour];
   }
 
   _prepareResolve() {
@@ -219,9 +224,12 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   }
 
   _prepareInflexibility(armour) {
-    const inflexibility = armour.map(a => a.system.defense.inflexibility).reduce((a, b) => a + b, 0);
-    this.defense.inflexibility.raw = inflexibility;
-    this.defense.inflexibility.value = Math.ceil(inflexibility / 10);
+    const armourInflexibility = armour.map(a => a.system.defense.inflexibility).reduce((a, b) => a + b, 0);
+    const weapons = this.parent.items.filter(i => i.type === 'weapon').filter(a => a.system.equipType === 'held').filter(a => a.system.equipState.startsWith('held'));
+    const otherInflexibility = Math.max(0, weapons.reduce((result, w) => result += w.system.weapon.size, 0) - this.attributes['str'].value);
+    this.defense.inflexibility.resistance.raw = armourInflexibility;
+    this.defense.inflexibility.raw = 0 + armourInflexibility + otherInflexibility; // TODO: - weapon drills
+    this.defense.inflexibility.resistance.value = Math.ceil(armourInflexibility / 10);
   }
 
   getRollData() {

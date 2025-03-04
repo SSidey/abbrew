@@ -188,7 +188,7 @@ Hooks.on("updateActor", async (actor, updates, options, userId) => {
 
   }
 
-  if (doesNestedFieldExist(updates, "system.wounds")) {
+  if (doesNestedFieldExist(updates, "system.wounds") || doesNestedFieldExist(updates, "system.defense.resolve")) {
 
     await handleActorWoundConditions(actor);
 

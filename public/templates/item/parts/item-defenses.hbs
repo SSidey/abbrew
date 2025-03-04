@@ -9,10 +9,7 @@
             <input type="text" name="system.defense.inflexibility" value="{{system.defense.inflexibility}}"
                 data-dtype="Number" />
         </div>
-        <div>
-            <label>{{localize "ABBREW.ArmourPoints.label"}}</label>
-            <input type="text" name="system.armourPoints" value="{{system.armourPoints}}" data-dtype="text" />
-        </div>
+        {{> "systems/abbrew/templates/item/parts/item-equipstate.hbs"}}
     </div>
     {{#each system.defense.protection as |protection i|}}
     <li class="item effect flexrow" data-id="{{i}}">

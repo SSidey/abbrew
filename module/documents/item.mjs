@@ -1,3 +1,4 @@
+import { doesNestedFieldExist, arrayDifference } from '../helpers/utils.mjs';
 /**
  * Extend the basic Item with some very simple modifications.
  * @extends {Item}
@@ -10,6 +11,54 @@ export default class AbbrewItem extends Item {
     // As with the actor class, items are documents that can have their data
     // preparation methods overridden (such as prepareBaseData()).
     super.prepareData();
+  }
+
+  _preUpdate(changed, options, userId) {
+    if (doesNestedFieldExist(changed, "system.equipState") && changed.system.equipState === 'worn' && this.type === 'armour') {
+      if (!this.isWornEquipStateChangePossible()) {
+        this.actor.sheet.render();
+        return false;
+      }
+    }
+
+
+    if (doesNestedFieldExist(changed, "system.equipState") && changed.system.equipState.startsWith('held')) {
+      if (!this.isHeldEquipStateChangePossible()) {
+        this.actor.sheet.render();
+        return false;
+      }
+    }
+
+    super._preUpdate(changed, options, userId);
+  }
+
+  isWornEquipStateChangePossible() {
+    const armourPoints = JSON.parse(this.system.armourPoints).map(ap => ap.value);
+    const usedArmourPoints = this.actor.getActorWornArmour().flatMap(a => JSON.parse(a.system.armourPoints).map(ap => ap.value));
+    const actorArmourPoints = this.actor.getActorAnatomy().flatMap(a => JSON.parse(a.system.parts).map(ap => ap.value));
+    const availableArmourPoints = arrayDifference(actorArmourPoints, usedArmourPoints);
+    if (!armourPoints.every(ap => availableArmourPoints.includes(ap))) {
+      return false;
+    }
+    let requiredArmourPoints = availableArmourPoints.filter(ap => armourPoints.includes(ap));
+    const allRequiredAvailable = armourPoints.reduce((result, a) => {
+      if (requiredArmourPoints.length > 0 && requiredArmourPoints.includes(a)) {
+        requiredArmourPoints.pop(a);
+      } else {
+        result = false;
+      }
+
+      return result;
+    }, true);
+
+    return allRequiredAvailable;
+  }
+
+  isHeldEquipStateChangePossible() {
+    const actorHands = this.actor.getActorAnatomy().reduce((result, a) => result += a.system.hands, 0);
+    const equippedHeldItemHands = this.actor.getActorHeldItems().reduce((result, a) => result += a.system.hands, 0);
+    const requiredHands = equippedHeldItemHands + this.system.hands;
+    return actorHands >= requiredHands;
   }
 
   /**

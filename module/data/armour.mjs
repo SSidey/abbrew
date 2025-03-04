@@ -7,7 +7,6 @@ export default class AbbrewArmour extends AbbrewItemBase {
         const requiredInteger = { required: true, nullable: false, integer: true };
         const schema = super.defineSchema();
 
-        schema.armourPoints = new fields.StringField({ required: true, blank: true });
         schema.defense = new fields.SchemaField({
             guard: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
             inflexibility: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),

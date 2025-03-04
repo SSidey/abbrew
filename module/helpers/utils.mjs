@@ -23,3 +23,11 @@ export function doesNestedFieldExist(obj, props) {
     }
     return true
 }
+
+/* -------------------------------------------- */
+
+export function arrayDifference(a, b) {
+    return [...b.reduce((acc, v) => acc.set(v, (acc.get(v) || 0) - 1),
+        a.reduce((acc, v) => acc.set(v, (acc.get(v) || 0) + 1), new Map())
+    )].reduce((acc, [v, count]) => acc.concat(Array(Math.abs(count)).fill(v)), []);
+}

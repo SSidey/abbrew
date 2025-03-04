@@ -36,6 +36,10 @@
     {{!-- Attributes Tab --}}
     <div class="tab attributes" data-group="primary" data-tab="attributes">
       <pre>{{{json system}}}</pre>
+      <div class="resource">
+        <label class="resource-label">Size</label>
+        <input type="text" name="system.weapon.size" value="{{system.weapon.size}}" data-dtype="Number" />
+      </div>
       {{> "systems/abbrew/templates/item/parts/item-equipstate.hbs"}}
       {{> "systems/abbrew/templates/item/parts/item-damage.hbs"}}
     </div>

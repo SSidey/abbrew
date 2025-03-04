@@ -15,16 +15,20 @@ export default class AbbrewWeapon extends AbbrewItemBase {
     const fields = foundry.data.fields;
     const requiredInteger = { required: true, nullable: false, integer: true };
 
-    schema.hands = new fields.SchemaField(
-      {
-        required: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-        occupied: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-      }
-    );
+    schema.weapon = new fields.SchemaField({
+      size: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 9 })
+    });
 
     AbbrewAttackBase.addAttackSchema(schema);
   }
 
+  // Prior to Active Effects
+  prepareBaseData() {
+
+  }
+
+
+  // Post Active Effects
   prepareDerivedData() {
     // Build the formula dynamically using string interpolation
 

@@ -19,9 +19,15 @@
       <h4>{{item.name}}</h4>
     </div>
     {{#if ../showEquipState}}
+    {{#if (eq item.system.equipType "held")}}
     <select class="item-select" name="system.equipState">
       {{selectOptions ../config.equipState selected=item.system.equipState localize=true}}
     </select>
+    {{else}}
+    <select class="item-select" name="system.equipState">
+      {{selectOptions ../config.armourEquipState selected=item.system.equipState localize=true}}
+    </select>
+    {{/if}}
     {{/if}}
     <div class='item-controls'>
       <a class='item-control item-edit' title='{{localize "DOCUMENT.Edit" type=' armour'}}'>

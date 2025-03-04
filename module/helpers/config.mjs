@@ -174,6 +174,12 @@ ABBREW.statusEffects = {
   }
 }
 
+ABBREW.equipTypes = {
+  none: "ABBREW.EquipTypes.none",
+  held: "ABBREW.EquipTypes.held",
+  worn: "ABBREW.EquipTypes.worn"
+}
+
 ABBREW.traits = {
   canBleed: {
     name: "ABBREW.Traits.CanBleed.name"

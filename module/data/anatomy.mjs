@@ -8,7 +8,6 @@ export default class AbbrewAnatomy extends AbbrewItemBase {
     const schema = super.defineSchema();
 
     schema.parts = new fields.StringField({ required: true, blank: true });
-    schema.hands = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
     schema.speed = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
 
     return schema;

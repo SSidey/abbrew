@@ -92,7 +92,7 @@ export default class AbbrewActor extends Actor {
     // TODO: Tier Diff
     // TODO: Lethal Diff
     // TODO: Material Tier Diff
-    return 0 + this.system.defense.risk.value + rollSuccesses - this.system.defense.inflexibility.value;
+    return 0 + this.system.defense.risk.value + rollSuccesses - this.system.defense.inflexibility.resistance.value;
   }
 
   getAvailableFinishersForDamageType(data) {
@@ -235,5 +235,18 @@ export default class AbbrewActor extends Actor {
         flags: { /* data: { finisher, finisherCost } */ }
       });
     }
+  }
+
+  getActorWornArmour() {
+    const armour = this.items.filter(i => i.type === 'armour');
+    return armour.filter(a => a.system.equipState === 'worn')
+  }
+
+  getActorHeldItems() {
+    return this.items.filter(a => a.system.equipType === 'held').filter(a => a.system.equipState.startsWith('held'));
+  }
+
+  getActorAnatomy() {
+    return this.items.filter(i => i.type === 'anatomy');
   }
 }

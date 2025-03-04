@@ -137,6 +137,11 @@
         }
       }
     },
+    "EquipTypes": {
+      "none": "None",
+      "held": "Held",
+      "worn": "Worn"
+    },
     "Traits": {
       "CanBleed": {
         "name": "Can Bleed"
