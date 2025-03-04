@@ -63,7 +63,6 @@ export default class AbbrewActor extends Actor {
   }
 
   async takeFinisher(rolls, data) {
-    // TODO: Check for successes or Off Guard
     if (data.totalSuccesses < 1 && !this.statuses.has('offGuard')) {
       // TODO: Report to chat that the finisher failed for unable to use finisher?
       console.log('No finisher was possible');
@@ -141,13 +140,7 @@ export default class AbbrewActor extends Actor {
 
   async applyFinisher(risk, finisher, finisherCost) {
     const updates = { "system.wounds": mergeActorWounds(this, finisher.wounds), "system.defense.risk.raw": this.reduceRiskForFinisher(risk, finisherCost) };
-    // TODO: Pass through single update function? combat.updateActorWounds
     await this.update(updates);
-    if (this.system.wounds.reduce((total, wound) => total += wound.value, 0) >= this.system.defense.resolve.value) {
-      // TODO: Mark Actor as defeated
-      await renderLostResolveCard(this);
-    }
-    await checkActorFatalWounds(this);
     return this;
   }
 
@@ -158,7 +151,7 @@ export default class AbbrewActor extends Actor {
   applyModifiersToDamage(rolls, data) {
     let rollSuccesses = data.totalSuccesses;
     return data.damage.reduce((result, d) => {
-      // TODO: Do we do damage reduction, or just give negations per DR?
+      // TODO: Enable new DR types
       const protection = /* this.system.defense.protection.some(dr => dr.type === d.damageType) ? this.system.defense.protection.filter(dr => dr.type === d.damageType)[0] : */ { immunity: 0, resistance: 0, weakness: 0, value: 0 };
       if (protection.immunity > 0) {
         return result;

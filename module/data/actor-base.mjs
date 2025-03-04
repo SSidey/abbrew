@@ -95,7 +95,6 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
     this.defense.risk.value = Math.floor(this.defense.risk.raw / 10);
 
-    // TODO: Set by tag
     this.defense.canBleed = this.traits ? JSON.parse(this.traits).filter(t => t.value === 'Can Bleed').length : false;
 
     // PLAYTEST: Does this feel good?
