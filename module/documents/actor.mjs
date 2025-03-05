@@ -64,34 +64,33 @@ export default class AbbrewActor extends Actor {
 
   async takeFinisher(rolls, data) {
     if (data.totalSuccesses < 1 && !this.statuses.has('offGuard')) {
-      // TODO: Report to chat that the finisher failed for unable to use finisher?
-      console.log('No finisher was possible');
+      await this.sendFinisherToChat();
       return;
     }
 
     const risk = this.system.defense.risk.raw;
-    console.log('Finisher');
     const totalRisk = this.applyModifiersToRisk(rolls, data);
     const availableFinishers = this.getAvailableFinishersForDamageType(data);
     const finisherCost = this.getFinisherCost(availableFinishers, totalRisk);
     const finisher = this.getFinisher(availableFinishers, finisherCost);
-    console.log(finisher);
+    await this.sendFinisherToChat(finisher, finisherCost);
     if (finisher) {
-      await this.sendFinisherToChat(finisher, finisherCost);
       return await this.applyFinisher(risk, finisher, finisherCost);
     }
-
-    // TODO: Report to chat that the finisher failed for resistance?
   }
 
   applyModifiersToRisk(rolls, data) {
-    const rollSuccesses = data.totalSuccesses;
-    // Plate less guard, more risk reduction, leather more guard, less risk reduction
+    let successes = 0;
+    successes += data.totalSuccesses;
+    successes += this.system.defense.risk.value;
+    successes -= this.system.defense.inflexibility.resistance.value
+    successes += data.damage.map(d => this.system.defense.protection.find(w => w.type === d.damageType)).reduce((result, p) => result += p.weakness, 0)
+    successes -= data.damage.map(d => this.system.defense.protection.find(w => w.type === d.damageType)).reduce((result, p) => result += p.resistance, 0)
     // TODO: Size Diff
     // TODO: Tier Diff
     // TODO: Lethal Diff
     // TODO: Material Tier Diff
-    return 0 + this.system.defense.risk.value + rollSuccesses - this.system.defense.inflexibility.resistance.value;
+    return successes;
   }
 
   getAvailableFinishersForDamageType(data) {
@@ -128,7 +127,7 @@ export default class AbbrewActor extends Actor {
     // Initialize chat data.
     const speaker = ChatMessage.getSpeaker({ actor: this.actor });
     // const rollMode = game.settings.get('core', 'rollMode');
-    const label = `${finisher.name}`;
+    const label = finisher ? `${finisher.name}` : "No available finisher";
     ChatMessage.create({
       speaker: speaker,
       // rollMode: rollMode,

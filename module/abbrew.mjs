@@ -10,6 +10,7 @@ import * as models from './data/_module.mjs';
 import * as documents from './documents/_module.mjs';
 import { handleTurnStart, handleActorWoundConditions, handleActorGuardConditions } from './helpers/combat.mjs';
 import { staticID, doesNestedFieldExist } from './helpers/utils.mjs';
+import { registerSystemSettings } from './settings.mjs';
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -56,6 +57,9 @@ Hooks.once('init', function () {
     armour: models.AbbrewArmour,
     weapon: models.AbbrewWeapon
   }
+
+  // Register System Settings  
+  registerSystemSettings();
 
   // Active Effects are never copied to the Actor,
   // but will still apply to the Actor from within the Item

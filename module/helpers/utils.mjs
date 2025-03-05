@@ -31,3 +31,11 @@ export function arrayDifference(a, b) {
         a.reduce((acc, v) => acc.set(v, (acc.get(v) || 0) + 1), new Map())
     )].reduce((acc, [v, count]) => acc.concat(Array(Math.abs(count)).fill(v)), []);
 }
+
+/* -------------------------------------------- */
+
+export function getObjectValueByStringPath(entity, path) {
+    return path.split('.').reduce(function (o, k) {
+        return o && o[k];
+    }, entity);
+}

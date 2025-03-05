@@ -117,6 +117,7 @@ export class AbbrewItemSheet extends ItemSheet {
 
     this._activateArmourPoints(html);
     this._activateAnatomyParts(html);
+    this._activateSkillFlags(html);
   }
 
   prepareActions(system) {
@@ -160,6 +161,25 @@ export class AbbrewItemSheet extends ItemSheet {
     };
     if (anatomyParts) {
       var taggedAnatomyParts = new Tagify(anatomyParts, anatomyPartsSettings);
+    }
+  }
+
+  _activateSkillFlags(html) {
+    const skillFlags = html[0].querySelector('input[name="system.skillFlags"]');
+    const skillFlagSettings = {
+      dropdown: {
+        maxItems: 20,               // <- mixumum allowed rendered suggestions
+        classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
+        enabled: 0,                 // <- show suggestions on focus
+        closeOnSelect: false,       // <- do not hide the suggestions dropdown once an item has been selected
+        includeSelectedTags: true   // <- Should the suggestions list Include already-selected tags (after filtering)
+      },
+      userInput: false,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+      duplicates: true,             // <- Should duplicate tags be allowed or not
+      whitelist: [...Object.values(CONFIG.ABBREW.skillFlags).map(key => game.i18n.localize(key))]
+    };
+    if (skillFlags) {
+      var taggedSkillFlags = new Tagify(skillFlags, skillFlagSettings);
     }
   }
 
@@ -286,7 +306,7 @@ export class AbbrewItemSheet extends ItemSheet {
     */
   _onSkillActionModifierDamageAction(target, action) {
     if (this.item.system.configurable) {
-      switch (action) {        
+      switch (action) {
         case 'add-skill-action-modifier-damage':
           return this.addSkillActionModifierDamage(target);
         case 'remove-skill-action-modifier-damage':

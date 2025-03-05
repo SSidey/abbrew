@@ -1,11 +1,20 @@
 import AbbrewItemBase from "./item-base.mjs";
+import AbbrewRevealedItem from "./revealedItem.mjs";
 
 export default class AbbrewArmour extends AbbrewItemBase {
 
     static defineSchema() {
+        const schema = super.defineSchema();
+
+        this.addDefenseSchema(schema);
+        AbbrewRevealedItem.addRevealedItemSchema(schema);
+
+        return schema;
+    }
+
+    static addDefenseSchema(schema) {
         const fields = foundry.data.fields;
         const requiredInteger = { required: true, nullable: false, integer: true };
-        const schema = super.defineSchema();
 
         schema.defense = new fields.SchemaField({
             guard: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
@@ -21,8 +30,6 @@ export default class AbbrewArmour extends AbbrewItemBase {
                 })
             )
         });
-
-        return schema;
     }
 
     prepareDerivedData() {

@@ -135,13 +135,12 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
     this._prepareMovement(anatomy);
 
-    this._prepareDefenses(anatomy);
+    this._prepareDefenses();
 
     this._prepareResolve();
   }
 
   _prepareAnatomy() {
-    console.log('anatomy');
     const res = this.parent.items.filter(i => i.type == 'anatomy').reduce((result, a) => {
       const values = a.system;
       result.hands += values.hands;
@@ -157,8 +156,9 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     this.movement.baseSpeed = this.attributes.agi.value * anatomy.speed;
   }
 
-  _prepareDefenses(anatomy) {
+  _prepareDefenses() {
     const armour = this.parent.items.filter(i => i.type === 'armour');
+    const anatomy = this.parent.items.filter(i => i.type === 'anatomy');
     const wornArmour = this._getAppliedArmour(armour);
     this._prepareDamageReduction(wornArmour, anatomy);
     this._prepareGuard(wornArmour, anatomy);
@@ -180,23 +180,17 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
   _prepareDamageReduction(armour, anatomy) {
     console.log('ARMOUR');
-    const protection = armour.map(a => a.system.defense.protection).flat(1);
+    const armourProtection = armour.map(a => a.system.defense.protection).flat(1);
+    const anatomyProtection = anatomy.map(a => a.system.defense.protection).flat(1);
+    const protection = [...armourProtection, ...anatomyProtection];
 
     const flatDR = protection.reduce((result, dr) => {
       const drType = dr.type;
       if (Object.keys(result).includes(drType)) {
-        // if (result[drType].value < dr.value) {
         result[drType].value += dr.value;
-        // }
-        // if (result[drType].resistance < dr.resistance) {
         result[drType].resistance += dr.resistance;
-        // }
-        // if (result[drType].immunity < dr.immunity) {
         result[drType].immunity += dr.immunity;
-        // }
-        // if (result[drType].weakness < dr.weakness) {
         result[drType].weakness += dr.weakness;
-        // }
       }
       else {
         result[drType] = { type: dr.type, value: dr.value, resistance: dr.resistance, immunity: dr.immunity, weakness: dr.weakness, label: dr.label };

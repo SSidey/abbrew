@@ -19,6 +19,10 @@ export default class AbbrewItem extends AbbrewItemBase {
 
     schema.formula = new fields.StringField({ blank: true });
 
+    // TODO: Add a layer of inheritance again, PhysicalItem and give it a material or just add it here
+    // TODO: Add a form field for Armour e.g. Plate, Chain, Splint
+    // TODO: Base projected inflexibility, DR, Guard on the material and form   
+
     return schema;
   }
 
@@ -27,5 +31,5 @@ export default class AbbrewItem extends AbbrewItemBase {
     const roll = this.roll;
 
     this.formula = `${roll.diceNum}${roll.diceSize}${roll.diceBonus}`
-  } 
+  }
 }

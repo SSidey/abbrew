@@ -16,6 +16,7 @@ export default class AbbrewItem extends Item {
   _preUpdate(changed, options, userId) {
     if (doesNestedFieldExist(changed, "system.equipState") && changed.system.equipState === 'worn' && this.type === 'armour') {
       if (!this.isWornEquipStateChangePossible()) {
+        ui.notifications.info("You are already wearing too many items, try stowing some");
         this.actor.sheet.render();
         return false;
       }
@@ -24,6 +25,7 @@ export default class AbbrewItem extends Item {
 
     if (doesNestedFieldExist(changed, "system.equipState") && changed.system.equipState.startsWith('held')) {
       if (!this.isHeldEquipStateChangePossible()) {
+        ui.notifications.info("You are already holding too many items, try stowing some");
         this.actor.sheet.render();
         return false;
       }

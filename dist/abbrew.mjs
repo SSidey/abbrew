@@ -103,7 +103,9 @@ async function setActorToOffGuard(actor) {
   setActorCondition(actor, "offGuard");
 }
 async function turnStart(actor) {
-  ChatMessage.create({ content: `${actor.name} starts their turn`, speaker: ChatMessage.getSpeaker({ actor }) });
+  if (game.settings.get("abbrew", "announceTurnStart")) {
+    ChatMessage.create({ content: `${actor.name} starts their turn`, speaker: ChatMessage.getSpeaker({ actor }) });
+  }
   if (actor.system.defense.canBleed) {
     const filteredWounds = actor.system.wounds.filter((wound) => wound.type === "bleed");
     const bleedingWounds = filteredWounds.length > 0 ? filteredWounds[0].value : 0;
@@ -168,12 +170,41 @@ function prepareActiveEffectCategories(effects) {
   }
   return categories;
 }
+function staticID(id) {
+  if (id.length >= 16)
+    return id.substring(0, 16);
+  return id.padEnd(16, "0");
+}
+function doesNestedFieldExist(obj, props) {
+  var splited = props.split(".");
+  var temp = obj;
+  for (var index in splited) {
+    if (typeof temp[splited[index]] === "undefined")
+      return false;
+    temp = temp[splited[index]];
+  }
+  return true;
+}
+function arrayDifference(a, b) {
+  return [...b.reduce(
+    (acc, v) => acc.set(v, (acc.get(v) || 0) - 1),
+    a.reduce((acc, v) => acc.set(v, (acc.get(v) || 0) + 1), /* @__PURE__ */ new Map())
+  )].reduce((acc, [v, count]) => acc.concat(Array(Math.abs(count)).fill(v)), []);
+}
+function getObjectValueByStringPath(entity, path) {
+  return path.split(".").reduce(function(o, k) {
+    return o && o[k];
+  }, entity);
+}
 async function activateSkill(actor, skill) {
   let updates = {};
   if (skill.action.modifiers.guard.self.value) {
+    const rawValue = skill.action.modifiers.guard.self.value;
+    const value = Number.isInteger(rawValue) ? rawValue : parsePath(rawValue, actor);
+    const skilledGuard = applySkillsForGuard(value, actor);
     const guard = applyOperator(
       actor.system.defense.guard.value,
-      skill.action.modifiers.guard.self.value,
+      skilledGuard,
       skill.action.modifiers.guard.self.operator
     );
     updates["system.defense.guard.value"] = guard;
@@ -184,6 +215,38 @@ async function activateSkill(actor, skill) {
     updates["system.wounds"] = updateWounds;
   }
   await actor.update(updates);
+}
+function parsePath(rawValue, actor) {
+  const entityType = rawValue.split(".").slice(0, 1).shift();
+  const entity = function() {
+    switch (entityType) {
+      case "actor":
+        return actor;
+      case "item":
+        const id = rawValue.split(".").slice(1, 2).shift();
+        return id ? actor.items.filter((i) => i._id === id).shift() : actor;
+    }
+  }();
+  const path = function() {
+    switch (entityType) {
+      case "actor":
+        return rawValue.split(".").slice(1).join(".");
+      case "item":
+        return rawValue.split(".").slice(2).join(".");
+    }
+  }();
+  if (getObjectValueByStringPath(entity, path)) {
+    return getObjectValueByStringPath(entity, path);
+  }
+}
+function applySkillsForGuard(value, actor) {
+  let skilledValue = value;
+  const skillFlags = actor.items.filter((i) => i.type === "skill").filter((i) => i.system.skillFlags).flatMap((i) => JSON.parse(i.system.skillFlags).map((ap) => ap.value));
+  if (skillFlags.includes("Shield Training")) {
+    const heldArmour = actor.getActorHeldItems().filter((i) => i.type === "armour").reduce((result, a) => result += a.system.defense.guard, 0);
+    skilledValue += heldArmour;
+  }
+  return skilledValue;
 }
 var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
 function getDefaultExportFromCjs(x) {
@@ -1910,7 +1973,7 @@ class AbbrewActorSheet extends ActorSheet {
   }
   /* -------------------------------------------- */
   getSkillSectionKeys(skillTypes) {
-    return Object.keys(skillTypes).filter((s) => s !== "path");
+    return Object.keys(skillTypes);
   }
   /* -------------------------------------------- */
   _activateTraits(html) {
@@ -2261,6 +2324,7 @@ class AbbrewItemSheet extends ItemSheet {
     html.find(".skill-configuration-section :input").prop("disabled", !this.item.system.configurable);
     this._activateArmourPoints(html);
     this._activateAnatomyParts(html);
+    this._activateSkillFlags(html);
   }
   prepareActions(system) {
     let actions = system.actions;
@@ -2314,6 +2378,31 @@ class AbbrewItemSheet extends ItemSheet {
     };
     if (anatomyParts) {
       new Tagify(anatomyParts, anatomyPartsSettings);
+    }
+  }
+  _activateSkillFlags(html) {
+    const skillFlags = html[0].querySelector('input[name="system.skillFlags"]');
+    const skillFlagSettings = {
+      dropdown: {
+        maxItems: 20,
+        // <- mixumum allowed rendered suggestions
+        classname: "tags-look",
+        // <- custom classname for this dropdown, so it could be targeted
+        enabled: 0,
+        // <- show suggestions on focus
+        closeOnSelect: false,
+        // <- do not hide the suggestions dropdown once an item has been selected
+        includeSelectedTags: true
+        // <- Should the suggestions list Include already-selected tags (after filtering)
+      },
+      userInput: false,
+      // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+      duplicates: true,
+      // <- Should duplicate tags be allowed or not
+      whitelist: [...Object.values(CONFIG.ABBREW.skillFlags).map((key2) => game.i18n.localize(key2))]
+    };
+    if (skillFlags) {
+      new Tagify(skillFlags, skillFlagSettings);
     }
   }
   /**
@@ -2696,6 +2785,9 @@ ABBREW.traits = {
     name: "ABBREW.Traits.CanBleed.name"
   }
 };
+ABBREW.skillFlags = {
+  shieldTraining: "ABBREW.SkillFlags.shieldTraining"
+};
 class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   static defineSchema() {
     const fields = foundry.data.fields;
@@ -2800,11 +2892,10 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     }
     const anatomy = this._prepareAnatomy();
     this._prepareMovement(anatomy);
-    this._prepareDefenses(anatomy);
+    this._prepareDefenses();
     this._prepareResolve();
   }
   _prepareAnatomy() {
-    console.log("anatomy");
     const res = this.parent.items.filter((i) => i.type == "anatomy").reduce((result, a) => {
       const values = a.system;
       result.hands += values.hands;
@@ -2818,8 +2909,9 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     console.log("movement");
     this.movement.baseSpeed = this.attributes.agi.value * anatomy.speed;
   }
-  _prepareDefenses(anatomy) {
+  _prepareDefenses() {
     const armour = this.parent.items.filter((i) => i.type === "armour");
+    const anatomy = this.parent.items.filter((i) => i.type === "anatomy");
     const wornArmour = this._getAppliedArmour(armour);
     this._prepareDamageReduction(wornArmour, anatomy);
     this._prepareGuard(wornArmour, anatomy);
@@ -2838,7 +2930,9 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   }
   _prepareDamageReduction(armour, anatomy) {
     console.log("ARMOUR");
-    const protection = armour.map((a) => a.system.defense.protection).flat(1);
+    const armourProtection = armour.map((a) => a.system.defense.protection).flat(1);
+    const anatomyProtection = anatomy.map((a) => a.system.defense.protection).flat(1);
+    const protection = [...armourProtection, ...anatomyProtection];
     const flatDR = protection.reduce(
       (result, dr) => {
         const drType = dr.type;
@@ -2991,24 +3085,24 @@ class AbbrewSkill extends AbbrewItemBase {
     const schema = super.defineSchema();
     const blankString = { required: true, blank: true };
     const requiredInteger = { required: true, nullable: false, integer: true };
+    schema.skillFlags = new fields.StringField({ ...blankString });
     schema.configurable = new fields.BooleanField({ required: true });
     schema.activatable = new fields.BooleanField({ required: true, label: "ABBREW.Activatable" });
     schema.action = new fields.SchemaField({
       activationType: new fields.StringField({ ...blankString }),
-      // Standalone, Synergy
       actionCost: new fields.StringField({ ...blankString }),
       modifiers: new fields.SchemaField({
         damage: new fields.SchemaField({
           self: new fields.ArrayField(
             new fields.SchemaField({
-              value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+              value: new fields.StringField({ ...blankString }),
               type: new fields.StringField({ ...blankString }),
               operator: new fields.StringField({ ...blankString })
             })
           ),
           target: new fields.ArrayField(
             new fields.SchemaField({
-              value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+              value: new fields.StringField({ ...blankString }),
               type: new fields.StringField({ ...blankString }),
               operator: new fields.StringField({ ...blankString })
             })
@@ -3016,11 +3110,11 @@ class AbbrewSkill extends AbbrewItemBase {
         }),
         guard: new fields.SchemaField({
           self: new fields.SchemaField({
-            value: new fields.NumberField({ required: true, nullable: true, integer: true, initial: 0 }),
+            value: new fields.StringField({ ...blankString }),
             operator: new fields.StringField({ ...blankString })
           }),
           target: new fields.SchemaField({
-            value: new fields.NumberField({ required: true, nullable: true, integer: true, initial: 0 }),
+            value: new fields.StringField({ ...blankString }),
             operator: new fields.StringField({ ...blankString })
           })
         }),
@@ -3106,24 +3200,27 @@ class AbbrewSkill extends AbbrewItemBase {
     return schema;
   }
 }
-class AbbrewAnatomy extends AbbrewItemBase {
-  static defineSchema() {
+class AbbrewRevealedItem {
+  static addRevealedItemSchema(schema) {
     const fields = foundry.data.fields;
     const requiredInteger = { required: true, nullable: false, integer: true };
-    const schema = super.defineSchema();
-    schema.parts = new fields.StringField({ required: true, blank: true });
-    schema.speed = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
-    return schema;
-  }
-  prepareDerivedData() {
-    this.roll;
+    schema.revealed = new fields.SchemaField({
+      isRevealed: new fields.BooleanField({}),
+      difficulty: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+      tier: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 10 })
+    });
   }
 }
 class AbbrewArmour extends AbbrewItemBase {
   static defineSchema() {
+    const schema = super.defineSchema();
+    this.addDefenseSchema(schema);
+    AbbrewRevealedItem.addRevealedItemSchema(schema);
+    return schema;
+  }
+  static addDefenseSchema(schema) {
     const fields = foundry.data.fields;
     const requiredInteger = { required: true, nullable: false, integer: true };
-    const schema = super.defineSchema();
     schema.defense = new fields.SchemaField({
       guard: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
       inflexibility: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
@@ -3138,6 +3235,20 @@ class AbbrewArmour extends AbbrewItemBase {
         })
       )
     });
+  }
+  prepareDerivedData() {
+    this.roll;
+  }
+}
+class AbbrewAnatomy extends AbbrewItemBase {
+  static defineSchema() {
+    const fields = foundry.data.fields;
+    const requiredInteger = { required: true, nullable: false, integer: true };
+    const schema = super.defineSchema();
+    schema.parts = new fields.StringField({ required: true, blank: true });
+    schema.speed = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
+    AbbrewRevealedItem.addRevealedItemSchema(schema);
+    AbbrewArmour.addDefenseSchema(schema);
     return schema;
   }
   prepareDerivedData() {
@@ -3265,24 +3376,27 @@ class AbbrewActor extends Actor {
   }
   async takeFinisher(rolls, data) {
     if (data.totalSuccesses < 1 && !this.statuses.has("offGuard")) {
-      console.log("No finisher was possible");
+      await this.sendFinisherToChat();
       return;
     }
     const risk = this.system.defense.risk.raw;
-    console.log("Finisher");
     const totalRisk = this.applyModifiersToRisk(rolls, data);
     const availableFinishers = this.getAvailableFinishersForDamageType(data);
     const finisherCost = this.getFinisherCost(availableFinishers, totalRisk);
     const finisher = this.getFinisher(availableFinishers, finisherCost);
-    console.log(finisher);
+    await this.sendFinisherToChat(finisher, finisherCost);
     if (finisher) {
-      await this.sendFinisherToChat(finisher, finisherCost);
       return await this.applyFinisher(risk, finisher, finisherCost);
     }
   }
   applyModifiersToRisk(rolls, data) {
-    const rollSuccesses = data.totalSuccesses;
-    return 0 + this.system.defense.risk.value + rollSuccesses - this.system.defense.inflexibility.resistance.value;
+    let successes = 0;
+    successes += data.totalSuccesses;
+    successes += this.system.defense.risk.value;
+    successes -= this.system.defense.inflexibility.resistance.value;
+    successes += data.damage.map((d) => this.system.defense.protection.find((w) => w.type === d.damageType)).reduce((result, p) => result += p.weakness, 0);
+    successes -= data.damage.map((d) => this.system.defense.protection.find((w) => w.type === d.damageType)).reduce((result, p) => result += p.resistance, 0);
+    return successes;
   }
   getAvailableFinishersForDamageType(data) {
     return data.damage[0].damageType in FINISHERS ? FINISHERS[data.damage[0].damageType] : FINISHERS["general"];
@@ -3309,7 +3423,7 @@ class AbbrewActor extends Actor {
     };
     const html = await renderTemplate("systems/abbrew/templates/chat/finisher-card.hbs", templateData);
     const speaker = ChatMessage.getSpeaker({ actor: this.actor });
-    const label = `${finisher.name}`;
+    const label = finisher ? `${finisher.name}` : "No available finisher";
     ChatMessage.create({
       speaker,
       // rollMode: rollMode,
@@ -3321,10 +3435,6 @@ class AbbrewActor extends Actor {
   async applyFinisher(risk, finisher, finisherCost) {
     const updates = { "system.wounds": mergeActorWounds(this, finisher.wounds), "system.defense.risk.raw": this.reduceRiskForFinisher(risk, finisherCost) };
     await this.update(updates);
-    if (this.system.wounds.reduce((total, wound) => total += wound.value, 0) >= this.system.defense.resolve.value) {
-      await renderLostResolveCard(this);
-    }
-    await checkActorFatalWounds(this);
     return this;
   }
   reduceRiskForFinisher(risk, finisherCost) {
@@ -3408,27 +3518,6 @@ class AbbrewActor extends Actor {
     return this.items.filter((i) => i.type === "anatomy");
   }
 }
-function staticID(id) {
-  if (id.length >= 16)
-    return id.substring(0, 16);
-  return id.padEnd(16, "0");
-}
-function doesNestedFieldExist(obj, props) {
-  var splited = props.split(".");
-  var temp = obj;
-  for (var index in splited) {
-    if (typeof temp[splited[index]] === "undefined")
-      return false;
-    temp = temp[splited[index]];
-  }
-  return true;
-}
-function arrayDifference(a, b) {
-  return [...b.reduce(
-    (acc, v) => acc.set(v, (acc.get(v) || 0) - 1),
-    a.reduce((acc, v) => acc.set(v, (acc.get(v) || 0) + 1), /* @__PURE__ */ new Map())
-  )].reduce((acc, [v, count]) => acc.concat(Array(Math.abs(count)).fill(v)), []);
-}
 class AbbrewItem2 extends Item {
   /**
    * Augment the basic Item data model with additional dynamic data.
@@ -3439,12 +3528,14 @@ class AbbrewItem2 extends Item {
   _preUpdate(changed, options, userId) {
     if (doesNestedFieldExist(changed, "system.equipState") && changed.system.equipState === "worn" && this.type === "armour") {
       if (!this.isWornEquipStateChangePossible()) {
+        ui.notifications.info("You are already wearing too many items, try stowing some");
         this.actor.sheet.render();
         return false;
       }
     }
     if (doesNestedFieldExist(changed, "system.equipState") && changed.system.equipState.startsWith("held")) {
       if (!this.isHeldEquipStateChangePossible()) {
+        ui.notifications.info("You are already holding too many items, try stowing some");
         this.actor.sheet.render();
         return false;
       }
@@ -3544,6 +3635,16 @@ class AbbrewItem2 extends Item {
     }
   }
 }
+function registerSystemSettings() {
+  game.settings.register("abbrew", "announceTurnStart", {
+    name: "SETTINGS.AnnounceTurnStart.Name",
+    hint: "SETTINGS.AnnounceTurnStart.Hint",
+    scope: "world",
+    config: true,
+    default: false,
+    type: Boolean
+  });
+}
 Hooks.once("init", function() {
   game.abbrew = {
     AbbrewActor,
@@ -3570,6 +3671,7 @@ Hooks.once("init", function() {
     armour: AbbrewArmour,
     weapon: AbbrewWeapon
   };
+  registerSystemSettings();
   CONFIG.ActiveEffect.legacyTransferral = false;
   Actors.unregisterSheet("core", ActorSheet);
   Actors.registerSheet("abbrew", AbbrewActorSheet, {

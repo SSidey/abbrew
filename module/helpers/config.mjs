@@ -185,3 +185,7 @@ ABBREW.traits = {
     name: "ABBREW.Traits.CanBleed.name"
   }
 }
+
+ABBREW.skillFlags = {
+  shieldTraining: "ABBREW.SkillFlags.shieldTraining"
+}

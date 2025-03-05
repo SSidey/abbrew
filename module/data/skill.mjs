@@ -8,24 +8,25 @@ export default class AbbrewSkill extends AbbrewItemBase {
         const blankString = { required: true, blank: true }
         const requiredInteger = { required: true, nullable: false, integer: true };
 
+        schema.skillFlags = new fields.StringField({ ...blankString });
         schema.configurable = new fields.BooleanField({ required: true });
         schema.activatable = new fields.BooleanField({ required: true, label: "ABBREW.Activatable" });
         schema.action = new fields.SchemaField({
-            activationType: new fields.StringField({ ...blankString }), // Standalone, Synergy
+            activationType: new fields.StringField({ ...blankString }),
             actionCost: new fields.StringField({ ...blankString }),
             modifiers: new fields.SchemaField({
                 damage:
                     new fields.SchemaField({
                         self: new fields.ArrayField(
                             new fields.SchemaField({
-                                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                                value: new fields.StringField({ ...blankString }),
                                 type: new fields.StringField({ ...blankString }),
                                 operator: new fields.StringField({ ...blankString })
                             })
                         ),
                         target: new fields.ArrayField(
                             new fields.SchemaField({
-                                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                                value: new fields.StringField({ ...blankString }),
                                 type: new fields.StringField({ ...blankString }),
                                 operator: new fields.StringField({ ...blankString })
                             })
@@ -33,11 +34,11 @@ export default class AbbrewSkill extends AbbrewItemBase {
                     }),
                 guard: new fields.SchemaField({
                     self: new fields.SchemaField({
-                        value: new fields.NumberField({ required: true, nullable: true, integer: true, initial: 0 }),
+                        value: new fields.StringField({ ...blankString }),
                         operator: new fields.StringField({ ...blankString })
                     }),
                     target: new fields.SchemaField({
-                        value: new fields.NumberField({ required: true, nullable: true, integer: true, initial: 0 }),
+                        value: new fields.StringField({ ...blankString }),
                         operator: new fields.StringField({ ...blankString })
                     })
                 }),

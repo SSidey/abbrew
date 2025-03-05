@@ -206,7 +206,7 @@ export class AbbrewActorSheet extends ActorSheet {
   /* -------------------------------------------- */
 
   getSkillSectionKeys(skillTypes) {
-    return Object.keys(skillTypes).filter(s => s !== 'path');
+    return Object.keys(skillTypes);
   }
 
   /* -------------------------------------------- */

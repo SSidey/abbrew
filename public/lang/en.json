@@ -146,6 +146,9 @@
       "CanBleed": {
         "name": "Can Bleed"
       }
+    },
+    "SkillFlags": {
+      "shieldTraining": "Shield Training"
     }
   },
 
@@ -163,5 +166,8 @@
       "armour": "Armour",
       "weapon": "Weapon"
     }
-  }
+  },
+
+  "SETTINGS.AnnounceTurnStart.Name": "Announce Turn Start",
+  "SETTINGS.AnnounceTurnStart.Hint": "Announce turn start to chat."
 }

@@ -1,9 +1,17 @@
 <div class="abbrew chat-message chat-card flexcol " data-actor-id="{{actor._id}}" data-token-id="{{tokenId}}" data-message-id="{{messageId}}">
     <header>
+        {{#if finisher}}
         <h3 class="finisher-name">{{finisher.type}} {{finisherCost}}</h3>
+        {{else}}
+        <h3 class="finisher-name">No Finisher</h3>
+        {{/if}}
     </header>
 
     <div class="message-content">
+        {{#if finisher}}
         <div>{{{finisher.text}}}</div>
+        {{else}}
+        <div>No finisher was available.</div>
+        {{/if}}
     </div>
 </div>

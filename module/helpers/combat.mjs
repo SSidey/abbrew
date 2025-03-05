@@ -48,7 +48,7 @@ export async function checkActorFatalWounds(actor) {
 }
 
 export async function handleActorGuardConditions(actor) {
-    if(actor.system.defense.guard.value <= 0) {
+    if (actor.system.defense.guard.value <= 0) {
         await setActorToOffGuard(actor);
     }
 }
@@ -182,7 +182,10 @@ export async function setActorToOffGuard(actor) {
 }
 
 async function turnStart(actor) {
-    ChatMessage.create({ content: `${actor.name} starts their turn`, speaker: ChatMessage.getSpeaker({ actor: actor }) });
+    if (game.settings.get("abbrew", "announceTurnStart")) {
+        ChatMessage.create({ content: `${actor.name} starts their turn`, speaker: ChatMessage.getSpeaker({ actor: actor }) });
+    }
+    
     if (actor.system.defense.canBleed) {
         const filteredWounds = actor.system.wounds.filter(wound => wound.type === 'bleed');
         const bleedingWounds = filteredWounds.length > 0 ? filteredWounds[0].value : 0;
