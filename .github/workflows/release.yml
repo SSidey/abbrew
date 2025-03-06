@@ -62,7 +62,7 @@ jobs:
     - name: System Json Variable Substitution
       uses: microsoft/variable-substitution@v1
       with:
-        files: '${{env.DOTNET_ROOT}}\abbrew\system.json'
+        files: '${{env.DOTNET_ROOT}}\abbrew\public\system.json'
       env:
         version: ${{ steps.semantic-version.outputs.version  }}        
 
