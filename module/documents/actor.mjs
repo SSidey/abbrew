@@ -95,7 +95,7 @@ export default class AbbrewActor extends Actor {
 
   getAvailableFinishersForDamageType(data) {
     // TODO: Only looking at main damage type?
-    return data.damage[0].damageType in FINISHERS ? FINISHERS[data.damage[0].damageType] : FINISHERS['general'];
+    return data.damage[0].damageType in FINISHERS ? FINISHERS[data.damage[0].damageType] : FINISHERS['physical'];
   }
 
   getFinisherCost(availableFinishers, risk) {

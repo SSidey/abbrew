@@ -110,7 +110,7 @@
     "HasRequirement": "Has Requirement",
     "EquippedWeapon": "Equipped Weapon",
     "Wounds": {
-      "general": "General",
+      "physical": "Physical",
       "bleed": "Bleed",
       "vital": "Vital",
       "fatigue": "Fatigue",

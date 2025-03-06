@@ -117,8 +117,8 @@ ABBREW.actionCosts = {
 }
 
 ABBREW.wounds = {
-  general: {
-    name: "ABBREW.Wounds.general"
+  physical: {
+    name: "ABBREW.Wounds.physical"
   },
   bleed: {
     name: "ABBREW.Wounds.bleed"
