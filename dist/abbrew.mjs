@@ -200,7 +200,7 @@ async function activateSkill(actor, skill) {
   let updates = {};
   if (skill.action.modifiers.guard.self.value) {
     const rawValue = skill.action.modifiers.guard.self.value;
-    const value = Number.isInteger(rawValue) ? rawValue : parsePath(rawValue, actor);
+    const value = isNumeric(rawValue) ? parseInt(rawValue) : parsePath(rawValue, actor);
     const skilledGuard = applySkillsForGuard(value, actor);
     const guard = applyOperator(
       actor.system.defense.guard.value,
@@ -215,6 +215,12 @@ async function activateSkill(actor, skill) {
     updates["system.wounds"] = updateWounds;
   }
   await actor.update(updates);
+}
+function isNumeric(str) {
+  if (typeof str != "string")
+    return false;
+  return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+  !isNaN(parseFloat(str));
 }
 function parsePath(rawValue, actor) {
   const entityType = rawValue.split(".").slice(0, 1).shift();
@@ -3394,8 +3400,8 @@ class AbbrewActor extends Actor {
     successes += data.totalSuccesses;
     successes += this.system.defense.risk.value;
     successes -= this.system.defense.inflexibility.resistance.value;
-    successes += data.damage.map((d) => this.system.defense.protection.find((w) => w.type === d.damageType)).reduce((result, p) => result += p.weakness, 0);
-    successes -= data.damage.map((d) => this.system.defense.protection.find((w) => w.type === d.damageType)).reduce((result, p) => result += p.resistance, 0);
+    successes += data.damage.map((d) => this.system.defense.protection.find((w) => w.type === d.damageType)).reduce((result, p) => result += (p == null ? void 0 : p.weakness) ?? 0, 0);
+    successes -= data.damage.map((d) => this.system.defense.protection.find((w) => w.type === d.damageType)).reduce((result, p) => result += (p == null ? void 0 : p.resistance) ?? 0, 0);
     return successes;
   }
   getAvailableFinishersForDamageType(data) {
@@ -3459,6 +3465,9 @@ class AbbrewActor extends Actor {
     }, 0);
   }
   async calculateGuard(damage, guard, isFeint, action) {
+    if (this.noneResult(isFeint, action)) {
+      return guard;
+    }
     let guardDamage = damage;
     if (this.defenderGainsAdvantage(isFeint, action)) {
       guardDamage = -10;
@@ -3470,7 +3479,9 @@ class AbbrewActor extends Actor {
     let riskIncrease = guard > 0 ? Math.min(damage, inflexibility) : damage;
     if (this.attackerGainsAdvantage(isFeint, action)) {
       riskIncrease += damage;
-    } else if (this.defenderGainsAdvantage()) {
+    } else if (this.defenderGainsAdvantage(isFeint, action)) {
+      riskIncrease = 0;
+    } else if (this.noneResult(isFeint, action)) {
       riskIncrease = 0;
     }
     return risk + riskIncrease;
@@ -3481,31 +3492,34 @@ class AbbrewActor extends Actor {
   attackerGainsAdvantage(isFeint, action) {
     return isFeint === true && action === "parry";
   }
+  noneResult(isFeint, action) {
+    return isFeint === true && action === "damage";
+  }
   async renderAttackResultCard(data, action) {
     var _a;
     const attackerAdvantage = this.attackerGainsAdvantage(data.isFeint, action);
     const defenderAdvantage = this.defenderGainsAdvantage(data.isFeint, action);
-    if (attackerAdvantage || defenderAdvantage) {
-      const templateData = {
-        attackerAdvantage,
-        defenderAdvantage,
-        actor: this,
-        defendingActor: this,
-        attackingActor: data.attackingActor,
-        tokenId: ((_a = this.token) == null ? void 0 : _a.uuid) || null
-      };
-      const html = await renderTemplate("systems/abbrew/templates/chat/attack-result-card.hbs", templateData);
-      const speaker = ChatMessage.getSpeaker({ actor: this.actor });
-      ChatMessage.create({
-        speaker,
-        // rollMode: rollMode,
-        // flavor: label,
-        content: html,
-        flags: {
-          /* data: { finisher, finisherCost } */
-        }
-      });
-    }
+    const noneResult = this.noneResult(data.isFeint, action);
+    const templateData = {
+      attackerAdvantage,
+      defenderAdvantage,
+      noneResult,
+      actor: this,
+      defendingActor: this,
+      attackingActor: data.attackingActor,
+      tokenId: ((_a = this.token) == null ? void 0 : _a.uuid) || null
+    };
+    const html = await renderTemplate("systems/abbrew/templates/chat/attack-result-card.hbs", templateData);
+    const speaker = ChatMessage.getSpeaker({ actor: this.actor });
+    ChatMessage.create({
+      speaker,
+      // rollMode: rollMode,
+      // flavor: label,
+      content: html,
+      flags: {
+        /* data: { finisher, finisherCost } */
+      }
+    });
   }
   getActorWornArmour() {
     const armour = this.items.filter((i) => i.type === "armour");
@@ -3553,7 +3567,12 @@ class AbbrewItem2 extends Item {
     let requiredArmourPoints = availableArmourPoints.filter((ap) => armourPoints.includes(ap));
     const allRequiredAvailable = armourPoints.reduce((result, a) => {
       if (requiredArmourPoints.length > 0 && requiredArmourPoints.includes(a)) {
-        requiredArmourPoints.pop(a);
+        const index = requiredArmourPoints.indexOf(a);
+        if (index > -1) {
+          requiredArmourPoints.splice(index, 1);
+        } else {
+          return false;
+        }
       } else {
         result = false;
       }

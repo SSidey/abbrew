@@ -45,7 +45,12 @@ export default class AbbrewItem extends Item {
     let requiredArmourPoints = availableArmourPoints.filter(ap => armourPoints.includes(ap));
     const allRequiredAvailable = armourPoints.reduce((result, a) => {
       if (requiredArmourPoints.length > 0 && requiredArmourPoints.includes(a)) {
-        requiredArmourPoints.pop(a);
+        const index = requiredArmourPoints.indexOf(a);
+        if (index > -1) { // only splice array when item is found
+          requiredArmourPoints.splice(index, 1); // 2nd parameter means remove one item only
+        } else {
+          return false;
+        }
       } else {
         result = false;
       }

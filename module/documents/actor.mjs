@@ -83,9 +83,9 @@ export default class AbbrewActor extends Actor {
     let successes = 0;
     successes += data.totalSuccesses;
     successes += this.system.defense.risk.value;
-    successes -= this.system.defense.inflexibility.resistance.value
-    successes += data.damage.map(d => this.system.defense.protection.find(w => w.type === d.damageType)).reduce((result, p) => result += p.weakness, 0)
-    successes -= data.damage.map(d => this.system.defense.protection.find(w => w.type === d.damageType)).reduce((result, p) => result += p.resistance, 0)
+    successes -= this.system.defense.inflexibility.resistance.value;
+    successes += data.damage.map(d => this.system.defense.protection.find(w => w.type === d.damageType)).reduce((result, p) => result += p?.weakness ?? 0, 0);
+    successes -= data.damage.map(d => this.system.defense.protection.find(w => w.type === d.damageType)).reduce((result, p) => result += p?.resistance ?? 0, 0);
     // TODO: Size Diff
     // TODO: Tier Diff
     // TODO: Lethal Diff
@@ -171,6 +171,10 @@ export default class AbbrewActor extends Actor {
   }
 
   async calculateGuard(damage, guard, isFeint, action) {
+    if (this.noneResult(isFeint, action)) {
+      return guard;
+    }
+
     let guardDamage = damage;
     if (this.defenderGainsAdvantage(isFeint, action)) {
       guardDamage = -10;
@@ -185,7 +189,9 @@ export default class AbbrewActor extends Actor {
     let riskIncrease = guard > 0 ? Math.min(damage, inflexibility) : damage;
     if (this.attackerGainsAdvantage(isFeint, action)) {
       riskIncrease += damage;
-    } else if (this.defenderGainsAdvantage()) {
+    } else if (this.defenderGainsAdvantage(isFeint, action)) {
+      riskIncrease = 0;
+    } else if (this.noneResult(isFeint, action)) {
       riskIncrease = 0;
     }
 
@@ -200,33 +206,37 @@ export default class AbbrewActor extends Actor {
     return isFeint === true && action === 'parry';
   }
 
+  noneResult(isFeint, action) {
+    return isFeint === true && action === 'damage'
+  }
+
   async renderAttackResultCard(data, action) {
     const attackerAdvantage = this.attackerGainsAdvantage(data.isFeint, action);
     const defenderAdvantage = this.defenderGainsAdvantage(data.isFeint, action);
+    const noneResult = this.noneResult(data.isFeint, action);
 
-    if (attackerAdvantage || defenderAdvantage) {
-      const templateData = {
-        attackerAdvantage,
-        defenderAdvantage,
-        actor: this,
-        defendingActor: this,
-        attackingActor: data.attackingActor,
-        tokenId: this.token?.uuid || null,
-      };
+    const templateData = {
+      attackerAdvantage,
+      defenderAdvantage,
+      noneResult,
+      actor: this,
+      defendingActor: this,
+      attackingActor: data.attackingActor,
+      tokenId: this.token?.uuid || null,
+    };
 
-      const html = await renderTemplate("systems/abbrew/templates/chat/attack-result-card.hbs", templateData);
+    const html = await renderTemplate("systems/abbrew/templates/chat/attack-result-card.hbs", templateData);
 
-      // Initialize chat data.
-      const speaker = ChatMessage.getSpeaker({ actor: this.actor });
+    // Initialize chat data.
+    const speaker = ChatMessage.getSpeaker({ actor: this.actor });
 
-      ChatMessage.create({
-        speaker: speaker,
-        // rollMode: rollMode,
-        // flavor: label,
-        content: html,
-        flags: { /* data: { finisher, finisherCost } */ }
-      });
-    }
+    ChatMessage.create({
+      speaker: speaker,
+      // rollMode: rollMode,
+      // flavor: label,
+      content: html,
+      flags: { /* data: { finisher, finisherCost } */ }
+    });
   }
 
   getActorWornArmour() {
