@@ -16,7 +16,55 @@ jobs:
         node-version: [20.x]
 
     steps:
+    - name: Checkout Repository
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Generate Semantic Version
+    - id: semantic-version
+    - uses: paulhatch/semantic-version@v5.4.0
+      with:
+        # The prefix to use to identify tags
+        tag_prefix: "v"
+        # A string which, if present in a git commit, indicates that a change represents a
+        # major (breaking) change, supports regular expressions wrapped with '/'
+        major_pattern: "(MAJOR)"
+        # A string which indicates the flags used by the `major_pattern` regular expression. Supported flags: idgs
+        major_regexp_flags: ""
+        # Same as above except indicating a minor change, supports regular expressions wrapped with '/'
+        minor_pattern: "(MINOR)"
+        # A string which indicates the flags used by the `minor_pattern` regular expression. Supported flags: idgs
+        minor_regexp_flags: ""
+        # A string to determine the format of the version output
+        version_format: "${major}.${minor}.${patch}-prerelease${increment}"
+        # Optional path to check for changes. If any changes are detected in the path the
+        # 'changed' output will true. Enter multiple paths separated by spaces.
+        change_path: "src/my-service"
+        # Named version, will be used as suffix for name version tag
+        namespace: my-service
+        # If this is set to true, *every* commit will be treated as a new version.
+        bump_each_commit: false
+        # If bump_each_commit is also set to true, setting this value will cause the version to increment only if the pattern specified is matched.
+        bump_each_commit_patch_pattern: ""
+        # If true, the body of commits will also be searched for major/minor patterns to determine the version type.
+        search_commit_body: false
+        # The output method used to generate list of users, 'csv' or 'json'.
+        user_format_type: "json"
+        # Prevents pre-v1.0.0 version from automatically incrementing the major version.
+        # If enabled, when the major version is 0, major releases will be treated as minor and minor as patch. Note that the version_type output is unchanged.
+        enable_prerelease_mode: true
+        # If enabled, diagnostic information will be added to the action output.
+        debug: false
+        # If true, the branch will be used to select the maximum version.
+        version_from_branch: false
+        
+    - name: System Json Variable Substitution
+      uses: microsoft/variable-substitution@v1
+      with:
+        files: '${{env.DOTNET_ROOT}}\abbrew\system.json'
+      env:
+        version: ${{ steps.semantic-version.outputs.version  }}        
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
@@ -33,6 +81,17 @@ jobs:
         git config --local user.name  ${{ github.actor }}
         git add -A
         git commit -m "Update gulp output files"
+
+    - name: Create tag
+      uses: actions/github-script@v5
+      with:
+        script: |
+          github.rest.git.createRef({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: 'refs/tags/${{ steps.semantic-version.outputs.version_tag }}',
+            sha: context.sha
+          })
         
     - name: Push changes
       uses: ad-m/github-push-action@master
