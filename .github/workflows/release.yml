@@ -85,3 +85,23 @@ jobs:
         branch: master
         github_token: ${{ secrets.GITHUB_TOKEN }}
         # force: true
+
+    - name: Zip package
+      run: zip ${{ steps.semantic-version.outputs.version }} -r **/dist/**
+
+    - name: Update Release with Files
+      id: create_version_release
+      uses: ncipollo/release-action@v1
+      with:
+        allowUpdates: false # Set this to false if you want to prevent updating existing releases
+        name: ${{ steps.semantic-version.outputs.version }}
+        draft: false
+        prerelease: true
+        omitDraftDuringUpdate: true
+        omitPrereleaseDuringUpdate: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: '/public./system.json, ./${{ steps.semantic-version.outputs.version }}.zip'
+        tag: ${{ steps.semantic-version.outputs.version }}
+        body: |
+          Abbrew prerelease ${{ steps.semantic-version.outputs.version }}
+
