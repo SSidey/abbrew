@@ -3469,18 +3469,17 @@ class AbbrewActor extends Actor {
       return guard;
     }
     let guardDamage = damage;
-    if (this.defenderGainsAdvantage(isFeint, action)) {
-      guardDamage = -10;
-    }
+    if (this.defenderGainsAdvantage(isFeint, action))
+      ;
     const guardUpdate = Math.max(0, guard - guardDamage);
     return guardUpdate;
   }
   calculateRisk(damage, guard, risk, inflexibility, isFeint, action) {
-    let riskIncrease = guard > 0 ? Math.min(damage, inflexibility) : damage;
+    let riskIncrease = damage + inflexibility;
     if (this.attackerGainsAdvantage(isFeint, action)) {
       riskIncrease += damage;
     } else if (this.defenderGainsAdvantage(isFeint, action)) {
-      riskIncrease = 0;
+      riskIncrease += 10;
     } else if (this.noneResult(isFeint, action)) {
       riskIncrease = 0;
     }
