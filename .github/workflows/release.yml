@@ -87,7 +87,7 @@ jobs:
         # force: true
 
     - name: Zip package
-      run: zip ${{ steps.semantic-version.outputs.version }}.zip -r ${{ github.workspace }}/dist
+      run: zip ${{ steps.semantic-version.outputs.version }}.zip -r dist
 
     - name: Update Release with Files
       id: create_version_release
@@ -100,7 +100,7 @@ jobs:
         omitDraftDuringUpdate: true
         omitPrereleaseDuringUpdate: true
         token: ${{ secrets.GITHUB_TOKEN }}
-        artifacts: '/public./system.json, ./${{ steps.semantic-version.outputs.version }}.zip'
+        artifacts: '${{ github.workspace }}/public/system.json, ./${{ steps.semantic-version.outputs.version }}.zip'
         tag: ${{ steps.semantic-version.outputs.version }}
         body: |
           Abbrew prerelease ${{ steps.semantic-version.outputs.version }}
