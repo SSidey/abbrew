@@ -87,7 +87,7 @@ jobs:
         # force: true
 
     - name: Zip package
-      run: zip ${{ steps.semantic-version.outputs.version }} -r **/dist/**
+      run: zip ${{ steps.semantic-version.outputs.version }}.zip -r abbrew/dist/
 
     - name: Update Release with Files
       id: create_version_release
