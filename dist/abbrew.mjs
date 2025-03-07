@@ -2875,7 +2875,7 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     }
     this.defense.risk.value = Math.floor(this.defense.risk.raw / 10);
     this.defense.canBleed = this.traits ? JSON.parse(this.traits).filter((t) => t.value === "Can Bleed").length : false;
-    this.defense.resolve.max = 2 + this._getMaxFromPhysicalAttributes() + this._getMaxFromMentalAttributes();
+    this.defense.resolve.max = 2 + Math.floor((this._getMaxFromPhysicalAttributes() + this._getMaxFromMentalAttributes()) / 2);
   }
   _getMaxFromPhysicalAttributes() {
     return this._getMaxFromAttributes(["str", "con", "dex", "agi"]);
