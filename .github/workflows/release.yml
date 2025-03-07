@@ -42,7 +42,7 @@ jobs:
         # 'changed' output will true. Enter multiple paths separated by spaces.
         change_path: "src/my-service"
         # Named version, will be used as suffix for name version tag
-        namespace: my-service
+        namespace: abbrew
         # If this is set to true, *every* commit will be treated as a new version.
         bump_each_commit: false
         # If bump_each_commit is also set to true, setting this value will cause the version to increment only if the pattern specified is matched.
@@ -81,17 +81,6 @@ jobs:
         git config --local user.name  ${{ github.actor }}
         git add -A
         git commit -m "Update gulp output files"
-
-    - name: Create tag
-      uses: actions/github-script@v5
-      with:
-        script: |
-          github.rest.git.createRef({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            ref: 'refs/tags/${{ steps.semantic-version.outputs.version_tag }}',
-            sha: context.sha
-          })
         
     - name: Push changes
       uses: ad-m/github-push-action@master
