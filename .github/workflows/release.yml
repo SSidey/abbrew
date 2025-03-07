@@ -87,7 +87,7 @@ jobs:
         # force: true
 
     - name: Zip package
-      run: zip ${{ steps.semantic-version.outputs.version }}.zip -r ${{ github.workspace }}
+      run: zip ${{ steps.semantic-version.outputs.version }}.zip -r ${{ github.workspace }}/dist
 
     - name: Update Release with Files
       id: create_version_release
