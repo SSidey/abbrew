@@ -87,6 +87,7 @@ jobs:
         # force: true
 
     - name: Zip package
+      id: zip-step
       run: zip ${{ steps.semantic-version.outputs.version }}.zip -r dist
 
     - name: Update Release with Files
