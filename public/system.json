@@ -20,7 +20,7 @@
             "thumbnail": "systems/abbrew/assets/anvil-impact.png"
         }
     ],
-    "version": "0.0.2-prerelease12",
+    "version": "0.0.2-prerelease16",
     "compatibility": {
         "minimum": 12,
         "verified": "12.331"
