@@ -12,6 +12,16 @@
                 {{selectOptions ../config.attackTypes selected=attackProfile.attackType blank="" localize=true}}
             </select>
         </div>
+        <div>
+            <label>Finisher Limit</label>
+            <input type="text" name="system.attackProfiles.{{i}}.finisherLimit" value="{{attackProfile.finisherLimit}}"
+                data-dtype="Number" />
+        </div>
+        <div>
+            <span>Strong Attack</span>
+            <input type="checkbox" class="attackProfiles-hasStrongAttack"
+                name="system.attackProfiles.{{i}}.hasStrongAttack" {{ checked attackProfile.hasStrongAttack }}>
+        </div>
         <ol class="form-list">
             {{#each attackProfile.damage as |damage j|}}
             <li class="item effect flexrow" data-id="{{j}}">

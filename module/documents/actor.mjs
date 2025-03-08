@@ -56,7 +56,7 @@ export default class AbbrewActor extends Actor {
 
     const damage = this.applyModifiersToDamage(rolls, data, action);
 
-    const updates = { "system.defense.guard.value": await this.calculateGuard(damage, guard, data.isFeint, action), "system.defense.risk.raw": this.calculateRisk(damage, guard, risk, inflexibility, data.isFeint, action) };
+    const updates = { "system.defense.guard.value": await this.calculateGuard(damage, guard, data.isFeint, data.isStrongAttack, action), "system.defense.risk.raw": this.calculateRisk(damage, guard, risk, inflexibility, data.isFeint, data.isStrongAttack, action) };
     await this.update(updates);
     await this.renderAttackResultCard(data, action);
     return this;
@@ -170,32 +170,52 @@ export default class AbbrewActor extends Actor {
     }, 0);
   }
 
-  async calculateGuard(damage, guard, isFeint, action) {
-    if (this.noneResult(isFeint, action)) {
-      return guard;
-    }
-
-    let guardDamage = damage;
-    if (this.defenderGainsAdvantage(isFeint, action)) {
-      // guardDamage = -10;
-    }
-
-    const guardUpdate = Math.max(0, guard - guardDamage);
-
-    return guardUpdate;
+  async calculateGuard(damage, guard, isFeint, isStrongAttack, action) {
+    return guard + this.calculateGuardIncrease(damage, guard, isFeint, isStrongAttack, action);
   }
 
-  calculateRisk(damage, guard, risk, inflexibility, isFeint, action) {
-    let riskIncrease = damage + inflexibility;
-    if (this.attackerGainsAdvantage(isFeint, action)) {
-      riskIncrease += damage;
-    } else if (this.defenderGainsAdvantage(isFeint, action)) {
-      riskIncrease += 10;
-    } else if (this.noneResult(isFeint, action)) {
-      riskIncrease = 0;
+  calculateGuardIncrease(damage, guard, isFeint, isStrongAttack, action) {
+    if (this.noneResult(isFeint, action)) {
+      return 0;
     }
 
-    return risk + riskIncrease;
+    if (isStrongAttack) {
+      return 0 - damage;
+    }
+
+    if (this.attackerGainsAdvantage(isFeint, action)) {
+      return 0 - damage;
+    }
+
+    if (this.defenderGainsAdvantage(isFeint, action)) {
+      return 0;
+    }
+
+    return 0 - damage;
+  }
+
+  calculateRisk(damage, guard, risk, inflexibility, isFeint, isStrongAttack, action) {
+    return risk + this.calculateRiskIncrease(damage, guard, risk, inflexibility, isFeint, isStrongAttack, action);
+  }
+
+  calculateRiskIncrease(damage, guard, risk, inflexibility, isFeint, isStrongAttack, action) {
+    if (this.noneResult(isFeint, action)) {
+      return 0;
+    }
+
+    if (isStrongAttack) {
+      return damage + inflexibility;
+    }
+
+    if (this.attackerGainsAdvantage(isFeint, action)) {
+      return 2 * (damage + inflexibility);
+    }
+
+    if (this.defenderGainsAdvantage(isFeint, action)) {
+      return 2 * (damage + inflexibility);
+    }
+
+    return damage + inflexibility;
   }
 
   defenderGainsAdvantage(isFeint, action) {

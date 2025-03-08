@@ -22,7 +22,9 @@ export default class AbbrewAttackBase extends foundry.abstract.TypeDataModel {
                         value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
                         attributeModifier: new fields.StringField({ required: true, blank: true }),
                     })
-                )
+                ),
+                finisherLimit: new fields.NumberField({ ...requiredInteger, initial: 10, min: 1 }),
+                hasStrongAttack: new fields.BooleanField({ required: true, nullable: false, initial: true })
             })
         );
     }

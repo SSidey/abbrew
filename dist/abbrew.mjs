@@ -91,6 +91,7 @@ async function setActorCondition(actor, conditionName) {
       flags: {}
     };
     await actor.createEmbeddedDocuments("ActiveEffect", [conditionEffectData]);
+    console.log(`${actor.name} gained ${conditionName}`);
   }
 }
 async function setActorToDefeated(actor) {
@@ -2078,6 +2079,10 @@ class AbbrewActorSheet extends ActorSheet {
       const t = event.currentTarget;
       await this._onAttackDamageAction(t, "feint");
     });
+    html.on("click", ".attack-strong-button", async (event) => {
+      const t = event.currentTarget;
+      await this._onAttackDamageAction(t, "strong");
+    });
     html.on("click", ".attack-finisher-button", async (event) => {
       const t = event.currentTarget;
       await this._onAttackDamageAction(t, "finisher");
@@ -2170,9 +2175,11 @@ class AbbrewActorSheet extends ActorSheet {
       }
       return total;
     }, 0);
-    const showAttack = ["attack", "feint"].includes(attackMode);
+    const showAttack = ["attack", "feint", "finisher"].includes(attackMode);
     const isFeint = attackMode === "feint";
+    const isStrongAttack = attackMode === "strong";
     const showFinisher = attackMode === "finisher" || totalSuccesses > 0;
+    const isFinisher = attackMode === "finisher";
     const templateData = {
       attackProfile,
       totalSuccesses,
@@ -2182,7 +2189,9 @@ class AbbrewActorSheet extends ActorSheet {
       item: this.item,
       tokenId: (token == null ? void 0 : token.uuid) || null,
       showAttack,
-      showFinisher
+      showFinisher,
+      isStrongAttack,
+      isFinisher
     };
     const html = await renderTemplate("systems/abbrew/templates/chat/attack-card.hbs", templateData);
     const speaker = ChatMessage.getSpeaker({ actor: this.actor });
@@ -2193,7 +2202,7 @@ class AbbrewActorSheet extends ActorSheet {
       rollMode,
       flavor: label,
       content: html,
-      flags: { data: { totalSuccesses, damage, isFeint, attackingActor: this.actor } }
+      flags: { data: { totalSuccesses, damage, isFeint, isStrongAttack, attackingActor: this.actor } }
     });
     return result;
   }
@@ -3280,7 +3289,9 @@ class AbbrewAttackBase extends foundry.abstract.TypeDataModel {
             value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
             attributeModifier: new fields.StringField({ required: true, blank: true })
           })
-        )
+        ),
+        finisherLimit: new fields.NumberField({ ...requiredInteger, initial: 10, min: 1 }),
+        hasStrongAttack: new fields.BooleanField({ required: true, nullable: false, initial: true })
       })
     );
   }
@@ -3375,7 +3386,7 @@ class AbbrewActor extends Actor {
     let risk = this.system.defense.risk.raw;
     const inflexibility = this.system.defense.inflexibility.raw;
     const damage = this.applyModifiersToDamage(rolls, data, action);
-    const updates = { "system.defense.guard.value": await this.calculateGuard(damage, guard, data.isFeint, action), "system.defense.risk.raw": this.calculateRisk(damage, guard, risk, inflexibility, data.isFeint, action) };
+    const updates = { "system.defense.guard.value": await this.calculateGuard(damage, guard, data.isFeint, data.isStrongAttack, action), "system.defense.risk.raw": this.calculateRisk(damage, guard, risk, inflexibility, data.isFeint, data.isStrongAttack, action) };
     await this.update(updates);
     await this.renderAttackResultCard(data, action);
     return this;
@@ -3464,26 +3475,41 @@ class AbbrewActor extends Actor {
       return result += dmg;
     }, 0);
   }
-  async calculateGuard(damage, guard, isFeint, action) {
-    if (this.noneResult(isFeint, action)) {
-      return guard;
-    }
-    let guardDamage = damage;
-    if (this.defenderGainsAdvantage(isFeint, action))
-      ;
-    const guardUpdate = Math.max(0, guard - guardDamage);
-    return guardUpdate;
+  async calculateGuard(damage, guard, isFeint, isStrongAttack, action) {
+    return guard + this.calculateGuardIncrease(damage, guard, isFeint, isStrongAttack, action);
   }
-  calculateRisk(damage, guard, risk, inflexibility, isFeint, action) {
-    let riskIncrease = damage + inflexibility;
-    if (this.attackerGainsAdvantage(isFeint, action)) {
-      riskIncrease += damage;
-    } else if (this.defenderGainsAdvantage(isFeint, action)) {
-      riskIncrease += 10;
-    } else if (this.noneResult(isFeint, action)) {
-      riskIncrease = 0;
+  calculateGuardIncrease(damage, guard, isFeint, isStrongAttack, action) {
+    if (this.noneResult(isFeint, action)) {
+      return 0;
     }
-    return risk + riskIncrease;
+    if (isStrongAttack) {
+      return 0 - damage;
+    }
+    if (this.attackerGainsAdvantage(isFeint, action)) {
+      return 0 - damage;
+    }
+    if (this.defenderGainsAdvantage(isFeint, action)) {
+      return 0;
+    }
+    return 0 - damage;
+  }
+  calculateRisk(damage, guard, risk, inflexibility, isFeint, isStrongAttack, action) {
+    return risk + this.calculateRiskIncrease(damage, guard, risk, inflexibility, isFeint, isStrongAttack, action);
+  }
+  calculateRiskIncrease(damage, guard, risk, inflexibility, isFeint, isStrongAttack, action) {
+    if (this.noneResult(isFeint, action)) {
+      return 0;
+    }
+    if (isStrongAttack) {
+      return damage + inflexibility;
+    }
+    if (this.attackerGainsAdvantage(isFeint, action)) {
+      return 2 * (damage + inflexibility);
+    }
+    if (this.defenderGainsAdvantage(isFeint, action)) {
+      return 2 * (damage + inflexibility);
+    }
+    return damage + inflexibility;
   }
   defenderGainsAdvantage(isFeint, action) {
     return isFeint === false && action === "parry";
@@ -3610,6 +3636,9 @@ class AbbrewItem2 extends Item {
     game.items.get(card.dataset.itemId);
     switch (action) {
       case "damage":
+        await this._onAcceptDamageAction(message.rolls, message.flags.data, action);
+        break;
+      case "strong":
         await this._onAcceptDamageAction(message.rolls, message.flags.data, action);
         break;
       case "parry":
@@ -3765,6 +3794,9 @@ Hooks.on("renderChatLog", (app, html, data) => {
   AbbrewItem2.chatListeners(html);
 });
 Hooks.on("updateActor", async (actor, updates, options, userId) => {
+  if (userId != game.user.id) {
+    return;
+  }
   if (doesNestedFieldExist(updates, "system.defense.guard.value")) {
     await handleActorGuardConditions(actor);
   }

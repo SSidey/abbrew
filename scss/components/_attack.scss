@@ -1,4 +1,14 @@
-.attack-profile {
+li.attack-profile {
     display: grid;
-    grid-template-columns: repeat(4 1fr);
+    grid-template-columns: repeat(4, 1fr);
+    list-style: none;
+}
+
+ol.attack-profiles {
+    list-style: none;
+}
+
+button.attack-damage-button {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
 }

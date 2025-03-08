@@ -186,6 +186,8 @@ Hooks.on("renderChatLog", (app, html, data) => {
 
 Hooks.on("updateActor", async (actor, updates, options, userId) => {
 
+  if (userId != game.user.id) { return; }
+
   if (doesNestedFieldExist(updates, "system.defense.guard.value")) {
 
     await handleActorGuardConditions(actor);

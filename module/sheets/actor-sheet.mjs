@@ -321,6 +321,11 @@ export class AbbrewActorSheet extends ActorSheet {
       await this._onAttackDamageAction(t, 'feint');
     });
 
+    html.on('click', '.attack-strong-button', async (event) => {
+      const t = event.currentTarget;
+      await this._onAttackDamageAction(t, 'strong');
+    });
+
     html.on('click', '.attack-finisher-button', async (event) => {
       const t = event.currentTarget;
       await this._onAttackDamageAction(t, 'finisher');
@@ -437,9 +442,11 @@ export class AbbrewActorSheet extends ActorSheet {
     }, 0);
 
 
-    const showAttack = ['attack', 'feint'].includes(attackMode);
+    const showAttack = ['attack', 'feint', 'finisher'].includes(attackMode);
     const isFeint = attackMode === 'feint';
+    const isStrongAttack = attackMode === 'strong';
     const showFinisher = attackMode === 'finisher' || totalSuccesses > 0;
+    const isFinisher = attackMode === 'finisher';
     const templateData = {
       attackProfile,
       totalSuccesses,
@@ -449,7 +456,9 @@ export class AbbrewActorSheet extends ActorSheet {
       item: this.item,
       tokenId: token?.uuid || null,
       showAttack,
-      showFinisher
+      showFinisher,
+      isStrongAttack,
+      isFinisher
     };
 
     // TODO: Move this out of item and into a weapon.mjs
@@ -464,7 +473,7 @@ export class AbbrewActorSheet extends ActorSheet {
       rollMode: rollMode,
       flavor: label,
       content: html,
-      flags: { data: { totalSuccesses, damage, isFeint, attackingActor: this.actor } }
+      flags: { data: { totalSuccesses, damage, isFeint, isStrongAttack, attackingActor: this.actor } }
     });
     return result;
   }

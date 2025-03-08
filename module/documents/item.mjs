@@ -107,6 +107,7 @@ export default class AbbrewItem extends Item {
 
     switch (action) {
       case 'damage': await this._onAcceptDamageAction(message.rolls, message.flags.data, action); break;
+      case 'strong': await this._onAcceptDamageAction(message.rolls, message.flags.data, action); break;
       case 'parry': await this._onAcceptDamageAction(message.rolls, message.flags.data, action); break;
       case 'finisher': await this._onAcceptFinisherAction(message.rolls, message.flags.data); break;
     }

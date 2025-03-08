@@ -105,87 +105,27 @@ async function setActorCondition(actor, conditionName) {
         };
 
         await actor.createEmbeddedDocuments('ActiveEffect', [conditionEffectData]);
+        console.log(`${actor.name} gained ${conditionName}`);
     }
 }
 
 async function setActorToDefeated(actor) {
     setActorCondition(actor, 'defeated');
-    // if (actor.statuses.has('defeated')) {
-    //     return;
-    // }
-
-    // const defeatedEffectData = {
-    //     _id: actor._id,
-    //     name: "Defeated",
-    //     img: CONFIG.statusEffects.find(s => s.id === 'defeated').img,
-    //     changes: [],
-    //     disabled: false,
-    //     duration: {},
-    //     description: "You resolve buckles as you are unable to continue the fight.",
-    //     origin: actor._id,
-    //     tint: '',
-    //     transfer: false,
-    //     statuses: new Set(['defeated']),
-    //     flags: {}
-    // };
-
-    // await actor.createEmbeddedDocuments('ActiveEffect', [defeatedEffectData]);
 }
 
 async function setActorToDead(actor) {
     setActorCondition(actor, 'dead');
-    // if (actor.statuses.has('dead')) {
-    //     return;
-    // }
-
-    // const defeatedEffectData = {
-    //     _id: actor._id,
-    //     name: "Dead",
-    //     img: CONFIG.statusEffects.find(s => s.id === 'dead').img,
-    //     changes: [],
-    //     disabled: false,
-    //     duration: {},
-    //     description: "You have suffered fatal wounds, resulting in death.",
-    //     origin: actor._id,
-    //     tint: '',
-    //     transfer: false,
-    //     statuses: new Set(['dead']),
-    //     flags: {}
-    // };
-
-    // await actor.createEmbeddedDocuments('ActiveEffect', [defeatedEffectData]);
 }
 
 export async function setActorToOffGuard(actor) {
     setActorCondition(actor, 'offGuard');
-    // if (actor.statuses.has('offGuard')) {
-    //     return;
-    // }
-
-    // const offGuardEffectData = {
-    //     _id: actor._id,
-    //     name: "Off Guard",
-    //     img: CONFIG.statusEffects.find(s => s.id === 'offGuard').img,
-    //     changes: [],
-    //     disabled: false,
-    //     duration: {},
-    //     description: "Your guard is broken or otherwise compromised, your foes can directly capitalise on your weakpoints. You can be targeted by finishers",
-    //     origin: actor._id,
-    //     tint: '',
-    //     transfer: false,
-    //     statuses: new Set(['offGuard']),
-    //     flags: {}
-    // };
-
-    // await actor.createEmbeddedDocuments('ActiveEffect', [offGuardEffectData]);
-
 }
 
 async function turnStart(actor) {
     if (game.settings.get("abbrew", "announceTurnStart")) {
         ChatMessage.create({ content: `${actor.name} starts their turn`, speaker: ChatMessage.getSpeaker({ actor: actor }) });
     }
-    
+
     if (actor.system.defense.canBleed) {
         const filteredWounds = actor.system.wounds.filter(wound => wound.type === 'bleed');
         const bleedingWounds = filteredWounds.length > 0 ? filteredWounds[0].value : 0;

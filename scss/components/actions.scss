@@ -1,0 +1,37 @@
+span.actions-icon {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+span.actions-icon::before {
+    display: inline-block;
+    content: '';
+    width: 24px;
+    height: 24px;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+span.actions-icon.action-fa::before {
+    background-image: url("../../abbrew/assets/icons/actions/fa.webp")
+}
+
+span.actions-icon.action-1a::before {
+    background-image: url("../../abbrew/assets/icons/actions/1a.webp")
+}
+
+span.actions-icon.action-2a::before {
+    background-image: url("../../abbrew/assets/icons/actions/2a.webp")
+}
+
+span.actions-icon.action-3a::before {
+    background-image: url("../../abbrew/assets/icons/actions/3a.webp")
+}
+
+span.actions-icon.action-4a::before {
+    background-image: url("../../abbrew/assets/icons/actions/4a.webp")
+}
+
+span.actions-icon.action-5a::before {
+    background-image: url("../../abbrew/assets/icons/actions/5a.webp")
+}

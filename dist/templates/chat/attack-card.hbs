@@ -37,10 +37,19 @@
 
     {{!-- TODO: If Crit, allow damage or finisher / do damage instead if no finisher --}}
     <div class="card-buttons">
-        {{#unless showFinisher}}
+        {{#unless isStrongAttack}}
+        {{#unless isFinisher}}
         {{#if showAttack}}
         <button data-action="damage">Damage</button>
         {{/if}}
+        {{/unless}}
+        {{/unless}}
+        {{#unless showAttack}}
+        {{#if isStrongAttack}}
+        <button data-action="strong">Overpower</button>
+        {{/if}}
+        {{/unless}}
+        {{#unless showFinisher}}
         {{#if showAttack}}
         <button data-action="parry">Parry</button>
         {{/if}}

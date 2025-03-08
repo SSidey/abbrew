@@ -48,7 +48,7 @@
           <label for="system.defense.guard" class="resource-label">Guard</label>
           <div class="resource-content flexrow flex-center flex-between">
             <input type="text" name="system.defense.guard.value" value="{{system.defense.guard.value}}"
-                    data-dtype="Number" />
+              data-dtype="Number" />
             <span> / </span>
             <input type="text" value="{{system.defense.guard.max}}" data-dtype="Number" readonly />
           </div>
@@ -122,7 +122,7 @@
           {{> "systems/abbrew/templates/actor/parts/actor-anatomy.hbs"}}
           {{> "systems/abbrew/templates/actor/parts/actor-armour.hbs" showEquipState=false}}
           {{> "systems/abbrew/templates/actor/parts/actor-weapons.hbs" weaponsList=equippedWeapons
-          showAttackProfiles=true showEquipState=false}}
+          showAttackProfiles=true showEquipState=false showItemControls=false}}
         </section>
 
       </section>
