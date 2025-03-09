@@ -1,0 +1,35 @@
+$icon-dimension: 24px;
+
+.icon-label {
+    display: grid;
+}
+
+span.icon {}
+
+span.icon::before {
+    display: inline-block;
+    content: '';
+    width: $icon-dimension;
+    height: $icon-dimension;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+span.icon.icon-sunder-c::before {
+    background-image: url("../../abbrew/assets/icons/icons/sunder_c.svg")
+}
+
+span.icon.icon-sunder-u::before {
+    background-image: url("../../abbrew/assets/icons/icons/sunder_u.svg")
+}
+
+input[type="checkbox"].armour-sunder {
+    /* Add if not using autoprefixer */
+    -webkit-appearance: none;
+    appearance: none;
+    display: none;
+    /* For iOS < 15 to remove gradient background */
+    background-color: #fff;
+    /* Not removed via appearance */
+    margin: 0;
+}

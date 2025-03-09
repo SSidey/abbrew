@@ -7,10 +7,12 @@
   background: rgba(0, 0, 0, 0.05);
   border: $border-groove;
   font-weight: bold;
-  > * {
+
+  >* {
     font-size: 14px;
     text-align: center;
   }
+
   .item-name {
     font-weight: bold;
     padding-left: 5px;
@@ -48,7 +50,9 @@
     text-align: left;
     align-items: center;
     display: flex;
-    h3, h4 {
+
+    h3,
+    h4 {
       margin: 0;
       white-space: nowrap;
       overflow-x: hidden;
@@ -60,6 +64,7 @@
     display: flex;
     flex: 0 0 100px;
     justify-content: flex-end;
+
     a {
       font-size: 12px;
       text-align: center;
@@ -72,9 +77,14 @@
     align-items: center;
     padding: 0 2px; // to align with the header border
     border-bottom: 1px solid $c-faint;
-    &:last-child { border-bottom: none; }
+
+    &:last-child {
+      border-bottom: none;
+    }
+
     .item-name {
       color: $c-dark;
+
       .item-image {
         flex: 0 0 30px;
         height: 30px;
@@ -101,10 +111,12 @@
     background: rgba(0, 0, 0, 0.05);
     border: $border-groove;
     font-weight: bold;
-    > * {
+
+    >* {
       font-size: 12px;
       text-align: center;
     }
+
     .item-name {
       padding-left: 5px;
       text-align: left;
@@ -115,11 +127,50 @@
 
 // Example style for Abbrew (can be removed if not needed).
 .item-formula {
-  
+
   flex: 0 0 200px;
   padding: 0 8px;
 }
 
 ol li.damage-reduction {
   list-style-type: none;
+}
+
+.item.item-row {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+
+  .item-name {
+    display: grid;
+    grid-column: 1 / 8;
+    grid-template-columns: repeat(7, 1fr);
+    
+    .item-image {
+      grid-column: 1 / 2;
+      height: 30px;
+      background-size: 30px;
+      border: none;
+      margin-right: 5px;
+    }
+
+    h4 {
+      grid-column: 2 / 8;
+    }
+  }
+
+  .icon-label {
+    grid-column: 8 / 9;    
+  }
+
+  .item-controls {
+    display: grid;
+    grid-column: 9 / 11;
+    grid-template-columns: repeat(2, 1fr);
+
+    a {
+      font-size: 12px;
+      text-align: center;
+      margin: 0 6px;
+    }
+  }
 }

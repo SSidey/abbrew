@@ -178,8 +178,8 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     }
   }
 
-  _prepareDamageReduction(armour, anatomy) {
-    console.log('ARMOUR');
+  _prepareDamageReduction(wornArmour, anatomy) {
+    const armour = wornArmour.filter(a => !a.system.isSundered);
     const armourProtection = armour.map(a => a.system.defense.protection).flat(1);
     const anatomyProtection = anatomy.map(a => a.system.defense.protection).flat(1);
     const protection = [...armourProtection, ...anatomyProtection];
@@ -203,7 +203,8 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     Object.values(flatDR).map(v => this.defense.protection.push(v));
   }
 
-  _prepareGuard(armour, anatomy) {
+  _prepareGuard(wornArmour, anatomy) {
+    const armour = wornArmour.filter(a => !a.system.isSundered);
     this.defense.guard.base = this.attributes['wit'].value;
     // Handle damage type label localization.
     this.defense.guard.label = game.i18n.localize(CONFIG.ABBREW.Defense.guard) ?? key;

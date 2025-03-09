@@ -49,6 +49,9 @@ export async function checkActorFatalWounds(actor) {
 export async function handleActorGuardConditions(actor) {
     if (actor.system.defense.guard.value <= 0) {
         await setActorToGuardBreak(actor);
+    } else if (actor.effects.toObject().find(e => e.name === 'Guard Break')) {
+        const id = actor.effects.toObject().find(e => e.name === 'Guard Break')._id;
+        await actor.deleteEmbeddedDocuments('ActiveEffect', [id]);
     }
 }
 
