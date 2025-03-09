@@ -29,6 +29,16 @@
     </select>
     {{/if}}
     {{/if}}
+    <span>Render me</span>
+    <span class="icon icon-sunder-c" />
+    <label class="roboto-upper">
+      <input type="checkbox" class="armour-sunder" name="system.isSundered" {{ checked item.system.isSundered }}>
+      {{#if item.system.isSundered}}
+      <span class="icon icon-sunder-c" />
+      {{else}}
+      <span class="icon icon-sunder-u" />
+      {{/if}}
+    </label>
     <div class='item-controls'>
       <a class='item-control item-edit' title='{{localize "DOCUMENT.Edit" type=' armour'}}'>
         <i class='fas fa-edit'></i>

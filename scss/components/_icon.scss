@@ -1,0 +1,21 @@
+span.icon {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+span.icon::before {
+    display: inline-block;
+    content: '';
+    width: 24px;
+    height: 24px;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+span.icon.icon-sunder-c::before {
+    background-image: url("../../abbrew/assets/icons/icons/sunder_c.svg")
+}
+
+span.icon.icon-sunder-u::before {
+    background-image: url("../../abbrew/assets/icons/icons/sunder_u.svg")
+}
