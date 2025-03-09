@@ -55,7 +55,9 @@ Hooks.once('init', function () {
     skill: models.AbbrewSkill,
     anatomy: models.AbbrewAnatomy,
     armour: models.AbbrewArmour,
-    weapon: models.AbbrewWeapon
+    weapon: models.AbbrewWeapon,
+    wound: models.AbbrewWound,
+    background: models.AbbrewBackground
   }
 
   // Register System Settings  
@@ -150,6 +152,14 @@ Handlebars.registerHelper('json', function (context) {
   return JSON.stringify(context, undefined, 2);
 });
 
+Handlebars.registerHelper('gm', function (opts) {
+  if (game.users.current === game.users.activeGM) {
+    return opts.fn(this);
+  } else {
+    return opts.inverse(this);
+  }
+});
+
 /* -------------------------------------------- */
 /*  Ready Hook                                  */
 /* -------------------------------------------- */
@@ -172,7 +182,14 @@ Hooks.on("combatRound", async (combat, updateData, updateOptions) => {
 })
 
 Hooks.on("combatTurn", async (combat, updateData, updateOptions) => {
-  await handleTurnStart(combat, updateData, updateOptions);
+  // Causing issues as the initating client triggers this i.e. player before enemies will be unable to trigger the enemy bleed
+  // await handleTurnStart(combat, updateData, updateOptions);
+})
+
+Hooks.on("combatTurnChange", async (combat, prior, current) => {
+  if (canvas.tokens.get(current.tokenId).actor.isOwner) {
+    await handleTurnStart(prior, current, canvas.tokens.get(current.tokenId).actor);
+  }
 })
 
 /* -------------------------------------------- */
@@ -201,6 +218,33 @@ Hooks.on("updateActor", async (actor, updates, options, userId) => {
   }
 
 });
+
+Hooks.on("dropActorSheetData", async (actor, sheet, data) => {
+  console.log(data);
+  if (data.type === "Item") {
+    const id = data.uuid.split(".").splice(1).shift();
+    const item = game.items.get(id);
+    if (item) {
+      switch (item.type) {
+        case "wound":
+          await handleActorWoundDrop(actor, item)
+          break;
+        case "background":
+          await handleActorBackgroundDrop(actor, item)
+          break;
+      }
+    }
+  }
+});
+
+async function handleActorWoundDrop(actor, item) {
+  const wound = item.system.wound;
+  await actor.acceptWound(wound.type, wound.value);
+}
+
+async function handleActorBackgroundDrop(actor, background) {
+  await actor.acceptBackground(background);
+}
 
 /* -------------------------------------------- */
 /*  Hotbar Macros                               */

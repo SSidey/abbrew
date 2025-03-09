@@ -14,12 +14,11 @@ function applyOperator(base, value, operator) {
       return base;
   }
 }
-async function handleTurnStart(combat, updateData, updateOptions) {
-  if (updateData.round < combat.round || updateData.round == combat.round && updateData.turn < combat.turn) {
+async function handleTurnStart(prior, current, actor) {
+  if (current.round < prior.round || prior.round == current.round && current.turn < prior.turn) {
     return;
   }
-  let nextActor = combat.current.combatantId ? combat.nextCombatant.actor : combat.turns[0].actor;
-  await turnStart(nextActor);
+  await turnStart(actor);
 }
 function mergeActorWounds(actor, incomingWounds) {
   return mergeActorWoundsWithOperator(actor, incomingWounds, "add");
@@ -47,7 +46,7 @@ async function checkActorFatalWounds(actor) {
 }
 async function handleActorGuardConditions(actor) {
   if (actor.system.defense.guard.value <= 0) {
-    await setActorToOffGuard(actor);
+    await setActorToGuardBreak(actor);
   }
 }
 async function handleActorWoundConditions(actor) {
@@ -100,8 +99,8 @@ async function setActorToDefeated(actor) {
 async function setActorToDead(actor) {
   setActorCondition(actor, "dead");
 }
-async function setActorToOffGuard(actor) {
-  setActorCondition(actor, "offGuard");
+async function setActorToGuardBreak(actor) {
+  setActorCondition(actor, "guardBreak");
 }
 async function turnStart(actor) {
   if (game.settings.get("abbrew", "announceTurnStart")) {
@@ -2202,7 +2201,7 @@ class AbbrewActorSheet extends ActorSheet {
       rollMode,
       flavor: label,
       content: html,
-      flags: { data: { totalSuccesses, damage, isFeint, isStrongAttack, attackingActor: this.actor } }
+      flags: { data: { totalSuccesses, damage, isFeint, isStrongAttack, attackProfile, attackingActor: this.actor } }
     });
     return result;
   }
@@ -2753,17 +2752,23 @@ ABBREW.wounds = {
   }
 };
 ABBREW.conditions = {
+  dead: {
+    name: "ABBREW.EFFECT.Condition.Dead.name",
+    img: "systems/abbrew/assets/icons/statuses/dead.svg",
+    description: "ABBREW.EFFECT.Condition.Dead.description",
+    statuses: ["dead", "defeated"]
+  },
   defeated: {
     name: "ABBREW.EFFECT.Condition.Defeated.name",
     img: "systems/abbrew/assets/icons/statuses/defeated.svg",
     description: "ABBREW.EFFECT.Condition.Defeated.description",
     statuses: ["defeated"]
   },
-  dead: {
-    name: "ABBREW.EFFECT.Condition.Dead.name",
-    img: "systems/abbrew/assets/icons/statuses/dead.svg",
-    description: "ABBREW.EFFECT.Condition.Dead.description",
-    statuses: ["dead", "defeated"]
+  guardBreak: {
+    name: "ABBREW.EFFECT.Condition.GuardBreak.name",
+    img: "systems/abbrew/assets/icons/statuses/guardBreak.svg",
+    description: "ABBREW.EFFECT.Condition.GuardBreak.description",
+    statuses: ["offGuard"]
   },
   offGuard: {
     name: "ABBREW.EFFECT.Condition.OffGuard.name",
@@ -2773,17 +2778,21 @@ ABBREW.conditions = {
   }
 };
 ABBREW.statusEffects = {
+  dead: {
+    name: "ABBREW.EFFECT.Status.dead",
+    img: "systems/abbrew/assets/icons/statuses/dead.svg",
+    order: 2,
+    statuses: ["defeated"]
+  },
   defeated: {
     name: "ABBREW.EFFECT.Status.defeated",
     img: "systems/abbrew/assets/icons/statuses/defeated.svg",
     special: "DEFEATED",
     order: 1
   },
-  dead: {
-    name: "ABBREW.EFFECT.Status.dead",
-    img: "systems/abbrew/assets/icons/statuses/dead.svg",
-    order: 2,
-    statuses: ["defeated"]
+  guardBreak: {
+    name: "ABBREW.EFFECT.Status.guardBreak",
+    img: "systems/abbrew/assets/icons/statuses/guardBreak.svg"
   },
   offGuard: {
     name: "ABBREW.EFFECT.Status.offGuard",
@@ -2981,7 +2990,7 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     const otherInflexibility = Math.max(0, weapons.reduce((result, w) => result += w.system.weapon.size, 0) - this.attributes["str"].value);
     this.defense.inflexibility.resistance.raw = armourInflexibility;
     this.defense.inflexibility.raw = 0 + armourInflexibility + otherInflexibility;
-    this.defense.inflexibility.resistance.value = Math.ceil(armourInflexibility / 10);
+    this.defense.inflexibility.resistance.value = Math.ceil(armourInflexibility / 20);
   }
   getRollData() {
     let data = {};
@@ -3211,8 +3220,16 @@ class AbbrewSkill extends AbbrewItemBase {
       archetype: new fields.StringField({ ...blankString })
     });
     schema.attributeIncrease = new fields.StringField({ ...blankString });
+    schema.attributeIncreaseLong = new fields.StringField({ ...blankString });
     schema.attributeRankIncrease = new fields.StringField({ ...blankString });
     return schema;
+  }
+  // Post Active Effects
+  prepareDerivedData() {
+    console.log("derive skill data");
+    if (this.attributeIncrease) {
+      this.attributeIncreaseLong = game.i18n.localize(CONFIG.ABBREW.attributes[this.attributeIncrease]);
+    }
   }
 }
 class AbbrewRevealedItem {
@@ -3229,8 +3246,10 @@ class AbbrewRevealedItem {
 class AbbrewArmour extends AbbrewItemBase {
   static defineSchema() {
     const schema = super.defineSchema();
+    const fields = foundry.data.fields;
     this.addDefenseSchema(schema);
     AbbrewRevealedItem.addRevealedItemSchema(schema);
+    schema.isSundered = new fields.BooleanField({ required: true, nullable: false, initial: false });
     return schema;
   }
   static addDefenseSchema(schema) {
@@ -3266,6 +3285,8 @@ class AbbrewAnatomy extends AbbrewItemBase {
     AbbrewArmour.addDefenseSchema(schema);
     return schema;
   }
+  // TODO: Add revealed button
+  // TODO: NPC sheet and player view that shows revealed armour / anatomy
   prepareDerivedData() {
     this.roll;
   }
@@ -3318,6 +3339,42 @@ class AbbrewWeapon extends AbbrewItemBase {
   // Post Active Effects
   prepareDerivedData() {
     this.formula = `1d10x10cs10`;
+  }
+}
+class AbbrewWound extends AbbrewItemBase {
+  static defineSchema() {
+    const fields = foundry.data.fields;
+    const schema = super.defineSchema();
+    const blankString = { required: true, blank: true };
+    const requiredInteger = { required: true, nullable: false, integer: true };
+    schema.wound = new fields.SchemaField({
+      type: new fields.StringField({ ...blankString }),
+      value: new fields.NumberField({ ...requiredInteger, initial: 0 })
+    });
+    return schema;
+  }
+}
+class AbbrewBackground extends AbbrewItemBase {
+  static defineSchema() {
+    const fields = foundry.data.fields;
+    const schema = super.defineSchema();
+    const requiredInteger = { required: true, nullable: false, integer: true };
+    schema.attributes = new fields.SchemaField(Object.keys(CONFIG.ABBREW.attributes).reduce((obj, attribute) => {
+      obj[attribute] = new fields.SchemaField({
+        value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 2 }),
+        label: new fields.StringField({ required: true, blank: true }),
+        isEnabled: new fields.BooleanField({ required: true, nullable: false, initial: false })
+      });
+      return obj;
+    }, {}));
+    return schema;
+  }
+  // Post Active Effects
+  prepareDerivedData() {
+    console.log("Preparing Derived Data for Background");
+    for (const key2 in this.attributes) {
+      this.attributes[key2].label = game.i18n.localize(CONFIG.ABBREW.attributes[key2]) ?? key2;
+    }
   }
 }
 const FINISHERS = {
@@ -3399,7 +3456,7 @@ class AbbrewActor extends Actor {
     const risk = this.system.defense.risk.raw;
     const totalRisk = this.applyModifiersToRisk(rolls, data);
     const availableFinishers = this.getAvailableFinishersForDamageType(data);
-    const finisherCost = this.getFinisherCost(availableFinishers, totalRisk);
+    const finisherCost = this.getFinisherCost(availableFinishers, totalRisk, data.attackProfile);
     const finisher = this.getFinisher(availableFinishers, finisherCost);
     await this.sendFinisherToChat(finisher, finisherCost);
     if (finisher) {
@@ -3418,9 +3475,10 @@ class AbbrewActor extends Actor {
   getAvailableFinishersForDamageType(data) {
     return data.damage[0].damageType in FINISHERS ? FINISHERS[data.damage[0].damageType] : FINISHERS["physical"];
   }
-  getFinisherCost(availableFinishers, risk) {
+  getFinisherCost(availableFinishers, risk, attackProfile) {
+    const viableRisk = Math.min(risk, attackProfile.finisherLimit);
     const keys = Object.keys(availableFinishers);
-    const cost = keys.filter((value) => value <= risk).pop();
+    const cost = keys.filter((value) => value <= viableRisk).pop();
     if (cost) {
       return cost;
     }
@@ -3556,6 +3614,31 @@ class AbbrewActor extends Actor {
   getActorAnatomy() {
     return this.items.filter((i) => i.type === "anatomy");
   }
+  async acceptWound(type, value) {
+    const updates = { "system.wounds": mergeActorWounds(this, [{ type, value }]) };
+    await this.update(updates);
+    return this;
+  }
+  async acceptBackground(background) {
+    const name = background.name;
+    const image = background.img;
+    const description = background.system.description;
+    const attributeIncreases = Object.entries(background.system.attributes).filter((atr) => atr[1].value > 0).reduce((result, attribute) => result.concat(Array(attribute[1].value).fill(attribute[0])), []);
+    for (const index in attributeIncreases) {
+      const system = {
+        description,
+        attributeIncrease: attributeIncreases[index],
+        skillType: "background"
+      };
+      const itemData = {
+        name,
+        img: image,
+        type: "skill",
+        system
+      };
+      await Item.create(itemData, { parent: this });
+    }
+  }
 }
 class AbbrewItem2 extends Item {
   /**
@@ -3573,7 +3656,7 @@ class AbbrewItem2 extends Item {
       }
     }
     if (doesNestedFieldExist(changed, "system.equipState") && changed.system.equipState.startsWith("held")) {
-      if (!this.isHeldEquipStateChangePossible()) {
+      if (!this.isHeldEquipStateChangePossible(changed.system.equipState)) {
         ui.notifications.info("You are already holding too many items, try stowing some");
         this.actor.sheet.render();
         return false;
@@ -3605,10 +3688,10 @@ class AbbrewItem2 extends Item {
     }, true);
     return allRequiredAvailable;
   }
-  isHeldEquipStateChangePossible() {
+  isHeldEquipStateChangePossible(equipState) {
     const actorHands = this.actor.getActorAnatomy().reduce((result, a) => result += a.system.hands, 0);
     const equippedHeldItemHands = this.actor.getActorHeldItems().reduce((result, a) => result += a.system.hands, 0);
-    const requiredHands = equippedHeldItemHands + this.system.hands;
+    const requiredHands = equippedHeldItemHands + parseInt(equipState.replace(/\D/g, ""));
     return actorHands >= requiredHands;
   }
   /**
@@ -3716,7 +3799,9 @@ Hooks.once("init", function() {
     skill: AbbrewSkill,
     anatomy: AbbrewAnatomy,
     armour: AbbrewArmour,
-    weapon: AbbrewWeapon
+    weapon: AbbrewWeapon,
+    wound: AbbrewWound,
+    background: AbbrewBackground
   };
   registerSystemSettings();
   CONFIG.ActiveEffect.legacyTransferral = false;
@@ -3777,17 +3862,28 @@ Handlebars.registerHelper("empty", function(collection) {
 Handlebars.registerHelper("json", function(context) {
   return JSON.stringify(context, void 0, 2);
 });
+Handlebars.registerHelper("gm", function(opts) {
+  if (game.users.current === game.users.activeGM) {
+    return opts.fn(this);
+  } else {
+    return opts.inverse(this);
+  }
+});
 Hooks.once("ready", function() {
   Hooks.on("hotbarDrop", (bar, data, slot) => createItemMacro(data, slot));
 });
 Hooks.on("combatStart", async (combat, updateData, updateOptions) => {
-  await handleTurnStart(combat, updateData);
+  await handleTurnStart(combat, updateData, updateOptions);
 });
 Hooks.on("combatRound", async (combat, updateData, updateOptions) => {
-  await handleTurnStart(combat, updateData);
+  await handleTurnStart(combat, updateData, updateOptions);
 });
 Hooks.on("combatTurn", async (combat, updateData, updateOptions) => {
-  await handleTurnStart(combat, updateData);
+});
+Hooks.on("combatTurnChange", async (combat, prior, current) => {
+  if (canvas.tokens.get(current.tokenId).actor.isOwner) {
+    await handleTurnStart(prior, current, canvas.tokens.get(current.tokenId).actor);
+  }
 });
 Hooks.on("applyActiveEffect", applyCustomEffects);
 Hooks.on("renderChatLog", (app, html, data) => {
@@ -3804,6 +3900,30 @@ Hooks.on("updateActor", async (actor, updates, options, userId) => {
     await handleActorWoundConditions(actor);
   }
 });
+Hooks.on("dropActorSheetData", async (actor, sheet, data) => {
+  console.log(data);
+  if (data.type === "Item") {
+    const id = data.uuid.split(".").splice(1).shift();
+    const item = game.items.get(id);
+    if (item) {
+      switch (item.type) {
+        case "wound":
+          await handleActorWoundDrop(actor, item);
+          break;
+        case "background":
+          await handleActorBackgroundDrop(actor, item);
+          break;
+      }
+    }
+  }
+});
+async function handleActorWoundDrop(actor, item) {
+  const wound = item.system.wound;
+  await actor.acceptWound(wound.type, wound.value);
+}
+async function handleActorBackgroundDrop(actor, background) {
+  await actor.acceptBackground(background);
+}
 async function createItemMacro(data, slot) {
   if (data.type !== "Item")
     return;

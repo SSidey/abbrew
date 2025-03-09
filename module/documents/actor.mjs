@@ -1,4 +1,4 @@
-import { mergeActorWounds, renderLostResolveCard, setActorToOffGuard, checkActorFatalWounds } from "../helpers/combat.mjs";
+import { mergeActorWounds } from "../helpers/combat.mjs";
 import { FINISHERS } from "../static/finishers.mjs";
 
 /**
@@ -71,7 +71,7 @@ export default class AbbrewActor extends Actor {
     const risk = this.system.defense.risk.raw;
     const totalRisk = this.applyModifiersToRisk(rolls, data);
     const availableFinishers = this.getAvailableFinishersForDamageType(data);
-    const finisherCost = this.getFinisherCost(availableFinishers, totalRisk);
+    const finisherCost = this.getFinisherCost(availableFinishers, totalRisk, data.attackProfile);
     const finisher = this.getFinisher(availableFinishers, finisherCost);
     await this.sendFinisherToChat(finisher, finisherCost);
     if (finisher) {
@@ -98,10 +98,10 @@ export default class AbbrewActor extends Actor {
     return data.damage[0].damageType in FINISHERS ? FINISHERS[data.damage[0].damageType] : FINISHERS['physical'];
   }
 
-  getFinisherCost(availableFinishers, risk) {
-    // TODO: Apply weapon size limit
+  getFinisherCost(availableFinishers, risk, attackProfile) {
+    const viableRisk = Math.min(risk, attackProfile.finisherLimit);
     const keys = Object.keys(availableFinishers);
-    const cost = keys.filter((value) => value <= risk).pop();
+    const cost = keys.filter((value) => value <= viableRisk).pop();
     if (cost) {
       return cost;
     }
@@ -270,5 +270,32 @@ export default class AbbrewActor extends Actor {
 
   getActorAnatomy() {
     return this.items.filter(i => i.type === 'anatomy');
+  }
+
+  async acceptWound(type, value) {
+    const updates = { "system.wounds": mergeActorWounds(this, [{ type, value }]) };
+    await this.update(updates);
+    return this;
+  }
+
+  async acceptBackground(background) {
+    const name = background.name;
+    const image = background.img;
+    const description = background.system.description;
+    const attributeIncreases = Object.entries(background.system.attributes).filter(atr => atr[1].value > 0).reduce((result, attribute) => result.concat(Array(attribute[1].value).fill(attribute[0])), []);
+    for (const index in attributeIncreases) {
+      const system = {
+        description,
+        attributeIncrease: attributeIncreases[index],
+        skillType: "background"
+      };
+      const itemData = {
+        name,
+        img: image,
+        type: 'skill',
+        system
+      };
+      await Item.create(itemData, { parent: this });
+    }
   }
 }

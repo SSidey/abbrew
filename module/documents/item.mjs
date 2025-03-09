@@ -24,7 +24,7 @@ export default class AbbrewItem extends Item {
 
 
     if (doesNestedFieldExist(changed, "system.equipState") && changed.system.equipState.startsWith('held')) {
-      if (!this.isHeldEquipStateChangePossible()) {
+      if (!this.isHeldEquipStateChangePossible(changed.system.equipState)) {
         ui.notifications.info("You are already holding too many items, try stowing some");
         this.actor.sheet.render();
         return false;
@@ -61,10 +61,10 @@ export default class AbbrewItem extends Item {
     return allRequiredAvailable;
   }
 
-  isHeldEquipStateChangePossible() {
+  isHeldEquipStateChangePossible(equipState) {
     const actorHands = this.actor.getActorAnatomy().reduce((result, a) => result += a.system.hands, 0);
     const equippedHeldItemHands = this.actor.getActorHeldItems().reduce((result, a) => result += a.system.hands, 0);
-    const requiredHands = equippedHeldItemHands + this.system.hands;
+    const requiredHands = equippedHeldItemHands + parseInt(equipState.replace(/\D/g, ""));
     return actorHands >= requiredHands;
   }
 

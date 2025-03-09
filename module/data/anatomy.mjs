@@ -17,6 +17,8 @@ export default class AbbrewAnatomy extends AbbrewItemBase {
     return schema;
   }
 
+  // TODO: Add revealed button
+  // TODO: NPC sheet and player view that shows revealed armour / anatomy
   prepareDerivedData() {
     // Build the formula dynamically using string interpolation
     const roll = this.roll;

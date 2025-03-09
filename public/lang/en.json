@@ -120,6 +120,7 @@
       "Status": {
         "dead": "Dead",
         "defeated": "Defeated",
+        "guardBreak": "Guard Break",
         "offGuard": "Off Guard"
       },
       "Condition": {
@@ -131,9 +132,13 @@
           "name": "Defeated",
           "description": "You resolve buckles as you are unable to continue the fight."
         },
+        "GuardBreak": {
+          "name": "Guard Break",
+          "description": "Your guard is broken, your foes can directly capitalise on your weakpoints. You can be targeted by finishers."
+        },
         "OffGuard": {
           "name": "Off Guard",
-          "description": "Your guard is broken or otherwise compromised, your foes can directly capitalise on your weakpoints. You can be targeted by finishers."
+          "description": "Your are harried and your guard compromised, your foes can directly capitalise on your weakpoints. You can be targeted by finishers."
         }
       }
     },
@@ -164,7 +169,9 @@
       "skill": "Skill",
       "anatomy": "Anatomy",
       "armour": "Armour",
-      "weapon": "Weapon"
+      "weapon": "Weapon",
+      "wound": "Wound",
+      "background": "Background"
     }
   },
 

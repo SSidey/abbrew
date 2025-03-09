@@ -3,8 +3,6 @@ name: Release
 on:
   push:
     branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
 
 jobs:
   build:
@@ -61,7 +59,8 @@ jobs:
       with:
         files: '**/public/system.json'
       env:
-        version: ${{ steps.semantic-version.outputs.version  }}        
+        version: ${{ steps.semantic-version.outputs.version }}
+        download: "https://github.com/SSidey/abbrew/releases/download/${{ steps.semantic-version.outputs.version }}/${{ steps.semantic-version.outputs.version }}.zip"
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4

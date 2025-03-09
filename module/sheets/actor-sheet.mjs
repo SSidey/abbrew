@@ -473,7 +473,7 @@ export class AbbrewActorSheet extends ActorSheet {
       rollMode: rollMode,
       flavor: label,
       content: html,
-      flags: { data: { totalSuccesses, damage, isFeint, isStrongAttack, attackingActor: this.actor } }
+      flags: { data: { totalSuccesses, damage, isFeint, isStrongAttack, attackProfile, attackingActor: this.actor } }
     });
     return result;
   }
