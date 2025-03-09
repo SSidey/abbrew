@@ -20,7 +20,7 @@
             "thumbnail": "systems/abbrew/assets/anvil-impact.png"
         }
     ],
-    "version": "0.0.2-prerelease16",
+    "version": "0.0.2-prerelease20",
     "compatibility": {
         "minimum": 12,
         "verified": "12.331"
@@ -42,7 +42,7 @@
     "packFolders": [],
     "socket": false,
     "manifest": "",
-    "download": "",
+    "download": "https://github.com/SSidey/abbrew/releases/download/0.0.2-prerelease20/0.0.2-prerelease20.zip",
     "background": "systems/abbrew/assets/anvil-impact.png",
     "grid": {
         "distance": 1,

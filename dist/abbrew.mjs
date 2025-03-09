@@ -3312,6 +3312,7 @@ class AbbrewAttackBase extends foundry.abstract.TypeDataModel {
           })
         ),
         finisherLimit: new fields.NumberField({ ...requiredInteger, initial: 10, min: 1 }),
+        // TODO: Should the number of actions required for attack/strong be hands and hands + 1?
         hasStrongAttack: new fields.BooleanField({ required: true, nullable: false, initial: true })
       })
     );
