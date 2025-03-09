@@ -27,6 +27,9 @@
         {{#if item.system.activatable}}
         <button class="skill-activate">Activate</button>
         {{/if}}
+        {{#if (eq item.system.skillType "background")}}
+        <h3 class="skill-attribute-increase">{{item.system.attributeIncreaseLong}}</h4>
+        {{/if}}
         <div class='skill-controls'>
           <a class='skill-control skill-edit' title='{{localize "DOCUMENT.Edit" type=' skill'}}'>
             <i class='fas fa-edit'></i>

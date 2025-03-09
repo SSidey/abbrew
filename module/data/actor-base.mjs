@@ -222,7 +222,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     const otherInflexibility = Math.max(0, weapons.reduce((result, w) => result += w.system.weapon.size, 0) - this.attributes['str'].value);
     this.defense.inflexibility.resistance.raw = armourInflexibility;
     this.defense.inflexibility.raw = 0 + armourInflexibility + otherInflexibility; // TODO: - weapon drills as "Shield Training" is handled
-    this.defense.inflexibility.resistance.value = Math.ceil(armourInflexibility / 10);
+    this.defense.inflexibility.resistance.value = Math.ceil(armourInflexibility / 20);
   }
 
   getRollData() {

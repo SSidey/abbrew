@@ -12,3 +12,5 @@ export {default as AbbrewSkill} from "./skill.mjs";
 export {default as AbbrewAnatomy} from "./anatomy.mjs";
 export {default as AbbrewArmour} from "./armour.mjs";
 export {default as AbbrewWeapon} from "./weapon.mjs";
+export {default as AbbrewWound} from "./wound.mjs";
+export {default as AbbrewBackground} from "./background.mjs"

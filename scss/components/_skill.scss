@@ -24,7 +24,7 @@ div.skill-card {
 
 .skill-image {
     display: grid;
-    grid-row: span 4;
+    grid-row: span 5;
     width: 80%;
     justify-self: center;
 }
@@ -66,6 +66,6 @@ li.action {
     list-style-type: none;
 }
 
-.wound-modifier-container {
-    list-style-type: none;
+.skill-attribute-increase {
+    justify-content: center;
 }

@@ -135,17 +135,23 @@ ABBREW.wounds = {
 }
 
 ABBREW.conditions = {
+  dead: {
+    name: "ABBREW.EFFECT.Condition.Dead.name",
+    img: "systems/abbrew/assets/icons/statuses/dead.svg",
+    description: "ABBREW.EFFECT.Condition.Dead.description",
+    statuses: ['dead', 'defeated']
+  },
   defeated: {
     name: "ABBREW.EFFECT.Condition.Defeated.name",
     img: "systems/abbrew/assets/icons/statuses/defeated.svg",
     description: "ABBREW.EFFECT.Condition.Defeated.description",
     statuses: ['defeated']
   },
-  dead: {
-    name: "ABBREW.EFFECT.Condition.Dead.name",
-    img: "systems/abbrew/assets/icons/statuses/dead.svg",
-    description: "ABBREW.EFFECT.Condition.Dead.description",
-    statuses: ['dead', 'defeated']
+  guardBreak: {
+    name: "ABBREW.EFFECT.Condition.GuardBreak.name",
+    img: "systems/abbrew/assets/icons/statuses/guardBreak.svg",
+    description: "ABBREW.EFFECT.Condition.GuardBreak.description",
+    statuses: ['offGuard']
   },
   offGuard: {
     name: "ABBREW.EFFECT.Condition.OffGuard.name",
@@ -156,17 +162,21 @@ ABBREW.conditions = {
 }
 
 ABBREW.statusEffects = {
+  dead: {
+    name: "ABBREW.EFFECT.Status.dead",
+    img: "systems/abbrew/assets/icons/statuses/dead.svg",
+    order: 2,
+    statuses: ['defeated']
+  },
   defeated: {
     name: "ABBREW.EFFECT.Status.defeated",
     img: "systems/abbrew/assets/icons/statuses/defeated.svg",
     special: "DEFEATED",
     order: 1
   },
-  dead: {
-    name: "ABBREW.EFFECT.Status.dead",
-    img: "systems/abbrew/assets/icons/statuses/dead.svg",
-    order: 2,
-    statuses: ['defeated']
+  guardBreak: {
+    name: "ABBREW.EFFECT.Status.guardBreak",
+    img: "systems/abbrew/assets/icons/statuses/guardBreak.svg"
   },
   offGuard: {
     name: "ABBREW.EFFECT.Status.offGuard",

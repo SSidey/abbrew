@@ -5,9 +5,11 @@ export default class AbbrewArmour extends AbbrewItemBase {
 
     static defineSchema() {
         const schema = super.defineSchema();
+        const fields = foundry.data.fields;
 
         this.addDefenseSchema(schema);
         AbbrewRevealedItem.addRevealedItemSchema(schema);
+        schema.isSundered = new fields.BooleanField({ required: true, nullable: false, initial: false })
 
         return schema;
     }

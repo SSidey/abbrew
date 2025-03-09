@@ -1,11 +1,10 @@
 import { applyOperator } from "./operators.mjs";
 
-export async function handleTurnStart(combat, updateData, updateOptions) {
-    if (updateData.round < combat.round || (updateData.round == combat.round && updateData.turn < combat.turn)) {
+export async function handleTurnStart(prior, current, actor) {
+    if (current.round < prior.round || (prior.round == current.round && current.turn < prior.turn)) {
         return;
     }
-    let nextActor = combat.current.combatantId ? combat.nextCombatant.actor : combat.turns[0].actor;
-    await turnStart(nextActor);
+    await turnStart(actor);
 }
 
 export function mergeActorWounds(actor, incomingWounds) {
@@ -49,7 +48,7 @@ export async function checkActorFatalWounds(actor) {
 
 export async function handleActorGuardConditions(actor) {
     if (actor.system.defense.guard.value <= 0) {
-        await setActorToOffGuard(actor);
+        await setActorToGuardBreak(actor);
     }
 }
 
@@ -62,7 +61,7 @@ export async function handleActorWoundConditions(actor) {
     await checkActorFatalWounds(actor);
 }
 
-export async function renderLostResolveCard(actor) {
+async function renderLostResolveCard(actor) {
     if (actor.statuses.has('defeated')) {
         return;
     }
@@ -117,7 +116,11 @@ async function setActorToDead(actor) {
     setActorCondition(actor, 'dead');
 }
 
-export async function setActorToOffGuard(actor) {
+async function setActorToGuardBreak(actor) {
+    setActorCondition(actor, 'guardBreak');
+}
+
+async function setActorToOffGuard(actor) {
     setActorCondition(actor, 'offGuard');
 }
 

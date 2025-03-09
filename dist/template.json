@@ -10,7 +10,9 @@
       "skill",
       "anatomy",
       "armour",
-      "weapon"
+      "weapon",
+      "wound",
+      "background"
     ]
   }
 }
