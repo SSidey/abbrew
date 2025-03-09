@@ -306,7 +306,9 @@ export class AbbrewActorSheet extends ActorSheet {
       onManageActiveEffect(ev, document);
     });
 
-    html.on('change', '.item-select', this._onItemSelectChange.bind(this));
+    html.on('change', '.item-select', this._onItemChange.bind(this));
+
+    html.on('change', '.item input[type="checkbox"]', this._onItemChange.bind(this));
 
     // Rollable abilities.
     html.on('click', '.rollable', this._onRoll.bind(this));
@@ -351,16 +353,26 @@ export class AbbrewActorSheet extends ActorSheet {
     }
   }
 
-  async _onItemSelectChange(event) {
+  async _onItemChange(event) {
     const target = event.target;
     const itemId = target.closest('.item').dataset.itemId;
     const itemValuePath = target.name;
     const item = this.actor.items.get(itemId);
-    const value = target.value;
+    const value = this._getItemInputValue(target);
     const updates = {};
     updates[itemValuePath] = value;
     await item.update(updates);
   }
+
+  _getItemInputValue(target) {
+    switch (target.type) {
+      case 'checkbox':
+        return target.checked;
+      default:
+        return target.value;
+    }
+  }
+
 
   async _onSkillActivate(event) {
     event.preventDefault();

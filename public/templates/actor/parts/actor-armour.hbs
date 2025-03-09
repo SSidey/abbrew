@@ -9,7 +9,7 @@
     </div>
   </li>
   {{#each armour as |item id|}}
-  <li class='item flexrow' data-item-id='{{item._id}}'>
+  <li class='item item-row' data-item-id='{{item._id}}'>
     <div class='item-name'>
       <div class='item-image'>
         <a class='rollable' data-roll-type='item'>
@@ -29,9 +29,7 @@
     </select>
     {{/if}}
     {{/if}}
-    <span>Render me</span>
-    <span class="icon icon-sunder-c" />
-    <label class="roboto-upper">
+    <label class="icon-label">
       <input type="checkbox" class="armour-sunder" name="system.isSundered" {{ checked item.system.isSundered }}>
       {{#if item.system.isSundered}}
       <span class="icon icon-sunder-c" />

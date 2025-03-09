@@ -47,6 +47,9 @@ async function checkActorFatalWounds(actor) {
 async function handleActorGuardConditions(actor) {
   if (actor.system.defense.guard.value <= 0) {
     await setActorToGuardBreak(actor);
+  } else if (actor.effects.toObject().find((e) => e.name === "Guard Break")) {
+    const id = actor.effects.toObject().find((e) => e.name === "Guard Break")._id;
+    await actor.deleteEmbeddedDocuments("ActiveEffect", [id]);
   }
 }
 async function handleActorWoundConditions(actor) {
@@ -2068,7 +2071,8 @@ class AbbrewActorSheet extends ActorSheet {
       const document2 = row.dataset.parentId === this.actor.id ? this.actor : this.actor.items.get(row.dataset.parentId);
       onManageActiveEffect(ev, document2);
     });
-    html.on("change", ".item-select", this._onItemSelectChange.bind(this));
+    html.on("change", ".item-select", this._onItemChange.bind(this));
+    html.on("change", '.item input[type="checkbox"]', this._onItemChange.bind(this));
     html.on("click", ".rollable", this._onRoll.bind(this));
     html.on("click", ".attack-damage-button", async (event) => {
       const t = event.currentTarget;
@@ -2101,15 +2105,23 @@ class AbbrewActorSheet extends ActorSheet {
       });
     }
   }
-  async _onItemSelectChange(event) {
+  async _onItemChange(event) {
     const target = event.target;
     const itemId = target.closest(".item").dataset.itemId;
     const itemValuePath = target.name;
     const item = this.actor.items.get(itemId);
-    const value = target.value;
+    const value = this._getItemInputValue(target);
     const updates = {};
     updates[itemValuePath] = value;
     await item.update(updates);
+  }
+  _getItemInputValue(target) {
+    switch (target.type) {
+      case "checkbox":
+        return target.checked;
+      default:
+        return target.value;
+    }
   }
   async _onSkillActivate(event) {
     event.preventDefault();
@@ -2952,8 +2964,8 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       this.defense.resolve.value = this.defense.resolve.max;
     }
   }
-  _prepareDamageReduction(armour, anatomy) {
-    console.log("ARMOUR");
+  _prepareDamageReduction(wornArmour, anatomy) {
+    const armour = wornArmour.filter((a) => !a.system.isSundered);
     const armourProtection = armour.map((a) => a.system.defense.protection).flat(1);
     const anatomyProtection = anatomy.map((a) => a.system.defense.protection).flat(1);
     const protection = [...armourProtection, ...anatomyProtection];
@@ -2975,7 +2987,8 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     this.defense.protection.length = 0;
     Object.values(flatDR).map((v) => this.defense.protection.push(v));
   }
-  _prepareGuard(armour, anatomy) {
+  _prepareGuard(wornArmour, anatomy) {
+    const armour = wornArmour.filter((a) => !a.system.isSundered);
     this.defense.guard.base = this.attributes["wit"].value;
     this.defense.guard.label = game.i18n.localize(CONFIG.ABBREW.Defense.guard) ?? key;
     const guardBonus = armour.map((a) => a.system.defense.guard).reduce((a, b) => a + b, 0);
