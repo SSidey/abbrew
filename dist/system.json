@@ -8,8 +8,7 @@
             "name": "Abde"
         }
     ],
-    "url": "",
-    "license": "LICENSE.txt",
+    "url": "https://github.com/SSidey/abbrew/",
     "readme": "README.md",
     "bugs": "Replace this with a link to file issues or tickets",
     "changelog": "CHANGELOG.md",
@@ -20,7 +19,7 @@
             "thumbnail": "systems/abbrew/assets/anvil-impact.png"
         }
     ],
-    "version": "0.0.2-prerelease20",
+    "version": "0.0.2-prerelease22",
     "compatibility": {
         "minimum": 12,
         "verified": "12.331"
@@ -41,8 +40,8 @@
     "packs": [],
     "packFolders": [],
     "socket": false,
-    "manifest": "",
-    "download": "https://github.com/SSidey/abbrew/releases/download/0.0.2-prerelease20/0.0.2-prerelease20.zip",
+    "manifest": "https://raw.githubusercontent.com/SSidey/abbrew/refs/heads/master/public/system.json",
+    "download": "https://github.com/SSidey/abbrew/releases/download/0.0.2-prerelease22/0.0.2-prerelease22.zip",
     "background": "systems/abbrew/assets/anvil-impact.png",
     "grid": {
         "distance": 1,
