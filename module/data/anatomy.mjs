@@ -1,8 +1,8 @@
-import AbbrewItemBase from "./item-base.mjs";
+import AbbrewPhysicalItem from "./item-physical.mjs";
 import AbbrewArmour from "./armour.mjs";
 import AbbrewRevealedItem from './revealedItem.mjs'
 
-export default class AbbrewAnatomy extends AbbrewItemBase {
+export default class AbbrewAnatomy extends AbbrewPhysicalItem {
 
   static defineSchema() {
     const fields = foundry.data.fields;
@@ -10,6 +10,11 @@ export default class AbbrewAnatomy extends AbbrewItemBase {
     const schema = super.defineSchema();
 
     schema.parts = new fields.StringField({ required: true, blank: true });
+    // TODO: Discount broken limbs but keep them in anatomy
+    schema.isBroken = new fields.BooleanField({ required: true, nullable: false, initial: false });
+    // TODO: Discount dismembered limbs and removed them from anatomy but include them in items (set to dropped?)
+    schema.isDismembered = new fields.BooleanField({ required: true, nullable: false, initial: false });
+    schema.hands = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
     schema.speed = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
     AbbrewRevealedItem.addRevealedItemSchema(schema);
     AbbrewArmour.addDefenseSchema(schema);

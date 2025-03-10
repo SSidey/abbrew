@@ -147,6 +147,12 @@
       "held": "Held",
       "worn": "Worn"
     },
+    "Hands": {
+      "none": "None",
+      "oneHand": "One Handed",
+      "versatile": "Versatile",
+      "twoHand": "Two Handed"
+    },
     "Traits": {
       "CanBleed": {
         "name": "Can Bleed"
@@ -171,7 +177,8 @@
       "armour": "Armour",
       "weapon": "Weapon",
       "wound": "Wound",
-      "background": "Background"
+      "background": "Background",
+      "creatureForm": "Creature Form"
     }
   },
 

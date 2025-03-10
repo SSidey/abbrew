@@ -422,10 +422,11 @@ export class AbbrewActorSheet extends ActorSheet {
     // If you need to store the value first, uncomment the next line.
     const result = await roll.evaluate();
     const token = this.actor.token;
+    const attributeMultiplier = attackMode === 'strong' ? Math.max(1, item.system.handsSupplied) : 1;
     const damage = attackProfile.damage.map(d => {
       let attributeModifier = 0;
       if (d.attributeModifier) {
-        attributeModifier = this.actor.system.attributes[d.attributeModifier].value;
+        attributeModifier = attributeMultiplier * this.actor.system.attributes[d.attributeModifier].value;
       }
 
       const finalDamage = attributeModifier + d.value;
@@ -473,7 +474,7 @@ export class AbbrewActorSheet extends ActorSheet {
       isFinisher
     };
 
-    // TODO: Move this out of item and into a weapon.mjs
+    // TODO: Move this out of item and into a weapon.mjs / attack-card.mjs
     const html = await renderTemplate("systems/abbrew/templates/chat/attack-card.hbs", templateData);
 
     // Initialize chat data.

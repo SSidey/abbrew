@@ -57,7 +57,8 @@ Hooks.once('init', function () {
     armour: models.AbbrewArmour,
     weapon: models.AbbrewWeapon,
     wound: models.AbbrewWound,
-    background: models.AbbrewBackground
+    background: models.AbbrewBackground,
+    creatureForm: models.AbbrewCreatureForm
   }
 
   // Register System Settings  
@@ -116,6 +117,8 @@ function _configureStatusEffects() {
 /* -------------------------------------------- */
 /*  Handlebars Helpers                          */
 /* -------------------------------------------- */
+
+// Another useful helper is log {{log obj}} will log to console
 
 // If you need to add Handlebars helpers, here is a useful example:
 Handlebars.registerHelper('toLowerCase', function (str) {

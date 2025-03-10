@@ -128,7 +128,6 @@ export default class AbbrewSkill extends AbbrewItemBase {
 
   // Post Active Effects
   prepareDerivedData() {
-        console.log('derive skill data');
         if (this.attributeIncrease) {
             this.attributeIncreaseLong = game.i18n.localize(CONFIG.ABBREW.attributes[this.attributeIncrease]);
         }

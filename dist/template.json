@@ -12,7 +12,8 @@
       "armour",
       "weapon",
       "wound",
-      "background"
+      "background",
+      "creatureForm"
     ]
   }
 }

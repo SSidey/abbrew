@@ -1,7 +1,7 @@
 import AbbrewAttackBase from "./attack-base.mjs";
-import AbbrewItemBase from "./item-base.mjs";
+import AbbrewPhysicalItem from "./item-physical.mjs";
 
-export default class AbbrewWeapon extends AbbrewItemBase {
+export default class AbbrewWeapon extends AbbrewPhysicalItem {
 
   static defineSchema() {
     const schema = super.defineSchema();
@@ -24,7 +24,7 @@ export default class AbbrewWeapon extends AbbrewItemBase {
 
   // Prior to Active Effects
   prepareBaseData() {
-
+    super.prepareBaseData();
   }
 
 

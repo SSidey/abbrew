@@ -39,3 +39,7 @@ export function getObjectValueByStringPath(entity, path) {
         return o && o[k];
     }, entity);
 }
+
+export function getNumericParts(value) {
+    return parseInt(value.replace(/\D/g, "")) ?? 0
+}

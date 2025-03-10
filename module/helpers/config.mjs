@@ -87,7 +87,7 @@ ABBREW.equipState = {
   dropped: "ABBREW.EquipState.dropped"
 }
 
-ABBREW.armourEquipState = {
+ABBREW.wornEquipState = {
   worn: "ABBREW.EquipState.worn",
   stowed: "ABBREW.EquipState.stowed",
   dropped: "ABBREW.EquipState.dropped"
@@ -188,6 +188,28 @@ ABBREW.equipTypes = {
   none: "ABBREW.EquipTypes.none",
   held: "ABBREW.EquipTypes.held",
   worn: "ABBREW.EquipTypes.worn"
+}
+
+// name made it pick the key above for display
+// label
+// value picks this to use in the data
+ABBREW.hands = {
+  none: {
+    label: "ABBREW.Hands.none",
+    states: []    
+  },
+  oneHand: {
+    label: "ABBREW.Hands.oneHand",
+    states: ["held1H"]
+  },
+  versatile: {
+    label: "ABBREW.Hands.versatile",
+    states: ["held2H", "held1H"]
+  },
+  twoHand: {
+    label: "ABBREW.Hands.twoHand",
+    states: ["held2H"]
+  }
 }
 
 ABBREW.traits = {
