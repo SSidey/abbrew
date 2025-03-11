@@ -19,7 +19,7 @@
             "thumbnail": "systems/abbrew/assets/anvil-impact.png"
         }
     ],
-    "version": "0.0.2-prerelease26",
+    "version": "0.0.2-prerelease31",
     "compatibility": {
         "minimum": 12,
         "verified": "12.331"
@@ -41,7 +41,7 @@
     "packFolders": [],
     "socket": false,
     "manifest": "https://raw.githubusercontent.com/SSidey/abbrew/refs/heads/master/public/system.json",
-    "download": "https://github.com/SSidey/abbrew/releases/download/0.0.2-prerelease26/0.0.2-prerelease26.zip",
+    "download": "https://github.com/SSidey/abbrew/releases/download/0.0.2-prerelease31/0.0.2-prerelease31.zip",
     "background": "systems/abbrew/assets/anvil-impact.png",
     "grid": {
         "distance": 1,
