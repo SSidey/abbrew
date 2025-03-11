@@ -2731,12 +2731,12 @@ ABBREW.wornEquipState = {
   dropped: "ABBREW.EquipState.dropped"
 };
 ABBREW.skillTypes = {
-  background: "ABBREW.SkillTypes.background",
   basic: "ABBREW.SkillTypes.basic",
   path: "ABBREW.SkillTypes.path",
   resource: "ABBREW.SkillTypes.resource",
   temporary: "ABBREW.SkillTypes.temporary",
-  untyped: "ABBREW.SkillTypes.untyped"
+  untyped: "ABBREW.SkillTypes.untyped",
+  background: "ABBREW.SkillTypes.background"
 };
 ABBREW.activationTypes = {
   passive: "ABBREW.ActivationTypes.passive",
@@ -2831,7 +2831,7 @@ ABBREW.hands = {
   },
   versatile: {
     label: "ABBREW.Hands.versatile",
-    states: ["held1H", "held2H"]
+    states: ["held2H", "held1H"]
   },
   twoHand: {
     label: "ABBREW.Hands.twoHand",
@@ -3196,6 +3196,7 @@ class AbbrewSkill extends AbbrewItemBase {
     schema.action = new fields.SchemaField({
       activationType: new fields.StringField({ ...blankString }),
       actionCost: new fields.StringField({ ...blankString }),
+      actionImage: new fields.StringField({ ...blankString }),
       modifiers: new fields.SchemaField({
         damage: new fields.SchemaField({
           self: new fields.ArrayField(
@@ -3310,6 +3311,15 @@ class AbbrewSkill extends AbbrewItemBase {
     if (this.attributeIncrease) {
       this.attributeIncreaseLong = game.i18n.localize(CONFIG.ABBREW.attributes[this.attributeIncrease]);
     }
+    if (this.action.actionCost) {
+      this.action.actionImage = this.getActionImageName(this.action.actionCost);
+    }
+  }
+  getActionImageName(cost) {
+    if (cost === "0" || cost > 5) {
+      return "fa";
+    }
+    return "" + cost + "a";
   }
 }
 class AbbrewRevealedItem {
@@ -3366,6 +3376,13 @@ class AbbrewAnatomy extends AbbrewPhysicalItem {
     schema.speed = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
     AbbrewRevealedItem.addRevealedItemSchema(schema);
     AbbrewArmour.addDefenseSchema(schema);
+    schema.naturalWeapons = new fields.ArrayField(
+      new fields.SchemaField({
+        name: new fields.StringField({ required: true, blank: true }),
+        id: new fields.StringField({ required: true, blank: true }),
+        image: new fields.StringField({ required: true, blank: true })
+      })
+    );
     return schema;
   }
   // TODO: Add revealed button
@@ -3439,36 +3456,70 @@ class AbbrewWound extends AbbrewItemBase {
     return schema;
   }
 }
-class AbbrewBackground extends AbbrewItemBase {
+class AbbrewSkillDeck extends AbbrewItemBase {
   static defineSchema() {
     const fields = foundry.data.fields;
     const schema = super.defineSchema();
-    const requiredInteger = { required: true, nullable: false, integer: true };
-    schema.attributes = new fields.SchemaField(Object.keys(CONFIG.ABBREW.attributes).reduce((obj, attribute) => {
-      obj[attribute] = new fields.SchemaField({
-        value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 2 }),
-        label: new fields.StringField({ required: true, blank: true }),
-        isEnabled: new fields.BooleanField({ required: true, nullable: false, initial: false })
-      });
-      return obj;
-    }, {}));
+    schema.skills = new fields.ArrayField(
+      new fields.SchemaField({
+        name: new fields.StringField({ required: true, blank: true }),
+        skillType: new fields.StringField({ required: true, blank: true }),
+        id: new fields.StringField({ required: true, blank: true }),
+        image: new fields.StringField({ required: true, blank: true })
+      })
+    );
     return schema;
   }
   // Post Active Effects
   prepareDerivedData() {
-    console.log("Preparing Derived Data for Background");
-    for (const key2 in this.attributes) {
-      this.attributes[key2].label = game.i18n.localize(CONFIG.ABBREW.attributes[key2]) ?? key2;
-    }
+    super.prepareDerivedData();
+  }
+}
+function addAttributesToSchema(schema) {
+  const fields = foundry.data.fields;
+  const requiredInteger = { required: true, nullable: false, integer: true };
+  schema.attributes = new fields.SchemaField(Object.keys(CONFIG.ABBREW.attributes).reduce((obj, attribute) => {
+    obj[attribute] = new fields.SchemaField({
+      value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 2 }),
+      label: new fields.StringField({ required: true, blank: true }),
+      isEnabled: new fields.BooleanField({ required: true, nullable: false, initial: false })
+    });
+    return obj;
+  }, {}));
+}
+function prepareDerivedAttributeData(obj) {
+  for (const key2 in obj.attributes) {
+    obj.attributes[key2].label = game.i18n.localize(CONFIG.ABBREW.attributes[key2]) ?? key2;
+  }
+}
+class AbbrewBackground extends AbbrewSkillDeck {
+  static defineSchema() {
+    const fields = foundry.data.fields;
+    const schema = super.defineSchema();
+    addAttributesToSchema(schema);
+    schema.creatureForm = new fields.SchemaField({
+      name: new fields.StringField({ required: true, blank: true }),
+      id: new fields.StringField({ required: true, blank: true }),
+      image: new fields.StringField({ required: true, blank: true })
+    });
+    return schema;
+  }
+  // Post Active Effects
+  prepareDerivedData() {
+    super.prepareDerivedData();
+    prepareDerivedAttributeData(this);
   }
 }
 class AbbrewCreatureForm extends AbbrewItemBase {
   static defineSchema() {
     const fields = foundry.data.fields;
     const schema = super.defineSchema();
-    const blankString = { required: true, blank: true };
     schema.anatomy = new fields.ArrayField(
-      new fields.StringField({ ...blankString })
+      new fields.SchemaField({
+        name: new fields.StringField({ required: true, blank: true }),
+        id: new fields.StringField({ required: true, blank: true }),
+        image: new fields.StringField({ required: true, blank: true })
+      })
     );
     return schema;
   }
@@ -3735,6 +3786,28 @@ class AbbrewActor extends Actor {
       await Item.create(itemData, { parent: this });
     }
   }
+  async acceptCreatureForm(creatureForm) {
+    const anatomy = creatureForm.system.anatomy.map((a) => game.items.get(a.id));
+    for (const index in anatomy) {
+      await Item.create(anatomy[index], { parent: this });
+      const weapons = anatomy[index].system.naturalWeapons.map((w) => game.items.get(w.id));
+      for (const weaponIndex in weapons) {
+        await Item.create(weapons[weaponIndex], { parent: this });
+      }
+    }
+  }
+  async acceptSkillDeck(skillDeck) {
+    const skills = skillDeck.system.skills.map((s) => game.items.get(s.id));
+    for (const index in skills) {
+      await Item.create(skills[index], { parent: this });
+    }
+  }
+  async acceptAnatomy(anatomy) {
+    const naturalWeapons = anatomy.system.naturalWeapons.map((w) => game.items.get(w.id));
+    for (const index in naturalWeapons) {
+      await Item.create(naturalWeapons[index], { parent: this });
+    }
+  }
 }
 class AbbrewItem2 extends Item {
   /**
@@ -3875,6 +3948,259 @@ function registerSystemSettings() {
     type: Boolean
   });
 }
+class AbbrewCreatureFormSheet extends ItemSheet {
+  /** @override */
+  static get defaultOptions() {
+    return foundry.utils.mergeObject(super.defaultOptions, {
+      classes: ["abbrew", "sheet", "item"],
+      width: 520,
+      height: 480,
+      tabs: [
+        {
+          navSelector: ".sheet-tabs",
+          contentSelector: ".sheet-body",
+          initial: "description"
+        }
+      ]
+    });
+  }
+  /** @override */
+  get template() {
+    const path = "systems/abbrew/templates/item";
+    return `${path}/item-${this.item.type}-sheet.hbs`;
+  }
+  /* -------------------------------------------- */
+  /** @override */
+  getData() {
+    const context = super.getData();
+    const itemData = context.data;
+    context.rollData = this.item.getRollData();
+    context.system = itemData.system;
+    context.flags = itemData.flags;
+    context.effects = prepareActiveEffectCategories(this.item.effects);
+    context.config = CONFIG.ABBREW;
+    return context;
+  }
+  /* -------------------------------------------- */
+  /** @override */
+  activateListeners(html) {
+    super.activateListeners(html);
+    if (!this.isEditable)
+      return;
+    html.on(
+      "click",
+      ".effect-control",
+      (event) => onManageActiveEffect(event, this.item)
+    );
+    html.on("dragover", (event) => {
+      event.preventDefault();
+    });
+    html.on("drop", async (event) => {
+      if (!this.item.testUserPermission(game.user, "OWNER")) {
+        return;
+      }
+      const droppedData = event.originalEvent.dataTransfer.getData("text");
+      const eventJson = JSON.parse(droppedData);
+      if (eventJson && eventJson.type === "Item") {
+        const itemId = eventJson.uuid.split(".").pop();
+        const item = game.items.get(itemId);
+        if (item.type === "anatomy") {
+          const storedAnatomy = this.item.system.anatomy;
+          const newAnatomy = [...storedAnatomy, { name: item.name, id: itemId, image: item.img }];
+          await this.item.update({ "system.anatomy": newAnatomy });
+        }
+      }
+    });
+  }
+}
+class AbbrewSkillDeckSheet extends ItemSheet {
+  /** @override */
+  static get defaultOptions() {
+    return foundry.utils.mergeObject(super.defaultOptions, {
+      classes: ["abbrew", "sheet", "item"],
+      width: 520,
+      height: 480,
+      tabs: [
+        {
+          navSelector: ".sheet-tabs",
+          contentSelector: ".sheet-body",
+          initial: "description"
+        }
+      ]
+    });
+  }
+  /** @override */
+  get template() {
+    const path = "systems/abbrew/templates/item";
+    return `${path}/item-${this.item.type}-sheet.hbs`;
+  }
+  /* -------------------------------------------- */
+  /** @override */
+  getData() {
+    const context = super.getData();
+    const itemData = context.data;
+    context.rollData = this.item.getRollData();
+    context.system = itemData.system;
+    context.flags = itemData.flags;
+    context.effects = prepareActiveEffectCategories(this.item.effects);
+    context.config = CONFIG.ABBREW;
+    return context;
+  }
+  /* -------------------------------------------- */
+  /** @override */
+  activateListeners(html) {
+    super.activateListeners(html);
+    if (!this.isEditable)
+      return;
+    html.on(
+      "click",
+      ".effect-control",
+      (event) => onManageActiveEffect(event, this.item)
+    );
+    html.on("dragover", (event) => {
+      event.preventDefault();
+    });
+    html.on("drop", async (event) => {
+      if (!this.item.testUserPermission(game.user, "OWNER")) {
+        return;
+      }
+      const droppedData = event.originalEvent.dataTransfer.getData("text");
+      const eventJson = JSON.parse(droppedData);
+      if (eventJson && eventJson.type === "Item") {
+        const itemId = eventJson.uuid.split(".").pop();
+        const item = game.items.get(itemId);
+        if (item.type === "skill") {
+          const storedSkills = this.item.system.skills;
+          const updateSkills = [...storedSkills, { name: item.name, id: itemId, image: item.img, skillType: item.system.skillType }];
+          await this.item.update({ "system.skills": updateSkills });
+        } else if (item.type === "creatureForm") {
+          await this.item.update({ "system.creatureForm": { name: item.name, id: itemId, image: item.img } });
+        }
+      }
+    });
+  }
+}
+class AbbrewAnatomySheet extends ItemSheet {
+  /** @override */
+  static get defaultOptions() {
+    return foundry.utils.mergeObject(super.defaultOptions, {
+      classes: ["abbrew", "sheet", "item"],
+      width: 520,
+      height: 480,
+      tabs: [
+        {
+          navSelector: ".sheet-tabs",
+          contentSelector: ".sheet-body",
+          initial: "description"
+        }
+      ]
+    });
+  }
+  /** @override */
+  get template() {
+    const path = "systems/abbrew/templates/item";
+    return `${path}/item-${this.item.type}-sheet.hbs`;
+  }
+  /* -------------------------------------------- */
+  /** @override */
+  getData() {
+    const context = super.getData();
+    const itemData = context.data;
+    context.rollData = this.item.getRollData();
+    context.system = itemData.system;
+    context.flags = itemData.flags;
+    context.effects = prepareActiveEffectCategories(this.item.effects);
+    context.config = CONFIG.ABBREW;
+    return context;
+  }
+  /* -------------------------------------------- */
+  _activateAnatomyParts(html) {
+    const anatomyParts = html[0].querySelector('input[name="system.parts"]');
+    const anatomyPartsSettings = {
+      dropdown: {
+        maxItems: 20,
+        // <- mixumum allowed rendered suggestions
+        classname: "tags-look",
+        // <- custom classname for this dropdown, so it could be targeted
+        enabled: 0,
+        // <- show suggestions on focus
+        closeOnSelect: false,
+        // <- do not hide the suggestions dropdown once an item has been selected
+        includeSelectedTags: true
+        // <- Should the suggestions list Include already-selected tags (after filtering)
+      },
+      userInput: false,
+      // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+      duplicates: true,
+      // <- Should duplicate tags be allowed or not
+      whitelist: [...Object.values(CONFIG.ABBREW.armourPoints.points).map((key2) => game.i18n.localize(key2))]
+    };
+    if (anatomyParts) {
+      new Tagify(anatomyParts, anatomyPartsSettings);
+    }
+  }
+  /**
+   * Handle one of the add or remove damage reduction buttons.
+   * @param {Element} target  Button or context menu entry that triggered this action.
+   * @param {string} action   Action being triggered.
+   * @returns {Promise|void}
+   */
+  _onDamageReductionAction(target, action) {
+    switch (action) {
+      case "add-damage-reduction":
+        return this.addDamageReduction();
+      case "remove-damage-reduction":
+        return this.removeDamageReduction(target);
+    }
+  }
+  addDamageReduction() {
+    const protection = this.item.system.defense.protection;
+    return this.item.update({ "system.defense.protection": [...protection, {}] });
+  }
+  removeDamageReduction(target) {
+    const id = target.closest("li").dataset.id;
+    const defense = foundry.utils.deepClone(this.item.system.defense);
+    defense.protection.splice(Number(id), 1);
+    return this.item.update({ "system.defense.protection": defense.protection });
+  }
+  /* -------------------------------------------- */
+  /** @override */
+  activateListeners(html) {
+    super.activateListeners(html);
+    if (!this.isEditable)
+      return;
+    html.on(
+      "click",
+      ".effect-control",
+      (ev) => onManageActiveEffect(ev, this.item)
+    );
+    html.find(".damage-reduction-control").click((event) => {
+      const t = event.currentTarget;
+      if (t.dataset.action)
+        this._onDamageReductionAction(t, t.dataset.action);
+    });
+    this._activateAnatomyParts(html);
+    html.on("dragover", (event) => {
+      event.preventDefault();
+    });
+    html.on("drop", async (event) => {
+      if (!this.item.testUserPermission(game.user, "OWNER")) {
+        return;
+      }
+      const droppedData = event.originalEvent.dataTransfer.getData("text");
+      const eventJson = JSON.parse(droppedData);
+      if (eventJson && eventJson.type === "Item") {
+        const itemId = eventJson.uuid.split(".").pop();
+        const item = game.items.get(itemId);
+        if (item.type === "weapon") {
+          const storedWeapons = this.item.system.naturalWeapons;
+          const updateWeapons = [...storedWeapons, { name: item.name, id: itemId, image: item.img }];
+          await this.item.update({ "system.naturalWeapons": updateWeapons });
+        }
+      }
+    });
+  }
+}
 Hooks.once("init", function() {
   game.abbrew = {
     AbbrewActor,
@@ -3902,6 +4228,7 @@ Hooks.once("init", function() {
     weapon: AbbrewWeapon,
     wound: AbbrewWound,
     background: AbbrewBackground,
+    skillDeck: AbbrewSkillDeck,
     creatureForm: AbbrewCreatureForm
   };
   registerSystemSettings();
@@ -3913,8 +4240,24 @@ Hooks.once("init", function() {
   });
   Items.unregisterSheet("core", ItemSheet);
   Items.registerSheet("abbrew", AbbrewItemSheet, {
+    types: ["item", "feature", "spell", "skill", "armour", "weapon", "wound"],
     makeDefault: true,
     label: "ABBREW.SheetLabels.Item"
+  });
+  Items.registerSheet("abbrew", AbbrewCreatureFormSheet, {
+    types: ["creatureForm"],
+    makeDefault: true,
+    label: "ABBREW.SheetLabels.CreatureForm"
+  });
+  Items.registerSheet("abbrew", AbbrewSkillDeckSheet, {
+    types: ["skillDeck", "background"],
+    makeDefault: true,
+    label: "ABBREW.SheetLabels.SkillDeck"
+  });
+  Items.registerSheet("abbrew", AbbrewAnatomySheet, {
+    types: ["anatomy"],
+    makeDefault: true,
+    label: "ABBREW.SheetLabels.Anatomy"
   });
   _configureStatusEffects();
   return preloadHandlebarsTemplates();
@@ -4004,7 +4347,7 @@ Hooks.on("updateActor", async (actor, updates, options, userId) => {
 Hooks.on("dropActorSheetData", async (actor, sheet, data) => {
   console.log(data);
   if (data.type === "Item") {
-    const id = data.uuid.split(".").splice(1).shift();
+    const id = data.uuid.split(".").pop();
     const item = game.items.get(id);
     if (item) {
       switch (item.type) {
@@ -4013,6 +4356,15 @@ Hooks.on("dropActorSheetData", async (actor, sheet, data) => {
           break;
         case "background":
           await handleActorBackgroundDrop(actor, item);
+          break;
+        case "skillDeck":
+          await handleActorSkillDeckDrop(actor, item);
+          break;
+        case "creatureForm":
+          await handleActorCreatureFormDrop(actor, item);
+          break;
+        case "anatomy":
+          await handleActorAnatomyDrop(actor, item);
           break;
       }
     }
@@ -4024,6 +4376,20 @@ async function handleActorWoundDrop(actor, item) {
 }
 async function handleActorBackgroundDrop(actor, background) {
   await actor.acceptBackground(background);
+  await actor.acceptSkillDeck(background);
+  if (background.system.creatureForm.id) {
+    const creatureForm = game.items.get(background.system.creatureForm.id);
+    await actor.acceptCreatureForm(creatureForm);
+  }
+}
+async function handleActorSkillDeckDrop(actor, skillDeck) {
+  await actor.acceptSkillDeck(skillDeck);
+}
+async function handleActorCreatureFormDrop(actor, creatureform) {
+  await actor.acceptCreatureForm(creatureform);
+}
+async function handleActorAnatomyDrop(actor, anatomy) {
+  await actor.acceptAnatomy(anatomy);
 }
 async function createItemMacro(data, slot) {
   if (data.type !== "Item")

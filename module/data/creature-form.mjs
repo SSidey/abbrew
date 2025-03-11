@@ -9,9 +9,13 @@ export default class AbbrewCreatureForm extends AbbrewItemBase {
         const fields = foundry.data.fields;
         const schema = super.defineSchema();
         const blankString = { required: true, blank: true }
-
+        // TODO: Traits that can apply down over e.g. canBleed, should add the same for Background e.g. darkvision
         schema.anatomy = new fields.ArrayField(
-            new fields.StringField({ ...blankString }),
+            new fields.SchemaField({
+                name: new fields.StringField({ required: true, blank: true }),
+                id: new fields.StringField({ required: true, blank: true }),
+                image: new fields.StringField({ required: true, blank: true })
+            })
         );
 
         return schema;

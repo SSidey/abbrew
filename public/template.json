@@ -13,7 +13,8 @@
       "weapon",
       "wound",
       "background",
-      "creatureForm"
+      "creatureForm",
+      "skillDeck"
     ]
   }
 }

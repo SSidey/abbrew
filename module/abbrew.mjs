@@ -11,6 +11,9 @@ import * as documents from './documents/_module.mjs';
 import { handleTurnStart, handleActorWoundConditions, handleActorGuardConditions } from './helpers/combat.mjs';
 import { staticID, doesNestedFieldExist } from './helpers/utils.mjs';
 import { registerSystemSettings } from './settings.mjs';
+import { AbbrewCreatureFormSheet } from './sheets/items/item-creature-form-sheet.mjs';
+import { AbbrewSkillDeckSheet } from './sheets/items/item-skill-deck-sheet.mjs';
+import { AbbrewAnatomySheet } from './sheets/items/item-anatomy-sheet.mjs';
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -58,6 +61,7 @@ Hooks.once('init', function () {
     weapon: models.AbbrewWeapon,
     wound: models.AbbrewWound,
     background: models.AbbrewBackground,
+    skillDeck: models.AbbrewSkillDeck,
     creatureForm: models.AbbrewCreatureForm
   }
 
@@ -77,8 +81,24 @@ Hooks.once('init', function () {
   });
   Items.unregisterSheet('core', ItemSheet);
   Items.registerSheet('abbrew', AbbrewItemSheet, {
+    types: ["item", "feature", "spell", "skill", "armour", "weapon", "wound"],
     makeDefault: true,
     label: 'ABBREW.SheetLabels.Item',
+  });
+  Items.registerSheet('abbrew', AbbrewCreatureFormSheet, {
+    types: ["creatureForm"],
+    makeDefault: true,
+    label: "ABBREW.SheetLabels.CreatureForm"
+  });
+  Items.registerSheet('abbrew', AbbrewSkillDeckSheet, {
+    types: ["skillDeck", "background"],
+    makeDefault: true,
+    label: "ABBREW.SheetLabels.SkillDeck"
+  });
+  Items.registerSheet('abbrew', AbbrewAnatomySheet, {
+    types: ["anatomy"],
+    makeDefault: true,
+    label: "ABBREW.SheetLabels.Anatomy"
   });
 
   _configureStatusEffects();
@@ -225,15 +245,24 @@ Hooks.on("updateActor", async (actor, updates, options, userId) => {
 Hooks.on("dropActorSheetData", async (actor, sheet, data) => {
   console.log(data);
   if (data.type === "Item") {
-    const id = data.uuid.split(".").splice(1).shift();
+    const id = data.uuid.split(".").pop(); // TODO: Check incase this breaks things.splice(1).shift();
     const item = game.items.get(id);
     if (item) {
       switch (item.type) {
         case "wound":
-          await handleActorWoundDrop(actor, item)
+          await handleActorWoundDrop(actor, item);
           break;
         case "background":
-          await handleActorBackgroundDrop(actor, item)
+          await handleActorBackgroundDrop(actor, item);
+          break;
+        case "skillDeck":
+          await handleActorSkillDeckDrop(actor, item);
+          break;
+        case "creatureForm":
+          await handleActorCreatureFormDrop(actor, item);
+          break;
+        case "anatomy":
+          await handleActorAnatomyDrop(actor, item);
           break;
       }
     }
@@ -247,6 +276,23 @@ async function handleActorWoundDrop(actor, item) {
 
 async function handleActorBackgroundDrop(actor, background) {
   await actor.acceptBackground(background);
+  await actor.acceptSkillDeck(background);
+  if (background.system.creatureForm.id) {
+    const creatureForm = game.items.get(background.system.creatureForm.id);
+    await actor.acceptCreatureForm(creatureForm);
+  }
+}
+
+async function handleActorSkillDeckDrop(actor, skillDeck) {
+  await actor.acceptSkillDeck(skillDeck)
+}
+
+async function handleActorCreatureFormDrop(actor, creatureform) {
+  await actor.acceptCreatureForm(creatureform);
+}
+
+async function handleActorAnatomyDrop(actor, anatomy) {
+  await actor.acceptAnatomy(anatomy);
 }
 
 /* -------------------------------------------- */

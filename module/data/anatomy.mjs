@@ -18,6 +18,13 @@ export default class AbbrewAnatomy extends AbbrewPhysicalItem {
     schema.speed = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
     AbbrewRevealedItem.addRevealedItemSchema(schema);
     AbbrewArmour.addDefenseSchema(schema);
+    schema.naturalWeapons = new fields.ArrayField(
+      new fields.SchemaField({
+        name: new fields.StringField({ required: true, blank: true }),
+        id: new fields.StringField({ required: true, blank: true }),
+        image: new fields.StringField({ required: true, blank: true })
+      })
+    );
 
     return schema;
   }

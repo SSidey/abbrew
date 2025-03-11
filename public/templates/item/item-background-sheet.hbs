@@ -25,39 +25,70 @@
         </div>
 
         {{!-- Attributes Tab --}}
-        <div class="background-attributes" data-group="primary" data-tab="attributes">
-            {{!-- {{#gm}}
-            <pre>{{{json system}}}</pre>
-            {{/gm}} --}}
-            {{#gm}}
-            <div class="attributes flexcol">
-                {{#each system.attributes as |attribute key|}}
-                <div class="attribute flexrow flex-group-center">
-                    <label class="slide-toggle roboto-upper">
-                        <input type="checkbox" class="background-attribute-is-enabled"
-                            name="system.attributes.{{key}}.isEnabled" {{ checked attribute.isEnabled }}>
-                        <span>{{attribute.label}}</span>
-                        {{#if attribute.isEnabled}}
-                        <i class="fa fa-toggle-on"></i>
-                        {{else}}
-                        <i class="fa fa-toggle-off"></i>
-                        {{/if}}
-                    </label>
+        <div class="background-attribute-tab" data-group="primary" data-tab="attributes">
+            <div class="background-attributes">
+                {{#gm}}
+                <div class="attributes flexcol">
+                    {{#each system.attributes as |attribute key|}}
+                    <div class="attribute flexrow flex-group-center">
+                        <label class="slide-toggle roboto-upper">
+                            <input type="checkbox" class="background-attribute-is-enabled"
+                                name="system.attributes.{{key}}.isEnabled" {{ checked attribute.isEnabled }}>
+                            <span>{{attribute.label}}</span>
+                            {{#if attribute.isEnabled}}
+                            <i class="fa fa-toggle-on"></i>
+                            {{else}}
+                            <i class="fa fa-toggle-off"></i>
+                            {{/if}}
+                        </label>
+                    </div>
+                    {{/each}}
                 </div>
-                {{/each}}
+                {{/gm}}
+                <div class="background-attributes-column">
+                    {{#each system.attributes as |attribute key|}}
+                    {{#if attribute.isEnabled}}
+                    <div class="attribute flexrow flex-group-center">
+                        <label for="system.attributes.{{key}}.value"
+                            class="resource-label rollable flexlarge align-left">{{attribute.label}}</label>
+                        <input type="text" name="system.attributes.{{key}}.value" value="{{attribute.value}}" min=0
+                            max=9 data-dtype="Number" />
+                    </div>
+                    {{/if}}
+                    {{/each}}
+                </div>
             </div>
-            {{/gm}}
-            <div class="background-attributes-column">
-                {{#each system.attributes as |attribute key|}}
-                {{#if attribute.isEnabled}}
-                <div class="attribute flexrow flex-group-center">
-                    <label for="system.attributes.{{key}}.value"
-                        class="resource-label rollable flexlarge align-left">{{attribute.label}}</label>
-                    <input type="text" name="system.attributes.{{key}}.value" value="{{attribute.value}}" min=0 max=9
-                        data-dtype="Number" />
+            <h3>Creature Form</h3>
+            {{#if system.creatureForm.id}}
+            <div class="background-summary-container">
+                <div class="background-summary">
+                    <div class="image-container"><img src="{{system.creatureForm.image}}" /></div>
+                    <div class="name"><span>{{system.creatureForm.name}}</span></div>
+                    <a class='item-control item-delete' title='{{localize "DOCUMENT.Delete" type=' creatureForm'}}'>
+                        <i class='fas fa-trash'></i>
+                    </a>
                 </div>
-                {{/if}}
-                {{/each}}
+            </div>
+            {{else}}
+            <div class="empty-summary-element">
+                <span>Creature Form</span>
+            </div>
+            {{/if}}
+            <div>
+                <h3>Skills</h3>
+                <ol>
+                    {{#each system.skills as |skill id|}}
+                    <li class="background-skill" data-id="{{id}}">
+                        <div class="background-summary">
+                            <div class="image-container"><img src="{{skill.image}}" /></div>
+                            <div class="name"><span>{{skill.name}}</span></div>
+                            <a class='item-control item-delete' title='{{localize "DOCUMENT.Delete" type=' skill'}}'>
+                                <i class='fas fa-trash'></i>
+                            </a>
+                        </div>
+                    </li>
+                    {{/each}}
+                </ol>
             </div>
         </div>
     </section>

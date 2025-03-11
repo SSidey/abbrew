@@ -14,6 +14,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
         schema.action = new fields.SchemaField({
             activationType: new fields.StringField({ ...blankString }),
             actionCost: new fields.StringField({ ...blankString }),
+            actionImage: new fields.StringField({ ...blankString }),
             modifiers: new fields.SchemaField({
                 damage:
                     new fields.SchemaField({
@@ -126,10 +127,22 @@ export default class AbbrewSkill extends AbbrewItemBase {
         return schema;
     }
 
-  // Post Active Effects
-  prepareDerivedData() {
+    // Post Active Effects
+    prepareDerivedData() {
         if (this.attributeIncrease) {
             this.attributeIncreaseLong = game.i18n.localize(CONFIG.ABBREW.attributes[this.attributeIncrease]);
         }
+
+        if (this.action.actionCost) {
+            this.action.actionImage = this.getActionImageName(this.action.actionCost);
+        }
+    }
+
+    getActionImageName(cost) {
+        if (cost === "0" || cost > 5) {
+            return "fa";
+        }
+
+        return "" + cost + "a";
     }
 }

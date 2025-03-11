@@ -94,12 +94,12 @@ ABBREW.wornEquipState = {
 }
 
 ABBREW.skillTypes = {
-  background: "ABBREW.SkillTypes.background",
   basic: "ABBREW.SkillTypes.basic",
   path: "ABBREW.SkillTypes.path",
   resource: "ABBREW.SkillTypes.resource",
   temporary: "ABBREW.SkillTypes.temporary",
-  untyped: "ABBREW.SkillTypes.untyped"
+  untyped: "ABBREW.SkillTypes.untyped",
+  background: "ABBREW.SkillTypes.background"
 }
 
 ABBREW.activationTypes = {
@@ -190,9 +190,6 @@ ABBREW.equipTypes = {
   worn: "ABBREW.EquipTypes.worn"
 }
 
-// name made it pick the key above for display
-// label
-// value picks this to use in the data
 ABBREW.hands = {
   none: {
     label: "ABBREW.Hands.none",

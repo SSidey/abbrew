@@ -159,6 +159,9 @@ export class AbbrewActorSheet extends ActorSheet {
       }
       else if (i.type === 'weapon') {
         weapons.push(i);
+        // TODO: May want to handle unarmed etc. differently i.e. worn weapons with no hands required.
+        // TODO: Non physical weapons?
+        // Unarmed technically should take 1h but stowed / dropped seem a little funny
         if (['held1H', 'held2H'].includes(i.system.equipState)) {
           equippedWeapons.push(i);
         }

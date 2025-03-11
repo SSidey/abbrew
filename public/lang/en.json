@@ -12,7 +12,10 @@
     },
     "SheetLabels": {
       "Actor": "Abbrew Actor Sheet",
-      "Item": "Abbrew Item Sheet"
+      "Item": "Abbrew Item Sheet",
+      "CreatureForm": "Abbrew Creature Form Sheet",
+      "SkillDeck": "Skill Deck",
+      "Anatomy": "Anatomy"
     },
     "Item": {
       "Spell": {
@@ -91,12 +94,12 @@
       "dropped": "Dropped"
     },
     "SkillTypes": {
-      "background": "Background",
       "basic": "Basic",
       "path": "Path",
       "resource": "Resource",
       "temporary": "Temporary",
-      "untyped": "Untyped"
+      "untyped": "Untyped",
+      "background": "Background"
     },
     "ActionCosts": {
       "passive": "Passive",
@@ -178,7 +181,8 @@
       "weapon": "Weapon",
       "wound": "Wound",
       "background": "Background",
-      "creatureForm": "Creature Form"
+      "creatureForm": "Creature Form",
+      "skillDeck": "Skill Deck"
     }
   },
 

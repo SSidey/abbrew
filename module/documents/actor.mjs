@@ -298,4 +298,30 @@ export default class AbbrewActor extends Actor {
       await Item.create(itemData, { parent: this });
     }
   }
+
+  async acceptCreatureForm(creatureForm) {
+    const anatomy = creatureForm.system.anatomy.map(a => game.items.get(a.id));
+    for (const index in anatomy) {
+      await Item.create(anatomy[index], { parent: this });
+
+      const weapons = anatomy[index].system.naturalWeapons.map(w => game.items.get(w.id));
+      for (const weaponIndex in weapons) {
+        await Item.create(weapons[weaponIndex], { parent: this });
+      }
+    }
+  }
+
+  async acceptSkillDeck(skillDeck) {
+    const skills = skillDeck.system.skills.map(s => game.items.get(s.id));
+    for (const index in skills) {
+      await Item.create(skills[index], { parent: this })
+    }
+  }
+
+  async acceptAnatomy(anatomy) {
+    const naturalWeapons = anatomy.system.naturalWeapons.map(w => game.items.get(w.id));
+    for (const index in naturalWeapons) {
+      await Item.create(naturalWeapons[index], { parent: this })
+    }
+  }
 }

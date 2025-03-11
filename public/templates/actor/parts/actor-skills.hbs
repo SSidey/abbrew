@@ -25,19 +25,20 @@
           </a>
         </div>
         {{#if item.system.activatable}}
-        <button class="skill-activate">Activate</button>
+        <button class="skill-activate"><span
+            class="actions-icon action-{{item.system.action.actionImage}}">Activate</span></button>
         {{/if}}
         {{#if (eq item.system.skillType "background")}}
         <h3 class="skill-attribute-increase">{{item.system.attributeIncreaseLong}}</h4>
-        {{/if}}
-        <div class='skill-controls'>
-          <a class='skill-control skill-edit' title='{{localize "DOCUMENT.Edit" type=' skill'}}'>
-            <i class='fas fa-edit'></i>
-          </a>
-          <a class='skill-control skill-delete' title='{{localize "DOCUMENT.Delete" type=' skill'}}'>
-            <i class='fas fa-trash'></i>
-          </a>
-        </div>
+          {{/if}}
+          <div class='skill-controls'>
+            <a class='skill-control skill-edit' title='{{localize "DOCUMENT.Edit" type=' skill'}}'>
+              <i class='fas fa-edit'></i>
+            </a>
+            <a class='skill-control skill-delete' title='{{localize "DOCUMENT.Delete" type=' skill'}}'>
+              <i class='fas fa-trash'></i>
+            </a>
+          </div>
       </div>
     </li>
     {{/each}}
