@@ -3024,7 +3024,7 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     const weapons = this.parent.items.filter((i) => i.type === "weapon").filter((a) => a.system.equipType === "held").filter((a) => a.system.equipState.startsWith("held"));
     const otherInflexibility = Math.max(0, weapons.reduce((result, w) => result += w.system.weapon.size, 0) - this.attributes["str"].value);
     this.defense.inflexibility.resistance.raw = armourInflexibility;
-    this.defense.inflexibility.raw = 0 + armourInflexibility + otherInflexibility;
+    this.defense.inflexibility.raw = Math.floor((0 + armourInflexibility + otherInflexibility) / 2);
     this.defense.inflexibility.resistance.value = Math.floor(armourInflexibility / 10);
   }
   getRollData() {
@@ -3589,8 +3589,10 @@ class AbbrewActor extends Actor {
     let guard = this.system.defense.guard.value;
     let risk = this.system.defense.risk.raw;
     const inflexibility = this.system.defense.inflexibility.raw;
-    const damage = this.applyModifiersToDamage(rolls, data, action);
-    const updates = { "system.defense.guard.value": await this.calculateGuard(damage, guard, data.isFeint, data.isStrongAttack, action), "system.defense.risk.raw": this.calculateRisk(damage, guard, risk, inflexibility, data.isFeint, data.isStrongAttack, action) };
+    let damage = this.applyModifiersToDamage(rolls, data, action);
+    const updateRisk = this.calculateRisk(damage, guard, risk, inflexibility, data.isFeint, data.isStrongAttack, action);
+    let overFlow = updateRisk > 100 ? updateRisk - 100 : 0;
+    const updates = { "system.defense.guard.value": await this.calculateGuard(damage + overFlow, guard, data.isFeint, data.isStrongAttack, action), "system.defense.risk.raw": updateRisk };
     await this.update(updates);
     await this.renderAttackResultCard(data, action);
     return this;
@@ -3712,7 +3714,7 @@ class AbbrewActor extends Actor {
       return 2 * (damage + inflexibility);
     }
     if (this.defenderGainsAdvantage(isFeint, action)) {
-      return 2 * (damage + inflexibility);
+      return 0;
     }
     return damage + inflexibility;
   }
@@ -3833,6 +3835,7 @@ class AbbrewItem2 extends Item {
     }
     super._preUpdate(changed, options, userId);
   }
+  // TODO: Drop items when not enough hands
   isWornEquipStateChangePossible() {
     const armourPoints = JSON.parse(this.system.armourPoints).map((ap) => ap.value);
     const usedArmourPoints = this.actor.getActorWornArmour().flatMap((a) => JSON.parse(a.system.armourPoints).map((ap) => ap.value));

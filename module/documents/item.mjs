@@ -34,6 +34,7 @@ export default class AbbrewItem extends Item {
     super._preUpdate(changed, options, userId);
   }
 
+  // TODO: Drop items when not enough hands
   isWornEquipStateChangePossible() {
     const armourPoints = JSON.parse(this.system.armourPoints).map(ap => ap.value);
     const usedArmourPoints = this.actor.getActorWornArmour().flatMap(a => JSON.parse(a.system.armourPoints).map(ap => ap.value));
