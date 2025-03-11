@@ -87,19 +87,19 @@ ABBREW.equipState = {
   dropped: "ABBREW.EquipState.dropped"
 }
 
-ABBREW.armourEquipState = {
+ABBREW.wornEquipState = {
   worn: "ABBREW.EquipState.worn",
   stowed: "ABBREW.EquipState.stowed",
   dropped: "ABBREW.EquipState.dropped"
 }
 
 ABBREW.skillTypes = {
-  background: "ABBREW.SkillTypes.background",
   basic: "ABBREW.SkillTypes.basic",
   path: "ABBREW.SkillTypes.path",
   resource: "ABBREW.SkillTypes.resource",
   temporary: "ABBREW.SkillTypes.temporary",
-  untyped: "ABBREW.SkillTypes.untyped"
+  untyped: "ABBREW.SkillTypes.untyped",
+  background: "ABBREW.SkillTypes.background"
 }
 
 ABBREW.activationTypes = {
@@ -188,6 +188,25 @@ ABBREW.equipTypes = {
   none: "ABBREW.EquipTypes.none",
   held: "ABBREW.EquipTypes.held",
   worn: "ABBREW.EquipTypes.worn"
+}
+
+ABBREW.hands = {
+  none: {
+    label: "ABBREW.Hands.none",
+    states: []    
+  },
+  oneHand: {
+    label: "ABBREW.Hands.oneHand",
+    states: ["held1H"]
+  },
+  versatile: {
+    label: "ABBREW.Hands.versatile",
+    states: ["held2H", "held1H"]
+  },
+  twoHand: {
+    label: "ABBREW.Hands.twoHand",
+    states: ["held2H"]
+  }
 }
 
 ABBREW.traits = {

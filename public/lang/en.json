@@ -12,7 +12,10 @@
     },
     "SheetLabels": {
       "Actor": "Abbrew Actor Sheet",
-      "Item": "Abbrew Item Sheet"
+      "Item": "Abbrew Item Sheet",
+      "CreatureForm": "Abbrew Creature Form Sheet",
+      "SkillDeck": "Skill Deck",
+      "Anatomy": "Anatomy"
     },
     "Item": {
       "Spell": {
@@ -91,12 +94,12 @@
       "dropped": "Dropped"
     },
     "SkillTypes": {
-      "background": "Background",
       "basic": "Basic",
       "path": "Path",
       "resource": "Resource",
       "temporary": "Temporary",
-      "untyped": "Untyped"
+      "untyped": "Untyped",
+      "background": "Background"
     },
     "ActionCosts": {
       "passive": "Passive",
@@ -147,6 +150,12 @@
       "held": "Held",
       "worn": "Worn"
     },
+    "Hands": {
+      "none": "None",
+      "oneHand": "One Handed",
+      "versatile": "Versatile",
+      "twoHand": "Two Handed"
+    },
     "Traits": {
       "CanBleed": {
         "name": "Can Bleed"
@@ -171,7 +180,9 @@
       "armour": "Armour",
       "weapon": "Weapon",
       "wound": "Wound",
-      "background": "Background"
+      "background": "Background",
+      "creatureForm": "Creature Form",
+      "skillDeck": "Skill Deck"
     }
   },
 

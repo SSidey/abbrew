@@ -13,6 +13,9 @@
 {{#if (eq system.equipType "held")}}
 <div class="grid-span-1">
     <label class="resource-label">Hands</label>
-    <input type="text" name="system.hands" value="{{system.hands}}" data-dtype="Number" />
+    {{!-- <input type="text" name="system.hands" value="{{system.hands}}" data-dtype="Number" /> --}}
+    <select name="system.handsRequired">
+        {{selectOptions config.hands selected=system.handsRequired localize=true}}
+    </select>
 </div>
 {{/if}}

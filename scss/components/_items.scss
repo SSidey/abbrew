@@ -142,7 +142,7 @@ ol li.damage-reduction {
 
   .item-name {
     display: grid;
-    grid-column: 1 / 8;
+    grid-column: 1 / 7;
     grid-template-columns: repeat(7, 1fr);
     
     .item-image {
@@ -156,6 +156,11 @@ ol li.damage-reduction {
     h4 {
       grid-column: 2 / 8;
     }
+  }
+
+  .item-equipState {
+    grid-column: 7 / 8;    
+    
   }
 
   .icon-label {

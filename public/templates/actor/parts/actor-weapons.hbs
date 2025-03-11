@@ -19,21 +19,22 @@
       <h4 class="rollable" data-roll-type="item">{{item.name}}</h4>
       {{#if ../showAttackProfiles}}
       <div>
+        {{!-- TODO: Base actions on held hands no. --}}
         {{#each item.system.attackProfiles as |attackProfile attackProfileId|}}
         <ol class="attack-profiles">
           <li class="attack-profile" data-attack-profile-id="{{attackProfileId}}">
             <button type="button" class="attack-damage-button"><span
-                class="actions-icon action-1a">{{attackProfile.name}}</span></button>
+                class="actions-icon action-{{item.system.actionCost}}a">{{attackProfile.name}}</span></button>
             {{#if hasStrongAttack}}
             <button type="button" class="attack-strong-button">
-              <span class="actions-icon action-2a">Strong</span>
+              <span class="actions-icon action-{{item.system.exertActionCost}}a">Strong</span>
             </button>
             {{else}}
             <div></div>
             {{/if}}
-            <button type="button" class="attack-feint-button"><span class="actions-icon action-1a">Feint</span></button>
+            <button type="button" class="attack-feint-button"><span class="actions-icon action-{{item.system.actionCost}}a">Feint</span></button>
             <button type="button" class="attack-finisher-button"><span
-                class="actions-icon action-1a">Finisher</span></button>
+                class="actions-icon action-{{item.system.actionCost}}a">Finisher</span></button>
           </li>
         </ol>
         {{/each}}
@@ -42,7 +43,7 @@
     </div>
     {{#if ../showEquipState}}
     <select class="item-select" name="system.equipState">
-      {{selectOptions ../config.equipState selected=item.system.equipState localize=true}}
+      {{selectOptions system.validEquipStates selected=item.system.equipState valueAttr="value" labelAttr="label" localize=true}}
     </select>
     {{/if}}
     {{#if ../showItemControls}}

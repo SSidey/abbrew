@@ -1,4 +1,4 @@
-import { doesNestedFieldExist, arrayDifference } from '../helpers/utils.mjs';
+import { doesNestedFieldExist, arrayDifference, getNumericParts } from '../helpers/utils.mjs';
 /**
  * Extend the basic Item with some very simple modifications.
  * @extends {Item}
@@ -34,6 +34,7 @@ export default class AbbrewItem extends Item {
     super._preUpdate(changed, options, userId);
   }
 
+  // TODO: Drop items when not enough hands
   isWornEquipStateChangePossible() {
     const armourPoints = JSON.parse(this.system.armourPoints).map(ap => ap.value);
     const usedArmourPoints = this.actor.getActorWornArmour().flatMap(a => JSON.parse(a.system.armourPoints).map(ap => ap.value));
@@ -63,8 +64,8 @@ export default class AbbrewItem extends Item {
 
   isHeldEquipStateChangePossible(equipState) {
     const actorHands = this.actor.getActorAnatomy().reduce((result, a) => result += a.system.hands, 0);
-    const equippedHeldItemHands = this.actor.getActorHeldItems().reduce((result, a) => result += a.system.hands, 0);
-    const requiredHands = equippedHeldItemHands + parseInt(equipState.replace(/\D/g, ""));
+    const equippedHeldItemHands = this.actor.getActorHeldItems().filter(i => i._id !== this._id).reduce((result, a) => result += getNumericParts(a.system.equipState), 0);
+    const requiredHands = equippedHeldItemHands + getNumericParts(equipState);
     return actorHands >= requiredHands;
   }
 
@@ -109,21 +110,26 @@ export default class AbbrewItem extends Item {
       case 'damage': await this._onAcceptDamageAction(message.rolls, message.flags.data, action); break;
       case 'strong': await this._onAcceptDamageAction(message.rolls, message.flags.data, action); break;
       case 'parry': await this._onAcceptDamageAction(message.rolls, message.flags.data, action); break;
-      case 'finisher': await this._onAcceptFinisherAction(message.rolls, message.flags.data); break;
+      case 'finisher': await this._onAcceptFinisherAction(message.rolls, message.flags.data, action); break;
     }
   }
 
   static async _onAcceptDamageAction(rolls, data, action) {
     const tokens = canvas.tokens.controlled.filter((token) => token.actor);
+    if (tokens.length === 0) {
+      return;
+    }
+
     await tokens[0].actor.takeDamage(rolls, data, action);
   }
 
-  static async _onAcceptFinisherAction(rolls, data) {
+  static async _onAcceptFinisherAction(rolls, data, action) {
     const tokens = canvas.tokens.controlled.filter((token) => token.actor);
     if (tokens.length === 0) {
       return;
     }
 
+    await tokens[0].actor.takeDamage(rolls, data, action);
     await tokens[0].actor.takeFinisher(rolls, data);
   }
 

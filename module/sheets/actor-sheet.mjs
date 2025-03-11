@@ -159,6 +159,9 @@ export class AbbrewActorSheet extends ActorSheet {
       }
       else if (i.type === 'weapon') {
         weapons.push(i);
+        // TODO: May want to handle unarmed etc. differently i.e. worn weapons with no hands required.
+        // TODO: Non physical weapons?
+        // Unarmed technically should take 1h but stowed / dropped seem a little funny
         if (['held1H', 'held2H'].includes(i.system.equipState)) {
           equippedWeapons.push(i);
         }
@@ -422,10 +425,11 @@ export class AbbrewActorSheet extends ActorSheet {
     // If you need to store the value first, uncomment the next line.
     const result = await roll.evaluate();
     const token = this.actor.token;
+    const attributeMultiplier = attackMode === 'strong' ? Math.max(1, item.system.handsSupplied) : 1;
     const damage = attackProfile.damage.map(d => {
       let attributeModifier = 0;
       if (d.attributeModifier) {
-        attributeModifier = this.actor.system.attributes[d.attributeModifier].value;
+        attributeModifier = attributeMultiplier * this.actor.system.attributes[d.attributeModifier].value;
       }
 
       const finalDamage = attributeModifier + d.value;
@@ -473,7 +477,7 @@ export class AbbrewActorSheet extends ActorSheet {
       isFinisher
     };
 
-    // TODO: Move this out of item and into a weapon.mjs
+    // TODO: Move this out of item and into a weapon.mjs / attack-card.mjs
     const html = await renderTemplate("systems/abbrew/templates/chat/attack-card.hbs", templateData);
 
     // Initialize chat data.

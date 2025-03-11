@@ -19,15 +19,10 @@
       <h4>{{item.name}}</h4>
     </div>
     {{#if ../showEquipState}}
-    {{#if (eq item.system.equipType "held")}}
     <select class="item-select" name="system.equipState">
-      {{selectOptions ../config.equipState selected=item.system.equipState localize=true}}
+      {{selectOptions system.validEquipStates selected=item.system.equipState valueAttr="value" labelAttr="label"
+      localize=true}}
     </select>
-    {{else}}
-    <select class="item-select" name="system.equipState">
-      {{selectOptions ../config.armourEquipState selected=item.system.equipState localize=true}}
-    </select>
-    {{/if}}
     {{/if}}
     <label class="icon-label">
       <input type="checkbox" class="armour-sunder" name="system.isSundered" {{ checked item.system.isSundered }}>
@@ -38,10 +33,10 @@
       {{/if}}
     </label>
     <div class='item-controls'>
-      <a class='item-control item-edit' title='{{localize "DOCUMENT.Edit" type=' armour'}}'>
+      <a class='item-control item-edit' title='{{localize "DOCUMENT.Edit" type='armour'}}'>
         <i class='fas fa-edit'></i>
       </a>
-      <a class='item-control item-delete' title='{{localize "DOCUMENT.Delete" type=' armour'}}'>
+      <a class='item-control item-delete' title='{{localize "DOCUMENT.Delete" type='armour'}}'>
         <i class='fas fa-trash'></i>
       </a>
     </div>
