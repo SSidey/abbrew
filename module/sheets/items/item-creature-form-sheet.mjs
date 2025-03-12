@@ -80,6 +80,16 @@ export class AbbrewCreatureFormSheet extends ItemSheet {
             event.preventDefault();
         });
 
+        // Delete Anatomy Summary
+        html.on('click', '.anatomy-delete', async (ev) => {
+            const li = $(ev.currentTarget).parents('.creature-form-anatomy');
+            if (li.data('id') || li.data('id') === 0) {
+                const anatomy = this.item.system.anatomy;
+                anatomy.splice(li.data('id'), 1);
+                await this.item.update({ "system.anatomy": anatomy });
+            }
+        });
+
         html.on('drop', async (event) => {
             if (!this.item.testUserPermission(game.user, 'OWNER')) {
                 return;

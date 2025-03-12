@@ -414,7 +414,6 @@ export class AbbrewActorSheet extends ActorSheet {
   }
 
   async _onAttackDamageAction(target, attackMode) {
-
     const itemId = target.closest('li.item').dataset.itemId;
     const attackProfileId = target.closest('li .attack-profile').dataset.attackProfileId;
     const item = this.actor.items.get(itemId);
@@ -460,6 +459,7 @@ export class AbbrewActorSheet extends ActorSheet {
 
     const showAttack = ['attack', 'feint', 'finisher'].includes(attackMode);
     const isFeint = attackMode === 'feint';
+    const showParry = game.user.targets.some(t => t.actor.doesActorHaveSkillFlag("Parry"));
     const isStrongAttack = attackMode === 'strong';
     const showFinisher = attackMode === 'finisher' || totalSuccesses > 0;
     const isFinisher = attackMode === 'finisher';
@@ -474,7 +474,8 @@ export class AbbrewActorSheet extends ActorSheet {
       showAttack,
       showFinisher,
       isStrongAttack,
-      isFinisher
+      isFinisher,
+      showParry
     };
 
     // TODO: Move this out of item and into a weapon.mjs / attack-card.mjs

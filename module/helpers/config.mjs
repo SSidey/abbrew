@@ -193,7 +193,7 @@ ABBREW.equipTypes = {
 ABBREW.hands = {
   none: {
     label: "ABBREW.Hands.none",
-    states: []    
+    states: []
   },
   oneHand: {
     label: "ABBREW.Hands.oneHand",
@@ -216,5 +216,8 @@ ABBREW.traits = {
 }
 
 ABBREW.skillFlags = {
-  shieldTraining: "ABBREW.SkillFlags.shieldTraining"
+  shieldTraining: "ABBREW.SkillFlags.shieldTraining",
+  overpower: "ABBREW.SkillFlags.overpower",
+  parry: "ABBREW.SkillFlags.parry",
+  feint: "ABBREW.SkillFlags.feint"
 }

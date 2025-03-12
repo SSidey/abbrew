@@ -12,15 +12,14 @@ export default class AbbrewActor extends Actor {
     // the following, in order: data reset (to clear active effects),
     // prepareBaseData(), prepareEmbeddedDocuments() (including active effects),
     // prepareDerivedData().
-    console.log('documentPrepareData');
     super.prepareData();
   }
 
   /** @override */
   prepareBaseData() {
-    console.log('documentPrepareBaseData');
     // Data modifications in this step occur before processing embedded
     // documents or derived data.
+    super.prepareBaseData();
   }
 
   /**
@@ -31,7 +30,7 @@ export default class AbbrewActor extends Actor {
    * is queried and has a roll executed directly from it).
    */
   prepareDerivedData() {
-    console.log('documentPrepareDerivedData');
+    super.prepareDerivedData();
     const actorData = this;
     const flags = actorData.flags.abbrew || {};
   }
@@ -49,6 +48,10 @@ export default class AbbrewActor extends Actor {
   }
 
   async takeDamage(rolls, data, action) {
+    if (action === "parry" && !this.doesActorHaveSkillFlag("Parry")) {
+      ui.notifications.info("You have not trained enough to be able to parry.");
+      return;
+    }
     Hooks.call('actorTakesDamage', this);
     let guard = this.system.defense.guard.value;
     let risk = this.system.defense.risk.raw;
@@ -59,7 +62,7 @@ export default class AbbrewActor extends Actor {
     const updateRisk = this.calculateRisk(damage, guard, risk, inflexibility, data.isFeint, data.isStrongAttack, action);
     let overFlow = updateRisk > 100 ? updateRisk - 100 : 0;
 
-    const updates = { "system.defense.guard.value": await this.calculateGuard(damage + overFlow, guard, data.isFeint, data.isStrongAttack, action), "system.defense.risk.raw": updateRisk};
+    const updates = { "system.defense.guard.value": await this.calculateGuard(damage + overFlow, guard, data.isFeint, data.isStrongAttack, action), "system.defense.risk.raw": updateRisk };
     await this.update(updates);
     await this.renderAttackResultCard(data, action);
     return this;
@@ -274,6 +277,10 @@ export default class AbbrewActor extends Actor {
 
   getActorAnatomy() {
     return this.items.filter(i => i.type === 'anatomy');
+  }
+
+  doesActorHaveSkillFlag(trait) {
+    return this.items.filter(i => i.system.skillFlags).flatMap(i => JSON.parse(i.system.skillFlags)).map(st => st.value).includes(trait) ?? false;
   }
 
   async acceptWound(type, value) {

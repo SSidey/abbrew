@@ -6,7 +6,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     const schema = {};
 
     schema.traits = new fields.StringField({ required: true, blank: true });
-
+    schema.actions = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 5 })
     schema.wounds = new fields.ArrayField(
       new fields.SchemaField({
         type: new fields.StringField({ required: true }),
@@ -86,7 +86,6 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
   // Prior to Active Effects
   prepareBaseData() {
-    console.log('base');
     // Loop through attribute scores, and determine their base rank.
     for (const key in this.attributes) {
       this.attributes[key].value = 0 + this.parent.items.filter(i => i.type === 'skill' && i.system.skillType === 'background' && i.system.attributeIncrease === key).length;
@@ -152,7 +151,6 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   }
 
   _prepareMovement(anatomy) {
-    console.log('movement');
     this.movement.baseSpeed = this.attributes.agi.value * anatomy.speed;
   }
 
@@ -217,12 +215,14 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     }
   }
 
-  _prepareInflexibility(armour) {
+  _prepareInflexibility(wornArmour) {
+    const armour = wornArmour.filter(a => !a.system.isSundered);
     const armourInflexibility = armour.map(a => a.system.defense.inflexibility).reduce((a, b) => a + b, 0);
+    const wornArmourInflexibility = wornArmour.map(a => a.system.defense.inflexibility).reduce((a, b) => a + b, 0);
     const weapons = this.parent.items.filter(i => i.type === 'weapon').filter(a => a.system.equipType === 'held').filter(a => a.system.equipState.startsWith('held'));
     const otherInflexibility = Math.max(0, weapons.reduce((result, w) => result += w.system.weapon.size, 0) - this.attributes['str'].value);
     this.defense.inflexibility.resistance.raw = armourInflexibility;
-    this.defense.inflexibility.raw = Math.floor((0 + armourInflexibility + otherInflexibility)/2); // TODO: - weapon drills as "Shield Training" is handled
+    this.defense.inflexibility.raw = Math.floor((0 + wornArmourInflexibility + otherInflexibility) / 2); // TODO: - weapon drills as "Shield Training" is handled
     this.defense.inflexibility.resistance.value = Math.floor(armourInflexibility / 10);
   }
 

@@ -2192,6 +2192,7 @@ class AbbrewActorSheet extends ActorSheet {
     }, 0);
     const showAttack = ["attack", "feint", "finisher"].includes(attackMode);
     const isFeint = attackMode === "feint";
+    const showParry = game.user.targets.some((t) => t.actor.doesActorHaveSkillFlag("Parry"));
     const isStrongAttack = attackMode === "strong";
     const showFinisher = attackMode === "finisher" || totalSuccesses > 0;
     const isFinisher = attackMode === "finisher";
@@ -2206,7 +2207,8 @@ class AbbrewActorSheet extends ActorSheet {
       showAttack,
       showFinisher,
       isStrongAttack,
-      isFinisher
+      isFinisher,
+      showParry
     };
     const html = await renderTemplate("systems/abbrew/templates/chat/attack-card.hbs", templateData);
     const speaker = ChatMessage.getSpeaker({ actor: this.actor });
@@ -2844,7 +2846,10 @@ ABBREW.traits = {
   }
 };
 ABBREW.skillFlags = {
-  shieldTraining: "ABBREW.SkillFlags.shieldTraining"
+  shieldTraining: "ABBREW.SkillFlags.shieldTraining",
+  overpower: "ABBREW.SkillFlags.overpower",
+  parry: "ABBREW.SkillFlags.parry",
+  feint: "ABBREW.SkillFlags.feint"
 };
 class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   static defineSchema() {
@@ -2852,6 +2857,7 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     const requiredInteger = { required: true, nullable: false, integer: true };
     const schema = {};
     schema.traits = new fields.StringField({ required: true, blank: true });
+    schema.actions = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 5 });
     schema.wounds = new fields.ArrayField(
       new fields.SchemaField({
         type: new fields.StringField({ required: true }),
@@ -2920,7 +2926,6 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   }
   // Prior to Active Effects
   prepareBaseData() {
-    console.log("base");
     for (const key2 in this.attributes) {
       this.attributes[key2].value = 0 + this.parent.items.filter((i) => i.type === "skill" && i.system.skillType === "background" && i.system.attributeIncrease === key2).length;
       this.attributes[key2].rank = this.attributes[key2].value;
@@ -2964,7 +2969,6 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     return res;
   }
   _prepareMovement(anatomy) {
-    console.log("movement");
     this.movement.baseSpeed = this.attributes.agi.value * anatomy.speed;
   }
   _prepareDefenses() {
@@ -3019,12 +3023,14 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       this.defense.guard.value = this.defense.guard.max;
     }
   }
-  _prepareInflexibility(armour) {
+  _prepareInflexibility(wornArmour) {
+    const armour = wornArmour.filter((a) => !a.system.isSundered);
     const armourInflexibility = armour.map((a) => a.system.defense.inflexibility).reduce((a, b) => a + b, 0);
+    const wornArmourInflexibility = wornArmour.map((a) => a.system.defense.inflexibility).reduce((a, b) => a + b, 0);
     const weapons = this.parent.items.filter((i) => i.type === "weapon").filter((a) => a.system.equipType === "held").filter((a) => a.system.equipState.startsWith("held"));
     const otherInflexibility = Math.max(0, weapons.reduce((result, w) => result += w.system.weapon.size, 0) - this.attributes["str"].value);
     this.defense.inflexibility.resistance.raw = armourInflexibility;
-    this.defense.inflexibility.raw = Math.floor((0 + armourInflexibility + otherInflexibility) / 2);
+    this.defense.inflexibility.raw = Math.floor((0 + wornArmourInflexibility + otherInflexibility) / 2);
     this.defense.inflexibility.resistance.value = Math.floor(armourInflexibility / 10);
   }
   getRollData() {
@@ -3432,6 +3438,9 @@ class AbbrewWeapon extends AbbrewPhysicalItem {
     schema.weapon = new fields.SchemaField({
       size: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 9 })
     });
+    schema.isFeintTrained = new fields.BooleanField({ required: true, nullable: false, initial: false });
+    schema.isOverpowerTrained = new fields.BooleanField({ required: true, nullable: false, initial: false });
+    schema.isParryTrained = new fields.BooleanField({ required: true, nullable: false, initial: false });
     AbbrewAttackBase.addAttackSchema(schema);
   }
   // Prior to Active Effects
@@ -3441,6 +3450,12 @@ class AbbrewWeapon extends AbbrewPhysicalItem {
   // Post Active Effects
   prepareDerivedData() {
     this.formula = `1d10x10cs10`;
+    this.isFeintTrained = this.doesParentActorHaveSkillFlag("Feint");
+    this.isOverpowerTrained = this.doesParentActorHaveSkillFlag("Overpower");
+  }
+  doesParentActorHaveSkillFlag(trait) {
+    var _a, _b;
+    return ((_b = (_a = this == null ? void 0 : this.parent) == null ? void 0 : _a.actor) == null ? void 0 : _b.doesActorHaveSkillFlag(trait)) ?? false;
   }
 }
 class AbbrewWound extends AbbrewItemBase {
@@ -3553,12 +3568,11 @@ const FINISHERS = {
 class AbbrewActor extends Actor {
   /** @override */
   prepareData() {
-    console.log("documentPrepareData");
     super.prepareData();
   }
   /** @override */
   prepareBaseData() {
-    console.log("documentPrepareBaseData");
+    super.prepareBaseData();
   }
   /**
    * @override
@@ -3568,7 +3582,7 @@ class AbbrewActor extends Actor {
    * is queried and has a roll executed directly from it).
    */
   prepareDerivedData() {
-    console.log("documentPrepareDerivedData");
+    super.prepareDerivedData();
     const actorData = this;
     actorData.flags.abbrew || {};
   }
@@ -3585,6 +3599,10 @@ class AbbrewActor extends Actor {
     return { ...super.getRollData(), ...((_b = (_a = this.system).getRollData) == null ? void 0 : _b.call(_a)) ?? null };
   }
   async takeDamage(rolls, data, action) {
+    if (action === "parry" && !this.doesActorHaveSkillFlag("Parry")) {
+      ui.notifications.info("You have not trained enough to be able to parry.");
+      return;
+    }
     Hooks.call("actorTakesDamage", this);
     let guard = this.system.defense.guard.value;
     let risk = this.system.defense.risk.raw;
@@ -3762,6 +3780,9 @@ class AbbrewActor extends Actor {
   }
   getActorAnatomy() {
     return this.items.filter((i) => i.type === "anatomy");
+  }
+  doesActorHaveSkillFlag(trait) {
+    return this.items.filter((i) => i.system.skillFlags).flatMap((i) => JSON.parse(i.system.skillFlags)).map((st) => st.value).includes(trait) ?? false;
   }
   async acceptWound(type, value) {
     const updates = { "system.wounds": mergeActorWounds(this, [{ type, value }]) };
@@ -3998,6 +4019,14 @@ class AbbrewCreatureFormSheet extends ItemSheet {
     html.on("dragover", (event) => {
       event.preventDefault();
     });
+    html.on("click", ".anatomy-delete", async (ev) => {
+      const li = $(ev.currentTarget).parents(".creature-form-anatomy");
+      if (li.data("id") || li.data("id") === 0) {
+        const anatomy = this.item.system.anatomy;
+        anatomy.splice(li.data("id"), 1);
+        await this.item.update({ "system.anatomy": anatomy });
+      }
+    });
     html.on("drop", async (event) => {
       if (!this.item.testUserPermission(game.user, "OWNER")) {
         return;
@@ -4062,6 +4091,17 @@ class AbbrewSkillDeckSheet extends ItemSheet {
     );
     html.on("dragover", (event) => {
       event.preventDefault();
+    });
+    html.on("click", ".skill-delete", async (ev) => {
+      const li = $(ev.currentTarget).parents(".skill-deck-skill");
+      if (li.data("id") || li.data("id") === 0) {
+        const skills = this.item.system.skills;
+        skills.splice(li.data("id"), 1);
+        await this.item.update({ "system.skills": skills });
+      }
+    });
+    html.on("click", ".creature-form-delete", async (ev) => {
+      await this.item.update({ "system.creatureForm": { name: "", id: "", image: "" } });
     });
     html.on("drop", async (event) => {
       if (!this.item.testUserPermission(game.user, "OWNER")) {
@@ -4285,11 +4325,9 @@ Handlebars.registerHelper("toLowerCase", function(str) {
   return str.toLowerCase();
 });
 Handlebars.registerHelper("eq", function(arg1, arg2) {
-  console.log("eq");
   return arg1 === arg2;
 });
 Handlebars.registerHelper("pos", function(arg1) {
-  console.log("pos");
   return arg1 > 0;
 });
 Handlebars.registerHelper("getProperty", function(parent, child) {
@@ -4320,10 +4358,8 @@ Hooks.once("ready", function() {
   Hooks.on("hotbarDrop", (bar, data, slot) => createItemMacro(data, slot));
 });
 Hooks.on("combatStart", async (combat, updateData, updateOptions) => {
-  await handleTurnStart(combat, updateData, updateOptions);
 });
 Hooks.on("combatRound", async (combat, updateData, updateOptions) => {
-  await handleTurnStart(combat, updateData, updateOptions);
 });
 Hooks.on("combatTurn", async (combat, updateData, updateOptions) => {
 });

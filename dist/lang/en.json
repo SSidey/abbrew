@@ -162,7 +162,10 @@
       }
     },
     "SkillFlags": {
-      "shieldTraining": "Shield Training"
+      "shieldTraining": "Shield Training",
+      "overpower": "Overpower",
+      "parry": "Parry",
+      "feint": "Feint"
     }
   },
 

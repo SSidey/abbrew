@@ -146,12 +146,10 @@ Handlebars.registerHelper('toLowerCase', function (str) {
 });
 
 Handlebars.registerHelper('eq', function (arg1, arg2) {
-  console.log('eq');
   return (arg1 === arg2);
 });
 
 Handlebars.registerHelper('pos', function (arg1) {
-  console.log('pos');
   return (arg1 > 0);
 });
 
@@ -197,16 +195,12 @@ Hooks.once('ready', function () {
 /* -------------------------------------------- */
 
 Hooks.on("combatStart", async (combat, updateData, updateOptions) => {
-  await handleTurnStart(combat, updateData, updateOptions);
 });
 
 Hooks.on("combatRound", async (combat, updateData, updateOptions) => {
-  await handleTurnStart(combat, updateData, updateOptions);
 })
 
 Hooks.on("combatTurn", async (combat, updateData, updateOptions) => {
-  // Causing issues as the initating client triggers this i.e. player before enemies will be unable to trigger the enemy bleed
-  // await handleTurnStart(combat, updateData, updateOptions);
 })
 
 Hooks.on("combatTurnChange", async (combat, prior, current) => {

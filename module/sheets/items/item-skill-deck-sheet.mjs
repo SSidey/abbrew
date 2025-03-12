@@ -80,6 +80,21 @@ export class AbbrewSkillDeckSheet extends ItemSheet {
             event.preventDefault();
         });
 
+        // Delete Skill Summary
+        html.on('click', '.skill-delete', async (ev) => {
+            const li = $(ev.currentTarget).parents('.skill-deck-skill');
+            if (li.data('id') || li.data('id') === 0) {
+                const skills = this.item.system.skills;
+                skills.splice(li.data('id'), 1);
+                await this.item.update({ "system.skills": skills });
+            }
+        });
+
+        // Delete Creature Form
+        html.on('click', '.creature-form-delete', async (ev) => {
+            await this.item.update({ "system.creatureForm": { name: "", id: "", image: "" } });
+        });
+
         html.on('drop', async (event) => {
             if (!this.item.testUserPermission(game.user, 'OWNER')) {
                 return;
