@@ -270,13 +270,13 @@ ABBREW.hands = {
 }
 
 ABBREW.traits = [
-  { key: "bleedImmunity", value: "ABBREW.Traits.WoundImmunities.bleedImmunity", type: "lingeringWoundImmunity", data: "bleed" },
-  { key: "burningImmunity", value: "ABBREW.Traits.WoundImmunities.burningImmunity", type: "lingeringWoundImmunity", data: "burning" },
-  { key: "fatigueImmunity", value: "ABBREW.Traits.WoundImmunities.fatigueImmunity", type: "lingeringWoundImmunity", data: "fatigue" },
-  { key: "dreadImmunity", value: "ABBREW.Traits.WoundImmunities.dreadImmunity", type: "lingeringWoundImmunity", data: "dread" },
-  { key: "enragedImmunity", value: "ABBREW.Traits.WoundImmunities.enragedImmunity", type: "lingeringWoundImmunity", data: "enraged" },
-  { key: "instabilityImmunity", value: "ABBREW.Traits.WoundImmunities.instabilityImmunity", type: "lingeringWoundImmunity", data: "instability" },
-  { key: "sinImmunity", value: "ABBREW.Traits.WoundImmunities.sinImmunity", type: "lingeringWoundImmunity", data: "sin" }
+  { key: "bleedImmunity", value: "ABBREW.Traits.WoundImmunities.bleedImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "bleed" },
+  { key: "burningImmunity", value: "ABBREW.Traits.WoundImmunities.burningImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "burning" },
+  { key: "fatigueImmunity", value: "ABBREW.Traits.WoundImmunities.fatigueImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "fatigue" },
+  { key: "dreadImmunity", value: "ABBREW.Traits.WoundImmunities.dreadImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "dread" },
+  { key: "enragedImmunity", value: "ABBREW.Traits.WoundImmunities.enragedImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "enraged" },
+  { key: "instabilityImmunity", value: "ABBREW.Traits.WoundImmunities.instabilityImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "instability" },
+  { key: "sinImmunity", value: "ABBREW.Traits.WoundImmunities.sinImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "sin" }
 ]
 
 ABBREW.skillFlags = {

@@ -1,6 +1,10 @@
 {
-    "files.exclude": {
-        "": true,
-        "**/dist/**": true
-    }
+  "files.exclude": {
+    "": true,
+    "**/dist/**": true
+  },
+"eslint.options": {
+    "configFile": ".eslintrc.json"
+},
+"eslint.lintTask.enable": true
 }

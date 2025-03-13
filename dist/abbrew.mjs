@@ -109,16 +109,30 @@ async function turnStart(actor) {
   if (game.settings.get("abbrew", "announceTurnStart")) {
     ChatMessage.create({ content: `${actor.name} starts their turn`, speaker: ChatMessage.getSpeaker({ actor }) });
   }
-  if (actor.system.traitsData) {
-    const lingeringWoundTypes = Object.entries(CONFIG.ABBREW.wounds).filter((w) => w[1].lingeringWounds.length > 0).map((w) => w[0]);
-    const filteredWounds = actor.system.wounds.filter((wound) => lingeringWoundTypes.includes(wound.type));
-    const bleedingWounds = filteredWounds.length > 0 ? filteredWounds[0].value : 0;
-    if (bleedingWounds > 0) {
-      const bleedModifier = bleedingWounds > 1 ? -1 : 0;
-      const vitalWounds = [{ type: "vital", value: bleedingWounds }, { type: "bleed", value: bleedModifier }];
-      await updateActorWounds(actor, mergeActorWounds(actor, vitalWounds));
+  const lingeringWoundTypes = foundry.utils.deepClone(CONFIG.ABBREW.lingeringWoundTypes);
+  const woundToLingeringWounds = foundry.utils.deepClone(CONFIG.ABBREW.woundToLingeringWounds);
+  const lingeringWoundImmunities = actor.system.traitsData.filter((t) => t.feature === "wound" && t.subFeature === "lingeringWound" && t.effect === "immunity").map((t) => t.data);
+  const activeLingeringWounds = actor.system.wounds.filter((w) => lingeringWoundTypes.some((lw) => w.type === lw)).filter((w) => !lingeringWoundImmunities.includes(w.type));
+  if (activeLingeringWounds.length > 0) {
+    const appliedLingeringWounds = {};
+    activeLingeringWounds.flatMap((lw) => woundToLingeringWounds[lw.type].map((lwt) => ({ type: lwt, value: lw.value }))).reduce((appliedLingeringWounds2, wound) => {
+      if (wound.type in appliedLingeringWounds2) {
+        appliedLingeringWounds2[wound.type] += wound.value;
+      } else {
+        appliedLingeringWounds2[wound.type] = wound.value;
+      }
+      return appliedLingeringWounds2;
+    }, appliedLingeringWounds);
+    const acuteWounUpdate = Object.entries(appliedLingeringWounds).map((alw) => ({ type: alw[0], value: alw[1] }));
+    const lingeringWoundUpdate = activeLingeringWounds.flatMap((lw) => actor.system.wounds.filter((w) => w.type === lw.type).map((w) => ({ type: w.type, value: getLingeringWoundValueUpdate(w.value) })));
+    const fullWoundUpdate = [...acuteWounUpdate, ...lingeringWoundUpdate];
+    if (fullWoundUpdate.length > 0) {
+      await updateActorWounds(actor, mergeActorWounds(actor, fullWoundUpdate));
     }
   }
+}
+function getLingeringWoundValueUpdate(woundValue) {
+  return woundValue > 1 ? -1 : 0;
 }
 function onManageActiveEffect(event, owner) {
   event.preventDefault();
@@ -2907,13 +2921,13 @@ ABBREW.hands = {
   }
 };
 ABBREW.traits = [
-  { key: "bleedImmunity", value: "ABBREW.Traits.WoundImmunities.bleedImmunity", type: "lingeringWoundImmunity", data: "bleed" },
-  { key: "burningImmunity", value: "ABBREW.Traits.WoundImmunities.burningImmunity", type: "lingeringWoundImmunity", data: "burning" },
-  { key: "fatigueImmunity", value: "ABBREW.Traits.WoundImmunities.fatigueImmunity", type: "lingeringWoundImmunity", data: "fatigue" },
-  { key: "dreadImmunity", value: "ABBREW.Traits.WoundImmunities.dreadImmunity", type: "lingeringWoundImmunity", data: "dread" },
-  { key: "enragedImmunity", value: "ABBREW.Traits.WoundImmunities.enragedImmunity", type: "lingeringWoundImmunity", data: "enraged" },
-  { key: "instabilityImmunity", value: "ABBREW.Traits.WoundImmunities.instabilityImmunity", type: "lingeringWoundImmunity", data: "instability" },
-  { key: "sinImmunity", value: "ABBREW.Traits.WoundImmunities.sinImmunity", type: "lingeringWoundImmunity", data: "sin" }
+  { key: "bleedImmunity", value: "ABBREW.Traits.WoundImmunities.bleedImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "bleed" },
+  { key: "burningImmunity", value: "ABBREW.Traits.WoundImmunities.burningImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "burning" },
+  { key: "fatigueImmunity", value: "ABBREW.Traits.WoundImmunities.fatigueImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "fatigue" },
+  { key: "dreadImmunity", value: "ABBREW.Traits.WoundImmunities.dreadImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "dread" },
+  { key: "enragedImmunity", value: "ABBREW.Traits.WoundImmunities.enragedImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "enraged" },
+  { key: "instabilityImmunity", value: "ABBREW.Traits.WoundImmunities.instabilityImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "instability" },
+  { key: "sinImmunity", value: "ABBREW.Traits.WoundImmunities.sinImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "sin" }
 ];
 ABBREW.skillFlags = {
   shieldTraining: "ABBREW.SkillFlags.shieldTraining",
@@ -4322,6 +4336,7 @@ Hooks.once("init", function() {
     rollItemMacro
   };
   CONFIG.ABBREW = ABBREW;
+  addWoundUtilities();
   CONFIG.Combat.initiative = {
     formula: "1d10 + @attributes.agi.value + @attributes.wit.value",
     decimals: 2
@@ -4391,6 +4406,14 @@ function _configureStatusEffects() {
     addEffect(arr, foundry.utils.mergeObject(original ?? {}, { id, ...data }, { inplace: false }));
     return arr;
   }, []);
+}
+function addWoundUtilities() {
+  const wounds = foundry.utils.deepClone(CONFIG.ABBREW.wounds);
+  CONFIG.ABBREW.lingeringWoundTypes = Object.entries(wounds).filter((w) => w[1].lingeringWounds.length > 0).map((w) => w[0]);
+  CONFIG.ABBREW.woundToLingeringWounds = Object.entries(wounds).filter((w) => w[1].lingeringWounds.length > 0).reduce((result, wound) => {
+    result[wound[0]] = wound[1].lingeringWounds;
+    return result;
+  }, {});
 }
 Handlebars.registerHelper("toLowerCase", function(str) {
   return str.toLowerCase();

@@ -132,20 +132,30 @@ async function turnStart(actor) {
         ChatMessage.create({ content: `${actor.name} starts their turn`, speaker: ChatMessage.getSpeaker({ actor: actor }) });
     }
 
-    if (actor.system.traitsData) {
-        // TODO: Add to CONFIG.ABBREW in abbrew.mjs for easier pull
-        // TODO: Sort this shit out:
-        // Need to get the applied wound types, again could store in config
-        // Need to get the value of the parent wound
-        // Do the update
-        const lingeringWoundTypes = Object.entries(CONFIG.ABBREW.wounds).filter(w => w[1].lingeringWounds.length > 0);
-        const activeLingeringdWounds = lingeringWoundTypes.filter(w => actor.system.wounds.some(aw => aw.type === w[0]));
-        const appliedLingeringWounds = activeLingeringdWounds.
-        const bleedingWounds = filteredWounds.length > 0 ? filteredWounds[0].value : 0;
-        if (bleedingWounds > 0) {
-            const bleedModifier = bleedingWounds > 1 ? -1 : 0;
-            const vitalWounds = [{ type: 'vital', value: bleedingWounds }, { type: 'bleed', value: bleedModifier }];
-            await updateActorWounds(actor, mergeActorWounds(actor, vitalWounds));
+    const lingeringWoundTypes = foundry.utils.deepClone(CONFIG.ABBREW.lingeringWoundTypes);
+    const woundToLingeringWounds = foundry.utils.deepClone(CONFIG.ABBREW.woundToLingeringWounds);
+    const lingeringWoundImmunities = actor.system.traitsData.filter(t => t.feature === "wound" && t.subFeature === "lingeringWound" && t.effect === "immunity").map(t => t.data);
+    const activeLingeringWounds = actor.system.wounds.filter(w => lingeringWoundTypes.some(lw => w.type === lw)).filter(w => !lingeringWoundImmunities.includes(w.type));
+    if (activeLingeringWounds.length > 0) {
+        const appliedLingeringWounds = {};
+        activeLingeringWounds.flatMap(lw => woundToLingeringWounds[lw.type].map(lwt => ({ type: lwt, value: lw.value }))).reduce((appliedLingeringWounds, wound) => {
+            if (wound.type in appliedLingeringWounds) {
+                appliedLingeringWounds[wound.type] += wound.value;
+            } else {
+                appliedLingeringWounds[wound.type] = wound.value;
+            }
+
+            return appliedLingeringWounds;
+        }, appliedLingeringWounds);
+        const acuteWounUpdate = Object.entries(appliedLingeringWounds).map(alw => ({ type: alw[0], value: alw[1] }));
+        const lingeringWoundUpdate = activeLingeringWounds.flatMap(lw => actor.system.wounds.filter(w => w.type === lw.type).map(w => ({ type: w.type, value: getLingeringWoundValueUpdate(w.value) })));
+        const fullWoundUpdate = [...acuteWounUpdate, ...lingeringWoundUpdate];
+        if (fullWoundUpdate.length > 0) {
+            await updateActorWounds(actor, mergeActorWounds(actor, fullWoundUpdate));
         }
     }
+}
+
+function getLingeringWoundValueUpdate(woundValue) {
+    return woundValue > 1 ? -1 : 0;
 }

@@ -31,6 +31,8 @@ Hooks.once('init', function () {
   // Add custom constants for configuration.
   CONFIG.ABBREW = ABBREW;
 
+  addWoundUtilities();
+
   /**
    * Set an initiative formula for the system
    * @type {String}
@@ -133,6 +135,14 @@ function _configureStatusEffects() {
   //   addEffect(CONFIG.statusEffects, { id, ...data, hud: false });
   // }
 }
+
+/*--------------------------------------------*/
+
+function addWoundUtilities() {
+  const wounds = foundry.utils.deepClone(CONFIG.ABBREW.wounds);
+  CONFIG.ABBREW.lingeringWoundTypes = Object.entries(wounds).filter(w => w[1].lingeringWounds.length > 0).map(w => w[0]);
+  CONFIG.ABBREW.woundToLingeringWounds = Object.entries(wounds).filter(w => w[1].lingeringWounds.length > 0).reduce((result, wound) => { result[wound[0]] = wound[1].lingeringWounds; return result; }, {});
+};
 
 /* -------------------------------------------- */
 /*  Handlebars Helpers                          */
