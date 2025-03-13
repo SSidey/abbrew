@@ -109,8 +109,9 @@ async function turnStart(actor) {
   if (game.settings.get("abbrew", "announceTurnStart")) {
     ChatMessage.create({ content: `${actor.name} starts their turn`, speaker: ChatMessage.getSpeaker({ actor }) });
   }
-  if (actor.system.defense.canBleed) {
-    const filteredWounds = actor.system.wounds.filter((wound) => wound.type === "bleed");
+  if (actor.system.traitsData) {
+    const lingeringWoundTypes = Object.entries(CONFIG.ABBREW.wounds).filter((w) => w[1].lingeringWounds.length > 0).map((w) => w[0]);
+    const filteredWounds = actor.system.wounds.filter((wound) => lingeringWoundTypes.includes(wound.type));
     const bleedingWounds = filteredWounds.length > 0 ? filteredWounds[0].value : 0;
     if (bleedingWounds > 0) {
       const bleedModifier = bleedingWounds > 1 ? -1 : 0;
@@ -2007,7 +2008,12 @@ class AbbrewActorSheet extends ActorSheet {
       // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
       duplicates: false,
       // <- Should duplicate tags be allowed or not
-      whitelist: [...Object.values(CONFIG.ABBREW.traits).map((trait) => game.i18n.localize(trait.name))]
+      // whitelist: [.../* Object.values( */CONFIG.ABBREW.traits/* ) */.map(trait => game.i18n.localize(trait.name))]
+      whitelist: [.../* Object.values( */
+      CONFIG.ABBREW.traits.map((trait) => ({
+        ...trait,
+        value: game.i18n.localize(trait.value)
+      }))]
     };
     if (traits) {
       new Tagify(traits, traitsSettings);
@@ -2754,19 +2760,79 @@ ABBREW.actionCosts = {
 };
 ABBREW.wounds = {
   physical: {
-    name: "ABBREW.Wounds.physical"
+    name: "ABBREW.Wounds.physical",
+    lingeringWounds: [],
+    concepts: ["physical"]
   },
   bleed: {
-    name: "ABBREW.Wounds.bleed"
+    name: "ABBREW.Wounds.bleed",
+    lingeringWounds: ["vital"],
+    concepts: ["life"]
   },
   vital: {
-    name: "ABBREW.Wounds.vital"
+    name: "ABBREW.Wounds.vital",
+    lingeringWounds: [],
+    concepts: ["life"]
+  },
+  burning: {
+    name: "ABBREW.Wounds.burning",
+    lingeringWounds: ["burn"],
+    concepts: ["fire"]
+  },
+  burn: {
+    name: "ABBREW.Wounds.burn",
+    lingeringWounds: [],
+    concepts: ["fire"]
   },
   fatigue: {
-    name: "ABBREW.Wounds.fatigue"
+    name: "ABBREW.Wounds.fatigue",
+    lingeringWounds: ["exhaustion"],
+    concepts: []
+  },
+  exhaustion: {
+    name: "ABBREW.Wounds.exhaustion",
+    lingeringWounds: [],
+    concepts: []
+  },
+  dread: {
+    name: "ABBREW.Wounds.dread",
+    lingeringWounds: ["terror"],
+    concepts: ["fear"]
   },
   terror: {
-    name: "ABBREW.Wounds.terror"
+    name: "ABBREW.Wounds.terror",
+    lingeringWounds: [],
+    concepts: ["fear"]
+  },
+  enraged: {
+    name: "ABBREW.Wounds.enraged",
+    lingeringWounds: ["rage"],
+    concepts: ["emotion"]
+  },
+  rage: {
+    name: "ABBREW.Wounds.rage",
+    lingeringWounds: [],
+    concepts: ["emotion"]
+  },
+  instability: {
+    name: "ABBREW.Wounds.instability",
+    lingeringWounds: ["mutation"],
+    concepts: ["mutation"]
+  },
+  mutation: {
+    name: "ABBREW.Wounds.mutation",
+    lingeringWounds: [],
+    concepts: ["mutation"]
+  },
+  sin: {
+    name: "ABBREW.Wounds.sin",
+    lingeringWounds: ["corruption"],
+    concepts: ["corruption"]
+  },
+  corruption: {
+    name: "ABBREW.Wounds.corruption",
+    lingeringWounds: [],
+    concepts: ["corruption"]
   }
 };
 ABBREW.conditions = {
@@ -2840,11 +2906,15 @@ ABBREW.hands = {
     states: ["held2H"]
   }
 };
-ABBREW.traits = {
-  canBleed: {
-    name: "ABBREW.Traits.CanBleed.name"
-  }
-};
+ABBREW.traits = [
+  { key: "bleedImmunity", value: "ABBREW.Traits.WoundImmunities.bleedImmunity", type: "lingeringWoundImmunity", data: "bleed" },
+  { key: "burningImmunity", value: "ABBREW.Traits.WoundImmunities.burningImmunity", type: "lingeringWoundImmunity", data: "burning" },
+  { key: "fatigueImmunity", value: "ABBREW.Traits.WoundImmunities.fatigueImmunity", type: "lingeringWoundImmunity", data: "fatigue" },
+  { key: "dreadImmunity", value: "ABBREW.Traits.WoundImmunities.dreadImmunity", type: "lingeringWoundImmunity", data: "dread" },
+  { key: "enragedImmunity", value: "ABBREW.Traits.WoundImmunities.enragedImmunity", type: "lingeringWoundImmunity", data: "enraged" },
+  { key: "instabilityImmunity", value: "ABBREW.Traits.WoundImmunities.instabilityImmunity", type: "lingeringWoundImmunity", data: "instability" },
+  { key: "sinImmunity", value: "ABBREW.Traits.WoundImmunities.sinImmunity", type: "lingeringWoundImmunity", data: "sin" }
+];
 ABBREW.skillFlags = {
   shieldTraining: "ABBREW.SkillFlags.shieldTraining",
   overpower: "ABBREW.SkillFlags.overpower",
@@ -2852,6 +2922,9 @@ ABBREW.skillFlags = {
   feint: "ABBREW.SkillFlags.feint"
 };
 class AbbrewActorBase extends foundry.abstract.TypeDataModel {
+  get traitsData() {
+    return this.traits !== "" ? JSON.parse(this.traits) : [];
+  }
   static defineSchema() {
     const fields = foundry.data.fields;
     const requiredInteger = { required: true, nullable: false, integer: true };
@@ -2900,7 +2973,6 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 20 }),
         label: new fields.StringField({ required: true, blank: true })
       }),
-      canBleed: new fields.BooleanField({ required: true, nullable: false, initial: false }),
       fatalWounds: new fields.StringField({ required: true, blank: true })
     });
     schema.biography = new fields.StringField({ required: true, blank: true });
@@ -2931,7 +3003,6 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       this.attributes[key2].rank = this.attributes[key2].value;
     }
     this.defense.risk.value = Math.floor(this.defense.risk.raw / 10);
-    this.defense.canBleed = this.traits ? JSON.parse(this.traits).filter((t) => t.value === "Can Bleed").length : false;
     this.defense.resolve.max = 2 + Math.floor((this._getMaxFromPhysicalAttributes() + this._getMaxFromMentalAttributes()) / 2);
   }
   _getMaxFromPhysicalAttributes() {
@@ -3028,7 +3099,7 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     const armourInflexibility = armour.map((a) => a.system.defense.inflexibility).reduce((a, b) => a + b, 0);
     const wornArmourInflexibility = wornArmour.map((a) => a.system.defense.inflexibility).reduce((a, b) => a + b, 0);
     const weapons = this.parent.items.filter((i) => i.type === "weapon").filter((a) => a.system.equipType === "held").filter((a) => a.system.equipState.startsWith("held"));
-    const otherInflexibility = Math.max(0, weapons.reduce((result, w) => result += w.system.weapon.size, 0) - this.attributes["str"].value);
+    const otherInflexibility = Math.max(0, weapons.reduce((result, w) => result += w.system.weapon.size * 2, 0) - this.attributes["str"].value);
     this.defense.inflexibility.resistance.raw = armourInflexibility;
     this.defense.inflexibility.raw = Math.floor((0 + wornArmourInflexibility + otherInflexibility) / 2);
     this.defense.inflexibility.resistance.value = Math.floor(armourInflexibility / 10);
@@ -3620,6 +3691,7 @@ class AbbrewActor extends Actor {
       await this.sendFinisherToChat();
       return;
     }
+    await this.takeDamage(rolls, data);
     const risk = this.system.defense.risk.raw;
     const totalRisk = this.applyModifiersToRisk(rolls, data);
     const availableFinishers = this.getAvailableFinishersForDamageType(data);
@@ -3937,7 +4009,6 @@ class AbbrewItem2 extends Item {
     if (tokens.length === 0) {
       return;
     }
-    await tokens[0].actor.takeDamage(rolls, data, action);
     await tokens[0].actor.takeFinisher(rolls, data);
   }
   /**

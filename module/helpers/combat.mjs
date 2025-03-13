@@ -132,8 +132,15 @@ async function turnStart(actor) {
         ChatMessage.create({ content: `${actor.name} starts their turn`, speaker: ChatMessage.getSpeaker({ actor: actor }) });
     }
 
-    if (actor.system.defense.canBleed) {
-        const filteredWounds = actor.system.wounds.filter(wound => wound.type === 'bleed');
+    if (actor.system.traitsData) {
+        // TODO: Add to CONFIG.ABBREW in abbrew.mjs for easier pull
+        // TODO: Sort this shit out:
+        // Need to get the applied wound types, again could store in config
+        // Need to get the value of the parent wound
+        // Do the update
+        const lingeringWoundTypes = Object.entries(CONFIG.ABBREW.wounds).filter(w => w[1].lingeringWounds.length > 0);
+        const activeLingeringdWounds = lingeringWoundTypes.filter(w => actor.system.wounds.some(aw => aw.type === w[0]));
+        const appliedLingeringWounds = activeLingeringdWounds.
         const bleedingWounds = filteredWounds.length > 0 ? filteredWounds[0].value : 0;
         if (bleedingWounds > 0) {
             const bleedModifier = bleedingWounds > 1 ? -1 : 0;

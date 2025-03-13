@@ -74,6 +74,8 @@ export default class AbbrewActor extends Actor {
       return;
     }
 
+    await this.takeDamage(rolls, data);
+
     const risk = this.system.defense.risk.raw;
     const totalRisk = this.applyModifiersToRisk(rolls, data);
     const availableFinishers = this.getAvailableFinishersForDamageType(data);

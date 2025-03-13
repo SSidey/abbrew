@@ -129,7 +129,6 @@ export default class AbbrewItem extends Item {
       return;
     }
 
-    await tokens[0].actor.takeDamage(rolls, data, action);
     await tokens[0].actor.takeFinisher(rolls, data);
   }
 

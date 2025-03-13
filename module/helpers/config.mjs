@@ -118,19 +118,79 @@ ABBREW.actionCosts = {
 
 ABBREW.wounds = {
   physical: {
-    name: "ABBREW.Wounds.physical"
+    name: "ABBREW.Wounds.physical",
+    lingeringWounds: [],
+    concepts: ["physical"]
   },
   bleed: {
-    name: "ABBREW.Wounds.bleed"
+    name: "ABBREW.Wounds.bleed",
+    lingeringWounds: ["vital"],
+    concepts: ["life"]
   },
   vital: {
-    name: "ABBREW.Wounds.vital"
+    name: "ABBREW.Wounds.vital",
+    lingeringWounds: [],
+    concepts: ["life"]
+  },
+  burning: {
+    name: "ABBREW.Wounds.burning",
+    lingeringWounds: ["burn"],
+    concepts: ["fire"]
+  },
+  burn: {
+    name: "ABBREW.Wounds.burn",
+    lingeringWounds: [],
+    concepts: ["fire"]
   },
   fatigue: {
-    name: "ABBREW.Wounds.fatigue"
+    name: "ABBREW.Wounds.fatigue",
+    lingeringWounds: ["exhaustion"],
+    concepts: []
+  },
+  exhaustion: {
+    name: "ABBREW.Wounds.exhaustion",
+    lingeringWounds: [],
+    concepts: []
+  },
+  dread: {
+    name: "ABBREW.Wounds.dread",
+    lingeringWounds: ["terror"],
+    concepts: ["fear"]
   },
   terror: {
-    name: "ABBREW.Wounds.terror"
+    name: "ABBREW.Wounds.terror",
+    lingeringWounds: [],
+    concepts: ["fear"]
+  },
+  enraged: {
+    name: "ABBREW.Wounds.enraged",
+    lingeringWounds: ["rage"],
+    concepts: ["emotion"]
+  },
+  rage: {
+    name: "ABBREW.Wounds.rage",
+    lingeringWounds: [],
+    concepts: ["emotion"]
+  },
+  instability: {
+    name: "ABBREW.Wounds.instability",
+    lingeringWounds: ["mutation"],
+    concepts: ["mutation"]
+  },
+  mutation: {
+    name: "ABBREW.Wounds.mutation",
+    lingeringWounds: [],
+    concepts: ["mutation"]
+  },
+  sin: {
+    name: "ABBREW.Wounds.sin",
+    lingeringWounds: ["corruption"],
+    concepts: ["corruption"]
+  },
+  corruption: {
+    name: "ABBREW.Wounds.corruption",
+    lingeringWounds: [],
+    concepts: ["corruption"]
   }
 }
 
@@ -209,11 +269,15 @@ ABBREW.hands = {
   }
 }
 
-ABBREW.traits = {
-  canBleed: {
-    name: "ABBREW.Traits.CanBleed.name"
-  }
-}
+ABBREW.traits = [
+  { key: "bleedImmunity", value: "ABBREW.Traits.WoundImmunities.bleedImmunity", type: "lingeringWoundImmunity", data: "bleed" },
+  { key: "burningImmunity", value: "ABBREW.Traits.WoundImmunities.burningImmunity", type: "lingeringWoundImmunity", data: "burning" },
+  { key: "fatigueImmunity", value: "ABBREW.Traits.WoundImmunities.fatigueImmunity", type: "lingeringWoundImmunity", data: "fatigue" },
+  { key: "dreadImmunity", value: "ABBREW.Traits.WoundImmunities.dreadImmunity", type: "lingeringWoundImmunity", data: "dread" },
+  { key: "enragedImmunity", value: "ABBREW.Traits.WoundImmunities.enragedImmunity", type: "lingeringWoundImmunity", data: "enraged" },
+  { key: "instabilityImmunity", value: "ABBREW.Traits.WoundImmunities.instabilityImmunity", type: "lingeringWoundImmunity", data: "instability" },
+  { key: "sinImmunity", value: "ABBREW.Traits.WoundImmunities.sinImmunity", type: "lingeringWoundImmunity", data: "sin" }
+]
 
 ABBREW.skillFlags = {
   shieldTraining: "ABBREW.SkillFlags.shieldTraining",

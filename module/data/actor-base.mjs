@@ -1,5 +1,9 @@
 export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
+  get traitsData() {
+    return this.traits !== "" ? JSON.parse(this.traits) : [];
+  }
+
   static defineSchema() {
     const fields = foundry.data.fields;
     const requiredInteger = { required: true, nullable: false, integer: true };
@@ -13,7 +17,6 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         value: new fields.NumberField({ ...requiredInteger, initial: 0, max: 100 })
       })
     );
-
     schema.defense = new fields.SchemaField({
       guard: new fields.SchemaField({
         value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
@@ -51,7 +54,6 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 20 }),
         label: new fields.StringField({ required: true, blank: true })
       }),
-      canBleed: new fields.BooleanField({ required: true, nullable: false, initial: false }),
       fatalWounds: new fields.StringField({ required: true, blank: true })
     });
 
@@ -94,9 +96,6 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
     this.defense.risk.value = Math.floor(this.defense.risk.raw / 10);
 
-    this.defense.canBleed = this.traits ? JSON.parse(this.traits).filter(t => t.value === 'Can Bleed').length : false;
-
-    // PLAYTEST: Does this feel good?
     this.defense.resolve.max = 2 + Math.floor((this._getMaxFromPhysicalAttributes() + this._getMaxFromMentalAttributes()) / 2);
   }
 
@@ -220,7 +219,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     const armourInflexibility = armour.map(a => a.system.defense.inflexibility).reduce((a, b) => a + b, 0);
     const wornArmourInflexibility = wornArmour.map(a => a.system.defense.inflexibility).reduce((a, b) => a + b, 0);
     const weapons = this.parent.items.filter(i => i.type === 'weapon').filter(a => a.system.equipType === 'held').filter(a => a.system.equipState.startsWith('held'));
-    const otherInflexibility = Math.max(0, weapons.reduce((result, w) => result += w.system.weapon.size, 0) - this.attributes['str'].value);
+    const otherInflexibility = Math.max(0, weapons.reduce((result, w) => result += (w.system.weapon.size * 2), 0) - this.attributes['str'].value);
     this.defense.inflexibility.resistance.raw = armourInflexibility;
     this.defense.inflexibility.raw = Math.floor((0 + wornArmourInflexibility + otherInflexibility) / 2); // TODO: - weapon drills as "Shield Training" is handled
     this.defense.inflexibility.resistance.value = Math.floor(armourInflexibility / 10);

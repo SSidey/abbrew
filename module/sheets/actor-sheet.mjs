@@ -226,7 +226,11 @@ export class AbbrewActorSheet extends ActorSheet {
       },
       userInput: false,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
       duplicates: false,             // <- Should duplicate tags be allowed or not
-      whitelist: [...Object.values(CONFIG.ABBREW.traits).map(trait => game.i18n.localize(trait.name))]
+      // whitelist: [.../* Object.values( */CONFIG.ABBREW.traits/* ) */.map(trait => game.i18n.localize(trait.name))]
+      whitelist: [.../* Object.values( */CONFIG.ABBREW.traits/* ) */.map(trait => ({
+        ...trait,
+        value: game.i18n.localize(trait.value)
+      }))],
     };
     if (traits) {
       var taggedTraits = new Tagify(traits, traitsSettings);

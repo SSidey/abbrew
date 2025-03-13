@@ -116,8 +116,18 @@
       "physical": "Physical",
       "bleed": "Bleed",
       "vital": "Vital",
+      "burning": "Burning",
+      "burn": "Burn",
       "fatigue": "Fatigue",
-      "terror": "Terror"
+      "exhaustion": "Exhaustion",
+      "dread": "Dread",
+      "terror": "Terror",
+      "enraged": "Enraged",
+      "rage": "Rage",
+      "instability": "Instability",
+      "mutation": "Mutation",
+      "sin": "Sin",
+      "corruption": "Corruption"
     },
     "EFFECT": {
       "Status": {
@@ -157,8 +167,14 @@
       "twoHand": "Two Handed"
     },
     "Traits": {
-      "CanBleed": {
-        "name": "Can Bleed"
+      "WoundImmunities": {
+        "bleedImmunity": "Bleed Immunity",
+        "burningImmunity": "Burning Immunity",
+        "fatigueImmunity": "Fatigue Immunity",
+        "dreadImmunity": "Dread Immunity",
+        "enragedImmunity": "Enraged Immunity",
+        "instabilityImmunity": "Instability Immunity",
+        "sinImmunity": "Sin Immunity"
       }
     },
     "SkillFlags": {
