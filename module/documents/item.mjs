@@ -120,7 +120,18 @@ export default class AbbrewItem extends Item {
       return;
     }
 
-    await tokens[0].actor.takeDamage(rolls, data, action);
+    const actor = tokens[0].actor;
+
+    if (action === "parry" && !actor.doesActorHaveSkillFlag("Parry")) {
+      ui.notifications.info("You have not trained enough to be able to parry.");
+      return;
+    }
+
+    const actions = action === "parry" ? 1 : 0;
+    if (actions > 0 && !await actor.canActorUseActions(actions)) {
+      return;
+    }
+    await actor.takeDamage(rolls, data, action);
   }
 
   static async _onAcceptFinisherAction(rolls, data, action) {

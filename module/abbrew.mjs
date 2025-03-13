@@ -215,7 +215,7 @@ Hooks.on("combatTurn", async (combat, updateData, updateOptions) => {
 
 Hooks.on("combatTurnChange", async (combat, prior, current) => {
   if (canvas.tokens.get(current.tokenId).actor.isOwner) {
-    await handleTurnStart(prior, current, canvas.tokens.get(current.tokenId).actor);
+    await handleTurnStart(prior, current,  canvas.tokens.get(prior.tokenId).actor, canvas.tokens.get(current.tokenId).actor);
   }
 })
 

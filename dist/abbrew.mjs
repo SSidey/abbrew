@@ -14,11 +14,12 @@ function applyOperator(base, value, operator) {
       return base;
   }
 }
-async function handleTurnStart(prior, current, actor) {
+async function handleTurnStart(prior, current, priorActor, currentActor) {
   if (current.round < prior.round || prior.round == current.round && current.turn < prior.turn) {
     return;
   }
-  await turnStart(actor);
+  await turnEnd(priorActor);
+  await turnStart(currentActor);
 }
 function mergeActorWounds(actor, incomingWounds) {
   return mergeActorWoundsWithOperator(actor, incomingWounds, "add");
@@ -104,6 +105,9 @@ async function setActorToDead(actor) {
 }
 async function setActorToGuardBreak(actor) {
   setActorCondition(actor, "guardBreak");
+}
+async function turnEnd(actor) {
+  await actor.update({ "system.actions": 5 });
 }
 async function turnStart(actor) {
   if (game.settings.get("abbrew", "announceTurnStart")) {
@@ -2182,6 +2186,10 @@ class AbbrewActorSheet extends ActorSheet {
     const attackProfileId = target.closest("li .attack-profile").dataset.attackProfileId;
     const item = this.actor.items.get(itemId);
     const attackProfile = item.system.attackProfiles[attackProfileId];
+    const actions = attackMode === "strong" ? item.system.exertActionCost : item.system.actionCost;
+    if (!await this.actor.canActorUseActions(actions)) {
+      return;
+    }
     const roll = new Roll(item.system.formula, item.actor);
     const result = await roll.evaluate();
     const token = this.actor.token;
@@ -3917,6 +3925,15 @@ class AbbrewActor extends Actor {
       await Item.create(naturalWeapons[index], { parent: this });
     }
   }
+  async canActorUseActions(actions) {
+    let remainingActions = this.system.actions;
+    if (actions > remainingActions) {
+      ui.notifications.info("You do not have enough actions to do that.");
+      return false;
+    }
+    await this.update({ "system.actions": remainingActions -= actions });
+    return true;
+  }
 }
 class AbbrewItem2 extends Item {
   /**
@@ -4016,7 +4033,16 @@ class AbbrewItem2 extends Item {
     if (tokens.length === 0) {
       return;
     }
-    await tokens[0].actor.takeDamage(rolls, data, action);
+    const actor = tokens[0].actor;
+    if (action === "parry" && !actor.doesActorHaveSkillFlag("Parry")) {
+      ui.notifications.info("You have not trained enough to be able to parry.");
+      return;
+    }
+    const actions = action === "parry" ? 1 : 0;
+    if (actions > 0 && !await actor.canActorUseActions(actions)) {
+      return;
+    }
+    await actor.takeDamage(rolls, data, action);
   }
   static async _onAcceptFinisherAction(rolls, data, action) {
     const tokens = canvas.tokens.controlled.filter((token) => token.actor);
@@ -4459,7 +4485,7 @@ Hooks.on("combatTurn", async (combat, updateData, updateOptions) => {
 });
 Hooks.on("combatTurnChange", async (combat, prior, current) => {
   if (canvas.tokens.get(current.tokenId).actor.isOwner) {
-    await handleTurnStart(prior, current, canvas.tokens.get(current.tokenId).actor);
+    await handleTurnStart(prior, current, canvas.tokens.get(prior.tokenId).actor, canvas.tokens.get(current.tokenId).actor);
   }
 });
 Hooks.on("applyActiveEffect", applyCustomEffects);

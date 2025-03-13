@@ -37,10 +37,10 @@
         </div>
 
         <div class="resource flex-group-center">
-          <label for="system.movement.baseSpeed" class="resource-label">Speed</label>
+          <label for="system.actions" class="resource-label">Actions</label>
           <div class="resource-content flexrow flex-center flex-between">
-            <input type="text" name="system.movement.baseSpeed" value="{{system.movement.baseSpeed}}"
-              data-dtype="Number" readonly />
+            <input type="text" name="system.actions" value="{{system.actions}}"
+              data-dtype="Number" />
           </div>
         </div>
 
@@ -119,6 +119,13 @@
         <section class="main grid-span-2">
           {{!-- This is a Handlebars partial. They're stored in the `/parts` folder next to this sheet, and defined in
           module/helpers/templates.mjs --}}
+          <div class="resource flex-group-center">
+            <label for="system.movement.baseSpeed" class="resource-label">Speed</label>
+            <div class="resource-content flexrow flex-center flex-between">
+              <input type="text" name="system.movement.baseSpeed" value="{{system.movement.baseSpeed}}"
+                data-dtype="Number" readonly />
+            </div>
+          </div>
           {{> "systems/abbrew/templates/actor/parts/actor-anatomy.hbs"}}
           {{> "systems/abbrew/templates/actor/parts/actor-armour.hbs" showEquipState=false}}
           {{> "systems/abbrew/templates/actor/parts/actor-weapons.hbs" weaponsList=equippedWeapons

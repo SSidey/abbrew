@@ -1,10 +1,11 @@
 import { applyOperator } from "./operators.mjs";
 
-export async function handleTurnStart(prior, current, actor) {
+export async function handleTurnStart(prior, current, priorActor, currentActor) {
     if (current.round < prior.round || (prior.round == current.round && current.turn < prior.turn)) {
         return;
     }
-    await turnStart(actor);
+    await turnEnd(priorActor);
+    await turnStart(currentActor);
 }
 
 export function mergeActorWounds(actor, incomingWounds) {
@@ -125,6 +126,11 @@ async function setActorToGuardBreak(actor) {
 
 async function setActorToOffGuard(actor) {
     setActorCondition(actor, 'offGuard');
+}
+
+async function turnEnd(actor) {
+    // TODO: Conditions could modify this?
+    await actor.update({ "system.actions": 5 })
 }
 
 async function turnStart(actor) {

@@ -337,4 +337,15 @@ export default class AbbrewActor extends Actor {
       await Item.create(naturalWeapons[index], { parent: this })
     }
   }
+
+  async canActorUseActions(actions) {
+    let remainingActions = this.system.actions;
+    if (actions > remainingActions) {
+      ui.notifications.info("You do not have enough actions to do that.");
+      return false;
+    }
+
+    await this.update({ "system.actions": remainingActions -= actions });
+    return true;
+  }
 }

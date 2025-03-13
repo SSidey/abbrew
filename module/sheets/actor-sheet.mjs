@@ -422,7 +422,10 @@ export class AbbrewActorSheet extends ActorSheet {
     const attackProfileId = target.closest('li .attack-profile').dataset.attackProfileId;
     const item = this.actor.items.get(itemId);
     const attackProfile = item.system.attackProfiles[attackProfileId];
-
+    const actions = attackMode === "strong" ? item.system.exertActionCost : item.system.actionCost;
+    if (!await this.actor.canActorUseActions(actions)) {
+      return;
+    }    
     // Invoke the roll and submit it to chat.
     const roll = new Roll(item.system.formula, item.actor);
     // If you need to store the value first, uncomment the next line.
