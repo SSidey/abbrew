@@ -185,6 +185,11 @@
     }
   },
 
+  "Speeds": {
+    "walk": "Walk",
+    "dash": "Dash"
+  },
+
   "TYPES": {
     "Actor": {
       "character": "Character",

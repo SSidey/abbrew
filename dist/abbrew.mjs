@@ -14,11 +14,20 @@ function applyOperator(base, value, operator) {
       return base;
   }
 }
+async function handleCombatStart(combatants) {
+  for (const index in combatants) {
+    const combatant = combatants[index];
+    const actor = game.actors.get(combatant.actorId);
+    await actor.update({ "system.actions": [5] });
+  }
+}
 async function handleTurnStart(prior, current, priorActor, currentActor) {
   if (current.round < prior.round || prior.round == current.round && current.turn < prior.turn) {
     return;
   }
-  await turnEnd(priorActor);
+  if (priorActor) {
+    await turnEnd(priorActor);
+  }
   await turnStart(currentActor);
 }
 function mergeActorWounds(actor, incomingWounds) {
@@ -3692,10 +3701,6 @@ class AbbrewActor extends Actor {
     return { ...super.getRollData(), ...((_b = (_a = this.system).getRollData) == null ? void 0 : _b.call(_a)) ?? null };
   }
   async takeDamage(rolls, data, action) {
-    if (action === "parry" && !this.doesActorHaveSkillFlag("Parry")) {
-      ui.notifications.info("You have not trained enough to be able to parry.");
-      return;
-    }
     Hooks.call("actorTakesDamage", this);
     let guard = this.system.defense.guard.value;
     let risk = this.system.defense.risk.raw;
@@ -4484,9 +4489,16 @@ Hooks.on("combatRound", async (combat, updateData, updateOptions) => {
 Hooks.on("combatTurn", async (combat, updateData, updateOptions) => {
 });
 Hooks.on("combatTurnChange", async (combat, prior, current) => {
-  if (canvas.tokens.get(current.tokenId).actor.isOwner) {
-    await handleTurnStart(prior, current, canvas.tokens.get(prior.tokenId).actor, canvas.tokens.get(current.tokenId).actor);
+  var _a;
+  if (combat.previous.round === 0 && combat.previous.turn === null) {
+    const combatants = combat.combatants.toObject();
+    await handleCombatStart(combatants);
   }
+  if (canvas.tokens.get(current.tokenId).actor.isOwner) {
+    await handleTurnStart(prior, current, (_a = canvas.tokens.get(prior.tokenId)) == null ? void 0 : _a.actor, canvas.tokens.get(current.tokenId).actor);
+  }
+});
+Hooks.on("updateToken", (document2, changed, options, userId) => {
 });
 Hooks.on("applyActiveEffect", applyCustomEffects);
 Hooks.on("renderChatLog", (app, html, data) => {

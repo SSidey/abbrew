@@ -48,10 +48,6 @@ export default class AbbrewActor extends Actor {
   }
 
   async takeDamage(rolls, data, action) {
-    if (action === "parry" && !this.doesActorHaveSkillFlag("Parry")) {
-      ui.notifications.info("You have not trained enough to be able to parry.");
-      return;
-    }
     Hooks.call('actorTakesDamage', this);
     let guard = this.system.defense.guard.value;
     let risk = this.system.defense.risk.raw;

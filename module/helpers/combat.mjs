@@ -1,10 +1,20 @@
 import { applyOperator } from "./operators.mjs";
 
+export async function handleCombatStart(combatants) {
+    for (const index in combatants) {
+        const combatant = combatants[index];
+        const actor = game.actors.get(combatant.actorId);
+        await actor.update({ "system.actions": 5 });
+    }
+}
+
 export async function handleTurnStart(prior, current, priorActor, currentActor) {
     if (current.round < prior.round || (prior.round == current.round && current.turn < prior.turn)) {
         return;
     }
-    await turnEnd(priorActor);
+    if (priorActor) {
+        await turnEnd(priorActor);
+    }
     await turnStart(currentActor);
 }
 
@@ -130,7 +140,7 @@ async function setActorToOffGuard(actor) {
 
 async function turnEnd(actor) {
     // TODO: Conditions could modify this?
-    await actor.update({ "system.actions": 5 })
+    await actor.update({ "system.actions": 5 });
 }
 
 async function turnStart(actor) {

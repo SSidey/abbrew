@@ -8,7 +8,7 @@ import { ABBREW } from './helpers/config.mjs';
 import * as models from './data/_module.mjs';
 // Import Documents Classes
 import * as documents from './documents/_module.mjs';
-import { handleTurnStart, handleActorWoundConditions, handleActorGuardConditions } from './helpers/combat.mjs';
+import { handleTurnStart, handleActorWoundConditions, handleActorGuardConditions, handleCombatStart } from './helpers/combat.mjs';
 import { staticID, doesNestedFieldExist } from './helpers/utils.mjs';
 import { registerSystemSettings } from './settings.mjs';
 import { AbbrewCreatureFormSheet } from './sheets/items/item-creature-form-sheet.mjs';
@@ -214,10 +214,23 @@ Hooks.on("combatTurn", async (combat, updateData, updateOptions) => {
 })
 
 Hooks.on("combatTurnChange", async (combat, prior, current) => {
+  if (combat.previous.round === 0 && combat.previous.turn === null) {
+    const combatants = combat.combatants.toObject()
+    await handleCombatStart(combatants);
+  }
   if (canvas.tokens.get(current.tokenId).actor.isOwner) {
-    await handleTurnStart(prior, current,  canvas.tokens.get(prior.tokenId).actor, canvas.tokens.get(current.tokenId).actor);
+    await handleTurnStart(prior, current, canvas.tokens.get(prior.tokenId)?.actor, canvas.tokens.get(current.tokenId).actor);
   }
 })
+
+Hooks.on("updateToken", (document, changed, options, userId) => {
+  // const combatId = game.combat._id;
+  // document.flags.elevationruler.movementHistory.combatMoveData[combatId]lastMoveDistance;
+  // use the selectedMovementType to determine?
+  // stepping is 1 action, less than or equal to speed is 2 actions, over that is 4, then should show red or no ruler?
+  // Once another action has been taken, reset for next movement?
+  // console.log("Somewhere to hit");
+});
 
 /* -------------------------------------------- */
 /*  Other Hooks                                 */
@@ -245,6 +258,36 @@ Hooks.on("updateActor", async (actor, updates, options, userId) => {
   }
 
 });
+
+// Hooks.once("dragRuler.ready", (SpeedProvider) => {
+//   class AbbrewSpeedProvider extends SpeedProvider {
+//     get colors() {
+//       return [
+//         { id: "walk", default: 0x00FF00, name: "ABBREW.Speeds.walk" },
+//         { id: "dash", default: 0xFFFF00, name: "ABBREW.Speeds.dash" },
+//       ]
+//     }
+
+//     getRanges(token) {
+//       const baseSpeed = token.actor.data.speed
+
+//       // A character can always walk it's base speed and dash twice it's base speed
+//       const ranges = [
+//         { range: baseSpeed, color: "walk" },
+//         { range: baseSpeed * 2, color: "dash" }
+//       ]
+
+//       return ranges
+//     }
+
+//     async onMovementHistoryUpdate(tokens) {
+//       super.onMovementHistoryUpdate(tokens);
+//     }
+
+//   }
+
+//   dragRuler.registerSystem("abbrew", AbbrewSpeedProvider)
+// })
 
 Hooks.on("dropActorSheetData", async (actor, sheet, data) => {
   console.log(data);
