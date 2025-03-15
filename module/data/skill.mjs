@@ -15,6 +15,10 @@ export default class AbbrewSkill extends AbbrewItemBase {
             activationType: new fields.StringField({ ...blankString }),
             actionCost: new fields.StringField({ ...blankString }),
             actionImage: new fields.StringField({ ...blankString }),
+            duration: new fields.SchemaField({
+                precision: new fields.StringField({ ...blankString }),
+                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+            }),
             modifiers: new fields.SchemaField({
                 damage:
                     new fields.SchemaField({
@@ -67,6 +71,20 @@ export default class AbbrewSkill extends AbbrewItemBase {
                             type: new fields.StringField({ ...blankString }),
                             value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
                             operator: new fields.StringField({ ...blankString })
+                        })
+                    )
+                }),
+                lingeringWoundSuppression: new fields.SchemaField({
+                    self: new fields.ArrayField(
+                        new fields.SchemaField({
+                            type: new fields.StringField({ ...blankString }),
+                            value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                        })
+                    ),
+                    target: new fields.ArrayField(
+                        new fields.SchemaField({
+                            type: new fields.StringField({ ...blankString }),
+                            value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
                         })
                     )
                 }),

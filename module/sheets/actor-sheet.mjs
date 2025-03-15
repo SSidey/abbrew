@@ -3,7 +3,7 @@ import {
   onManageActiveEffect,
   prepareActiveEffectCategories,
 } from '../helpers/effects.mjs';
-import { activateSkill } from '../helpers/skill.mjs';
+import { activateSkill, queueSynergySkill } from '../helpers/skill.mjs';
 import Tagify from '@yaireo/tagify'
 
 /**
@@ -380,17 +380,6 @@ export class AbbrewActorSheet extends ActorSheet {
     }
   }
 
-
-  async _onSkillActivate(event) {
-    event.preventDefault();
-    const target = event.target.closest('.skill');
-    const id = target.dataset.skillId;
-    const skill = this.actor.items.get(id).system;
-    if (skill.activatable && skill.action.activationType === 'standalone') {
-      await activateSkill(this.actor, skill);
-    }
-  }
-
   _onToggleSkillHeader(event) {
     event.preventDefault();
     const target = event.currentTarget;
@@ -417,6 +406,22 @@ export class AbbrewActorSheet extends ActorSheet {
     updateActorWounds(this.actor, mergeActorWounds(this.actor, [{ type: woundType, value: modification }]));
   }
 
+  async _onSkillActivate(event) {
+    event.preventDefault();
+    const target = event.target.closest('.skill');
+    const id = target.dataset.skillId;
+    const skill = this.actor.items.get(id);
+    if (!await this.actor.canActorUseActions(skill.system.action.actionCost)) {
+      return;
+    }
+
+    if (skill.system.activatable && skill.system.action.activationType === 'standalone') {
+      await activateSkill(this.actor, skill);
+    } else {
+      queueSynergySkill(this.actor, skill);
+    }
+  }
+
   async _onAttackDamageAction(target, attackMode) {
     const itemId = target.closest('li.item').dataset.itemId;
     const attackProfileId = target.closest('li .attack-profile').dataset.attackProfileId;
@@ -425,7 +430,7 @@ export class AbbrewActorSheet extends ActorSheet {
     const actions = attackMode === "strong" ? item.system.exertActionCost : item.system.actionCost;
     if (!await this.actor.canActorUseActions(actions)) {
       return;
-    }    
+    }
     // Invoke the roll and submit it to chat.
     const roll = new Roll(item.system.formula, item.actor);
     // If you need to store the value first, uncomment the next line.
@@ -514,7 +519,7 @@ export class AbbrewActorSheet extends ActorSheet {
     // Get the type of item to create.
     const type = header.dataset.type;
     // Grab any data associated with this control.
-    const data = duplicate(header.dataset);
+    const data = foundry.utils.duplicate(header.dataset);
     // Initialize a default name.
     const name = `New ${type.capitalize()}`;
     // Prepare the item object.

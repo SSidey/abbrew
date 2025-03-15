@@ -177,6 +177,13 @@
         "sinImmunity": "Sin Immunity"
       }
     },
+    "Durations": {
+      "second": "Second",
+      "round": "Round",
+      "minute": "Minute",
+      "hour": "Hour",
+      "day": "Day"
+    },
     "SkillFlags": {
       "shieldTraining": "Shield Training",
       "overpower": "Overpower",

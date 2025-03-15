@@ -20,6 +20,14 @@
         <input type="text" name="system.action.actionCost" value="{{system.action.actionCost}}" data-dtype="String" />
     </div>
     <div>
+        <h3>Duration</h3>
+        <select name="system.action.duration.precision">
+            {{selectOptions config.durations selected=system.action.duration.precision blank="" localize=true}}
+        </select>
+        <input type="text" name="system.action.duration.value" value="{{system.action.duration.value}}"
+            data-dtype="String" />
+    </div>
+    <div>
         <div>
             <label>Guard</label>
             <div>
@@ -64,7 +72,7 @@
                             <label>Type</label>
                             <select name="system.action.modifiers.wounds.self.{{k}}.type">
                                 {{selectOptions ../config.wounds selected=wound.type
-                                blank="" 
+                                blank=""
                                 localize=true}}
                             </select>
                         </div>

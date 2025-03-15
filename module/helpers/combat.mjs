@@ -1,14 +1,13 @@
 import { applyOperator } from "./operators.mjs";
 
-export async function handleCombatStart(combatants) {
-    for (const index in combatants) {
-        const combatant = combatants[index];
-        const actor = game.actors.get(combatant.actorId);
+export async function handleCombatStart(actors) {
+    for (const index in actors) {
+        const actor = actors[index];
         await actor.update({ "system.actions": 5 });
     }
 }
 
-export async function handleTurnStart(prior, current, priorActor, currentActor) {
+export async function handleTurnChange(prior, current, priorActor, currentActor) {
     if (current.round < prior.round || (prior.round == current.round && current.turn < prior.turn)) {
         return;
     }

@@ -1,6 +1,16 @@
 // Namespace Configuration Values
 export const ABBREW = {};
 
+ABBREW.durations = {
+  instant: { label: "ABBREW.Durations.instant", value: 0 },
+  second: { label: "ABBREW.Durations.second", value: 1 },
+  turn: { label: "ABBREW.Durations.turn", value: 0.01 },
+  round: { label: "ABBREW.Durations.round", value: 6 },
+  minute: { label: "ABBREW.Durations.minute", value: 60 },
+  hour: { label: "ABBREW.Durations.hour", value: 3600 },
+  day: { label: "ABBREW.Durations.day", value: 86400 }
+}
+
 /**
  * The set of Attribute Scores used within the system.
  * @type {Object}

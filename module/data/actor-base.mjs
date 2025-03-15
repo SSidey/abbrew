@@ -17,6 +17,9 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         value: new fields.NumberField({ ...requiredInteger, initial: 0, max: 100 })
       })
     );
+    schema.queuedSkills = new fields.ArrayField(
+      new fields.StringField({ required: true, blank: true })
+    );
     schema.defense = new fields.SchemaField({
       guard: new fields.SchemaField({
         value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),

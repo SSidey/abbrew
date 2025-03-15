@@ -21,6 +21,7 @@
   "private": true,
   "devDependencies": {
     "chalk": "^3.0.0",
+    "foundryvtt-simple-calendar": "^2.4.18",
     "fs-extra": "^9.1.0",
     "gulp": "^4.0.2",
     "gulp-autoprefixer": "^8.0.0",

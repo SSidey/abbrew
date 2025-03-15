@@ -8,7 +8,7 @@ import { ABBREW } from './helpers/config.mjs';
 import * as models from './data/_module.mjs';
 // Import Documents Classes
 import * as documents from './documents/_module.mjs';
-import { handleTurnStart, handleActorWoundConditions, handleActorGuardConditions, handleCombatStart } from './helpers/combat.mjs';
+import { handleTurnChange, handleActorWoundConditions, handleActorGuardConditions, handleCombatStart } from './helpers/combat.mjs';
 import { staticID, doesNestedFieldExist } from './helpers/utils.mjs';
 import { registerSystemSettings } from './settings.mjs';
 import { AbbrewCreatureFormSheet } from './sheets/items/item-creature-form-sheet.mjs';
@@ -205,21 +205,20 @@ Hooks.once('ready', function () {
 /* -------------------------------------------- */
 
 Hooks.on("combatStart", async (combat, updateData, updateOptions) => {
+  const actors = combat.combatants.toObject().map(c => canvas.tokens.get(c.tokenId).actor);
+  await handleCombatStart(actors);
 });
 
 Hooks.on("combatRound", async (combat, updateData, updateOptions) => {
+  game.time.advance(CONFIG.ABBREW.durations.round.value);
 })
 
 Hooks.on("combatTurn", async (combat, updateData, updateOptions) => {
 })
 
 Hooks.on("combatTurnChange", async (combat, prior, current) => {
-  if (combat.previous.round === 0 && combat.previous.turn === null) {
-    const combatants = combat.combatants.toObject()
-    await handleCombatStart(combatants);
-  }
   if (canvas.tokens.get(current.tokenId).actor.isOwner) {
-    await handleTurnStart(prior, current, canvas.tokens.get(prior.tokenId)?.actor, canvas.tokens.get(current.tokenId).actor);
+    await handleTurnChange(prior, current, canvas.tokens.get(prior.tokenId)?.actor, canvas.tokens.get(current.tokenId).actor);
   }
 })
 
@@ -259,35 +258,22 @@ Hooks.on("updateActor", async (actor, updates, options, userId) => {
 
 });
 
-// Hooks.once("dragRuler.ready", (SpeedProvider) => {
-//   class AbbrewSpeedProvider extends SpeedProvider {
-//     get colors() {
-//       return [
-//         { id: "walk", default: 0x00FF00, name: "ABBREW.Speeds.walk" },
-//         { id: "dash", default: 0xFFFF00, name: "ABBREW.Speeds.dash" },
-//       ]
-//     }
+Hooks.on("updateItem", (document, options, userId) => { });
 
-//     getRanges(token) {
-//       const baseSpeed = token.actor.data.speed
+Hooks.on("preUpdateItem", () => { })
 
-//       // A character can always walk it's base speed and dash twice it's base speed
-//       const ranges = [
-//         { range: baseSpeed, color: "walk" },
-//         { range: baseSpeed * 2, color: "dash" }
-//       ]
+Hooks.on("deleteActiveEffect", async (effect, options, userId) => {
+  console.log("deleted");
+  const actor = effect.parent;
+  const queuedSkillsWithDuration = actor.effects.toObject().map(e => e.flags.abbrew.skill.trackDuration);
+  await actor.update({ "system.queuedSkills": queuedSkillsWithDuration });
+});
 
-//       return ranges
-//     }
+Hooks.on("updateActiveEffect", () => { })
 
-//     async onMovementHistoryUpdate(tokens) {
-//       super.onMovementHistoryUpdate(tokens);
-//     }
+Hooks.on("preUpdateActiveEffect", (effect, update, options, user) => { });
 
-//   }
-
-//   dragRuler.registerSystem("abbrew", AbbrewSpeedProvider)
-// })
+Hooks.on("preDeleteActiveEffect", async (effect, options, userId) => { })
 
 Hooks.on("dropActorSheetData", async (actor, sheet, data) => {
   console.log(data);

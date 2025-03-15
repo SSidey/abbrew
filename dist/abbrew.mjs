@@ -14,14 +14,13 @@ function applyOperator(base, value, operator) {
       return base;
   }
 }
-async function handleCombatStart(combatants) {
-  for (const index in combatants) {
-    const combatant = combatants[index];
-    const actor = game.actors.get(combatant.actorId);
-    await actor.update({ "system.actions": [5] });
+async function handleCombatStart(actors) {
+  for (const index in actors) {
+    const actor = actors[index];
+    await actor.update({ "system.actions": 5 });
   }
 }
-async function handleTurnStart(prior, current, priorActor, currentActor) {
+async function handleTurnChange(prior, current, priorActor, currentActor) {
   if (current.round < prior.round || prior.round == current.round && current.turn < prior.turn) {
     return;
   }
@@ -232,23 +231,84 @@ function getNumericParts(value) {
 }
 async function activateSkill(actor, skill) {
   let updates = {};
-  if (skill.action.modifiers.guard.self.value) {
-    const rawValue = skill.action.modifiers.guard.self.value;
+  const duration = getSkillDuration(skill);
+  if (duration) {
+    await createDurationActiveEffect(actor, skill, duration);
+  }
+  if (skill.system.action.modifiers.guard.self.value) {
+    const rawValue = skill.system.action.modifiers.guard.self.value;
     const value = isNumeric(rawValue) ? parseInt(rawValue) : parsePath(rawValue, actor);
     const skilledGuard = applySkillsForGuard(value, actor);
     const guard = applyOperator(
       actor.system.defense.guard.value,
       skilledGuard,
-      skill.action.modifiers.guard.self.operator
+      skill.system.action.modifiers.guard.self.operator
     );
     updates["system.defense.guard.value"] = guard;
   }
-  if (skill.action.modifiers.wounds.self.length > 0) {
+  if (skill.system.action.modifiers.wounds.self.length > 0) {
     let updateWounds = actor.system.wounds;
-    skill.action.modifiers.wounds.self.filter((w) => w.value && w.type && w.operator).forEach((w) => updateWounds = mergeWoundsWithOperator(updateWounds, [{ type: w.type, value: w.value }], w.operator));
+    skill.system.action.modifiers.wounds.self.filter((w) => w.value && w.type && w.operator).forEach((w) => updateWounds = mergeWoundsWithOperator(updateWounds, [{ type: w.type, value: w.value }], w.operator));
     updates["system.wounds"] = updateWounds;
   }
   await actor.update(updates);
+}
+function getSkillDuration(skill) {
+  var _a, _b, _c, _d;
+  const precision = skill.system.action.duration.precision;
+  if (precision === "0") {
+    return null;
+  }
+  const duration = {};
+  const value = skill.system.action.duration.value;
+  duration["startTime"] = game.time.worldTime;
+  if (precision === "6") {
+    duration["rounds"] = value;
+    duration["startRound"] = ((_a = game.combat) == null ? void 0 : _a.round) ?? 0;
+    duration["startTurn"] = ((_b = game.combat) == null ? void 0 : _b.turn) ?? 0;
+    duration["type"] = "rounds";
+    duration["duration"] = value;
+    return duration;
+  }
+  if (precision === "0.01") {
+    duration["turns"] = value;
+    duration["startRound"] = ((_c = game.combat) == null ? void 0 : _c.round) ?? 0;
+    duration["startTurn"] = ((_d = game.combat) == null ? void 0 : _d.turn) ?? 0;
+    duration["type"] = "turns";
+    duration["duration"] = (value / 100).toFixed(2);
+    return duration;
+  }
+  const seconds = precision * value;
+  duration["duration"] = seconds;
+  duration["seconds"] = seconds;
+  duration["type"] = "seconds";
+  return duration;
+}
+async function queueSynergySkill(actor, skill) {
+  const duration = getSkillDuration(skill);
+  if (duration) {
+    await createDurationActiveEffect(actor, skill, duration);
+  }
+  const skills = actor.system.queuedSkills;
+  const updateSkills = [...skills, skill._id];
+  await actor.update({ "system.queuedSkills": updateSkills });
+}
+async function createDurationActiveEffect(actor, skill, duration) {
+  const conditionEffectData = {
+    _id: actor._id,
+    name: game.i18n.localize(skill.name),
+    img: skill.img,
+    changes: [],
+    disabled: false,
+    duration,
+    description: game.i18n.localize(skill.description),
+    origin: `Actor.${actor._id}`,
+    tint: "",
+    transfer: false,
+    statuses: [],
+    flags: { abbrew: { skill: { trackDuration: skill._id } } }
+  };
+  await actor.createEmbeddedDocuments("ActiveEffect", [conditionEffectData]);
 }
 function isNumeric(str) {
   if (typeof str != "string")
@@ -2159,15 +2219,6 @@ class AbbrewActorSheet extends ActorSheet {
         return target.value;
     }
   }
-  async _onSkillActivate(event) {
-    event.preventDefault();
-    const target = event.target.closest(".skill");
-    const id = target.dataset.skillId;
-    const skill = this.actor.items.get(id).system;
-    if (skill.activatable && skill.action.activationType === "standalone") {
-      await activateSkill(this.actor, skill);
-    }
-  }
   _onToggleSkillHeader(event) {
     event.preventDefault();
     const target = event.currentTarget;
@@ -2189,6 +2240,20 @@ class AbbrewActorSheet extends ActorSheet {
   handleWoundClick(event, modification) {
     const woundType = event.currentTarget.dataset.woundType;
     updateActorWounds(this.actor, mergeActorWounds(this.actor, [{ type: woundType, value: modification }]));
+  }
+  async _onSkillActivate(event) {
+    event.preventDefault();
+    const target = event.target.closest(".skill");
+    const id = target.dataset.skillId;
+    const skill = this.actor.items.get(id);
+    if (!await this.actor.canActorUseActions(skill.system.action.actionCost)) {
+      return;
+    }
+    if (skill.system.activatable && skill.system.action.activationType === "standalone") {
+      await activateSkill(this.actor, skill);
+    } else {
+      queueSynergySkill(this.actor, skill);
+    }
   }
   async _onAttackDamageAction(target, attackMode) {
     const itemId = target.closest("li.item").dataset.itemId;
@@ -2270,7 +2335,7 @@ class AbbrewActorSheet extends ActorSheet {
     event.stopPropagation();
     const header = event.currentTarget;
     const type = header.dataset.type;
-    const data = duplicate(header.dataset);
+    const data = foundry.utils.duplicate(header.dataset);
     const name = `New ${type.capitalize()}`;
     const itemData = {
       name,
@@ -2691,6 +2756,15 @@ const preloadHandlebarsTemplates = async function() {
   ]);
 };
 const ABBREW = {};
+ABBREW.durations = {
+  instant: { label: "ABBREW.Durations.instant", value: 0 },
+  second: { label: "ABBREW.Durations.second", value: 1 },
+  turn: { label: "ABBREW.Durations.turn", value: 0.01 },
+  round: { label: "ABBREW.Durations.round", value: 6 },
+  minute: { label: "ABBREW.Durations.minute", value: 60 },
+  hour: { label: "ABBREW.Durations.hour", value: 3600 },
+  day: { label: "ABBREW.Durations.day", value: 86400 }
+};
 ABBREW.attributes = {
   str: "ABBREW.Attribute.Str.long",
   dex: "ABBREW.Attribute.Dex.long",
@@ -2967,6 +3041,9 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         type: new fields.StringField({ required: true }),
         value: new fields.NumberField({ ...requiredInteger, initial: 0, max: 100 })
       })
+    );
+    schema.queuedSkills = new fields.ArrayField(
+      new fields.StringField({ required: true, blank: true })
     );
     schema.defense = new fields.SchemaField({
       guard: new fields.SchemaField({
@@ -3305,6 +3382,10 @@ class AbbrewSkill extends AbbrewItemBase {
       activationType: new fields.StringField({ ...blankString }),
       actionCost: new fields.StringField({ ...blankString }),
       actionImage: new fields.StringField({ ...blankString }),
+      duration: new fields.SchemaField({
+        precision: new fields.StringField({ ...blankString }),
+        value: new fields.NumberField({ ...requiredInteger, initial: 0 })
+      }),
       modifiers: new fields.SchemaField({
         damage: new fields.SchemaField({
           self: new fields.ArrayField(
@@ -3356,6 +3437,20 @@ class AbbrewSkill extends AbbrewItemBase {
               type: new fields.StringField({ ...blankString }),
               value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
               operator: new fields.StringField({ ...blankString })
+            })
+          )
+        }),
+        lingeringWoundSuppression: new fields.SchemaField({
+          self: new fields.ArrayField(
+            new fields.SchemaField({
+              type: new fields.StringField({ ...blankString }),
+              value: new fields.NumberField({ ...requiredInteger, initial: 0 })
+            })
+          ),
+          target: new fields.ArrayField(
+            new fields.SchemaField({
+              type: new fields.StringField({ ...blankString }),
+              value: new fields.NumberField({ ...requiredInteger, initial: 0 })
             })
           )
         }),
@@ -4483,19 +4578,18 @@ Hooks.once("ready", function() {
   Hooks.on("hotbarDrop", (bar, data, slot) => createItemMacro(data, slot));
 });
 Hooks.on("combatStart", async (combat, updateData, updateOptions) => {
+  const actors = combat.combatants.toObject().map((c) => canvas.tokens.get(c.tokenId).actor);
+  await handleCombatStart(actors);
 });
 Hooks.on("combatRound", async (combat, updateData, updateOptions) => {
+  game.time.advance(CONFIG.ABBREW.durations.round.value);
 });
 Hooks.on("combatTurn", async (combat, updateData, updateOptions) => {
 });
 Hooks.on("combatTurnChange", async (combat, prior, current) => {
   var _a;
-  if (combat.previous.round === 0 && combat.previous.turn === null) {
-    const combatants = combat.combatants.toObject();
-    await handleCombatStart(combatants);
-  }
   if (canvas.tokens.get(current.tokenId).actor.isOwner) {
-    await handleTurnStart(prior, current, (_a = canvas.tokens.get(prior.tokenId)) == null ? void 0 : _a.actor, canvas.tokens.get(current.tokenId).actor);
+    await handleTurnChange(prior, current, (_a = canvas.tokens.get(prior.tokenId)) == null ? void 0 : _a.actor, canvas.tokens.get(current.tokenId).actor);
   }
 });
 Hooks.on("updateToken", (document2, changed, options, userId) => {
@@ -4514,6 +4608,22 @@ Hooks.on("updateActor", async (actor, updates, options, userId) => {
   if (doesNestedFieldExist(updates, "system.wounds") || doesNestedFieldExist(updates, "system.defense.resolve")) {
     await handleActorWoundConditions(actor);
   }
+});
+Hooks.on("updateItem", (document2, options, userId) => {
+});
+Hooks.on("preUpdateItem", () => {
+});
+Hooks.on("deleteActiveEffect", async (effect, options, userId) => {
+  console.log("deleted");
+  const actor = effect.parent;
+  const queuedSkillsWithDuration = actor.effects.toObject().map((e) => e.flags.abbrew.skill.trackDuration);
+  await actor.update({ "system.queuedSkills": queuedSkillsWithDuration });
+});
+Hooks.on("updateActiveEffect", () => {
+});
+Hooks.on("preUpdateActiveEffect", (effect, update, options, user) => {
+});
+Hooks.on("preDeleteActiveEffect", async (effect, options, userId) => {
 });
 Hooks.on("dropActorSheetData", async (actor, sheet, data) => {
   console.log(data);
