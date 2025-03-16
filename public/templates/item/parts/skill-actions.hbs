@@ -7,8 +7,8 @@
     <i class="fa fa-toggle-off"></i>
     {{/if}}
 </label>
-{{#if system.activatable}}
 <div class="item action">
+    {{#if system.activatable}}
     <div class="form-group">
         <label>{{ localize "ABBREW.SkillActivationType" }}</label>
         <select name="system.action.activationType">
@@ -28,8 +28,29 @@
             data-dtype="String" />
     </div>
     <div>
+        <label>Charges</label>
+        <label class="slide-toggle roboto-upper">
+            <input type="checkbox" name="system.action.charges.hasCharges" {{ checked system.action.charges.hasCharges
+                }}>
+            <span>{{attribute.label}}</span>
+            {{#if system.action.charges.hasCharges}}
+            <i class="fa fa-toggle-on"></i>
+            {{else}}
+            <i class="fa fa-toggle-off"></i>
+            {{/if}}
+        </label>
+        {{#if system.action.charges.hasCharges}}
+        <label>Curent Charges</label>
+        <input type="text" name="system.action.charges.value" value="{{system.action.charges.value}}"
+            data-dtype="Number" />
+        <label>Maximum Charges</label>
+        <input type="text" name="system.action.charges.max" value="{{system.action.charges.max}}" data-dtype="Number" />
+        {{/if}}
+    </div>
+    {{/if}}
+    <div>
         <div>
-            <label>Guard</label>
+            <h3>Guard</h3>
             <div>
                 <label>Self</label>
                 <input type="text" name="system.action.modifiers.guard.self.value"
@@ -140,4 +161,3 @@
         </ol> --}}
     </div>
 </div>
-{{/if}}

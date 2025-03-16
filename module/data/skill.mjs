@@ -8,7 +8,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
         const blankString = { required: true, blank: true }
         const requiredInteger = { required: true, nullable: false, integer: true };
 
-        schema.skillFlags = new fields.StringField({ ...blankString });
+        schema.skillTraits = new fields.StringField({ ...blankString });
         schema.configurable = new fields.BooleanField({ required: true });
         schema.activatable = new fields.BooleanField({ required: true, label: "ABBREW.Activatable" });
         schema.action = new fields.SchemaField({
@@ -19,6 +19,13 @@ export default class AbbrewSkill extends AbbrewItemBase {
                 precision: new fields.StringField({ ...blankString }),
                 value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
             }),
+            uses: new fields.NumberField({ ...requiredInteger, initial: -1 }),
+            charges: new fields.SchemaField({
+                hasCharges: new fields.BooleanField({ required: true, initial: false }),
+                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                max: new fields.NumberField({ ...requiredInteger, initial: 0 })
+            }),
+            isActive: new fields.BooleanField({ required: true }),
             modifiers: new fields.SchemaField({
                 damage:
                     new fields.SchemaField({
@@ -153,6 +160,13 @@ export default class AbbrewSkill extends AbbrewItemBase {
 
         if (this.action.actionCost) {
             this.action.actionImage = this.getActionImageName(this.action.actionCost);
+        }
+
+        if (this.parent) {
+            const queuedSkills = this.parent?.parent?.system?.queuedSkills ?? [];
+            const activeSkills = this.parent?.parent?.system?.activeSkills ?? [];
+            const id = this.parent?._id ?? null;
+            this.action.isActive = queuedSkills.includes(id) || activeSkills.includes(id)
         }
     }
 

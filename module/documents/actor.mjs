@@ -277,8 +277,8 @@ export default class AbbrewActor extends Actor {
     return this.items.filter(i => i.type === 'anatomy');
   }
 
-  doesActorHaveSkillFlag(trait) {
-    return this.items.filter(i => i.system.skillFlags).flatMap(i => JSON.parse(i.system.skillFlags)).map(st => st.value).includes(trait) ?? false;
+  doesActorHaveSkillTrait(trait) {
+    return this.items.filter(i => i.system.skillTraits).flatMap(i => JSON.parse(i.system.skillTraits)).map(st => st.value).includes(trait) ?? false;
   }
 
   async acceptWound(type, value) {
@@ -343,5 +343,11 @@ export default class AbbrewActor extends Actor {
 
     await this.update({ "system.actions": remainingActions -= actions });
     return true;
+  }
+
+  async handleDeleteActiveEffect() {
+    const activeSkillsWithDuration = this.effects.toObject().filter(e => e.flags.abbrew.skill.type === "standalone").map(e => e.flags.abbrew.skill.trackDuration);
+    const queuedSkillsWithDuration = this.effects.toObject().filter(e => e.flags.abbrew.skill.type === "synergy").map(e => e.flags.abbrew.skill.trackDuration);
+    await this.update({ "system.activeSkills": activeSkillsWithDuration, "system.queuedSkills": queuedSkillsWithDuration });
   }
 }

@@ -25,7 +25,7 @@
 //   const rollData = getRollData(actor, attack, attackProfile);
 
 //   // HERE: Look at skill rolls in 5e
-//   // TODO: FUCKER WAS COMING FROM HERE
+//   // TODO: WAS COMING FROM HERE
 //   rollData.mod = 10;
 
 //   // Compose roll options

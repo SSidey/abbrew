@@ -117,7 +117,7 @@ export class AbbrewItemSheet extends ItemSheet {
 
     this._activateArmourPoints(html);
     this._activateAnatomyParts(html);
-    this._activateSkillFlags(html);
+    this._activateSkillTraits(html);
   }
 
   prepareActions(system) {
@@ -164,22 +164,25 @@ export class AbbrewItemSheet extends ItemSheet {
     }
   }
 
-  _activateSkillFlags(html) {
-    const skillFlags = html[0].querySelector('input[name="system.skillFlags"]');
-    const skillFlagSettings = {
+  _activateSkillTraits(html) {
+    const skillTraits = html[0].querySelector('input[name="system.skillTraits"]');
+    const skillTraitSettings = {
       dropdown: {
         maxItems: 20,               // <- mixumum allowed rendered suggestions
         classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
         enabled: 0,                 // <- show suggestions on focus
         closeOnSelect: false,       // <- do not hide the suggestions dropdown once an item has been selected
-        includeSelectedTags: true   // <- Should the suggestions list Include already-selected tags (after filtering)
+        includeSelectedTags: false   // <- Should the suggestions list Include already-selected tags (after filtering)
       },
       userInput: false,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
       duplicates: true,             // <- Should duplicate tags be allowed or not
-      whitelist: [...Object.values(CONFIG.ABBREW.skillFlags).map(key => game.i18n.localize(key))]
+      whitelist: [.../* Object.values( */CONFIG.ABBREW.traits/* ) */.map(trait => ({
+        ...trait,
+        value: game.i18n.localize(trait.value)
+      }))],
     };
-    if (skillFlags) {
-      var taggedSkillFlags = new Tagify(skillFlags, skillFlagSettings);
+    if (skillTraits) {
+      var taggedSkillTraits = new Tagify(skillTraits, skillTraitSettings);
     }
   }
 

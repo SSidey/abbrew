@@ -17,7 +17,7 @@
   <ol class='skill-container' style="display: {{display}}" data-skill-section="{{localize (skillType)}}">
     {{#each (getProperty ../skills (localize (skillType))) as |item id|}}
     <li class='skill' data-skill-id='{{item._id}}'>
-      <div class="skill-card">
+      <div class="skill-card {{#if item.system.action.isActive}}skill-active{{/if}}">
         <h4 class="skill-name">{{item.name}}</h4>
         <div class='skill-image'>
           <a class='rollable' data-roll-type='item'>

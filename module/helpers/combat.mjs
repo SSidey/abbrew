@@ -1,4 +1,5 @@
 import { applyOperator } from "./operators.mjs";
+import { applySkillEffects } from "./skill.mjs";
 
 export async function handleCombatStart(actors) {
     for (const index in actors) {
@@ -147,6 +148,12 @@ async function turnStart(actor) {
         ChatMessage.create({ content: `${actor.name} starts their turn`, speaker: ChatMessage.getSpeaker({ actor: actor }) });
     }
 
+    await updateTurnStartWounds(actor);
+
+    await applyActiveSkills(actor);
+}
+
+async function updateTurnStartWounds(actor) {
     const lingeringWoundTypes = foundry.utils.deepClone(CONFIG.ABBREW.lingeringWoundTypes);
     const woundToLingeringWounds = foundry.utils.deepClone(CONFIG.ABBREW.woundToLingeringWounds);
     const lingeringWoundImmunities = actor.system.traitsData.filter(t => t.feature === "wound" && t.subFeature === "lingeringWound" && t.effect === "immunity").map(t => t.data);
@@ -168,6 +175,13 @@ async function turnStart(actor) {
         if (fullWoundUpdate.length > 0) {
             await updateActorWounds(actor, mergeActorWounds(actor, fullWoundUpdate));
         }
+    }
+}
+
+async function applyActiveSkills(actor) {
+    const activeSkills = actor.system.activeSkills.flatMap(s => actor.items.filter(i => i._id === s));
+    for (const index in activeSkills) {
+        await applySkillEffects(actor, activeSkills[index]);
     }
 }
 

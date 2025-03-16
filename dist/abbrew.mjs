@@ -14,6 +14,195 @@ function applyOperator(base, value, operator) {
       return base;
   }
 }
+function staticID(id) {
+  if (id.length >= 16)
+    return id.substring(0, 16);
+  return id.padEnd(16, "0");
+}
+function doesNestedFieldExist(obj, props) {
+  var splited = props.split(".");
+  var temp = obj;
+  for (var index in splited) {
+    if (typeof temp[splited[index]] === "undefined")
+      return false;
+    temp = temp[splited[index]];
+  }
+  return true;
+}
+function arrayDifference(a, b) {
+  return [...b.reduce(
+    (acc, v) => acc.set(v, (acc.get(v) || 0) - 1),
+    a.reduce((acc, v) => acc.set(v, (acc.get(v) || 0) + 1), /* @__PURE__ */ new Map())
+  )].reduce((acc, [v, count]) => acc.concat(Array(Math.abs(count)).fill(v)), []);
+}
+function getObjectValueByStringPath(entity, path) {
+  return path.split(".").reduce(function(o, k) {
+    return o && o[k];
+  }, entity);
+}
+function getNumericParts(value) {
+  return parseInt(value.replace(/\D/g, "")) ?? 0;
+}
+async function activateSkill(actor, skill) {
+  if (skill.system.action.activationType === "synergy") {
+    await trackSkillDuration(actor, skill);
+    await addSkillToQueuedSkills(actor, skill);
+    await rechargeSkill(actor, skill);
+    return;
+  }
+  if (skill.system.action.duration.precision !== "0" && skill.system.action.duration.value !== 0) {
+    await trackSkillDuration(actor, skill);
+    await addSkillToActiveSkills(actor, skill);
+  }
+  await applySkillEffects(actor, skill);
+}
+async function applySkillEffects(actor, skill) {
+  let updates = {};
+  const queuedSkills = actor.items.toObject().filter((i) => actor.system.queuedSkills.includes(i._id));
+  const skillTriggers2 = getSafeJson(skill.system.skillTraits, []).filter((t) => t.feature === "skillTrigger").map((t) => t.key);
+  const queuedSynergies = queuedSkills.filter((s) => getSafeJson(s.system.skillTraits, []).filter((st) => skillTriggers2.indexOf(st)));
+  const passiveSkills = actor.items.toObject().filter((i) => i.system.activatable === false && i.system.skillTraits);
+  const passiveSynergies = passiveSkills.filter((s) => getSafeJson(s.system.skillTraits, []).filter((st) => skillTriggers2.indexOf(st)));
+  const allSkills = [skill, ...queuedSynergies, ...passiveSynergies].filter((s) => !s.system.action.charges.hasCharges || s.system.action.charges.value > 0);
+  const chargedSkills = allSkills.filter((s) => s.system.action.charges.hasCharges);
+  const guardModifiers = allSkills.filter((s) => s.system.action.modifiers.guard.self.operator).map((s) => ({ value: getSkillValueForPath("system.action.modifiers.guard.self.value", s, s.system.action.modifiers.guard.self.value, actor), operator: s.system.action.modifiers.guard.self.operator }));
+  if (guardModifiers) {
+    const currentGuard = actor.system.defense.guard.value;
+    const guardModifier = mergeModifiers(guardModifiers);
+    updates["system.defense.guard.value"] = applyOperator(currentGuard, guardModifier, skill.system.action.modifiers.guard.self.operator);
+  }
+  await actor.update(updates);
+  for (const index in chargedSkills) {
+    const skill2 = chargedSkills[index];
+    let currentCharges = skill2.system.action.charges.value;
+    const item = actor.items.find((i) => i._id === skill2._id);
+    await item.update({ "system.action.charges.value": currentCharges -= 1 });
+  }
+}
+function getSafeJson(json, defaultValue) {
+  if (!json || json === "") {
+    return defaultValue;
+  }
+  return JSON.parse(json);
+}
+function mergeModifiers(modifiers) {
+  return modifiers.reduce((result, modifier) => applyOperator(result, modifier.value, modifier.operator), 0);
+}
+function getSkillValueForPath(path, skill, rawValue, actor) {
+  const skillTraits = getSafeJson(skill.system.skillTraits, []);
+  const valueReplacers2 = skillTraits.filter((st) => st.feature === "valueReplacer" && st.subFeature === path && st.effect === "replace");
+  if (valueReplacers2 == null ? void 0 : valueReplacers2.length) {
+    const valueReplacer = valueReplacers2.shift();
+    const value = parsePath(valueReplacer.data, actor);
+    return value;
+  }
+  return isNumeric(rawValue) ? parseInt(rawValue) : parsePath(rawValue, actor);
+}
+async function trackSkillDuration(actor, skill) {
+  const duration = getSkillDuration(skill);
+  if (duration) {
+    await createDurationActiveEffect(actor, skill, duration);
+  }
+}
+async function addSkillToActiveSkills(actor, skill) {
+  const skills = actor.system.activeSkills;
+  const updateSkills = [...skills, skill._id];
+  await actor.update({ "system.activeSkills": updateSkills });
+}
+async function addSkillToQueuedSkills(actor, skill) {
+  const skills = actor.system.queuedSkills;
+  const updateSkills = [...skills, skill._id];
+  await actor.update({ "system.queuedSkills": updateSkills });
+}
+function getSkillDuration(skill) {
+  var _a, _b, _c, _d, _e, _f;
+  const precision = skill.system.action.duration.precision;
+  const duration = {};
+  if (precision === "0") {
+    duration["turns"] = 1;
+    duration["startRound"] = ((_a = game.combat) == null ? void 0 : _a.round) ?? 0;
+    duration["startTurn"] = ((_b = game.combat) == null ? void 0 : _b.turn) ?? 0;
+    duration["type"] = "turns";
+    duration["duration"] = 0.01;
+    return duration;
+  }
+  const value = skill.system.action.duration.value;
+  duration["startTime"] = game.time.worldTime;
+  if (precision === "6") {
+    duration["rounds"] = value;
+    duration["startRound"] = ((_c = game.combat) == null ? void 0 : _c.round) ?? 0;
+    duration["startTurn"] = ((_d = game.combat) == null ? void 0 : _d.turn) ?? 0;
+    duration["type"] = "rounds";
+    duration["duration"] = value;
+    return duration;
+  }
+  if (precision === "0.01") {
+    duration["turns"] = value;
+    duration["startRound"] = ((_e = game.combat) == null ? void 0 : _e.round) ?? 0;
+    duration["startTurn"] = ((_f = game.combat) == null ? void 0 : _f.turn) ?? 0;
+    duration["type"] = "turns";
+    duration["duration"] = (value / 100).toFixed(2);
+    return duration;
+  }
+  const seconds = precision * value;
+  duration["duration"] = seconds;
+  duration["seconds"] = seconds;
+  duration["type"] = "seconds";
+  return duration;
+}
+async function createDurationActiveEffect(actor, skill, duration) {
+  const conditionEffectData = {
+    _id: actor._id,
+    name: game.i18n.localize(skill.name),
+    img: skill.img,
+    changes: [],
+    disabled: false,
+    duration,
+    description: game.i18n.localize(skill.description),
+    origin: `Actor.${actor._id}`,
+    tint: "",
+    transfer: false,
+    statuses: [],
+    flags: { abbrew: { skill: { type: skill.system.action.activationType, trackDuration: skill._id } } }
+  };
+  await actor.createEmbeddedDocuments("ActiveEffect", [conditionEffectData]);
+}
+async function rechargeSkill(actor, skill) {
+  const item = actor.items.filter((i) => i._id === skill._id).pop();
+  if (skill.system.action.charges.hasCharges) {
+    const maxCharges = skill.system.action.charges.max;
+    await item.update({ "system.action.charges.value": maxCharges });
+  }
+}
+function isNumeric(str) {
+  if (typeof str != "string")
+    return false;
+  return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+  !isNaN(parseFloat(str));
+}
+function parsePath(rawValue, actor) {
+  const entityType = rawValue.split(".").slice(0, 1).shift();
+  const entity = function() {
+    switch (entityType) {
+      case "actor":
+        return actor;
+      case "item":
+        const id = rawValue.split(".").slice(1, 2).shift();
+        return id ? actor.items.filter((i) => i._id === id).shift() : actor;
+    }
+  }();
+  const path = function() {
+    switch (entityType) {
+      case "actor":
+        return rawValue.split(".").slice(1).join(".");
+      case "item":
+        return rawValue.split(".").slice(2).join(".");
+    }
+  }();
+  if (getObjectValueByStringPath(entity, path) != null) {
+    return getObjectValueByStringPath(entity, path);
+  }
+}
 async function handleCombatStart(actors) {
   for (const index in actors) {
     const actor = actors[index];
@@ -121,10 +310,14 @@ async function turnStart(actor) {
   if (game.settings.get("abbrew", "announceTurnStart")) {
     ChatMessage.create({ content: `${actor.name} starts their turn`, speaker: ChatMessage.getSpeaker({ actor }) });
   }
+  await updateTurnStartWounds(actor);
+  await applyActiveSkills(actor);
+}
+async function updateTurnStartWounds(actor) {
   const lingeringWoundTypes = foundry.utils.deepClone(CONFIG.ABBREW.lingeringWoundTypes);
   const woundToLingeringWounds = foundry.utils.deepClone(CONFIG.ABBREW.woundToLingeringWounds);
-  const lingeringWoundImmunities = actor.system.traitsData.filter((t) => t.feature === "wound" && t.subFeature === "lingeringWound" && t.effect === "immunity").map((t) => t.data);
-  const activeLingeringWounds = actor.system.wounds.filter((w) => lingeringWoundTypes.some((lw) => w.type === lw)).filter((w) => !lingeringWoundImmunities.includes(w.type));
+  const lingeringWoundImmunities2 = actor.system.traitsData.filter((t) => t.feature === "wound" && t.subFeature === "lingeringWound" && t.effect === "immunity").map((t) => t.data);
+  const activeLingeringWounds = actor.system.wounds.filter((w) => lingeringWoundTypes.some((lw) => w.type === lw)).filter((w) => !lingeringWoundImmunities2.includes(w.type));
   if (activeLingeringWounds.length > 0) {
     const appliedLingeringWounds = {};
     activeLingeringWounds.flatMap((lw) => woundToLingeringWounds[lw.type].map((lwt) => ({ type: lwt, value: lw.value }))).reduce((appliedLingeringWounds2, wound) => {
@@ -141,6 +334,12 @@ async function turnStart(actor) {
     if (fullWoundUpdate.length > 0) {
       await updateActorWounds(actor, mergeActorWounds(actor, fullWoundUpdate));
     }
+  }
+}
+async function applyActiveSkills(actor) {
+  const activeSkills = actor.system.activeSkills.flatMap((s) => actor.items.filter((i) => i._id === s));
+  for (const index in activeSkills) {
+    await applySkillEffects(actor, activeSkills[index]);
   }
 }
 function getLingeringWoundValueUpdate(woundValue) {
@@ -199,154 +398,6 @@ function prepareActiveEffectCategories(effects) {
       categories.passive.effects.push(e);
   }
   return categories;
-}
-function staticID(id) {
-  if (id.length >= 16)
-    return id.substring(0, 16);
-  return id.padEnd(16, "0");
-}
-function doesNestedFieldExist(obj, props) {
-  var splited = props.split(".");
-  var temp = obj;
-  for (var index in splited) {
-    if (typeof temp[splited[index]] === "undefined")
-      return false;
-    temp = temp[splited[index]];
-  }
-  return true;
-}
-function arrayDifference(a, b) {
-  return [...b.reduce(
-    (acc, v) => acc.set(v, (acc.get(v) || 0) - 1),
-    a.reduce((acc, v) => acc.set(v, (acc.get(v) || 0) + 1), /* @__PURE__ */ new Map())
-  )].reduce((acc, [v, count]) => acc.concat(Array(Math.abs(count)).fill(v)), []);
-}
-function getObjectValueByStringPath(entity, path) {
-  return path.split(".").reduce(function(o, k) {
-    return o && o[k];
-  }, entity);
-}
-function getNumericParts(value) {
-  return parseInt(value.replace(/\D/g, "")) ?? 0;
-}
-async function activateSkill(actor, skill) {
-  let updates = {};
-  const duration = getSkillDuration(skill);
-  if (duration) {
-    await createDurationActiveEffect(actor, skill, duration);
-  }
-  if (skill.system.action.modifiers.guard.self.value) {
-    const rawValue = skill.system.action.modifiers.guard.self.value;
-    const value = isNumeric(rawValue) ? parseInt(rawValue) : parsePath(rawValue, actor);
-    const skilledGuard = applySkillsForGuard(value, actor);
-    const guard = applyOperator(
-      actor.system.defense.guard.value,
-      skilledGuard,
-      skill.system.action.modifiers.guard.self.operator
-    );
-    updates["system.defense.guard.value"] = guard;
-  }
-  if (skill.system.action.modifiers.wounds.self.length > 0) {
-    let updateWounds = actor.system.wounds;
-    skill.system.action.modifiers.wounds.self.filter((w) => w.value && w.type && w.operator).forEach((w) => updateWounds = mergeWoundsWithOperator(updateWounds, [{ type: w.type, value: w.value }], w.operator));
-    updates["system.wounds"] = updateWounds;
-  }
-  await actor.update(updates);
-}
-function getSkillDuration(skill) {
-  var _a, _b, _c, _d;
-  const precision = skill.system.action.duration.precision;
-  if (precision === "0") {
-    return null;
-  }
-  const duration = {};
-  const value = skill.system.action.duration.value;
-  duration["startTime"] = game.time.worldTime;
-  if (precision === "6") {
-    duration["rounds"] = value;
-    duration["startRound"] = ((_a = game.combat) == null ? void 0 : _a.round) ?? 0;
-    duration["startTurn"] = ((_b = game.combat) == null ? void 0 : _b.turn) ?? 0;
-    duration["type"] = "rounds";
-    duration["duration"] = value;
-    return duration;
-  }
-  if (precision === "0.01") {
-    duration["turns"] = value;
-    duration["startRound"] = ((_c = game.combat) == null ? void 0 : _c.round) ?? 0;
-    duration["startTurn"] = ((_d = game.combat) == null ? void 0 : _d.turn) ?? 0;
-    duration["type"] = "turns";
-    duration["duration"] = (value / 100).toFixed(2);
-    return duration;
-  }
-  const seconds = precision * value;
-  duration["duration"] = seconds;
-  duration["seconds"] = seconds;
-  duration["type"] = "seconds";
-  return duration;
-}
-async function queueSynergySkill(actor, skill) {
-  const duration = getSkillDuration(skill);
-  if (duration) {
-    await createDurationActiveEffect(actor, skill, duration);
-  }
-  const skills = actor.system.queuedSkills;
-  const updateSkills = [...skills, skill._id];
-  await actor.update({ "system.queuedSkills": updateSkills });
-}
-async function createDurationActiveEffect(actor, skill, duration) {
-  const conditionEffectData = {
-    _id: actor._id,
-    name: game.i18n.localize(skill.name),
-    img: skill.img,
-    changes: [],
-    disabled: false,
-    duration,
-    description: game.i18n.localize(skill.description),
-    origin: `Actor.${actor._id}`,
-    tint: "",
-    transfer: false,
-    statuses: [],
-    flags: { abbrew: { skill: { trackDuration: skill._id } } }
-  };
-  await actor.createEmbeddedDocuments("ActiveEffect", [conditionEffectData]);
-}
-function isNumeric(str) {
-  if (typeof str != "string")
-    return false;
-  return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
-  !isNaN(parseFloat(str));
-}
-function parsePath(rawValue, actor) {
-  const entityType = rawValue.split(".").slice(0, 1).shift();
-  const entity = function() {
-    switch (entityType) {
-      case "actor":
-        return actor;
-      case "item":
-        const id = rawValue.split(".").slice(1, 2).shift();
-        return id ? actor.items.filter((i) => i._id === id).shift() : actor;
-    }
-  }();
-  const path = function() {
-    switch (entityType) {
-      case "actor":
-        return rawValue.split(".").slice(1).join(".");
-      case "item":
-        return rawValue.split(".").slice(2).join(".");
-    }
-  }();
-  if (getObjectValueByStringPath(entity, path)) {
-    return getObjectValueByStringPath(entity, path);
-  }
-}
-function applySkillsForGuard(value, actor) {
-  let skilledValue = value;
-  const skillFlags = actor.items.filter((i) => i.type === "skill").filter((i) => i.system.skillFlags).flatMap((i) => JSON.parse(i.system.skillFlags).map((ap) => ap.value));
-  if (skillFlags.includes("Shield Training")) {
-    const heldArmour = actor.getActorHeldItems().filter((i) => i.type === "armour").reduce((result, a) => result += a.system.defense.guard, 0);
-    skilledValue += heldArmour;
-  }
-  return skilledValue;
 }
 var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
 function getDefaultExportFromCjs(x) {
@@ -2249,11 +2300,7 @@ class AbbrewActorSheet extends ActorSheet {
     if (!await this.actor.canActorUseActions(skill.system.action.actionCost)) {
       return;
     }
-    if (skill.system.activatable && skill.system.action.activationType === "standalone") {
-      await activateSkill(this.actor, skill);
-    } else {
-      queueSynergySkill(this.actor, skill);
-    }
+    await activateSkill(this.actor, skill);
   }
   async _onAttackDamageAction(target, attackMode) {
     const itemId = target.closest("li.item").dataset.itemId;
@@ -2294,7 +2341,7 @@ class AbbrewActorSheet extends ActorSheet {
     }, 0);
     const showAttack = ["attack", "feint", "finisher"].includes(attackMode);
     const isFeint = attackMode === "feint";
-    const showParry = game.user.targets.some((t) => t.actor.doesActorHaveSkillFlag("Parry"));
+    const showParry = game.user.targets.some((t) => t.actor.doesActorHaveSkillTrait("Parry"));
     const isStrongAttack = attackMode === "strong";
     const showFinisher = attackMode === "finisher" || totalSuccesses > 0;
     const isFinisher = attackMode === "finisher";
@@ -2458,7 +2505,7 @@ class AbbrewItemSheet extends ItemSheet {
     html.find(".skill-configuration-section :input").prop("disabled", !this.item.system.configurable);
     this._activateArmourPoints(html);
     this._activateAnatomyParts(html);
-    this._activateSkillFlags(html);
+    this._activateSkillTraits(html);
   }
   prepareActions(system) {
     let actions = system.actions;
@@ -2514,9 +2561,9 @@ class AbbrewItemSheet extends ItemSheet {
       new Tagify(anatomyParts, anatomyPartsSettings);
     }
   }
-  _activateSkillFlags(html) {
-    const skillFlags = html[0].querySelector('input[name="system.skillFlags"]');
-    const skillFlagSettings = {
+  _activateSkillTraits(html) {
+    const skillTraits = html[0].querySelector('input[name="system.skillTraits"]');
+    const skillTraitSettings = {
       dropdown: {
         maxItems: 20,
         // <- mixumum allowed rendered suggestions
@@ -2526,17 +2573,21 @@ class AbbrewItemSheet extends ItemSheet {
         // <- show suggestions on focus
         closeOnSelect: false,
         // <- do not hide the suggestions dropdown once an item has been selected
-        includeSelectedTags: true
+        includeSelectedTags: false
         // <- Should the suggestions list Include already-selected tags (after filtering)
       },
       userInput: false,
       // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
       duplicates: true,
       // <- Should duplicate tags be allowed or not
-      whitelist: [...Object.values(CONFIG.ABBREW.skillFlags).map((key2) => game.i18n.localize(key2))]
+      whitelist: [.../* Object.values( */
+      CONFIG.ABBREW.traits.map((trait) => ({
+        ...trait,
+        value: game.i18n.localize(trait.value)
+      }))]
     };
-    if (skillFlags) {
-      new Tagify(skillFlags, skillFlagSettings);
+    if (skillTraits) {
+      new Tagify(skillTraits, skillTraitSettings);
     }
   }
   /**
@@ -3011,7 +3062,7 @@ ABBREW.hands = {
     states: ["held2H"]
   }
 };
-ABBREW.traits = [
+const lingeringWoundImmunities = [
   { key: "bleedImmunity", value: "ABBREW.Traits.WoundImmunities.bleedImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "bleed" },
   { key: "burningImmunity", value: "ABBREW.Traits.WoundImmunities.burningImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "burning" },
   { key: "fatigueImmunity", value: "ABBREW.Traits.WoundImmunities.fatigueImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "fatigue" },
@@ -3020,15 +3071,29 @@ ABBREW.traits = [
   { key: "instabilityImmunity", value: "ABBREW.Traits.WoundImmunities.instabilityImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "instability" },
   { key: "sinImmunity", value: "ABBREW.Traits.WoundImmunities.sinImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "sin" }
 ];
-ABBREW.skillFlags = {
-  shieldTraining: "ABBREW.SkillFlags.shieldTraining",
-  overpower: "ABBREW.SkillFlags.overpower",
-  parry: "ABBREW.SkillFlags.parry",
-  feint: "ABBREW.SkillFlags.feint"
-};
+const skillTriggers = [
+  { key: "guardRestoreTrigger", value: "ABBREW.Traits.SkillTriggers.guardRestore", feature: "skillTrigger", subFeature: "", effect: "", data: "guardRestore" }
+];
+const skillEnablers = [
+  { key: "overpowerEnable", value: "ABBREW.Traits.SkillEnablers.overpower", feature: "skillTrigger", subFeature: "defensiveSkills", effect: "enable", data: "overpower" },
+  { key: "parryEnable", value: "ABBREW.Traits.SkillEnablers.parry", feature: "skillTrigger", subFeature: "offensiveSkills", effect: "enable", data: "parry" },
+  { key: "feintEnable", value: "ABBREW.Traits.SkillEnablers.feint", feature: "skillTrigger", subFeature: "offensiveSkills", effect: "enable", data: "feint" }
+];
+const valueReplacers = [
+  { key: "shieldTrainingReplacer", value: "ABBREW.Traits.ValueReplacers.shieldTraining", feature: "valueReplacer", subFeature: "system.action.modifiers.guard.self.value", effect: "replace", data: "actor.system.heldArmourGuard" }
+];
+ABBREW.traits = [
+  ...lingeringWoundImmunities,
+  ...skillTriggers,
+  ...skillEnablers,
+  ...valueReplacers
+];
 class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   get traitsData() {
     return this.traits !== "" ? JSON.parse(this.traits) : [];
+  }
+  get heldArmourGuard() {
+    return this.parent.getActorHeldItems().filter((i) => i.type === "armour").reduce((result, a) => result += a.system.defense.guard, 0);
   }
   static defineSchema() {
     const fields = foundry.data.fields;
@@ -3041,6 +3106,9 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         type: new fields.StringField({ required: true }),
         value: new fields.NumberField({ ...requiredInteger, initial: 0, max: 100 })
       })
+    );
+    schema.activeSkills = new fields.ArrayField(
+      new fields.StringField({ required: true, blank: true })
     );
     schema.queuedSkills = new fields.ArrayField(
       new fields.StringField({ required: true, blank: true })
@@ -3375,7 +3443,7 @@ class AbbrewSkill extends AbbrewItemBase {
     const schema = super.defineSchema();
     const blankString = { required: true, blank: true };
     const requiredInteger = { required: true, nullable: false, integer: true };
-    schema.skillFlags = new fields.StringField({ ...blankString });
+    schema.skillTraits = new fields.StringField({ ...blankString });
     schema.configurable = new fields.BooleanField({ required: true });
     schema.activatable = new fields.BooleanField({ required: true, label: "ABBREW.Activatable" });
     schema.action = new fields.SchemaField({
@@ -3386,6 +3454,13 @@ class AbbrewSkill extends AbbrewItemBase {
         precision: new fields.StringField({ ...blankString }),
         value: new fields.NumberField({ ...requiredInteger, initial: 0 })
       }),
+      uses: new fields.NumberField({ ...requiredInteger, initial: -1 }),
+      charges: new fields.SchemaField({
+        hasCharges: new fields.BooleanField({ required: true, initial: false }),
+        value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+        max: new fields.NumberField({ ...requiredInteger, initial: 0 })
+      }),
+      isActive: new fields.BooleanField({ required: true }),
       modifiers: new fields.SchemaField({
         damage: new fields.SchemaField({
           self: new fields.ArrayField(
@@ -3511,11 +3586,18 @@ class AbbrewSkill extends AbbrewItemBase {
   }
   // Post Active Effects
   prepareDerivedData() {
+    var _a, _b, _c, _d, _e, _f, _g;
     if (this.attributeIncrease) {
       this.attributeIncreaseLong = game.i18n.localize(CONFIG.ABBREW.attributes[this.attributeIncrease]);
     }
     if (this.action.actionCost) {
       this.action.actionImage = this.getActionImageName(this.action.actionCost);
+    }
+    if (this.parent) {
+      const queuedSkills = ((_c = (_b = (_a = this.parent) == null ? void 0 : _a.parent) == null ? void 0 : _b.system) == null ? void 0 : _c.queuedSkills) ?? [];
+      const activeSkills = ((_f = (_e = (_d = this.parent) == null ? void 0 : _d.parent) == null ? void 0 : _e.system) == null ? void 0 : _f.activeSkills) ?? [];
+      const id = ((_g = this.parent) == null ? void 0 : _g._id) ?? null;
+      this.action.isActive = queuedSkills.includes(id) || activeSkills.includes(id);
     }
   }
   getActionImageName(cost) {
@@ -3647,12 +3729,12 @@ class AbbrewWeapon extends AbbrewPhysicalItem {
   // Post Active Effects
   prepareDerivedData() {
     this.formula = `1d10x10cs10`;
-    this.isFeintTrained = this.doesParentActorHaveSkillFlag("Feint");
-    this.isOverpowerTrained = this.doesParentActorHaveSkillFlag("Overpower");
+    this.isFeintTrained = this.doesParentActorHaveSkillTrait("Feint");
+    this.isOverpowerTrained = this.doesParentActorHaveSkillTrait("Overpower");
   }
-  doesParentActorHaveSkillFlag(trait) {
+  doesParentActorHaveSkillTrait(trait) {
     var _a, _b;
-    return ((_b = (_a = this == null ? void 0 : this.parent) == null ? void 0 : _a.actor) == null ? void 0 : _b.doesActorHaveSkillFlag(trait)) ?? false;
+    return ((_b = (_a = this == null ? void 0 : this.parent) == null ? void 0 : _a.actor) == null ? void 0 : _b.doesActorHaveSkillTrait(trait)) ?? false;
   }
 }
 class AbbrewWound extends AbbrewItemBase {
@@ -3975,8 +4057,8 @@ class AbbrewActor extends Actor {
   getActorAnatomy() {
     return this.items.filter((i) => i.type === "anatomy");
   }
-  doesActorHaveSkillFlag(trait) {
-    return this.items.filter((i) => i.system.skillFlags).flatMap((i) => JSON.parse(i.system.skillFlags)).map((st) => st.value).includes(trait) ?? false;
+  doesActorHaveSkillTrait(trait) {
+    return this.items.filter((i) => i.system.skillTraits).flatMap((i) => JSON.parse(i.system.skillTraits)).map((st) => st.value).includes(trait) ?? false;
   }
   async acceptWound(type, value) {
     const updates = { "system.wounds": mergeActorWounds(this, [{ type, value }]) };
@@ -4033,6 +4115,11 @@ class AbbrewActor extends Actor {
     }
     await this.update({ "system.actions": remainingActions -= actions });
     return true;
+  }
+  async handleDeleteActiveEffect() {
+    const activeSkillsWithDuration = this.effects.toObject().filter((e) => e.flags.abbrew.skill.type === "standalone").map((e) => e.flags.abbrew.skill.trackDuration);
+    const queuedSkillsWithDuration = this.effects.toObject().filter((e) => e.flags.abbrew.skill.type === "synergy").map((e) => e.flags.abbrew.skill.trackDuration);
+    await this.update({ "system.activeSkills": activeSkillsWithDuration, "system.queuedSkills": queuedSkillsWithDuration });
   }
 }
 class AbbrewItem2 extends Item {
@@ -4134,7 +4221,7 @@ class AbbrewItem2 extends Item {
       return;
     }
     const actor = tokens[0].actor;
-    if (action === "parry" && !actor.doesActorHaveSkillFlag("Parry")) {
+    if (action === "parry" && !actor.doesActorHaveSkillTrait("Parry")) {
       ui.notifications.info("You have not trained enough to be able to parry.");
       return;
     }
@@ -4616,8 +4703,7 @@ Hooks.on("preUpdateItem", () => {
 Hooks.on("deleteActiveEffect", async (effect, options, userId) => {
   console.log("deleted");
   const actor = effect.parent;
-  const queuedSkillsWithDuration = actor.effects.toObject().map((e) => e.flags.abbrew.skill.trackDuration);
-  await actor.update({ "system.queuedSkills": queuedSkillsWithDuration });
+  await actor.handleDeleteActiveEffect();
 });
 Hooks.on("updateActiveEffect", () => {
 });

@@ -3,7 +3,7 @@ import {
   onManageActiveEffect,
   prepareActiveEffectCategories,
 } from '../helpers/effects.mjs';
-import { activateSkill, queueSynergySkill } from '../helpers/skill.mjs';
+import { activateSkill } from '../helpers/skill.mjs';
 import Tagify from '@yaireo/tagify'
 
 /**
@@ -415,14 +415,19 @@ export class AbbrewActorSheet extends ActorSheet {
       return;
     }
 
-    if (skill.system.activatable && skill.system.action.activationType === 'standalone') {
-      await activateSkill(this.actor, skill);
-    } else {
-      queueSynergySkill(this.actor, skill);
-    }
+    await activateSkill(this.actor, skill);
   }
 
   async _onAttackDamageAction(target, attackMode) {
+    // TODO: Create a skill section that contains:
+    // Damage 
+    // Attack Profile
+    // AttackMode
+    // Lethal
+    // Criticality
+    // Fortune
+    // TODO: Display card as part of applySkillEffect
+    // TODO: Do roll etc. done here as part of that
     const itemId = target.closest('li.item').dataset.itemId;
     const attackProfileId = target.closest('li .attack-profile').dataset.attackProfileId;
     const item = this.actor.items.get(itemId);
@@ -471,7 +476,7 @@ export class AbbrewActorSheet extends ActorSheet {
 
     const showAttack = ['attack', 'feint', 'finisher'].includes(attackMode);
     const isFeint = attackMode === 'feint';
-    const showParry = game.user.targets.some(t => t.actor.doesActorHaveSkillFlag("Parry"));
+    const showParry = game.user.targets.some(t => t.actor.doesActorHaveSkillTrait("Parry"));
     const isStrongAttack = attackMode === 'strong';
     const showFinisher = attackMode === 'finisher' || totalSuccesses > 0;
     const isFinisher = attackMode === 'finisher';

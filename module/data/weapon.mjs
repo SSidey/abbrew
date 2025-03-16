@@ -37,11 +37,11 @@ export default class AbbrewWeapon extends AbbrewPhysicalItem {
 
     this.formula = `1d10x10cs10`;
 
-    this.isFeintTrained = this.doesParentActorHaveSkillFlag("Feint");
-    this.isOverpowerTrained = this.doesParentActorHaveSkillFlag("Overpower");
+    this.isFeintTrained = this.doesParentActorHaveSkillTrait("Feint");
+    this.isOverpowerTrained = this.doesParentActorHaveSkillTrait("Overpower");
   }
 
-  doesParentActorHaveSkillFlag(trait) {
-    return this?.parent?.actor?.doesActorHaveSkillFlag(trait) ?? false;
+  doesParentActorHaveSkillTrait(trait) {
+    return this?.parent?.actor?.doesActorHaveSkillTrait(trait) ?? false;
   }
 }

@@ -279,7 +279,7 @@ ABBREW.hands = {
   }
 }
 
-ABBREW.traits = [
+const lingeringWoundImmunities = [
   { key: "bleedImmunity", value: "ABBREW.Traits.WoundImmunities.bleedImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "bleed" },
   { key: "burningImmunity", value: "ABBREW.Traits.WoundImmunities.burningImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "burning" },
   { key: "fatigueImmunity", value: "ABBREW.Traits.WoundImmunities.fatigueImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "fatigue" },
@@ -289,9 +289,23 @@ ABBREW.traits = [
   { key: "sinImmunity", value: "ABBREW.Traits.WoundImmunities.sinImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "sin" }
 ]
 
-ABBREW.skillFlags = {
-  shieldTraining: "ABBREW.SkillFlags.shieldTraining",
-  overpower: "ABBREW.SkillFlags.overpower",
-  parry: "ABBREW.SkillFlags.parry",
-  feint: "ABBREW.SkillFlags.feint"
-}
+const skillTriggers = [
+  { key: "guardRestoreTrigger", value: "ABBREW.Traits.SkillTriggers.guardRestore", feature: "skillTrigger", subFeature: "", effect: "", data: "guardRestore" },
+]
+
+const skillEnablers = [
+  { key: "overpowerEnable", value: "ABBREW.Traits.SkillEnablers.overpower", feature: "skillTrigger", subFeature: "defensiveSkills", effect: "enable", data: "overpower" },
+  { key: "parryEnable", value: "ABBREW.Traits.SkillEnablers.parry", feature: "skillTrigger", subFeature: "offensiveSkills", effect: "enable", data: "parry" },
+  { key: "feintEnable", value: "ABBREW.Traits.SkillEnablers.feint", feature: "skillTrigger", subFeature: "offensiveSkills", effect: "enable", data: "feint" },
+]
+
+const valueReplacers = [
+  { key: "shieldTrainingReplacer", value: "ABBREW.Traits.ValueReplacers.shieldTraining", feature: "valueReplacer", subFeature: "system.action.modifiers.guard.self.value", effect: "replace", data: "actor.system.heldArmourGuard" },
+]
+
+ABBREW.traits = [
+  ...lingeringWoundImmunities,
+  ...skillTriggers,
+  ...skillEnablers,
+  ...valueReplacers
+]

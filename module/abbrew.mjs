@@ -265,8 +265,7 @@ Hooks.on("preUpdateItem", () => { })
 Hooks.on("deleteActiveEffect", async (effect, options, userId) => {
   console.log("deleted");
   const actor = effect.parent;
-  const queuedSkillsWithDuration = actor.effects.toObject().map(e => e.flags.abbrew.skill.trackDuration);
-  await actor.update({ "system.queuedSkills": queuedSkillsWithDuration });
+  await actor.handleDeleteActiveEffect();
 });
 
 Hooks.on("updateActiveEffect", () => { })

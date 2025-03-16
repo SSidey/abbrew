@@ -175,20 +175,27 @@
         "enragedImmunity": "Enraged Immunity",
         "instabilityImmunity": "Instability Immunity",
         "sinImmunity": "Sin Immunity"
+      },
+      "SkillTriggers": {
+        "guardRestore": "On Guard Restore"
+      },
+      "SkillEnablers": {
+        "overpower": "Enable Overpower",
+        "parry": "Enale Parry",
+        "feint": "Enable Feint"
+      },
+      "ValueReplacers": {
+        "shieldTraining": "Shield Training"
       }
     },
     "Durations": {
+      "instant": "Instant",
       "second": "Second",
+      "turn": "Turn",
       "round": "Round",
       "minute": "Minute",
       "hour": "Hour",
       "day": "Day"
-    },
-    "SkillFlags": {
-      "shieldTraining": "Shield Training",
-      "overpower": "Overpower",
-      "parry": "Parry",
-      "feint": "Feint"
     }
   },
 

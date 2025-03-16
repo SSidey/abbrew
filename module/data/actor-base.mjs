@@ -4,6 +4,10 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     return this.traits !== "" ? JSON.parse(this.traits) : [];
   }
 
+  get heldArmourGuard() {
+    return this.parent.getActorHeldItems().filter(i => i.type === 'armour').reduce((result, a) => result += a.system.defense.guard, 0);
+  }
+
   static defineSchema() {
     const fields = foundry.data.fields;
     const requiredInteger = { required: true, nullable: false, integer: true };
@@ -16,6 +20,9 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         type: new fields.StringField({ required: true }),
         value: new fields.NumberField({ ...requiredInteger, initial: 0, max: 100 })
       })
+    );
+    schema.activeSkills = new fields.ArrayField(
+      new fields.StringField({ required: true, blank: true })
     );
     schema.queuedSkills = new fields.ArrayField(
       new fields.StringField({ required: true, blank: true })
