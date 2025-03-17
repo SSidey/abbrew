@@ -1,6 +1,6 @@
 ol.skill-container {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     list-style-type: none;
 }
 
@@ -19,8 +19,12 @@ div.skill-card {
 }
 
 .skill-name {
-    justify-self: center;
-    text-wrap: nowrap;
+    // justify-self: center;
+    // text-wrap: nowrap;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .skill-image {

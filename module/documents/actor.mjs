@@ -155,20 +155,18 @@ export default class AbbrewActor extends Actor {
     let rollSuccesses = data.totalSuccesses;
     return data.damage.reduce((result, d) => {
       // TODO: Enable new DR types
-      const protection = /* this.system.defense.protection.some(dr => dr.type === d.damageType) ? this.system.defense.protection.filter(dr => dr.type === d.damageType)[0] : */ { immunity: 0, resistance: 0, weakness: 0, value: 0 };
+      const protection = /* this.system.defense.protection.some(dr => dr.type === d.damageType) ? this.system.defense.protection.filter(dr => dr.type === d.damageType)[0] : */ { immunity: 0, resistance: 0, weakness: 0 };
       if (protection.immunity > 0) {
         return result;
       }
 
-      const firstRoll = rolls[0].dice[0].results[0].result ?? 0;
-      // const dodge = this.system.defense.dodge.value;
-      const damageTypeSuccesses = /* firstRoll > dodge ? */ rollSuccesses/*  + protection.weakness - protection.resistance : -1 */;
+      const damageTypeSuccesses = rollSuccesses;
 
       if (damageTypeSuccesses < 0) {
         return result;
       }
 
-      const dmg = /* damageTypeSuccesses == 0 ? Math.max(0, d.value - protection.value) : */ d.value;
+      const dmg = d.value;
 
       return result += dmg;
     }, 0);
@@ -277,8 +275,8 @@ export default class AbbrewActor extends Actor {
     return this.items.filter(i => i.type === 'anatomy');
   }
 
-  doesActorHaveSkillTrait(trait) {
-    return this.items.filter(i => i.system.skillTraits).flatMap(i => JSON.parse(i.system.skillTraits)).map(st => st.value).includes(trait) ?? false;
+  doesActorHaveSkillTrait(feature, subFeature, effect, data) {
+    return this.items.filter(i => i.system.skillTraits).flatMap(i => JSON.parse(i.system.skillTraits)).some(t => t.feature === feature && t.subFeature === subFeature && t.effect === effect && t.data === data) ?? false;
   }
 
   async acceptWound(type, value) {

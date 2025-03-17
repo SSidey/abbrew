@@ -19,7 +19,12 @@ export default class AbbrewSkill extends AbbrewItemBase {
                 precision: new fields.StringField({ ...blankString }),
                 value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
             }),
-            uses: new fields.NumberField({ ...requiredInteger, initial: -1 }),
+            uses: new fields.SchemaField({
+                hasUses: new fields.BooleanField({ required: true, initial: false }),
+                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                max: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                period: new fields.StringField({ ...blankString })
+            }),
             charges: new fields.SchemaField({
                 hasCharges: new fields.BooleanField({ required: true, initial: false }),
                 value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
@@ -27,16 +32,25 @@ export default class AbbrewSkill extends AbbrewItemBase {
             }),
             isActive: new fields.BooleanField({ required: true }),
             modifiers: new fields.SchemaField({
+                fortune: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                attackProfile: new fields.SchemaField({
+                    attackType: new fields.StringField({ required: true, blank: true }),
+                    lethal: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                    critical: new fields.NumberField({ ...requiredInteger, initial: 10, min: 5 }),
+                    damage: new fields.ArrayField(
+                        new fields.SchemaField({
+                            type: new fields.StringField({ required: true, blank: true }),
+                            value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+                            attributeModifier: new fields.StringField({ required: true, blank: true }),
+                        })
+                    ),
+                    finisherLimit: new fields.NumberField({ ...requiredInteger, initial: 10, min: 1 }),
+                    attackMode: new fields.StringField({ required: true, blank: true }),
+                    handsSupplied: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                }),
                 damage:
                     new fields.SchemaField({
                         self: new fields.ArrayField(
-                            new fields.SchemaField({
-                                value: new fields.StringField({ ...blankString }),
-                                type: new fields.StringField({ ...blankString }),
-                                operator: new fields.StringField({ ...blankString })
-                            })
-                        ),
-                        target: new fields.ArrayField(
                             new fields.SchemaField({
                                 value: new fields.StringField({ ...blankString }),
                                 type: new fields.StringField({ ...blankString }),
@@ -54,7 +68,6 @@ export default class AbbrewSkill extends AbbrewItemBase {
                         operator: new fields.StringField({ ...blankString })
                     })
                 }),
-                successes: new fields.NumberField({ ...requiredInteger, initial: 0 }),
                 risk: new fields.SchemaField({
                     self: new fields.SchemaField({
                         value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
@@ -70,6 +83,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
                         new fields.SchemaField({
                             type: new fields.StringField({ ...blankString }),
                             value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                            // TODO: Should be Increase/Suppress/Reduce
                             operator: new fields.StringField({ ...blankString })
                         })
                     ),
@@ -78,20 +92,6 @@ export default class AbbrewSkill extends AbbrewItemBase {
                             type: new fields.StringField({ ...blankString }),
                             value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
                             operator: new fields.StringField({ ...blankString })
-                        })
-                    )
-                }),
-                lingeringWoundSuppression: new fields.SchemaField({
-                    self: new fields.ArrayField(
-                        new fields.SchemaField({
-                            type: new fields.StringField({ ...blankString }),
-                            value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-                        })
-                    ),
-                    target: new fields.ArrayField(
-                        new fields.SchemaField({
-                            type: new fields.StringField({ ...blankString }),
-                            value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
                         })
                     )
                 }),
@@ -105,20 +105,22 @@ export default class AbbrewSkill extends AbbrewItemBase {
                         operator: new fields.StringField({ ...blankString })
                     })
                 }),
-                resources: new fields.ArrayField(
-                    new fields.SchemaField({
-                        self: new fields.SchemaField({
-                            name: new fields.StringField({ ...blankString }),
-                            value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-                            operator: new fields.StringField({ ...blankString }),
-                        }),
-                        target: new fields.SchemaField({
+                resources: new fields.SchemaField({
+                    self: new fields.ArrayField(
+                        new fields.SchemaField({
                             name: new fields.StringField({ ...blankString }),
                             value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
                             operator: new fields.StringField({ ...blankString }),
                         })
-                    })
-                ),
+                    ),
+                    target: new fields.ArrayField(
+                        new fields.SchemaField({
+                            name: new fields.StringField({ ...blankString }),
+                            value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                            operator: new fields.StringField({ ...blankString }),
+                        })
+                    ),
+                }),
                 concepts: new fields.SchemaField({
                     self: new fields.ArrayField(
                         new fields.SchemaField({
@@ -137,8 +139,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
                         })
                     )
                 })
-            }),
-            description: new fields.StringField({ ...blankString })
+            })
         });
         schema.skillType = new fields.StringField({ ...blankString });
         schema.path = new fields.SchemaField({

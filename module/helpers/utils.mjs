@@ -40,6 +40,20 @@ export function getObjectValueByStringPath(entity, path) {
     }, entity);
 }
 
+/* -------------------------------------------- */
+
 export function getNumericParts(value) {
     return parseInt(value.replace(/\D/g, "")) ?? 0
 }
+
+/* -------------------------------------------- */
+
+export function getSafeJson(json, defaultValue) {
+    if (!json || json === "") {
+        return defaultValue;
+    }
+
+    return JSON.parse(json);
+}
+
+/* -------------------------------------------- */

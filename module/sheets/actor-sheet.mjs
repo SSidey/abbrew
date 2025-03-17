@@ -3,7 +3,7 @@ import {
   onManageActiveEffect,
   prepareActiveEffectCategories,
 } from '../helpers/effects.mjs';
-import { activateSkill } from '../helpers/skill.mjs';
+import { activateSkill, applySkillEffects, rechargeSkill } from '../helpers/skill.mjs';
 import Tagify from '@yaireo/tagify'
 
 /**
@@ -411,23 +411,20 @@ export class AbbrewActorSheet extends ActorSheet {
     const target = event.target.closest('.skill');
     const id = target.dataset.skillId;
     const skill = this.actor.items.get(id);
+    if (skill.system.action.charges.hasCharges && skill.system.action.charges.value > 0) {
+      await activateSkill(this.actor, skill);
+      return;
+    }
+
     if (!await this.actor.canActorUseActions(skill.system.action.actionCost)) {
       return;
     }
 
+    await rechargeSkill(this.actor, skill);
     await activateSkill(this.actor, skill);
   }
 
   async _onAttackDamageAction(target, attackMode) {
-    // TODO: Create a skill section that contains:
-    // Damage 
-    // Attack Profile
-    // AttackMode
-    // Lethal
-    // Criticality
-    // Fortune
-    // TODO: Display card as part of applySkillEffect
-    // TODO: Do roll etc. done here as part of that
     const itemId = target.closest('li.item').dataset.itemId;
     const attackProfileId = target.closest('li .attack-profile').dataset.attackProfileId;
     const item = this.actor.items.get(itemId);
@@ -436,80 +433,92 @@ export class AbbrewActorSheet extends ActorSheet {
     if (!await this.actor.canActorUseActions(actions)) {
       return;
     }
-    // Invoke the roll and submit it to chat.
-    const roll = new Roll(item.system.formula, item.actor);
-    // If you need to store the value first, uncomment the next line.
-    const result = await roll.evaluate();
-    const token = this.actor.token;
-    const attributeMultiplier = attackMode === 'strong' ? Math.max(1, item.system.handsSupplied) : 1;
-    const damage = attackProfile.damage.map(d => {
-      let attributeModifier = 0;
-      if (d.attributeModifier) {
-        attributeModifier = attributeMultiplier * this.actor.system.attributes[d.attributeModifier].value;
+
+    const skillTraits = CONFIG.ABBREW.skillTriggers.find(s => s.subFeature === "attacks" && s.data === attackMode);
+
+    const attackSkill = {
+      name: item.name,
+      system: {
+        activatable: true,
+        skillTraits: JSON.stringify([skillTraits]),
+        skillType: "basic",
+        attributeIncrease: "",
+        attributeIncreaseLong: "",
+        attributeRankIncrease: "",
+        action: {
+          activationType: "standalone",
+          actionCost: actions,
+          actionImage: item.img,
+          duration: {
+            precision: "0.01",
+            value: 0
+          },
+          uses: {
+            hasUses: false,
+            value: 0,
+            max: 0,
+            period: ""
+          },
+          charges: {
+            hasCharges: false,
+            value: 0,
+            max: 0
+          },
+          isActive: false,
+          modifiers: {
+            fortune: 0,
+            attackProfile: { ...attackProfile, attackMode: attackMode, handsSupplied: item.system.handsSupplied },
+            damage: {
+              self: []
+            },
+            guard: {
+              self: {
+                value: 0,
+                operator: ""
+              },
+              target: {
+                value: 0,
+                operator: ""
+              }
+            },
+            risk: {
+              self: {
+                value: 0,
+                operator: ""
+              },
+              target: {
+                value: 0,
+                operator: ""
+              }
+            },
+            wounds: {
+              self: [],
+              target: []
+            },
+            resolve: {
+              self: {
+                value: 0,
+                operator: ""
+              },
+              target: {
+                value: 0,
+                operator: ""
+              }
+            },
+            resources: {
+              self: [],
+              target: []
+            },
+            conceepts: {
+              self: [],
+              target: []
+            }
+          }
+        }
       }
+    }
 
-      const finalDamage = attributeModifier + d.value;
-
-      return { damageType: d.type, value: finalDamage };
-    });
-    //this.actor.system.attributes[item.system.attributeModifier].value + item.system.damage[0].value;
-    const resultDice = result.dice[0].results.map(die => {
-      let baseClasses = "roll die d10";
-      if (die.success) {
-        baseClasses = baseClasses.concat(' ', 'success')
-      }
-
-      if (die.exploded) {
-        baseClasses = baseClasses.concat(' ', 'exploded');
-      }
-
-      return { result: die.result, classes: baseClasses };
-    });
-
-    const totalSuccesses = result.dice[0].results.reduce((total, r) => {
-      if (r.success) {
-        total += 1;
-      }
-      return total;
-    }, 0);
-
-
-    const showAttack = ['attack', 'feint', 'finisher'].includes(attackMode);
-    const isFeint = attackMode === 'feint';
-    const showParry = game.user.targets.some(t => t.actor.doesActorHaveSkillTrait("Parry"));
-    const isStrongAttack = attackMode === 'strong';
-    const showFinisher = attackMode === 'finisher' || totalSuccesses > 0;
-    const isFinisher = attackMode === 'finisher';
-    const templateData = {
-      attackProfile,
-      totalSuccesses,
-      resultDice,
-      damage,
-      actor: this.actor,
-      item: this.item,
-      tokenId: token?.uuid || null,
-      showAttack,
-      showFinisher,
-      isStrongAttack,
-      isFinisher,
-      showParry
-    };
-
-    // TODO: Move this out of item and into a weapon.mjs / attack-card.mjs
-    const html = await renderTemplate("systems/abbrew/templates/chat/attack-card.hbs", templateData);
-
-    // Initialize chat data.
-    const speaker = ChatMessage.getSpeaker({ actor: this.actor });
-    const rollMode = game.settings.get('core', 'rollMode');
-    const label = `[${item.type}] ${item.name}`;
-    result.toMessage({
-      speaker: speaker,
-      rollMode: rollMode,
-      flavor: label,
-      content: html,
-      flags: { data: { totalSuccesses, damage, isFeint, isStrongAttack, attackProfile, attackingActor: this.actor } }
-    });
-    return result;
+    await applySkillEffects(this.actor, attackSkill);
   }
 
   /**

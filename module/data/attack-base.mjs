@@ -16,6 +16,8 @@ export default class AbbrewAttackBase extends foundry.abstract.TypeDataModel {
             new fields.SchemaField({
                 name: new fields.StringField({ required: true, blank: true }),
                 attackType: new fields.StringField({ required: true, blank: true }),
+                lethal: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                critical: new fields.NumberField({ ...requiredInteger, initial: 10, min: 5 }),
                 damage: new fields.ArrayField(
                     new fields.SchemaField({
                         type: new fields.StringField({ required: true, blank: true }),
@@ -24,7 +26,6 @@ export default class AbbrewAttackBase extends foundry.abstract.TypeDataModel {
                     })
                 ),
                 finisherLimit: new fields.NumberField({ ...requiredInteger, initial: 10, min: 1 }),
-                // TODO: Should the number of actions required for attack/strong be hands and hands + 1?
                 hasStrongAttack: new fields.BooleanField({ required: true, nullable: false, initial: true })
             })
         );

@@ -177,11 +177,15 @@
         "sinImmunity": "Sin Immunity"
       },
       "SkillTriggers": {
-        "guardRestore": "On Guard Restore"
+        "guardRestore": "On Guard Restore",
+        "allAttackModes": "All Attack Modes",
+        "attack": "Attack",
+        "overpower": "Overpower",
+        "feint": "Feint"
       },
       "SkillEnablers": {
         "overpower": "Enable Overpower",
-        "parry": "Enale Parry",
+        "parry": "Enable Parry",
         "feint": "Enable Feint"
       },
       "ValueReplacers": {

@@ -33,15 +33,11 @@ export default class AbbrewWeapon extends AbbrewPhysicalItem {
 
   // Post Active Effects
   prepareDerivedData() {
-    // Build the formula dynamically using string interpolation
-
-    this.formula = `1d10x10cs10`;
-
-    this.isFeintTrained = this.doesParentActorHaveSkillTrait("Feint");
-    this.isOverpowerTrained = this.doesParentActorHaveSkillTrait("Overpower");
+    this.isFeintTrained = this.doesParentActorHaveSkillTrait("skillEnabler", "offensiveSkills", "enable", "feint");
+    this.isOverpowerTrained = this.doesParentActorHaveSkillTrait("skillEnabler", "offensiveSkills", "enable", "overpower");
   }
 
-  doesParentActorHaveSkillTrait(trait) {
-    return this?.parent?.actor?.doesActorHaveSkillTrait(trait) ?? false;
+  doesParentActorHaveSkillTrait(feature, subFeature, effect, data) {
+    return this?.parent?.actor?.doesActorHaveSkillTrait(feature, subFeature, effect, data) ?? false;
   }
 }

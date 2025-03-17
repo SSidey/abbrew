@@ -290,13 +290,17 @@ const lingeringWoundImmunities = [
 ]
 
 const skillTriggers = [
-  { key: "guardRestoreTrigger", value: "ABBREW.Traits.SkillTriggers.guardRestore", feature: "skillTrigger", subFeature: "", effect: "", data: "guardRestore" },
+  { key: "guardRestoreTrigger", value: "ABBREW.Traits.SkillTriggers.guardRestore", feature: "skillTrigger", subFeature: "guard", effect: "", data: "guardRestore" },
+  { key: "allAttackModeTrigger", value: "ABBREW.Traits.SkillTriggers.allAttackModes", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "allAttackModes" },
+  { key: "attackTrigger", value: "ABBREW.Traits.SkillTriggers.attack", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "attack" },
+  { key: "overpowerTrigger", value: "ABBREW.Traits.SkillTriggers.overpower", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "overpower" },
+  { key: "feintTrigger", value: "ABBREW.Traits.SkillTriggers.feint", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "feint" },
 ]
 
 const skillEnablers = [
-  { key: "overpowerEnable", value: "ABBREW.Traits.SkillEnablers.overpower", feature: "skillTrigger", subFeature: "defensiveSkills", effect: "enable", data: "overpower" },
-  { key: "parryEnable", value: "ABBREW.Traits.SkillEnablers.parry", feature: "skillTrigger", subFeature: "offensiveSkills", effect: "enable", data: "parry" },
-  { key: "feintEnable", value: "ABBREW.Traits.SkillEnablers.feint", feature: "skillTrigger", subFeature: "offensiveSkills", effect: "enable", data: "feint" },
+  { key: "overpowerEnable", value: "ABBREW.Traits.SkillEnablers.overpower", feature: "skillEnabler", subFeature: "offensiveSkills", effect: "enable", data: "overpower" },
+  { key: "parryEnable", value: "ABBREW.Traits.SkillEnablers.parry", feature: "skillEnabler", subFeature: "defensiveSkills", effect: "enable", data: "parry" },
+  { key: "feintEnable", value: "ABBREW.Traits.SkillEnablers.feint", feature: "skillEnabler", subFeature: "offensiveSkills", effect: "enable", data: "feint" },
 ]
 
 const valueReplacers = [
@@ -309,3 +313,5 @@ ABBREW.traits = [
   ...skillEnablers,
   ...valueReplacers
 ]
+
+ABBREW.skillTriggers = skillTriggers;

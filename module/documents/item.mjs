@@ -122,7 +122,7 @@ export default class AbbrewItem extends Item {
 
     const actor = tokens[0].actor;
 
-    if (action === "parry" && !actor.doesActorHaveSkillTrait("Parry")) {
+    if (action === "parry" && !actor.doesActorHaveSkillTrait("skillEnabler", "defensiveSkills", "enable", "parry")) {
       ui.notifications.info("You have not trained enough to be able to parry.");
       return;
     }

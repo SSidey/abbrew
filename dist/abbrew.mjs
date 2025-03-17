@@ -43,11 +43,16 @@ function getObjectValueByStringPath(entity, path) {
 function getNumericParts(value) {
   return parseInt(value.replace(/\D/g, "")) ?? 0;
 }
+function getSafeJson(json, defaultValue) {
+  if (!json || json === "") {
+    return defaultValue;
+  }
+  return JSON.parse(json);
+}
 async function activateSkill(actor, skill) {
   if (skill.system.action.activationType === "synergy") {
     await trackSkillDuration(actor, skill);
     await addSkillToQueuedSkills(actor, skill);
-    await rechargeSkill(actor, skill);
     return;
   }
   if (skill.system.action.duration.precision !== "0" && skill.system.action.duration.value !== 0) {
@@ -78,12 +83,80 @@ async function applySkillEffects(actor, skill) {
     const item = actor.items.find((i) => i._id === skill2._id);
     await item.update({ "system.action.charges.value": currentCharges -= 1 });
   }
-}
-function getSafeJson(json, defaultValue) {
-  if (!json || json === "") {
-    return defaultValue;
+  let templateData = {};
+  let data = {};
+  if (skill.system.action.modifiers.attackProfile) {
+    const attackProfile = skill.system.action.modifiers.attackProfile;
+    const rollFormula = getRollFormula(actor.system.meta.tier.value, attackProfile, skill.system.action.modifiers.fortune);
+    const roll = new Roll(rollFormula, skill.system.actor);
+    const result = await roll.evaluate();
+    const token = actor.token;
+    const attackMode = attackProfile.attackMode;
+    const attributeMultiplier = attackMode === "strong" ? Math.max(1, attackProfile.handsSupplied) : 1;
+    const damage = attackProfile.damage.map((d) => {
+      let attributeModifier = 0;
+      if (d.attributeModifier) {
+        attributeModifier = attributeMultiplier * actor.system.attributes[d.attributeModifier].value;
+      }
+      const finalDamage = attributeModifier + d.value;
+      return { damageType: d.type, value: finalDamage };
+    });
+    const resultDice = result.dice[0].results.map((die) => {
+      let baseClasses = "roll die d10";
+      if (die.success) {
+        baseClasses = baseClasses.concat(" ", "success");
+      }
+      if (die.exploded) {
+        baseClasses = baseClasses.concat(" ", "exploded");
+      }
+      return { result: die.result, classes: baseClasses };
+    });
+    const totalSuccesses = result.dice[0].results.reduce((total, r) => {
+      if (r.success) {
+        total += 1;
+      }
+      return total;
+    }, 0) + attackProfile.lethal;
+    const showAttack = ["attack", "feint", "finisher"].includes(attackMode);
+    const isFeint = attackMode === "feint";
+    const showParry = game.user.targets.some((t) => t.actor.doesActorHaveSkillTrait("skillEnabler", "defensiveSkills", "enable", "parry"));
+    const isStrongAttack = attackMode === "strong";
+    const showFinisher = attackMode === "finisher" || totalSuccesses > 0;
+    const isFinisher = attackMode === "finisher";
+    templateData = {
+      ...templateData,
+      attackProfile,
+      totalSuccesses,
+      resultDice,
+      damage,
+      actor,
+      tokenId: (token == null ? void 0 : token.uuid) || null,
+      showAttack,
+      showFinisher,
+      isStrongAttack,
+      isFinisher,
+      showParry
+    };
+    data = { ...data, totalSuccesses, damage, isFeint, isStrongAttack, attackProfile, attackingActor: actor };
   }
-  return JSON.parse(json);
+  const html = await renderTemplate("systems/abbrew/templates/chat/attack-card.hbs", templateData);
+  const speaker = ChatMessage.getSpeaker({ actor });
+  const rollMode = game.settings.get("core", "rollMode");
+  const label = `[${skill.system.skillType}] ${skill.name}`;
+  ChatMessage.create({
+    speaker,
+    rollMode,
+    flavor: label,
+    content: html,
+    flags: { data }
+  });
+  return {};
+}
+function getRollFormula(tier, attackProfile, fortune) {
+  const diceCount = tier + fortune;
+  const explodesOn = attackProfile.critical;
+  const successOn = attackProfile.critical;
+  return `${diceCount}d10x${explodesOn}cs${successOn}`;
 }
 function mergeModifiers(modifiers) {
   return modifiers.reduce((result, modifier) => applyOperator(result, modifier.value, modifier.operator), 0);
@@ -168,7 +241,7 @@ async function createDurationActiveEffect(actor, skill, duration) {
   await actor.createEmbeddedDocuments("ActiveEffect", [conditionEffectData]);
 }
 async function rechargeSkill(actor, skill) {
-  const item = actor.items.filter((i) => i._id === skill._id).pop();
+  const item = actor.items.find((i) => i._id === skill._id);
   if (skill.system.action.charges.hasCharges) {
     const maxCharges = skill.system.action.charges.max;
     await item.update({ "system.action.charges.value": maxCharges });
@@ -2297,9 +2370,14 @@ class AbbrewActorSheet extends ActorSheet {
     const target = event.target.closest(".skill");
     const id = target.dataset.skillId;
     const skill = this.actor.items.get(id);
+    if (skill.system.action.charges.hasCharges && skill.system.action.charges.value > 0) {
+      await activateSkill(this.actor, skill);
+      return;
+    }
     if (!await this.actor.canActorUseActions(skill.system.action.actionCost)) {
       return;
     }
+    await rechargeSkill(this.actor, skill);
     await activateSkill(this.actor, skill);
   }
   async _onAttackDamageAction(target, attackMode) {
@@ -2311,66 +2389,89 @@ class AbbrewActorSheet extends ActorSheet {
     if (!await this.actor.canActorUseActions(actions)) {
       return;
     }
-    const roll = new Roll(item.system.formula, item.actor);
-    const result = await roll.evaluate();
-    const token = this.actor.token;
-    const attributeMultiplier = attackMode === "strong" ? Math.max(1, item.system.handsSupplied) : 1;
-    const damage = attackProfile.damage.map((d) => {
-      let attributeModifier = 0;
-      if (d.attributeModifier) {
-        attributeModifier = attributeMultiplier * this.actor.system.attributes[d.attributeModifier].value;
+    const skillTraits = CONFIG.ABBREW.skillTriggers.find((s) => s.subFeature === "attacks" && s.data === attackMode);
+    const attackSkill = {
+      name: item.name,
+      system: {
+        activatable: true,
+        skillTraits: JSON.stringify([skillTraits]),
+        skillType: "basic",
+        attributeIncrease: "",
+        attributeIncreaseLong: "",
+        attributeRankIncrease: "",
+        action: {
+          activationType: "standalone",
+          actionCost: actions,
+          actionImage: item.img,
+          duration: {
+            precision: "0.01",
+            value: 0
+          },
+          uses: {
+            hasUses: false,
+            value: 0,
+            max: 0,
+            period: ""
+          },
+          charges: {
+            hasCharges: false,
+            value: 0,
+            max: 0
+          },
+          isActive: false,
+          modifiers: {
+            fortune: 0,
+            attackProfile: { ...attackProfile, attackMode, handsSupplied: item.system.handsSupplied },
+            damage: {
+              self: []
+            },
+            guard: {
+              self: {
+                value: 0,
+                operator: ""
+              },
+              target: {
+                value: 0,
+                operator: ""
+              }
+            },
+            risk: {
+              self: {
+                value: 0,
+                operator: ""
+              },
+              target: {
+                value: 0,
+                operator: ""
+              }
+            },
+            wounds: {
+              self: [],
+              target: []
+            },
+            resolve: {
+              self: {
+                value: 0,
+                operator: ""
+              },
+              target: {
+                value: 0,
+                operator: ""
+              }
+            },
+            resources: {
+              self: [],
+              target: []
+            },
+            conceepts: {
+              self: [],
+              target: []
+            }
+          }
+        }
       }
-      const finalDamage = attributeModifier + d.value;
-      return { damageType: d.type, value: finalDamage };
-    });
-    const resultDice = result.dice[0].results.map((die) => {
-      let baseClasses = "roll die d10";
-      if (die.success) {
-        baseClasses = baseClasses.concat(" ", "success");
-      }
-      if (die.exploded) {
-        baseClasses = baseClasses.concat(" ", "exploded");
-      }
-      return { result: die.result, classes: baseClasses };
-    });
-    const totalSuccesses = result.dice[0].results.reduce((total, r) => {
-      if (r.success) {
-        total += 1;
-      }
-      return total;
-    }, 0);
-    const showAttack = ["attack", "feint", "finisher"].includes(attackMode);
-    const isFeint = attackMode === "feint";
-    const showParry = game.user.targets.some((t) => t.actor.doesActorHaveSkillTrait("Parry"));
-    const isStrongAttack = attackMode === "strong";
-    const showFinisher = attackMode === "finisher" || totalSuccesses > 0;
-    const isFinisher = attackMode === "finisher";
-    const templateData = {
-      attackProfile,
-      totalSuccesses,
-      resultDice,
-      damage,
-      actor: this.actor,
-      item: this.item,
-      tokenId: (token == null ? void 0 : token.uuid) || null,
-      showAttack,
-      showFinisher,
-      isStrongAttack,
-      isFinisher,
-      showParry
     };
-    const html = await renderTemplate("systems/abbrew/templates/chat/attack-card.hbs", templateData);
-    const speaker = ChatMessage.getSpeaker({ actor: this.actor });
-    const rollMode = game.settings.get("core", "rollMode");
-    const label = `[${item.type}] ${item.name}`;
-    result.toMessage({
-      speaker,
-      rollMode,
-      flavor: label,
-      content: html,
-      flags: { data: { totalSuccesses, damage, isFeint, isStrongAttack, attackProfile, attackingActor: this.actor } }
-    });
-    return result;
+    await applySkillEffects(this.actor, attackSkill);
   }
   /**
    * Handle creating a new Owned Item for the actor using initial data defined in the HTML dataset
@@ -3072,12 +3173,16 @@ const lingeringWoundImmunities = [
   { key: "sinImmunity", value: "ABBREW.Traits.WoundImmunities.sinImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "sin" }
 ];
 const skillTriggers = [
-  { key: "guardRestoreTrigger", value: "ABBREW.Traits.SkillTriggers.guardRestore", feature: "skillTrigger", subFeature: "", effect: "", data: "guardRestore" }
+  { key: "guardRestoreTrigger", value: "ABBREW.Traits.SkillTriggers.guardRestore", feature: "skillTrigger", subFeature: "guard", effect: "", data: "guardRestore" },
+  { key: "allAttackModeTrigger", value: "ABBREW.Traits.SkillTriggers.allAttackModes", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "allAttackModes" },
+  { key: "attackTrigger", value: "ABBREW.Traits.SkillTriggers.attack", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "attack" },
+  { key: "overpowerTrigger", value: "ABBREW.Traits.SkillTriggers.overpower", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "overpower" },
+  { key: "feintTrigger", value: "ABBREW.Traits.SkillTriggers.feint", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "feint" }
 ];
 const skillEnablers = [
-  { key: "overpowerEnable", value: "ABBREW.Traits.SkillEnablers.overpower", feature: "skillTrigger", subFeature: "defensiveSkills", effect: "enable", data: "overpower" },
-  { key: "parryEnable", value: "ABBREW.Traits.SkillEnablers.parry", feature: "skillTrigger", subFeature: "offensiveSkills", effect: "enable", data: "parry" },
-  { key: "feintEnable", value: "ABBREW.Traits.SkillEnablers.feint", feature: "skillTrigger", subFeature: "offensiveSkills", effect: "enable", data: "feint" }
+  { key: "overpowerEnable", value: "ABBREW.Traits.SkillEnablers.overpower", feature: "skillEnabler", subFeature: "offensiveSkills", effect: "enable", data: "overpower" },
+  { key: "parryEnable", value: "ABBREW.Traits.SkillEnablers.parry", feature: "skillEnabler", subFeature: "defensiveSkills", effect: "enable", data: "parry" },
+  { key: "feintEnable", value: "ABBREW.Traits.SkillEnablers.feint", feature: "skillEnabler", subFeature: "offensiveSkills", effect: "enable", data: "feint" }
 ];
 const valueReplacers = [
   { key: "shieldTrainingReplacer", value: "ABBREW.Traits.ValueReplacers.shieldTraining", feature: "valueReplacer", subFeature: "system.action.modifiers.guard.self.value", effect: "replace", data: "actor.system.heldArmourGuard" }
@@ -3088,6 +3193,7 @@ ABBREW.traits = [
   ...skillEnablers,
   ...valueReplacers
 ];
+ABBREW.skillTriggers = skillTriggers;
 class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   get traitsData() {
     return this.traits !== "" ? JSON.parse(this.traits) : [];
@@ -3454,7 +3560,12 @@ class AbbrewSkill extends AbbrewItemBase {
         precision: new fields.StringField({ ...blankString }),
         value: new fields.NumberField({ ...requiredInteger, initial: 0 })
       }),
-      uses: new fields.NumberField({ ...requiredInteger, initial: -1 }),
+      uses: new fields.SchemaField({
+        hasUses: new fields.BooleanField({ required: true, initial: false }),
+        value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+        max: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+        period: new fields.StringField({ ...blankString })
+      }),
       charges: new fields.SchemaField({
         hasCharges: new fields.BooleanField({ required: true, initial: false }),
         value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
@@ -3462,15 +3573,24 @@ class AbbrewSkill extends AbbrewItemBase {
       }),
       isActive: new fields.BooleanField({ required: true }),
       modifiers: new fields.SchemaField({
-        damage: new fields.SchemaField({
-          self: new fields.ArrayField(
+        fortune: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+        attackProfile: new fields.SchemaField({
+          attackType: new fields.StringField({ required: true, blank: true }),
+          lethal: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+          critical: new fields.NumberField({ ...requiredInteger, initial: 10, min: 5 }),
+          damage: new fields.ArrayField(
             new fields.SchemaField({
-              value: new fields.StringField({ ...blankString }),
-              type: new fields.StringField({ ...blankString }),
-              operator: new fields.StringField({ ...blankString })
+              type: new fields.StringField({ required: true, blank: true }),
+              value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+              attributeModifier: new fields.StringField({ required: true, blank: true })
             })
           ),
-          target: new fields.ArrayField(
+          finisherLimit: new fields.NumberField({ ...requiredInteger, initial: 10, min: 1 }),
+          attackMode: new fields.StringField({ required: true, blank: true }),
+          handsSupplied: new fields.NumberField({ ...requiredInteger, initial: 0 })
+        }),
+        damage: new fields.SchemaField({
+          self: new fields.ArrayField(
             new fields.SchemaField({
               value: new fields.StringField({ ...blankString }),
               type: new fields.StringField({ ...blankString }),
@@ -3488,7 +3608,6 @@ class AbbrewSkill extends AbbrewItemBase {
             operator: new fields.StringField({ ...blankString })
           })
         }),
-        successes: new fields.NumberField({ ...requiredInteger, initial: 0 }),
         risk: new fields.SchemaField({
           self: new fields.SchemaField({
             value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
@@ -3504,6 +3623,7 @@ class AbbrewSkill extends AbbrewItemBase {
             new fields.SchemaField({
               type: new fields.StringField({ ...blankString }),
               value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+              // TODO: Should be Increase/Suppress/Reduce
               operator: new fields.StringField({ ...blankString })
             })
           ),
@@ -3512,20 +3632,6 @@ class AbbrewSkill extends AbbrewItemBase {
               type: new fields.StringField({ ...blankString }),
               value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
               operator: new fields.StringField({ ...blankString })
-            })
-          )
-        }),
-        lingeringWoundSuppression: new fields.SchemaField({
-          self: new fields.ArrayField(
-            new fields.SchemaField({
-              type: new fields.StringField({ ...blankString }),
-              value: new fields.NumberField({ ...requiredInteger, initial: 0 })
-            })
-          ),
-          target: new fields.ArrayField(
-            new fields.SchemaField({
-              type: new fields.StringField({ ...blankString }),
-              value: new fields.NumberField({ ...requiredInteger, initial: 0 })
             })
           )
         }),
@@ -3539,20 +3645,22 @@ class AbbrewSkill extends AbbrewItemBase {
             operator: new fields.StringField({ ...blankString })
           })
         }),
-        resources: new fields.ArrayField(
-          new fields.SchemaField({
-            self: new fields.SchemaField({
-              name: new fields.StringField({ ...blankString }),
-              value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-              operator: new fields.StringField({ ...blankString })
-            }),
-            target: new fields.SchemaField({
+        resources: new fields.SchemaField({
+          self: new fields.ArrayField(
+            new fields.SchemaField({
               name: new fields.StringField({ ...blankString }),
               value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
               operator: new fields.StringField({ ...blankString })
             })
-          })
-        ),
+          ),
+          target: new fields.ArrayField(
+            new fields.SchemaField({
+              name: new fields.StringField({ ...blankString }),
+              value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+              operator: new fields.StringField({ ...blankString })
+            })
+          )
+        }),
         concepts: new fields.SchemaField({
           self: new fields.ArrayField(
             new fields.SchemaField({
@@ -3571,8 +3679,7 @@ class AbbrewSkill extends AbbrewItemBase {
             })
           )
         })
-      }),
-      description: new fields.StringField({ ...blankString })
+      })
     });
     schema.skillType = new fields.StringField({ ...blankString });
     schema.path = new fields.SchemaField({
@@ -3689,6 +3796,8 @@ class AbbrewAttackBase extends foundry.abstract.TypeDataModel {
       new fields.SchemaField({
         name: new fields.StringField({ required: true, blank: true }),
         attackType: new fields.StringField({ required: true, blank: true }),
+        lethal: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+        critical: new fields.NumberField({ ...requiredInteger, initial: 10, min: 5 }),
         damage: new fields.ArrayField(
           new fields.SchemaField({
             type: new fields.StringField({ required: true, blank: true }),
@@ -3697,7 +3806,6 @@ class AbbrewAttackBase extends foundry.abstract.TypeDataModel {
           })
         ),
         finisherLimit: new fields.NumberField({ ...requiredInteger, initial: 10, min: 1 }),
-        // TODO: Should the number of actions required for attack/strong be hands and hands + 1?
         hasStrongAttack: new fields.BooleanField({ required: true, nullable: false, initial: true })
       })
     );
@@ -3729,12 +3837,12 @@ class AbbrewWeapon extends AbbrewPhysicalItem {
   // Post Active Effects
   prepareDerivedData() {
     this.formula = `1d10x10cs10`;
-    this.isFeintTrained = this.doesParentActorHaveSkillTrait("Feint");
-    this.isOverpowerTrained = this.doesParentActorHaveSkillTrait("Overpower");
+    this.isFeintTrained = this.doesParentActorHaveSkillTrait("skillEnabler", "offensiveSkills", "enable", "feint");
+    this.isOverpowerTrained = this.doesParentActorHaveSkillTrait("skillEnabler", "offensiveSkills", "enable", "overpower");
   }
-  doesParentActorHaveSkillTrait(trait) {
+  doesParentActorHaveSkillTrait(feature, subFeature, effect, data) {
     var _a, _b;
-    return ((_b = (_a = this == null ? void 0 : this.parent) == null ? void 0 : _a.actor) == null ? void 0 : _b.doesActorHaveSkillTrait(trait)) ?? false;
+    return ((_b = (_a = this == null ? void 0 : this.parent) == null ? void 0 : _a.actor) == null ? void 0 : _b.doesActorHaveSkillTrait(feature, subFeature, effect, data)) ?? false;
   }
 }
 class AbbrewWound extends AbbrewItemBase {
@@ -3961,18 +4069,11 @@ class AbbrewActor extends Actor {
   applyModifiersToDamage(rolls, data) {
     let rollSuccesses = data.totalSuccesses;
     return data.damage.reduce((result, d) => {
-      rolls[0].dice[0].results[0].result ?? 0;
-      const damageTypeSuccesses = (
-        /* firstRoll > dodge ? */
-        rollSuccesses
-      );
+      const damageTypeSuccesses = rollSuccesses;
       if (damageTypeSuccesses < 0) {
         return result;
       }
-      const dmg = (
-        /* damageTypeSuccesses == 0 ? Math.max(0, d.value - protection.value) : */
-        d.value
-      );
+      const dmg = d.value;
       return result += dmg;
     }, 0);
   }
@@ -4057,8 +4158,8 @@ class AbbrewActor extends Actor {
   getActorAnatomy() {
     return this.items.filter((i) => i.type === "anatomy");
   }
-  doesActorHaveSkillTrait(trait) {
-    return this.items.filter((i) => i.system.skillTraits).flatMap((i) => JSON.parse(i.system.skillTraits)).map((st) => st.value).includes(trait) ?? false;
+  doesActorHaveSkillTrait(feature, subFeature, effect, data) {
+    return this.items.filter((i) => i.system.skillTraits).flatMap((i) => JSON.parse(i.system.skillTraits)).some((t) => t.feature === feature && t.subFeature === subFeature && t.effect === effect && t.data === data) ?? false;
   }
   async acceptWound(type, value) {
     const updates = { "system.wounds": mergeActorWounds(this, [{ type, value }]) };
@@ -4221,7 +4322,7 @@ class AbbrewItem2 extends Item {
       return;
     }
     const actor = tokens[0].actor;
-    if (action === "parry" && !actor.doesActorHaveSkillTrait("Parry")) {
+    if (action === "parry" && !actor.doesActorHaveSkillTrait("skillEnabler", "defensiveSkills", "enable", "parry")) {
       ui.notifications.info("You have not trained enough to be able to parry.");
       return;
     }

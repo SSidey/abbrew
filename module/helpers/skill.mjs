@@ -1,12 +1,10 @@
-import { mergeWoundsWithOperator } from "./combat.mjs";
 import { applyOperator } from "./operators.mjs";
-import { getObjectValueByStringPath } from "../helpers/utils.mjs"
+import { getObjectValueByStringPath, getSafeJson } from "../helpers/utils.mjs"
 
 export async function activateSkill(actor, skill) {
     if (skill.system.action.activationType === "synergy") {
         await trackSkillDuration(actor, skill);
         await addSkillToQueuedSkills(actor, skill);
-        await rechargeSkill(actor, skill);
         return;
     }
 
@@ -55,14 +53,97 @@ export async function applySkillEffects(actor, skill) {
         const item = actor.items.find(i => i._id === skill._id);
         await item.update({ "system.action.charges.value": currentCharges -= 1 });
     }
-}
 
-function getSafeJson(json, defaultValue) {
-    if (!json || json === "") {
-        return defaultValue;
+    let templateData = {};
+    let data = {};
+    if (skill.system.action.modifiers.attackProfile) {
+        const attackProfile = skill.system.action.modifiers.attackProfile;
+        const rollFormula = getRollFormula(actor.system.meta.tier.value, attackProfile, skill.system.action.modifiers.fortune);
+        const roll = new Roll(rollFormula, skill.system.actor);
+        const result = await roll.evaluate();
+        const token = actor.token;
+        const attackMode = attackProfile.attackMode;
+        const attributeMultiplier = attackMode === 'strong' ? Math.max(1, attackProfile.handsSupplied) : 1;
+        const damage = attackProfile.damage.map(d => {
+            let attributeModifier = 0;
+            if (d.attributeModifier) {
+                attributeModifier = attributeMultiplier * actor.system.attributes[d.attributeModifier].value;
+            }
+
+            const finalDamage = attributeModifier + d.value;
+
+            return { damageType: d.type, value: finalDamage };
+        });
+
+        const resultDice = result.dice[0].results.map(die => {
+            let baseClasses = "roll die d10";
+            if (die.success) {
+                baseClasses = baseClasses.concat(' ', 'success')
+            }
+
+            if (die.exploded) {
+                baseClasses = baseClasses.concat(' ', 'exploded');
+            }
+
+            return { result: die.result, classes: baseClasses };
+        });
+
+        const totalSuccesses = result.dice[0].results.reduce((total, r) => {
+            if (r.success) {
+                total += 1;
+            }
+            return total;
+        }, 0) + attackProfile.lethal;
+
+
+        const showAttack = ['attack', 'feint', 'finisher'].includes(attackMode);
+        const isFeint = attackMode === 'feint';
+        const showParry = game.user.targets.some(t => t.actor.doesActorHaveSkillTrait("skillEnabler", "defensiveSkills", "enable", "parry"));
+        const isStrongAttack = attackMode === 'strong';
+        const showFinisher = attackMode === 'finisher' || totalSuccesses > 0;
+        const isFinisher = attackMode === 'finisher';
+        // TODO: Get all of the descriptions together into an array
+        // TODO: Update the chat card to display the descriptions
+        templateData = {
+            ...templateData,
+            attackProfile,
+            totalSuccesses,
+            resultDice,
+            damage,
+            actor: actor,
+            tokenId: token?.uuid || null,
+            showAttack,
+            showFinisher,
+            isStrongAttack,
+            isFinisher,
+            showParry
+        };
+        data = { ...data, totalSuccesses, damage, isFeint, isStrongAttack, attackProfile, attackingActor: actor };
     }
 
-    return JSON.parse(json);
+    // TODO: Move this out of item and into a weapon.mjs / attack-card.mjs
+    const html = await renderTemplate("systems/abbrew/templates/chat/attack-card.hbs", templateData);
+
+    // Initialize chat data.
+    const speaker = ChatMessage.getSpeaker({ actor: actor });
+    const rollMode = game.settings.get('core', 'rollMode');
+    const label = `[${skill.system.skillType}] ${skill.name}`;
+    ChatMessage.create({
+        speaker: speaker,
+        rollMode: rollMode,
+        flavor: label,
+        content: html,
+        flags: { data: data }
+    });
+    return {};
+}
+
+function getRollFormula(tier, attackProfile, fortune) {
+    // 1d10x10cs10
+    const diceCount = tier + fortune;
+    const explodesOn = attackProfile.critical;
+    const successOn = attackProfile.critical;
+    return `${diceCount}d10x${explodesOn}cs${successOn}`;
 }
 
 function mergeModifiers(modifiers) {
@@ -160,8 +241,8 @@ async function createDurationActiveEffect(actor, skill, duration) {
     await actor.createEmbeddedDocuments('ActiveEffect', [conditionEffectData]);
 }
 
-async function rechargeSkill(actor, skill) {
-    const item = actor.items.filter(i => i._id === skill._id).pop();
+export async function rechargeSkill(actor, skill) {
+    const item = actor.items.find(i => i._id === skill._id);
     if (skill.system.action.charges.hasCharges) {
         const maxCharges = skill.system.action.charges.max;
         await item.update({ "system.action.charges.value": maxCharges });
