@@ -49,7 +49,16 @@ function getSafeJson(json, defaultValue) {
   }
   return JSON.parse(json);
 }
+function intersection(a, b) {
+  const setA = new Set(a);
+  const foo = b.filter((value) => setA.has(value));
+  return foo;
+}
 async function activateSkill(actor, skill) {
+  if (isSkillBlocked(actor, skill)) {
+    ui.notifications.info(`You are blocked from using ${skill.name}`);
+    return;
+  }
   if (skill.system.action.activationType === "synergy") {
     await trackSkillDuration(actor, skill);
     await addSkillToQueuedSkills(actor, skill);
@@ -62,13 +71,19 @@ async function activateSkill(actor, skill) {
   await applySkillEffects(actor, skill);
 }
 async function applySkillEffects(actor, skill) {
+  if (isSkillBlocked(actor, skill)) {
+    ui.notifications.info(`You are blocked from using ${skill.name}`);
+    return;
+  }
   let updates = {};
   const queuedSkills = actor.items.toObject().filter((i) => actor.system.queuedSkills.includes(i._id));
   const skillTriggers2 = getSafeJson(skill.system.skillTraits, []).filter((t) => t.feature === "skillTrigger").map((t) => t.key);
-  const queuedSynergies = queuedSkills.filter((s) => getSafeJson(s.system.skillTraits, []).filter((st) => skillTriggers2.indexOf(st)));
+  const queuedSynergies = queuedSkills.filter((s) => s.system.skillTraits).map((s) => ({ skill: s, skillTraits: getSafeJson(s.system.skillTraits, []).filter((s2) => s2.feature === "skillTrigger").map((s2) => s2.key) })).filter((s) => intersection(s.skillTraits, skillTriggers2).length > 0).map((s) => s.skill);
   const passiveSkills = actor.items.toObject().filter((i) => i.system.activatable === false && i.system.skillTraits);
-  const passiveSynergies = passiveSkills.filter((s) => getSafeJson(s.system.skillTraits, []).filter((st) => skillTriggers2.indexOf(st)));
-  const allSkills = [skill, ...queuedSynergies, ...passiveSynergies].filter((s) => !s.system.action.charges.hasCharges || s.system.action.charges.value > 0);
+  const passiveSynergies = passiveSkills.filter((s) => s.system.skillTraits).map((s) => ({ skill: s, skillTraits: getSafeJson(s.system.skillTraits, []).filter((s2) => s2.feature === "skillTrigger").map((s2) => s2.key) })).filter((s) => intersection(s.skillTraits, skillTriggers2).length > 0).map((s) => s.skill);
+  const allSkills = [...passiveSynergies, ...queuedSynergies, skill].filter((s) => !s.system.action.charges.hasCharges || s.system.action.charges.value > 0);
+  const allSummaries = allSkills.map((s) => ({ name: s.name, description: s.system.description }));
+  const usesSkills = allSkills.filter((s) => s.system.action.uses.hasUses).filter((s) => s._id !== skill._id);
   const chargedSkills = allSkills.filter((s) => s.system.action.charges.hasCharges);
   const guardModifiers = allSkills.filter((s) => s.system.action.modifiers.guard.self.operator).map((s) => ({ value: getSkillValueForPath("system.action.modifiers.guard.self.value", s, s.system.action.modifiers.guard.self.value, actor), operator: s.system.action.modifiers.guard.self.operator }));
   if (guardModifiers) {
@@ -77,13 +92,23 @@ async function applySkillEffects(actor, skill) {
     updates["system.defense.guard.value"] = applyOperator(currentGuard, guardModifier, skill.system.action.modifiers.guard.self.operator);
   }
   await actor.update(updates);
+  for (const index in usesSkills) {
+    const skill2 = usesSkills[index];
+    let currentCharges = skill2.system.action.charges.value;
+    if (currentCharges > 0) {
+      continue;
+    }
+    let currentUses = skill2.system.action.uses.value;
+    const item = actor.items.find((i) => i._id === skill2._id);
+    await item.update({ "system.action.uses.value": currentUses -= 1 });
+  }
   for (const index in chargedSkills) {
     const skill2 = chargedSkills[index];
     let currentCharges = skill2.system.action.charges.value;
     const item = actor.items.find((i) => i._id === skill2._id);
     await item.update({ "system.action.charges.value": currentCharges -= 1 });
   }
-  let templateData = {};
+  let templateData = { allSummaries };
   let data = {};
   if (skill.system.action.modifiers.attackProfile) {
     const attackProfile = skill.system.action.modifiers.attackProfile;
@@ -92,11 +117,11 @@ async function applySkillEffects(actor, skill) {
     const result = await roll.evaluate();
     const token = actor.token;
     const attackMode = attackProfile.attackMode;
-    const attributeMultiplier = attackMode === "strong" ? Math.max(1, attackProfile.handsSupplied) : 1;
+    const attributeMultiplier = getAttributeModifier(attackMode, attackProfile);
     const damage = attackProfile.damage.map((d) => {
       let attributeModifier = 0;
       if (d.attributeModifier) {
-        attributeModifier = attributeMultiplier * actor.system.attributes[d.attributeModifier].value;
+        attributeModifier = Math.floor(attributeMultiplier * actor.system.attributes[d.attributeModifier].value);
       }
       const finalDamage = attributeModifier + d.value;
       return { damageType: d.type, value: finalDamage };
@@ -120,7 +145,7 @@ async function applySkillEffects(actor, skill) {
     const showAttack = ["attack", "feint", "finisher"].includes(attackMode);
     const isFeint = attackMode === "feint";
     const showParry = game.user.targets.some((t) => t.actor.doesActorHaveSkillTrait("skillEnabler", "defensiveSkills", "enable", "parry"));
-    const isStrongAttack = attackMode === "strong";
+    const isStrongAttack = attackMode === "overpower";
     const showFinisher = attackMode === "finisher" || totalSuccesses > 0;
     const isFinisher = attackMode === "finisher";
     templateData = {
@@ -135,11 +160,12 @@ async function applySkillEffects(actor, skill) {
       showFinisher,
       isStrongAttack,
       isFinisher,
-      showParry
+      showParry,
+      actionCost: skill.system.action.actionCost
     };
-    data = { ...data, totalSuccesses, damage, isFeint, isStrongAttack, attackProfile, attackingActor: actor };
+    data = { ...data, totalSuccesses, damage, isFeint, isStrongAttack, attackProfile, attackingActor: actor, actionCost: skill.system.action.actionCost };
   }
-  const html = await renderTemplate("systems/abbrew/templates/chat/attack-card.hbs", templateData);
+  const html = await renderTemplate("systems/abbrew/templates/chat/skill-card.hbs", templateData);
   const speaker = ChatMessage.getSpeaker({ actor });
   const rollMode = game.settings.get("core", "rollMode");
   const label = `[${skill.system.skillType}] ${skill.name}`;
@@ -151,6 +177,17 @@ async function applySkillEffects(actor, skill) {
     flags: { data }
   });
   return {};
+}
+function getAttributeModifier(attackMode, attackProfile) {
+  switch (attackMode) {
+    case "overpower":
+      return Math.max(1, attackProfile.handsSupplied);
+    case "attack":
+    case "feint":
+      return 0.5 + Math.max(1, attackProfile.handsSupplied) / 2;
+    default:
+      return 1;
+  }
 }
 function getRollFormula(tier, attackProfile, fortune) {
   const diceCount = tier + fortune;
@@ -242,10 +279,16 @@ async function createDurationActiveEffect(actor, skill, duration) {
 }
 async function rechargeSkill(actor, skill) {
   const item = actor.items.find((i) => i._id === skill._id);
+  let updates = {};
   if (skill.system.action.charges.hasCharges) {
     const maxCharges = skill.system.action.charges.max;
-    await item.update({ "system.action.charges.value": maxCharges });
+    updates["system.action.charges.value"] = maxCharges;
   }
+  if (skill.system.action.uses.hasUses) {
+    let currentUses = skill.system.action.uses.value;
+    updates["system.action.uses.value"] = currentUses -= 1;
+  }
+  await item.update(updates);
 }
 function isNumeric(str) {
   if (typeof str != "string")
@@ -275,6 +318,11 @@ function parsePath(rawValue, actor) {
   if (getObjectValueByStringPath(entity, path) != null) {
     return getObjectValueByStringPath(entity, path);
   }
+}
+function isSkillBlocked(actor, skill) {
+  const skillBlockers2 = actor.items.filter((i) => i.type === "skill").filter((s) => s.system.skillTraits).flatMap((s) => getSafeJson(s.system.skillTraits).filter((st) => st.feature === "skillBlocker").map((st) => st.data));
+  const skillTriggers2 = getSafeJson(skill.system.skillTraits).filter((st) => st.feature === "skillTrigger").map((st) => st.data);
+  return intersection(skillBlockers2, skillTriggers2).length > 0;
 }
 async function handleCombatStart(actors) {
   for (const index in actors) {
@@ -2267,7 +2315,7 @@ class AbbrewActorSheet extends ActorSheet {
     });
     html.on("click", ".skill-edit", (ev) => {
       const li = $(ev.currentTarget).parents(".skill");
-      const skill = this.actor.items.get(li.data("skillId"));
+      const skill = this.actor.items.get(li.data("itemId"));
       skill.sheet.render(true);
     });
     html.on("click", ".skill-activate", this._onSkillActivate.bind(this));
@@ -2282,7 +2330,7 @@ class AbbrewActorSheet extends ActorSheet {
     });
     html.on("click", ".skill-delete", (ev) => {
       const li = $(ev.currentTarget).parents(".skill");
-      const skill = this.actor.items.get(li.data("skillId"));
+      const skill = this.actor.items.get(li.data("itemId"));
       skill.delete();
       li.slideUp(200, () => this.render(false));
     });
@@ -2292,7 +2340,7 @@ class AbbrewActorSheet extends ActorSheet {
       onManageActiveEffect(ev, document2);
     });
     html.on("change", ".item-select", this._onItemChange.bind(this));
-    html.on("change", '.item input[type="checkbox"]', this._onItemChange.bind(this));
+    html.on("change", ".item input", this._onItemChange.bind(this));
     html.on("click", ".rollable", this._onRoll.bind(this));
     html.on("click", ".attack-damage-button", async (event) => {
       const t = event.currentTarget;
@@ -2302,9 +2350,9 @@ class AbbrewActorSheet extends ActorSheet {
       const t = event.currentTarget;
       await this._onAttackDamageAction(t, "feint");
     });
-    html.on("click", ".attack-strong-button", async (event) => {
+    html.on("click", ".attack-overpower-button", async (event) => {
       const t = event.currentTarget;
-      await this._onAttackDamageAction(t, "strong");
+      await this._onAttackDamageAction(t, "overpower");
     });
     html.on("click", ".attack-finisher-button", async (event) => {
       const t = event.currentTarget;
@@ -2368,10 +2416,18 @@ class AbbrewActorSheet extends ActorSheet {
   async _onSkillActivate(event) {
     event.preventDefault();
     const target = event.target.closest(".skill");
-    const id = target.dataset.skillId;
+    const id = target.dataset.itemId;
     const skill = this.actor.items.get(id);
+    if (isSkillBlocked(this.actor, skill)) {
+      ui.notifications.info(`You are blocked from using ${skill.name}`);
+      return;
+    }
     if (skill.system.action.charges.hasCharges && skill.system.action.charges.value > 0) {
-      await activateSkill(this.actor, skill);
+      await applySkillEffects(this.actor, skill);
+      return;
+    }
+    if (skill.system.action.uses.hasUses && !skill.system.action.uses.value > 0) {
+      ui.info("You don't have any more uses of that skill.");
       return;
     }
     if (!await this.actor.canActorUseActions(skill.system.action.actionCost)) {
@@ -2385,7 +2441,7 @@ class AbbrewActorSheet extends ActorSheet {
     const attackProfileId = target.closest("li .attack-profile").dataset.attackProfileId;
     const item = this.actor.items.get(itemId);
     const attackProfile = item.system.attackProfiles[attackProfileId];
-    const actions = attackMode === "strong" ? item.system.exertActionCost : item.system.actionCost;
+    const actions = attackMode === "overpower" ? item.system.exertActionCost : item.system.actionCost;
     if (!await this.actor.canActorUseActions(actions)) {
       return;
     }
@@ -2421,7 +2477,7 @@ class AbbrewActorSheet extends ActorSheet {
           isActive: false,
           modifiers: {
             fortune: 0,
-            attackProfile: { ...attackProfile, attackMode, handsSupplied: item.system.handsSupplied },
+            attackProfile: { ...attackProfile, attackMode, handsSupplied: item.system.handsSupplied, critical: 11 - item.system.handsSupplied },
             damage: {
               self: []
             },
@@ -2901,7 +2957,7 @@ const preloadHandlebarsTemplates = async function() {
     "systems/abbrew/templates/item/parts/skill-actions.hbs",
     "systems/abbrew/templates/item/parts/skill-damage.hbs",
     // Chat Cards.
-    "systems/abbrew/templates/chat/attack-card.hbs",
+    "systems/abbrew/templates/chat/skill-card.hbs",
     "systems/abbrew/templates/chat/finisher-card.hbs",
     "systems/abbrew/templates/chat/lost-resolve-card.hbs",
     "systems/abbrew/templates/chat/attack-result-card.hbs"
@@ -2916,6 +2972,15 @@ ABBREW.durations = {
   minute: { label: "ABBREW.Durations.minute", value: 60 },
   hour: { label: "ABBREW.Durations.hour", value: 3600 },
   day: { label: "ABBREW.Durations.day", value: 86400 }
+};
+ABBREW.durationsLabels = {
+  instant: "ABBREW.Durations.instant",
+  second: "ABBREW.Durations.second",
+  turn: "ABBREW.Durations.turn",
+  round: "ABBREW.Durations.round",
+  minute: "ABBREW.Durations.minute",
+  hour: "ABBREW.Durations.hour",
+  day: "ABBREW.Durations.day"
 };
 ABBREW.attributes = {
   str: "ABBREW.Attribute.Str.long",
@@ -3111,6 +3176,12 @@ ABBREW.conditions = {
     description: "ABBREW.EFFECT.Condition.GuardBreak.description",
     statuses: ["offGuard"]
   },
+  offBalance: {
+    name: "ABBREW.EFFECT.Condition.offBalance.name",
+    img: "systems/abbrew/assets/icons/statuses/offBalance.svg",
+    description: "ABBREW.EFFECT.Condition.OffBalance.description",
+    statuses: ["offBalance"]
+  },
   offGuard: {
     name: "ABBREW.EFFECT.Condition.OffGuard.name",
     img: "systems/abbrew/assets/icons/statuses/offGuard.svg",
@@ -3122,22 +3193,31 @@ ABBREW.statusEffects = {
   dead: {
     name: "ABBREW.EFFECT.Status.dead",
     img: "systems/abbrew/assets/icons/statuses/dead.svg",
+    "description": "You have suffered fatal wounds, resulting in death.",
     order: 2,
     statuses: ["defeated"]
   },
   defeated: {
     name: "ABBREW.EFFECT.Status.defeated",
     img: "systems/abbrew/assets/icons/statuses/defeated.svg",
+    "description": "You resolve buckles as you are unable to continue the fight.",
     special: "DEFEATED",
     order: 1
   },
   guardBreak: {
     name: "ABBREW.EFFECT.Status.guardBreak",
-    img: "systems/abbrew/assets/icons/statuses/guardBreak.svg"
+    img: "systems/abbrew/assets/icons/statuses/guardBreak.svg",
+    "description": "Your guard is broken, your foes can directly capitalise on your weakpoints. You can be targeted by finishers."
+  },
+  offBalance: {
+    name: "ABBREW.EFFECT.Status.offBalance",
+    img: "systems/abbrew/assets/icons/statuses/offBalance.svg",
+    "description": "You have been knocked off balance, you cannot restore guard while you have this condition. You can remove one stack of this condition by using the recover skill"
   },
   offGuard: {
     name: "ABBREW.EFFECT.Status.offGuard",
-    img: "systems/abbrew/assets/icons/statuses/offGuard.svg"
+    img: "systems/abbrew/assets/icons/statuses/offGuard.svg",
+    "description": "Your are harried and your guard compromised, your foes can directly capitalise on your weakpoints. You can be targeted by finishers."
   }
 };
 ABBREW.equipTypes = {
@@ -3174,10 +3254,13 @@ const lingeringWoundImmunities = [
 ];
 const skillTriggers = [
   { key: "guardRestoreTrigger", value: "ABBREW.Traits.SkillTriggers.guardRestore", feature: "skillTrigger", subFeature: "guard", effect: "", data: "guardRestore" },
-  { key: "allAttackModeTrigger", value: "ABBREW.Traits.SkillTriggers.allAttackModes", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "allAttackModes" },
   { key: "attackTrigger", value: "ABBREW.Traits.SkillTriggers.attack", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "attack" },
   { key: "overpowerTrigger", value: "ABBREW.Traits.SkillTriggers.overpower", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "overpower" },
-  { key: "feintTrigger", value: "ABBREW.Traits.SkillTriggers.feint", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "feint" }
+  { key: "feintTrigger", value: "ABBREW.Traits.SkillTriggers.feint", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "feint" },
+  { key: "finisherTrigger", value: "ABBREW.Traits.SkillTriggers.finisher", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "finisher" }
+];
+const skillBlockers = [
+  { key: "guardRestoreBlocker", value: "ABBREW.Traits.SkillBlockers.guardRestore", feature: "skillBlocker", subFeature: "guard", effect: "", data: "guardRestore" }
 ];
 const skillEnablers = [
   { key: "overpowerEnable", value: "ABBREW.Traits.SkillEnablers.overpower", feature: "skillEnabler", subFeature: "offensiveSkills", effect: "enable", data: "overpower" },
@@ -3191,6 +3274,7 @@ ABBREW.traits = [
   ...lingeringWoundImmunities,
   ...skillTriggers,
   ...skillEnablers,
+  ...skillBlockers,
   ...valueReplacers
 ];
 ABBREW.skillTriggers = skillTriggers;
@@ -3836,7 +3920,6 @@ class AbbrewWeapon extends AbbrewPhysicalItem {
   }
   // Post Active Effects
   prepareDerivedData() {
-    this.formula = `1d10x10cs10`;
     this.isFeintTrained = this.doesParentActorHaveSkillTrait("skillEnabler", "offensiveSkills", "enable", "feint");
     this.isOverpowerTrained = this.doesParentActorHaveSkillTrait("skillEnabler", "offensiveSkills", "enable", "overpower");
   }
@@ -4217,7 +4300,16 @@ class AbbrewActor extends Actor {
     await this.update({ "system.actions": remainingActions -= actions });
     return true;
   }
-  async handleDeleteActiveEffect() {
+  async handleDeleteActiveEffect(effect) {
+    var _a, _b, _c;
+    const itemId = (_c = (_b = (_a = effect == null ? void 0 : effect.flags) == null ? void 0 : _a.abbrew) == null ? void 0 : _b.skill) == null ? void 0 : _c.trackDuration;
+    if (itemId) {
+      const item = this.items.find((i) => i._id === itemId);
+      await item.update({ "system.action.charges.value": 0 });
+      if (item.system.skillType === "temporary") {
+        await item.delete();
+      }
+    }
     const activeSkillsWithDuration = this.effects.toObject().filter((e) => e.flags.abbrew.skill.type === "standalone").map((e) => e.flags.abbrew.skill.trackDuration);
     const queuedSkillsWithDuration = this.effects.toObject().filter((e) => e.flags.abbrew.skill.type === "synergy").map((e) => e.flags.abbrew.skill.trackDuration);
     await this.update({ "system.activeSkills": activeSkillsWithDuration, "system.queuedSkills": queuedSkillsWithDuration });
@@ -4305,7 +4397,7 @@ class AbbrewItem2 extends Item {
       case "damage":
         await this._onAcceptDamageAction(message.rolls, message.flags.data, action);
         break;
-      case "strong":
+      case "overpower":
         await this._onAcceptDamageAction(message.rolls, message.flags.data, action);
         break;
       case "parry":
@@ -4326,11 +4418,14 @@ class AbbrewItem2 extends Item {
       ui.notifications.info("You have not trained enough to be able to parry.");
       return;
     }
-    const actions = action === "parry" ? 1 : 0;
+    const actions = this.getActionCostForAccept(data, action);
     if (actions > 0 && !await actor.canActorUseActions(actions)) {
       return;
     }
     await actor.takeDamage(rolls, data, action);
+  }
+  static getActionCostForAccept(data, action) {
+    return action === "parry" ? data.actionCost : 0;
   }
   static async _onAcceptFinisherAction(rolls, data, action) {
     const tokens = canvas.tokens.controlled.filter((token) => token.actor);
@@ -4717,6 +4812,8 @@ function _configureStatusEffects() {
   };
   CONFIG.statusEffects = Object.entries(CONFIG.ABBREW.statusEffects).reduce((arr, [id, data]) => {
     const original = CONFIG.statusEffects.find((s) => s.id === id);
+    data.name = game.i18n.localize(data.name) ?? data.name;
+    data.description = game.i18n.localize(data.description) ?? data.description;
     addEffect(arr, foundry.utils.mergeObject(original ?? {}, { id, ...data }, { inplace: false }));
     return arr;
   }, []);
@@ -4804,7 +4901,7 @@ Hooks.on("preUpdateItem", () => {
 Hooks.on("deleteActiveEffect", async (effect, options, userId) => {
   console.log("deleted");
   const actor = effect.parent;
-  await actor.handleDeleteActiveEffect();
+  await actor.handleDeleteActiveEffect(effect);
 });
 Hooks.on("updateActiveEffect", () => {
 });

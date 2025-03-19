@@ -129,7 +129,7 @@
 //   };
 
 //   // Handle passed data / don't look for item
-//   const html = await renderTemplate("systems/abbrew/templates/chat/attack-card.hbs", templateData);
+//   const html = await renderTemplate("systems/abbrew/templates/chat/skill-card.hbs", templateData);
 
 //   // Create the ChatMessage data object
 //   const chatData = {

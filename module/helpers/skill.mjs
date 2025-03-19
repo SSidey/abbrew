@@ -1,7 +1,12 @@
 import { applyOperator } from "./operators.mjs";
-import { getObjectValueByStringPath, getSafeJson } from "../helpers/utils.mjs"
+import { getObjectValueByStringPath, getSafeJson, intersection } from "../helpers/utils.mjs"
 
 export async function activateSkill(actor, skill) {
+    if (isSkillBlocked(actor, skill)) {
+        ui.notifications.info(`You are blocked from using ${skill.name}`);
+        return;
+    }
+
     if (skill.system.action.activationType === "synergy") {
         await trackSkillDuration(actor, skill);
         await addSkillToQueuedSkills(actor, skill);
@@ -17,20 +22,27 @@ export async function activateSkill(actor, skill) {
 }
 
 export async function applySkillEffects(actor, skill) {
+    if (isSkillBlocked(actor, skill)) {
+        ui.notifications.info(`You are blocked from using ${skill.name}`);
+        return;
+    }
+
     let updates = {};
     // Get all queued synergy skills
     const queuedSkills = actor.items.toObject().filter(i => actor.system.queuedSkills.includes(i._id));
     // Get all skill triggers on the main skill
     const skillTriggers = getSafeJson(skill.system.skillTraits, []).filter(t => t.feature === "skillTrigger").map(t => t.key);
     // Get all synergies that apply to the main skill
-    const queuedSynergies = queuedSkills.filter(s => getSafeJson(s.system.skillTraits, []).filter(st => skillTriggers.indexOf(st)));
+    const queuedSynergies = queuedSkills.filter(s => s.system.skillTraits).map(s => ({ skill: s, skillTraits: getSafeJson(s.system.skillTraits, []).filter(s => s.feature === "skillTrigger").map(s => s.key) })).filter(s => intersection(s.skillTraits, skillTriggers).length > 0).map(s => s.skill);
     // Get all passives
     const passiveSkills = actor.items.toObject().filter(i => i.system.activatable === false && i.system.skillTraits);
     // Get passives that have synergy with the main skill
-    const passiveSynergies = passiveSkills.filter(s => getSafeJson(s.system.skillTraits, []).filter(st => skillTriggers.indexOf(st)));
+    const passiveSynergies = passiveSkills.filter(s => s.system.skillTraits).map(s => ({ skill: s, skillTraits: getSafeJson(s.system.skillTraits, []).filter(s => s.feature === "skillTrigger").map(s => s.key) })).filter(s => intersection(s.skillTraits, skillTriggers).length > 0).map(s => s.skill)
     // Combine all relevant skills, filtering for those that are out of charges
-    const allSkills = [skill, ...queuedSynergies, ...passiveSynergies].filter(s => !s.system.action.charges.hasCharges || (s.system.action.charges.value > 0));
+    const allSkills = [...passiveSynergies, ...queuedSynergies, skill].filter(s => !s.system.action.charges.hasCharges || (s.system.action.charges.value > 0));
+    const allSummaries = allSkills.map(s => ({ name: s.name, description: s.system.description }));
     // Explicitly get any skills with charges for later use
+    const usesSkills = allSkills.filter(s => s.system.action.uses.hasUses).filter(s => s._id !== skill._id);
     const chargedSkills = allSkills.filter(s => s.system.action.charges.hasCharges);
 
     const guardModifiers = allSkills.filter(s => s.system.action.modifiers.guard.self.operator).map(s => ({ value: getSkillValueForPath("system.action.modifiers.guard.self.value", s, s.system.action.modifiers.guard.self.value, actor), operator: s.system.action.modifiers.guard.self.operator }));
@@ -47,6 +59,16 @@ export async function applySkillEffects(actor, skill) {
     // }
 
     await actor.update(updates);
+    for (const index in usesSkills) {
+        const skill = usesSkills[index];
+        let currentCharges = skill.system.action.charges.value;
+        if (currentCharges > 0) {
+            continue;
+        }
+        let currentUses = skill.system.action.uses.value
+        const item = actor.items.find(i => i._id === skill._id);
+        await item.update({ "system.action.uses.value": currentUses -= 1 });
+    }
     for (const index in chargedSkills) {
         const skill = chargedSkills[index];
         let currentCharges = skill.system.action.charges.value;
@@ -54,7 +76,7 @@ export async function applySkillEffects(actor, skill) {
         await item.update({ "system.action.charges.value": currentCharges -= 1 });
     }
 
-    let templateData = {};
+    let templateData = { allSummaries: allSummaries };
     let data = {};
     if (skill.system.action.modifiers.attackProfile) {
         const attackProfile = skill.system.action.modifiers.attackProfile;
@@ -63,11 +85,11 @@ export async function applySkillEffects(actor, skill) {
         const result = await roll.evaluate();
         const token = actor.token;
         const attackMode = attackProfile.attackMode;
-        const attributeMultiplier = attackMode === 'strong' ? Math.max(1, attackProfile.handsSupplied) : 1;
+        const attributeMultiplier = getAttributeModifier(attackMode, attackProfile);
         const damage = attackProfile.damage.map(d => {
             let attributeModifier = 0;
             if (d.attributeModifier) {
-                attributeModifier = attributeMultiplier * actor.system.attributes[d.attributeModifier].value;
+                attributeModifier = Math.floor(attributeMultiplier * actor.system.attributes[d.attributeModifier].value);
             }
 
             const finalDamage = attributeModifier + d.value;
@@ -99,7 +121,7 @@ export async function applySkillEffects(actor, skill) {
         const showAttack = ['attack', 'feint', 'finisher'].includes(attackMode);
         const isFeint = attackMode === 'feint';
         const showParry = game.user.targets.some(t => t.actor.doesActorHaveSkillTrait("skillEnabler", "defensiveSkills", "enable", "parry"));
-        const isStrongAttack = attackMode === 'strong';
+        const isStrongAttack = attackMode === 'overpower';
         const showFinisher = attackMode === 'finisher' || totalSuccesses > 0;
         const isFinisher = attackMode === 'finisher';
         // TODO: Get all of the descriptions together into an array
@@ -116,13 +138,14 @@ export async function applySkillEffects(actor, skill) {
             showFinisher,
             isStrongAttack,
             isFinisher,
-            showParry
+            showParry,
+            actionCost: skill.system.action.actionCost
         };
-        data = { ...data, totalSuccesses, damage, isFeint, isStrongAttack, attackProfile, attackingActor: actor };
+        data = { ...data, totalSuccesses, damage, isFeint, isStrongAttack, attackProfile, attackingActor: actor, actionCost: skill.system.action.actionCost };
     }
 
-    // TODO: Move this out of item and into a weapon.mjs / attack-card.mjs
-    const html = await renderTemplate("systems/abbrew/templates/chat/attack-card.hbs", templateData);
+    // TODO: Move this out of item and into a weapon.mjs / skill-card.mjs
+    const html = await renderTemplate("systems/abbrew/templates/chat/skill-card.hbs", templateData);
 
     // Initialize chat data.
     const speaker = ChatMessage.getSpeaker({ actor: actor });
@@ -136,6 +159,18 @@ export async function applySkillEffects(actor, skill) {
         flags: { data: data }
     });
     return {};
+}
+
+function getAttributeModifier(attackMode, attackProfile) {
+    switch (attackMode) {
+        case "overpower":
+            return Math.max(1, attackProfile.handsSupplied);
+        case "attack":
+        case "feint":
+            return 0.5 + (Math.max(1, attackProfile.handsSupplied) / 2);
+        default:
+            return 1;
+    }
 }
 
 function getRollFormula(tier, attackProfile, fortune) {
@@ -243,10 +278,17 @@ async function createDurationActiveEffect(actor, skill, duration) {
 
 export async function rechargeSkill(actor, skill) {
     const item = actor.items.find(i => i._id === skill._id);
+    let updates = {};
     if (skill.system.action.charges.hasCharges) {
         const maxCharges = skill.system.action.charges.max;
-        await item.update({ "system.action.charges.value": maxCharges });
+        updates["system.action.charges.value"] = maxCharges;
     }
+    if (skill.system.action.uses.hasUses) {
+        let currentUses = skill.system.action.uses.value
+        updates["system.action.uses.value"] = currentUses -= 1;
+    }
+
+    await item.update(updates);
 }
 
 function isNumeric(str) {
@@ -277,4 +319,11 @@ function parsePath(rawValue, actor) {
     if (getObjectValueByStringPath(entity, path) != null) {
         return getObjectValueByStringPath(entity, path);
     }
+}
+
+export function isSkillBlocked(actor, skill) {
+    // TODO: May Require Refinement for durations.
+    const skillBlockers = actor.items.filter(i => i.type === "skill").filter(s => s.system.skillTraits).flatMap(s => getSafeJson(s.system.skillTraits).filter(st => st.feature === "skillBlocker").map(st => st.data));
+    const skillTriggers = getSafeJson(skill.system.skillTraits).filter(st => st.feature === "skillTrigger").map(st => st.data);
+    return intersection(skillBlockers, skillTriggers).length > 0;
 }

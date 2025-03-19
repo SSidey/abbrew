@@ -16,7 +16,7 @@
   </li>
   <ol class='skill-container' style="display: {{display}}" data-skill-section="{{localize (skillType)}}">
     {{#each (getProperty ../skills (localize (skillType))) as |item id|}}
-    <li class='skill' data-skill-id='{{item._id}}'>
+    <li class='skill item' data-item-id='{{item._id}}'>
       <div class="skill-card {{#if item.system.action.isActive}}skill-active{{/if}}">
         <h4 class="skill-name">{{item.name}}</h4>
         <div class='skill-image'>
@@ -31,6 +31,32 @@
         {{#if (eq item.system.skillType "background")}}
         <h3 class="skill-attribute-increase">{{item.system.attributeIncreaseLong}}</h4>
           {{/if}}
+          <div>
+            {{#if item.system.action.uses.hasUses}}
+            <div class="skill-uses">
+              <label for="system.action.uses" class="resource-label">Uses</label>
+              <div class="resource-content flexrow flex-center flex-between">
+                <input type="text" name="system.action.uses.value" value="{{item.system.action.uses.value}}"
+                  data-dtype="Number" />
+                <span class="skill-per"> / </span>
+                <input type="text" value="{{item.system.action.uses.period}}" data-dtype="String" readonly />
+              </div>
+            </div>
+            {{/if}}
+          </div>
+          <div>
+            {{#if item.system.action.charges.hasCharges}}
+            <div class="skill-charges">
+              <label for="system.action.charges" class="resource-label">Charges</label>
+              <div class="resource-content flexrow flex-center flex-between">
+                <input type="text" name="system.action.charges.value" value="{{item.system.action.charges.value}}"
+                  data-dtype="Number" />
+                <span class="skill-per"> / </span>
+                <input type="text" value="{{system.action.charges.max}}" data-dtype="Number" readonly />
+              </div>
+            </div>
+            {{/if}}
+          </div>
           <div class='skill-controls'>
             <a class='skill-control skill-edit' title='{{localize "DOCUMENT.Edit" type=' skill'}}'>
               <i class='fas fa-edit'></i>

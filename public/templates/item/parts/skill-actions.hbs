@@ -28,7 +28,29 @@
             data-dtype="String" />
     </div>
     <div>
-        <label>Charges</label>
+        <h3>Uses</h3>
+        <label class="slide-toggle roboto-upper">
+            <input type="checkbox" name="system.action.uses.hasUses" {{ checked system.action.uses.hasUses }}>
+            <span>{{attribute.label}}</span>
+            {{#if system.action.uses.hasUses}}
+            <i class="fa fa-toggle-on"></i>
+            {{else}}
+            <i class="fa fa-toggle-off"></i>
+            {{/if}}
+        </label>
+        {{#if system.action.uses.hasUses}}
+        <label>Curent Uses</label>
+        <input type="text" name="system.action.uses.value" value="{{system.action.uses.value}}" data-dtype="Number" />
+        <label>Maximum Uses</label>
+        <input type="text" name="system.action.uses.max" value="{{system.action.uses.max}}" data-dtype="Number" />
+        <select name="system.action.uses.period">
+            {{selectOptions config.durationsLabels selected=system.action.uses.period blank=""
+            localize=true}}
+        </select>
+        {{/if}}
+    </div>
+    <div>
+        <h3>Charges</h3>
         <label class="slide-toggle roboto-upper">
             <input type="checkbox" name="system.action.charges.hasCharges" {{ checked system.action.charges.hasCharges
                 }}>

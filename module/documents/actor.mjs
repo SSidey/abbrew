@@ -343,7 +343,15 @@ export default class AbbrewActor extends Actor {
     return true;
   }
 
-  async handleDeleteActiveEffect() {
+  async handleDeleteActiveEffect(effect) {
+    const itemId = effect?.flags?.abbrew?.skill?.trackDuration;
+    if (itemId) {
+      const item = this.items.find(i => i._id === itemId)
+      await item.update({ "system.action.charges.value": 0 })
+      if (item.system.skillType === "temporary") {
+        await item.delete();
+      }
+    }
     const activeSkillsWithDuration = this.effects.toObject().filter(e => e.flags.abbrew.skill.type === "standalone").map(e => e.flags.abbrew.skill.trackDuration);
     const queuedSkillsWithDuration = this.effects.toObject().filter(e => e.flags.abbrew.skill.type === "synergy").map(e => e.flags.abbrew.skill.trackDuration);
     await this.update({ "system.activeSkills": activeSkillsWithDuration, "system.queuedSkills": queuedSkillsWithDuration });

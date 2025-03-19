@@ -3,8 +3,9 @@ import {
   onManageActiveEffect,
   prepareActiveEffectCategories,
 } from '../helpers/effects.mjs';
-import { activateSkill, applySkillEffects, rechargeSkill } from '../helpers/skill.mjs';
+import { activateSkill, applySkillEffects, isSkillBlocked, rechargeSkill } from '../helpers/skill.mjs';
 import Tagify from '@yaireo/tagify'
+import { getSafeJson, intersection } from '../helpers/utils.mjs';
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -274,7 +275,7 @@ export class AbbrewActorSheet extends ActorSheet {
     // Render the skill sheet for viewing/editing prior to the editable check.
     html.on('click', '.skill-edit', (ev) => {
       const li = $(ev.currentTarget).parents('.skill');
-      const skill = this.actor.items.get(li.data('skillId'));
+      const skill = this.actor.items.get(li.data('itemId'));
       skill.sheet.render(true);
     });
 
@@ -298,7 +299,7 @@ export class AbbrewActorSheet extends ActorSheet {
     // Delete Skill Item
     html.on('click', '.skill-delete', (ev) => {
       const li = $(ev.currentTarget).parents('.skill');
-      const skill = this.actor.items.get(li.data('skillId'));
+      const skill = this.actor.items.get(li.data('itemId'));
       skill.delete();
       li.slideUp(200, () => this.render(false));
     });
@@ -315,7 +316,7 @@ export class AbbrewActorSheet extends ActorSheet {
 
     html.on('change', '.item-select', this._onItemChange.bind(this));
 
-    html.on('change', '.item input[type="checkbox"]', this._onItemChange.bind(this));
+    html.on('change', '.item input', this._onItemChange.bind(this));
 
     // Rollable abilities.
     html.on('click', '.rollable', this._onRoll.bind(this));
@@ -330,9 +331,9 @@ export class AbbrewActorSheet extends ActorSheet {
       await this._onAttackDamageAction(t, 'feint');
     });
 
-    html.on('click', '.attack-strong-button', async (event) => {
+    html.on('click', '.attack-overpower-button', async (event) => {
       const t = event.currentTarget;
-      await this._onAttackDamageAction(t, 'strong');
+      await this._onAttackDamageAction(t, 'overpower');
     });
 
     html.on('click', '.attack-finisher-button', async (event) => {
@@ -409,10 +410,21 @@ export class AbbrewActorSheet extends ActorSheet {
   async _onSkillActivate(event) {
     event.preventDefault();
     const target = event.target.closest('.skill');
-    const id = target.dataset.skillId;
+    const id = target.dataset.itemId;
     const skill = this.actor.items.get(id);
+
+    if (isSkillBlocked(this.actor, skill)) {
+      ui.notifications.info(`You are blocked from using ${skill.name}`);
+      return;
+    }
+
     if (skill.system.action.charges.hasCharges && skill.system.action.charges.value > 0) {
-      await activateSkill(this.actor, skill);
+      await applySkillEffects(this.actor, skill);
+      return;
+    }
+
+    if (skill.system.action.uses.hasUses && !skill.system.action.uses.value > 0) {
+      ui.info("You don't have any more uses of that skill.");
       return;
     }
 
@@ -429,7 +441,7 @@ export class AbbrewActorSheet extends ActorSheet {
     const attackProfileId = target.closest('li .attack-profile').dataset.attackProfileId;
     const item = this.actor.items.get(itemId);
     const attackProfile = item.system.attackProfiles[attackProfileId];
-    const actions = attackMode === "strong" ? item.system.exertActionCost : item.system.actionCost;
+    const actions = attackMode === "overpower" ? item.system.exertActionCost : item.system.actionCost;
     if (!await this.actor.canActorUseActions(actions)) {
       return;
     }
@@ -467,7 +479,7 @@ export class AbbrewActorSheet extends ActorSheet {
           isActive: false,
           modifiers: {
             fortune: 0,
-            attackProfile: { ...attackProfile, attackMode: attackMode, handsSupplied: item.system.handsSupplied },
+            attackProfile: { ...attackProfile, attackMode: attackMode, handsSupplied: item.system.handsSupplied, critical: 11 - item.system.handsSupplied },
             damage: {
               self: []
             },

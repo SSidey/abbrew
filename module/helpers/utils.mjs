@@ -57,3 +57,9 @@ export function getSafeJson(json, defaultValue) {
 }
 
 /* -------------------------------------------- */
+
+export function intersection(a, b) {
+    const setA = new Set(a);
+    const foo = b.filter(value => setA.has(value));
+    return foo;
+}

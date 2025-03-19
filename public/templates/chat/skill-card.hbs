@@ -5,7 +5,18 @@
     </header>
 
     <div class="message-content">
-        <div>{{{item.system.description}}}</div>
+        <div>
+            <ol class="skill-card-descriptions">
+                {{#each allSummaries as |summary| }}
+                <li>
+                    <h3>{{summary.name}}</h3>
+                    <span>
+                        {{{summary.description}}}
+                    </span>
+                </li>
+                {{/each}}
+            </ol>
+        </div>
         <div class="dice-roll">
             <div class="dice-result">
                 <div class="dice-formula">{{totalSuccesses}}</div>
@@ -46,13 +57,13 @@
         {{/unless}}
         {{#unless showAttack}}
         {{#if isStrongAttack}}
-        <button data-action="strong">Overpower</button>
+        <button data-action="overpower">Overpower</button>
         {{/if}}
         {{/unless}}
         {{#unless showFinisher}}
         {{#if showAttack}}
         {{#if showParry}}
-        <button data-action="parry"><span class="actions-icon action-1a">Parry</span></button>
+        <button data-action="parry"><span class="actions-icon action-{{actionCost}}a">Parry</span></button>
         {{/if}}
         {{/if}}
         {{/unless}}

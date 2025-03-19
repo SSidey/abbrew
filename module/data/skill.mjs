@@ -167,7 +167,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
             const queuedSkills = this.parent?.parent?.system?.queuedSkills ?? [];
             const activeSkills = this.parent?.parent?.system?.activeSkills ?? [];
             const id = this.parent?._id ?? null;
-            this.action.isActive = queuedSkills.includes(id) || activeSkills.includes(id)
+            this.action.isActive = queuedSkills.includes(id) || activeSkills.includes(id);
         }
     }
 

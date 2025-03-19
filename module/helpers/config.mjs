@@ -11,6 +11,16 @@ ABBREW.durations = {
   day: { label: "ABBREW.Durations.day", value: 86400 }
 }
 
+ABBREW.durationsLabels = {
+  instant: "ABBREW.Durations.instant",
+  second: "ABBREW.Durations.second",
+  turn: "ABBREW.Durations.turn",
+  round: "ABBREW.Durations.round",
+  minute: "ABBREW.Durations.minute",
+  hour: "ABBREW.Durations.hour",
+  day: "ABBREW.Durations.day"
+}
+
 /**
  * The set of Attribute Scores used within the system.
  * @type {Object}
@@ -223,6 +233,12 @@ ABBREW.conditions = {
     description: "ABBREW.EFFECT.Condition.GuardBreak.description",
     statuses: ['offGuard']
   },
+  offBalance: {
+    name: "ABBREW.EFFECT.Condition.offBalance.name",
+    img: "systems/abbrew/assets/icons/statuses/offBalance.svg",
+    description: "ABBREW.EFFECT.Condition.OffBalance.description",
+    statuses: ['offBalance']
+  },
   offGuard: {
     name: "ABBREW.EFFECT.Condition.OffGuard.name",
     img: "systems/abbrew/assets/icons/statuses/offGuard.svg",
@@ -235,22 +251,31 @@ ABBREW.statusEffects = {
   dead: {
     name: "ABBREW.EFFECT.Status.dead",
     img: "systems/abbrew/assets/icons/statuses/dead.svg",
+    "description": "You have suffered fatal wounds, resulting in death.",
     order: 2,
     statuses: ['defeated']
   },
   defeated: {
     name: "ABBREW.EFFECT.Status.defeated",
     img: "systems/abbrew/assets/icons/statuses/defeated.svg",
+    "description": "You resolve buckles as you are unable to continue the fight.",
     special: "DEFEATED",
     order: 1
   },
   guardBreak: {
     name: "ABBREW.EFFECT.Status.guardBreak",
-    img: "systems/abbrew/assets/icons/statuses/guardBreak.svg"
+    img: "systems/abbrew/assets/icons/statuses/guardBreak.svg",
+    "description": "Your guard is broken, your foes can directly capitalise on your weakpoints. You can be targeted by finishers."
+  },
+  offBalance: {
+    name: "ABBREW.EFFECT.Status.offBalance",
+    img: "systems/abbrew/assets/icons/statuses/offBalance.svg",
+    "description": "You have been knocked off balance, you cannot restore guard while you have this condition. You can remove one stack of this condition by using the recover skill"
   },
   offGuard: {
     name: "ABBREW.EFFECT.Status.offGuard",
-    img: "systems/abbrew/assets/icons/statuses/offGuard.svg"
+    img: "systems/abbrew/assets/icons/statuses/offGuard.svg",
+    "description": "Your are harried and your guard compromised, your foes can directly capitalise on your weakpoints. You can be targeted by finishers."
   }
 }
 
@@ -291,10 +316,14 @@ const lingeringWoundImmunities = [
 
 const skillTriggers = [
   { key: "guardRestoreTrigger", value: "ABBREW.Traits.SkillTriggers.guardRestore", feature: "skillTrigger", subFeature: "guard", effect: "", data: "guardRestore" },
-  { key: "allAttackModeTrigger", value: "ABBREW.Traits.SkillTriggers.allAttackModes", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "allAttackModes" },
   { key: "attackTrigger", value: "ABBREW.Traits.SkillTriggers.attack", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "attack" },
   { key: "overpowerTrigger", value: "ABBREW.Traits.SkillTriggers.overpower", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "overpower" },
   { key: "feintTrigger", value: "ABBREW.Traits.SkillTriggers.feint", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "feint" },
+  { key: "finisherTrigger", value: "ABBREW.Traits.SkillTriggers.finisher", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "finisher" },
+]
+
+const skillBlockers = [
+  { key: "guardRestoreBlocker", value: "ABBREW.Traits.SkillBlockers.guardRestore", feature: "skillBlocker", subFeature: "guard", effect: "", data: "guardRestore" },
 ]
 
 const skillEnablers = [
@@ -311,7 +340,8 @@ ABBREW.traits = [
   ...lingeringWoundImmunities,
   ...skillTriggers,
   ...skillEnablers,
-  ...valueReplacers
+  ...skillBlockers,
+  ...valueReplacers,
 ]
 
 ABBREW.skillTriggers = skillTriggers;

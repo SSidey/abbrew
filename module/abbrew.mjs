@@ -125,6 +125,8 @@ function _configureStatusEffects() {
   };
   CONFIG.statusEffects = Object.entries(CONFIG.ABBREW.statusEffects).reduce((arr, [id, data]) => {
     const original = CONFIG.statusEffects.find(s => s.id === id);
+    data.name = game.i18n.localize(data.name) ?? data.name;
+    data.description = game.i18n.localize(data.description) ?? data.description;
     addEffect(arr, foundry.utils.mergeObject(original ?? {}, { id, ...data }, { inplace: false }));
     return arr;
   }, []);
@@ -265,7 +267,7 @@ Hooks.on("preUpdateItem", () => { })
 Hooks.on("deleteActiveEffect", async (effect, options, userId) => {
   console.log("deleted");
   const actor = effect.parent;
-  await actor.handleDeleteActiveEffect();
+  await actor.handleDeleteActiveEffect(effect);
 });
 
 Hooks.on("updateActiveEffect", () => { })
