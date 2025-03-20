@@ -11,6 +11,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   static defineSchema() {
     const fields = foundry.data.fields;
     const requiredInteger = { required: true, nullable: false, integer: true };
+    const blankString = { required: true, blank: true }
     const schema = {};
 
     schema.traits = new fields.StringField({ required: true, blank: true });
@@ -75,8 +76,16 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
     schema.meta = new fields.SchemaField({
       tier: new fields.SchemaField({
-        value: new fields.NumberField({ ...requiredInteger, initial: 1, min: 1, max: 10 })
-      }),
+        value: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0, max: 10 })
+      })
+    });
+
+    schema.proxiedSkills = new fields.SchemaField({
+      attack: new fields.StringField({ ...blankString }),
+      parry: new fields.StringField({ ...blankString }),
+      feint: new fields.StringField({ ...blankString }),
+      overpower: new fields.StringField({ ...blankString }),
+      finisher: new fields.StringField({ ...blankString })
     });
 
     // Iterate over attribute names and create a new SchemaField for each.
@@ -146,6 +155,13 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     this._prepareDefenses();
 
     this._prepareResolve();
+
+    this.meta.skillList = this.parent.items.filter(i => i.type === "skill").map(s => ({ label: s.name, value: s._id }));
+
+    Object.keys(this.proxiedSkills).forEach(ps => {
+      const item = this.parent.items.find(i => i.name.toLowerCase() === ps);
+      this.proxiedSkills[ps] = item?._id;
+    });
   }
 
   _prepareAnatomy() {

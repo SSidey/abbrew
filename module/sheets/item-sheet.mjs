@@ -118,6 +118,7 @@ export class AbbrewItemSheet extends ItemSheet {
     this._activateArmourPoints(html);
     this._activateAnatomyParts(html);
     this._activateSkillTraits(html);
+    this._activateSkillModifiers(html);
   }
 
   prepareActions(system) {
@@ -183,6 +184,31 @@ export class AbbrewItemSheet extends ItemSheet {
     };
     if (skillTraits) {
       var taggedSkillTraits = new Tagify(skillTraits, skillTraitSettings);
+    }
+  }
+
+
+  _activateSkillModifiers(html) {
+    const skillSynergy = html[0].querySelector('input[name="system.skillModifiers.synergy"]');
+    const skillDiscord = html[0].querySelector('input[name="system.skillModifiers.discord"]');
+    const proxiedSkills = Object.entries(this.item?.actor?.system.proxiedSkills).filter(ps => ps[1]).map(ps => ({ value: CONFIG.ABBREW.proxiedSkills[ps[0]], id: ps[1] }));
+    const settings = {
+      dropdown: {
+        maxItems: 20,               // <- mixumum allowed rendered suggestions
+        classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
+        enabled: 0,                 // <- show suggestions on focus
+        closeOnSelect: false,       // <- do not hide the suggestions dropdown once an item has been selected
+        includeSelectedTags: false   // <- Should the suggestions list Include already-selected tags (after filtering)
+      },
+      userInput: true,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+      duplicates: false,             // <- Should duplicate tags be allowed or not
+      whitelist: [...this.item?.actor?.items?.filter(i => i.type === "skill").map(s => ({ value: s.name, id: s._id })) ?? []],
+    };
+    if (skillSynergy) {
+      var taggedSkillSynergy = new Tagify(skillSynergy, settings);
+    }
+    if (skillDiscord) {
+      var taggedSkillDiscord = new Tagify(skillDiscord, settings);
     }
   }
 

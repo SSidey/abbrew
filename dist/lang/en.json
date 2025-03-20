@@ -41,12 +41,14 @@
     "SkillActivationType": "Activation Type",
     "SkillActivationTypes": {
       "standalone": "Standalone",
-      "synergy": "Synergy"
+      "synergy": "Synergy",
+      "stackRemoval": "Stack Removal"
     },
     "Operator": "Operator",
     "Operators": {
-      "equal": "=",
-      "add": "+="
+      "equal": "Set",
+      "add": "Increase",
+      "minus": "Reduce"
     },
     "AttributeRankIncrease": "Attribute Rank Increase",
     "SkillType": "Skill Type",
@@ -133,8 +135,8 @@
       "Status": {
         "dead": "Dead",
         "defeated": "Defeated",
+        "disoriented": "Disoriented",
         "guardBreak": "Guard Break",
-        "offBalance": "Off Balance",
         "offGuard": "Off Guard"
       },
       "Condition": {
@@ -146,13 +148,13 @@
           "name": "Defeated",
           "description": "You resolve buckles as you are unable to continue the fight."
         },
+        "Disoriented": {
+          "name": "Disoriented",
+          "description": "You have been disoriented, you cannot restore guard nor parry while you have this condition."
+        },
         "GuardBreak": {
           "name": "Guard Break",
           "description": "Your guard is broken, your foes can directly capitalise on your weakpoints. You can be targeted by finishers."
-        },
-        "OffBalance": {
-          "name": "Off Balance",
-          "description": "You have been knocked off balance, you cannot restore guard while you have this condition. You can remove one stack of this condition by using the recover skill"
         },
         "OffGuard": {
           "name": "Off Guard",
@@ -189,7 +191,8 @@
         "finisher": "On Finisher"
       },
       "SkillBlockers": {
-        "guardRestore": "Block On Guard Restore"
+        "guardRestore": "Block On Guard Restore",
+        "parry": "Block Parry"
       },
       "SkillEnablers": {
         "overpower": "Enable Overpower",

@@ -9,6 +9,10 @@ export default class AbbrewSkill extends AbbrewItemBase {
         const requiredInteger = { required: true, nullable: false, integer: true };
 
         schema.skillTraits = new fields.StringField({ ...blankString });
+        schema.skillModifiers = new fields.SchemaField({
+            synergy: new fields.StringField({ ...blankString }),
+            discord: new fields.StringField({ ...blankString })
+        });
         schema.configurable = new fields.BooleanField({ required: true });
         schema.activatable = new fields.BooleanField({ required: true, label: "ABBREW.Activatable" });
         schema.action = new fields.SchemaField({
@@ -42,6 +46,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
                             type: new fields.StringField({ required: true, blank: true }),
                             value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
                             attributeModifier: new fields.StringField({ required: true, blank: true }),
+                            attributeMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 })
                         })
                     ),
                     finisherLimit: new fields.NumberField({ ...requiredInteger, initial: 10, min: 1 }),
@@ -151,6 +156,10 @@ export default class AbbrewSkill extends AbbrewItemBase {
         schema.attributeRankIncrease = new fields.StringField({ ...blankString });
 
         return schema;
+    }
+
+    prepareBaseData() {
+        super.prepareBaseData();
     }
 
     // Post Active Effects

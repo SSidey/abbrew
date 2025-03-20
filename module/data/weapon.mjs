@@ -33,6 +33,7 @@ export default class AbbrewWeapon extends AbbrewPhysicalItem {
 
   // Post Active Effects
   prepareDerivedData() {
+    // TODO: Make baseline and have weapon training for improved effect.
     this.isFeintTrained = this.doesParentActorHaveSkillTrait("skillEnabler", "offensiveSkills", "enable", "feint");
     this.isOverpowerTrained = this.doesParentActorHaveSkillTrait("skillEnabler", "offensiveSkills", "enable", "overpower");
   }

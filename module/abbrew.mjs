@@ -274,7 +274,7 @@ Hooks.on("updateActiveEffect", () => { })
 
 Hooks.on("preUpdateActiveEffect", (effect, update, options, user) => { });
 
-Hooks.on("preDeleteActiveEffect", async (effect, options, userId) => { })
+Hooks.on("preDeleteActiveEffect", async (effect, options, userId) => { });
 
 Hooks.on("dropActorSheetData", async (actor, sheet, data) => {
   console.log(data);

@@ -53,7 +53,8 @@ ABBREW.SkillAttributeIncrease = "ABBREW.AttributeIncrease";
 ABBREW.skillActivationType = "ABBREW.SkillActivationType";
 ABBREW.skillActivationTypes = {
   standalone: 'ABBREW.SkillActivationTypes.standalone',
-  synergy: 'ABBREW.SkillActivationTypes.synergy'
+  synergy: 'ABBREW.SkillActivationTypes.synergy',
+  stackRemoval: 'ABBREW.SkillActivationTypes.stackRemoval'
 }
 ABBREW.EquippedWeapon = "ABBREW.EquippedWeapon";
 ABBREW.Damage = "ABBREW.Damage";
@@ -61,6 +62,7 @@ ABBREW.operator = "ABBREW.Operator"
 ABBREW.operators = {
   equal: "ABBREW.Operators.equal",
   add: "ABBREW.Operators.add",
+  minus: "ABBREW.Operators.minus",
 }
 
 ABBREW.Defense = {
@@ -120,11 +122,6 @@ ABBREW.skillTypes = {
   temporary: "ABBREW.SkillTypes.temporary",
   untyped: "ABBREW.SkillTypes.untyped",
   background: "ABBREW.SkillTypes.background"
-}
-
-ABBREW.activationTypes = {
-  passive: "ABBREW.ActivationTypes.passive",
-  active: "ABBREW.ActivationTypes.actve"
 }
 
 ABBREW.actionCosts = {
@@ -227,17 +224,17 @@ ABBREW.conditions = {
     description: "ABBREW.EFFECT.Condition.Defeated.description",
     statuses: ['defeated']
   },
+  disoriented: {
+    name: "ABBREW.EFFECT.Condition.disoriented.name",
+    img: "systems/abbrew/assets/icons/statuses/disoriented.svg",
+    description: "ABBREW.EFFECT.Condition.Disoriented.description",
+    statuses: ['disoriented']
+  },
   guardBreak: {
     name: "ABBREW.EFFECT.Condition.GuardBreak.name",
     img: "systems/abbrew/assets/icons/statuses/guardBreak.svg",
     description: "ABBREW.EFFECT.Condition.GuardBreak.description",
     statuses: ['offGuard']
-  },
-  offBalance: {
-    name: "ABBREW.EFFECT.Condition.offBalance.name",
-    img: "systems/abbrew/assets/icons/statuses/offBalance.svg",
-    description: "ABBREW.EFFECT.Condition.OffBalance.description",
-    statuses: ['offBalance']
   },
   offGuard: {
     name: "ABBREW.EFFECT.Condition.OffGuard.name",
@@ -251,31 +248,31 @@ ABBREW.statusEffects = {
   dead: {
     name: "ABBREW.EFFECT.Status.dead",
     img: "systems/abbrew/assets/icons/statuses/dead.svg",
-    "description": "You have suffered fatal wounds, resulting in death.",
+    description: "You have suffered fatal wounds, resulting in death.",
     order: 2,
     statuses: ['defeated']
   },
   defeated: {
     name: "ABBREW.EFFECT.Status.defeated",
     img: "systems/abbrew/assets/icons/statuses/defeated.svg",
-    "description": "You resolve buckles as you are unable to continue the fight.",
+    description: "You resolve buckles as you are unable to continue the fight.",
     special: "DEFEATED",
     order: 1
+  },
+  disoriented: {
+    name: "ABBREW.EFFECT.Status.disoriented",
+    img: "systems/abbrew/assets/icons/statuses/disoriented.svg",
+    description: "You have been disoriented, you cannot restore guard nor parry while you have this condition."
   },
   guardBreak: {
     name: "ABBREW.EFFECT.Status.guardBreak",
     img: "systems/abbrew/assets/icons/statuses/guardBreak.svg",
-    "description": "Your guard is broken, your foes can directly capitalise on your weakpoints. You can be targeted by finishers."
-  },
-  offBalance: {
-    name: "ABBREW.EFFECT.Status.offBalance",
-    img: "systems/abbrew/assets/icons/statuses/offBalance.svg",
-    "description": "You have been knocked off balance, you cannot restore guard while you have this condition. You can remove one stack of this condition by using the recover skill"
+    description: "Your guard is broken, your foes can directly capitalise on your weakpoints. You can be targeted by finishers."
   },
   offGuard: {
     name: "ABBREW.EFFECT.Status.offGuard",
     img: "systems/abbrew/assets/icons/statuses/offGuard.svg",
-    "description": "Your are harried and your guard compromised, your foes can directly capitalise on your weakpoints. You can be targeted by finishers."
+    description: "Your are harried and your guard compromised, your foes can directly capitalise on your weakpoints. You can be targeted by finishers."
   }
 }
 
@@ -323,13 +320,12 @@ const skillTriggers = [
 ]
 
 const skillBlockers = [
-  { key: "guardRestoreBlocker", value: "ABBREW.Traits.SkillBlockers.guardRestore", feature: "skillBlocker", subFeature: "guard", effect: "", data: "guardRestore" },
+  { key: "guardRestoreBlocker", value: "ABBREW.Traits.SkillBlockers.guardRestore", feature: "skillBlocker", subFeature: "guard", effect: "block", data: "guardRestore" },
+  { key: "parryBlocker", value: "ABBREW.Traits.SkillBlockers.parry", feature: "skillBlocker", subFeature: "defensiveSkills", effect: "block", data: "parry" },
 ]
 
 const skillEnablers = [
-  { key: "overpowerEnable", value: "ABBREW.Traits.SkillEnablers.overpower", feature: "skillEnabler", subFeature: "offensiveSkills", effect: "enable", data: "overpower" },
-  { key: "parryEnable", value: "ABBREW.Traits.SkillEnablers.parry", feature: "skillEnabler", subFeature: "defensiveSkills", effect: "enable", data: "parry" },
-  { key: "feintEnable", value: "ABBREW.Traits.SkillEnablers.feint", feature: "skillEnabler", subFeature: "offensiveSkills", effect: "enable", data: "feint" },
+  { key: "overpowerEnable", value: "ABBREW.Traits.SkillEnablers.overpower", feature: "skillEnabler", subFeature: "offensiveSkills", effect: "enable", data: "overpower" }
 ]
 
 const valueReplacers = [
@@ -345,3 +341,11 @@ ABBREW.traits = [
 ]
 
 ABBREW.skillTriggers = skillTriggers;
+
+ABBREW.proxiedSkills = {
+  "attack": "Attack",
+  "parry": "Parry",
+  "feint": "Feint",
+  "overpower": "Overpower",
+  "finisher": "Finisher"
+}

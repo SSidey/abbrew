@@ -1,4 +1,4 @@
-import { doesNestedFieldExist, arrayDifference, getNumericParts } from '../helpers/utils.mjs';
+import { doesNestedFieldExist, arrayDifference, getNumericParts, getSafeJson } from '../helpers/utils.mjs';
 /**
  * Extend the basic Item with some very simple modifications.
  * @extends {Item}
@@ -122,8 +122,9 @@ export default class AbbrewItem extends Item {
 
     const actor = tokens[0].actor;
 
-    if (action === "parry" && !actor.doesActorHaveSkillTrait("skillEnabler", "defensiveSkills", "enable", "parry")) {
-      ui.notifications.info("You have not trained enough to be able to parry.");
+    // TODO: Make parry and feint baseline but weaker, training improves the effect
+    if (action === "parry" && actor.doesActorHaveSkillDiscord("Parry")) {
+      ui.notifications.info("You are prevented from parrying.");
       return;
     }
 
@@ -145,6 +146,24 @@ export default class AbbrewItem extends Item {
     }
 
     await tokens[0].actor.takeFinisher(rolls, data);
+  }
+
+  async _onCreate(data, options, userId) {
+    if (data.type === "skill") {
+      const synergies = getSafeJson(data.system.skillModifiers.synergy, []).map(s => ({ value: s.value, id: this.actor.items.find(i => i.name === s.value)?._id })).filter(s => s.id);
+      const discord = getSafeJson(data.system.skillModifiers.discord, []).map(s => ({ value: s.value, id: this.actor.items.find(i => i.name === s.value)?._id })).filter(s => s.id);
+      const update = {};
+      if (synergies.length > 0) {
+        update["system.skillModifiers.synergy"] = JSON.stringify(synergies);
+      }
+      if (discord.length > 0) {
+        update["system.skillModifiers.discord"] = JSON.stringify(discord);
+      }
+
+      if (Object.keys(update).length > 0) {
+        await this.update(update);
+      }
+    }
   }
 
   /**

@@ -25,8 +25,16 @@
     {{!-- Attributes Tab --}}
     <div class="tab attributes" data-group="primary" data-tab="attributes">
       <div class="grid-span-2">
-        <label class="resource-label">Skill Flags</label>
+        <label class="resource-label">Skill Traits</label>
         <input type="text" name="system.skillTraits" value="{{system.skillTraits}}" data-dtype="String" />
+      </div>
+      <div class="grid-span-2">
+        <label class="resource-label">Synergy</label>
+        <input type="text" name="system.skillModifiers.synergy" value="{{system.skillModifiers.synergy}}" data-dtype="String" />
+      </div>
+      <div class="grid-span-2">
+        <label class="resource-label">Discord</label>
+        <input type="text" name="system.skillModifiers.discord" value="{{system.skillModifiers.discord}}" data-dtype="String" />
       </div>
       {{!-- As you add new fields, add them in here! --}}
       <label class="slide-toggle roboto-upper">

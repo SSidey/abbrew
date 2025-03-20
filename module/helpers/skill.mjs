@@ -1,6 +1,16 @@
 import { applyOperator } from "./operators.mjs";
 import { getObjectValueByStringPath, getSafeJson, intersection } from "../helpers/utils.mjs"
 
+export async function removeStackFromSkill(skill) {
+    const stacks = skill.system.action.uses.value - 1;
+    if (stacks > 0) {
+        await skill.update({ "system.action.uses.value": stacks })
+        return;
+    }
+
+    await skill.delete();
+}
+
 export async function activateSkill(actor, skill) {
     if (isSkillBlocked(actor, skill)) {
         ui.notifications.info(`You are blocked from using ${skill.name}`);
@@ -30,14 +40,12 @@ export async function applySkillEffects(actor, skill) {
     let updates = {};
     // Get all queued synergy skills
     const queuedSkills = actor.items.toObject().filter(i => actor.system.queuedSkills.includes(i._id));
-    // Get all skill triggers on the main skill
-    const skillTriggers = getSafeJson(skill.system.skillTraits, []).filter(t => t.feature === "skillTrigger").map(t => t.key);
     // Get all synergies that apply to the main skill
-    const queuedSynergies = queuedSkills.filter(s => s.system.skillTraits).map(s => ({ skill: s, skillTraits: getSafeJson(s.system.skillTraits, []).filter(s => s.feature === "skillTrigger").map(s => s.key) })).filter(s => intersection(s.skillTraits, skillTriggers).length > 0).map(s => s.skill);
+    const queuedSynergies = queuedSkills.filter(s => s.system.skillModifiers.synergy).map(s => ({ skill: s, synergy: getSafeJson(s.system.skillModifiers.synergy, []).map(s => s.id) })).filter(s => s.synergy.includes(skill._id)).map(s => s.skill)
     // Get all passives
-    const passiveSkills = actor.items.toObject().filter(i => i.system.activatable === false && i.system.skillTraits);
+    const passiveSkills = actor.items.toObject().filter(i => i.system.activatable === false);
     // Get passives that have synergy with the main skill
-    const passiveSynergies = passiveSkills.filter(s => s.system.skillTraits).map(s => ({ skill: s, skillTraits: getSafeJson(s.system.skillTraits, []).filter(s => s.feature === "skillTrigger").map(s => s.key) })).filter(s => intersection(s.skillTraits, skillTriggers).length > 0).map(s => s.skill)
+    const passiveSynergies = passiveSkills.filter(s => s.system.skillModifiers.synergy).map(s => ({ skill: s, synergy: getSafeJson(s.system.skillModifiers.synergy, []).map(s => s.id) })).filter(s => s.synergy.includes(skill._id)).map(s => s.skill)
     // Combine all relevant skills, filtering for those that are out of charges
     const allSkills = [...passiveSynergies, ...queuedSynergies, skill].filter(s => !s.system.action.charges.hasCharges || (s.system.action.charges.value > 0));
     const allSummaries = allSkills.map(s => ({ name: s.name, description: s.system.description }));
@@ -45,12 +53,7 @@ export async function applySkillEffects(actor, skill) {
     const usesSkills = allSkills.filter(s => s.system.action.uses.hasUses).filter(s => s._id !== skill._id);
     const chargedSkills = allSkills.filter(s => s.system.action.charges.hasCharges);
 
-    const guardModifiers = allSkills.filter(s => s.system.action.modifiers.guard.self.operator).map(s => ({ value: getSkillValueForPath("system.action.modifiers.guard.self.value", s, s.system.action.modifiers.guard.self.value, actor), operator: s.system.action.modifiers.guard.self.operator }));
-    if (guardModifiers) {
-        const currentGuard = actor.system.defense.guard.value;
-        const guardModifier = mergeModifiers(guardModifiers);
-        updates["system.defense.guard.value"] = applyOperator(currentGuard, guardModifier, skill.system.action.modifiers.guard.self.operator);
-    }
+    mergeGuardSelfModifiers(updates, allSkills, actor);
 
     // if (skill.system.action.modifiers.wounds.self.length > 0) {
     //     let updateWounds = actor.system.wounds;
@@ -161,6 +164,14 @@ export async function applySkillEffects(actor, skill) {
     return {};
 }
 
+function mergeGuardSelfModifiers(updates, allSkills, actor) {
+    const guardModifiers = allSkills.filter(s => s.system.action.modifiers.guard.self.operator).map(s => ({ value: getSkillValueForPath("system.action.modifiers.guard.self.value", s, s.system.action.modifiers.guard.self.value, actor), operator: s.system.action.modifiers.guard.self.operator }));
+    if (guardModifiers) {
+        const currentGuard = actor.system.defense.guard.value;
+        updates["system.defense.guard.value"] = mergeModifiers(guardModifiers, currentGuard);
+    }
+}
+
 function getAttributeModifier(attackMode, attackProfile) {
     switch (attackMode) {
         case "overpower":
@@ -181,8 +192,32 @@ function getRollFormula(tier, attackProfile, fortune) {
     return `${diceCount}d10x${explodesOn}cs${successOn}`;
 }
 
-function mergeModifiers(modifiers) {
-    return modifiers.reduce((result, modifier) => applyOperator(result, modifier.value, modifier.operator), 0)
+function mergeModifiers(modifiers, value) {
+    const sortedModifiers = modifiers.map(m => ({ ...m, order: getOrderForOperator(m.operator) })).sort(compareModifierIndices);
+    return sortedModifiers.reduce((result, modifier) => applyOperator(result, modifier.value, modifier.operator), value)
+}
+
+function getOrderForOperator(operator) {
+    switch (operator) {
+        case "equal":
+            return 0;
+        case "add":
+            return 1;
+        case "minus":
+            return 2;
+        default:
+            return -1;
+    }
+}
+
+function compareModifierIndices(modifier1, modifier2) {
+    if (modifier1.order < modifier2.order) {
+        return -1;
+    } else if (modifier1.order > modifier2.order) {
+        return 1;
+    }
+
+    return 0;
 }
 
 function getSkillValueForPath(path, skill, rawValue, actor) {
@@ -323,7 +358,7 @@ function parsePath(rawValue, actor) {
 
 export function isSkillBlocked(actor, skill) {
     // TODO: May Require Refinement for durations.
-    const skillBlockers = actor.items.filter(i => i.type === "skill").filter(s => s.system.skillTraits).flatMap(s => getSafeJson(s.system.skillTraits).filter(st => st.feature === "skillBlocker").map(st => st.data));
-    const skillTriggers = getSafeJson(skill.system.skillTraits).filter(st => st.feature === "skillTrigger").map(st => st.data);
-    return intersection(skillBlockers, skillTriggers).length > 0;
+    const skillDiscord = actor.items.filter(i => i.type === "skill").filter(s => s.system.skillModifiers.discord).flatMap(s => getSafeJson(s.system.skillModifiers.discord, []).map(s => s.id));
+    const skillId = skill._id;
+    return skillDiscord.includes(skillId);
 }

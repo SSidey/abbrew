@@ -1,4 +1,5 @@
 import { mergeActorWounds } from "../helpers/combat.mjs";
+import { isSkillBlocked } from "../helpers/skill.mjs";
 import { FINISHERS } from "../static/finishers.mjs";
 
 /**
@@ -173,27 +174,27 @@ export default class AbbrewActor extends Actor {
   }
 
   async calculateGuard(damage, guard, isFeint, isStrongAttack, action) {
-    return guard + this.calculateGuardIncrease(damage, guard, isFeint, isStrongAttack, action);
+    return guard - this.calculateGuardReduction(damage, guard, isFeint, isStrongAttack, action);
   }
 
-  calculateGuardIncrease(damage, guard, isFeint, isStrongAttack, action) {
+  calculateGuardReduction(damage, guard, isFeint, isStrongAttack, action) {
     if (this.noneResult(isFeint, action)) {
       return 0;
     }
 
     if (isStrongAttack) {
-      return 0 - damage;
+      return 0 + damage;
     }
 
     if (this.attackerGainsAdvantage(isFeint, action)) {
-      return 0 - damage;
+      return 0 + damage;
     }
 
     if (this.defenderGainsAdvantage(isFeint, action)) {
       return 0;
     }
 
-    return 0 - damage;
+    return 0 + damage;
   }
 
   calculateRisk(damage, guard, risk, inflexibility, isFeint, isStrongAttack, action) {
@@ -213,7 +214,6 @@ export default class AbbrewActor extends Actor {
       return 2 * (damage + inflexibility);
     }
 
-    // TODO: Parry costs 1 action
     if (this.defenderGainsAdvantage(isFeint, action)) {
       return 0;
     }
@@ -352,8 +352,17 @@ export default class AbbrewActor extends Actor {
         await item.delete();
       }
     }
-    const activeSkillsWithDuration = this.effects.toObject().filter(e => e.flags.abbrew.skill.type === "standalone").map(e => e.flags.abbrew.skill.trackDuration);
-    const queuedSkillsWithDuration = this.effects.toObject().filter(e => e.flags.abbrew.skill.type === "synergy").map(e => e.flags.abbrew.skill.trackDuration);
+    const activeSkillsWithDuration = this.effects.toObject().filter(e => e.flags?.abbrew?.skill?.type === "standalone").map(e => e.flags.abbrew.skill.trackDuration);
+    const queuedSkillsWithDuration = this.effects.toObject().filter(e => e.flags?.abbrew?.skill?.type === "synergy").map(e => e.flags.abbrew.skill.trackDuration);
     await this.update({ "system.activeSkills": activeSkillsWithDuration, "system.queuedSkills": queuedSkillsWithDuration });
+  }
+
+  doesActorHaveSkillDiscord(skillName) {
+    const skill = this.items.find(i => i.name === skillName);
+    if (skill) {
+      return isSkillBlocked(this, skill);
+    }
+
+    return false;
   }
 }

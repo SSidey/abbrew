@@ -3,7 +3,7 @@ import {
   onManageActiveEffect,
   prepareActiveEffectCategories,
 } from '../helpers/effects.mjs';
-import { activateSkill, applySkillEffects, isSkillBlocked, rechargeSkill } from '../helpers/skill.mjs';
+import { activateSkill, applySkillEffects, isSkillBlocked, rechargeSkill, removeStackFromSkill } from '../helpers/skill.mjs';
 import Tagify from '@yaireo/tagify'
 import { getSafeJson, intersection } from '../helpers/utils.mjs';
 
@@ -413,6 +413,14 @@ export class AbbrewActorSheet extends ActorSheet {
     const id = target.dataset.itemId;
     const skill = this.actor.items.get(id);
 
+    if (skill.system.action.activationType === "stackRemoval") {
+      if (!await this.actor.canActorUseActions(skill.system.action.actionCost)) {
+        return;
+      }
+      removeStackFromSkill(skill);
+      return;
+    }
+
     if (isSkillBlocked(this.actor, skill)) {
       ui.notifications.info(`You are blocked from using ${skill.name}`);
       return;
@@ -446,13 +454,14 @@ export class AbbrewActorSheet extends ActorSheet {
       return;
     }
 
-    const skillTraits = CONFIG.ABBREW.skillTriggers.find(s => s.subFeature === "attacks" && s.data === attackMode);
+    const id = this.actor.system.proxiedSkills[attackMode];
 
     const attackSkill = {
+      _id: id,
       name: item.name,
       system: {
         activatable: true,
-        skillTraits: JSON.stringify([skillTraits]),
+        skillTraits: [],
         skillType: "basic",
         attributeIncrease: "",
         attributeIncreaseLong: "",

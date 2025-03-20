@@ -39,7 +39,9 @@
                 <input type="text" name="system.action.uses.value" value="{{item.system.action.uses.value}}"
                   data-dtype="Number" />
                 <span class="skill-per"> / </span>
-                <input type="text" value="{{item.system.action.uses.period}}" data-dtype="String" readonly />
+                <input type="text"
+                  value="{{#if item.system.action.uses.period}}{{item.system.action.uses.period}}{{else}}{{item.system.action.uses.max}}{{/if}}"
+                  data-dtype="String" readonly />
               </div>
             </div>
             {{/if}}
