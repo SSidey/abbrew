@@ -35,34 +35,55 @@ export default class AbbrewSkill extends AbbrewItemBase {
                 max: new fields.NumberField({ ...requiredInteger, initial: 0 })
             }),
             isActive: new fields.BooleanField({ required: true }),
+            attackProfile: new fields.SchemaField({
+                name: new fields.StringField({ required: true, blank: true }),
+                attackType: new fields.StringField({ required: true, blank: true }),
+                lethal: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                critical: new fields.NumberField({ ...requiredInteger, initial: 10, min: 5 }),
+                handsSupplied: new fields.NumberField({ ...requiredInteger, min: 0, max: 2, nullable: true }),
+                attackMode: new fields.StringField({ required: true, blank: true }),
+                damage: new fields.ArrayField(
+                    new fields.SchemaField({
+                        type: new fields.StringField({ required: true, blank: true }),
+                        value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+                        attributeModifier: new fields.StringField({ required: true, blank: true }),
+                        attributeMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 }),
+                        damageMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 }),
+                        overallMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 }),
+                    })
+                ),
+                finisherLimit: new fields.NumberField({ ...requiredInteger, initial: 10, min: 1 })
+            }),
             modifiers: new fields.SchemaField({
                 fortune: new fields.NumberField({ ...requiredInteger, initial: 0 }),
                 attackProfile: new fields.SchemaField({
                     attackType: new fields.StringField({ required: true, blank: true }),
-                    lethal: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-                    critical: new fields.NumberField({ ...requiredInteger, initial: 10, min: 5 }),
+                    attackMode: new fields.StringField({ required: true, blank: true }),
+                    handsSupplied: new fields.NumberField({ ...requiredInteger, min: 0, max: 2, nullable: true }),
+                    finisherLimit: new fields.SchemaField({
+                        value: new fields.NumberField({ ...requiredInteger, nullable: true }),
+                        operator: new fields.StringField({ required: true, blank: true })
+                    }),
+                    lethal: new fields.SchemaField({
+                        value: new fields.NumberField({ ...requiredInteger, initial: 0, nullable: true }),
+                        operator: new fields.StringField({ required: true, blank: true })
+                    }),
+                    critical: new fields.SchemaField({
+                        value: new fields.NumberField({ ...requiredInteger, initial: 10, nullable: true }),
+                        operator: new fields.StringField({ required: true, blank: true })
+                    }),
                     damage: new fields.ArrayField(
                         new fields.SchemaField({
-                            type: new fields.StringField({ required: true, blank: true }),
-                            value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-                            attributeModifier: new fields.StringField({ required: true, blank: true }),
-                            attributeMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 })
+                            modify: new fields.StringField({ required: true, blank: true }),
+                            type: new fields.StringField({ required: true, blank: true, nullable: true }),
+                            value: new fields.NumberField({ ...requiredInteger, nullable: true, nullable: true }),
+                            attributeModifier: new fields.StringField({ required: true, blank: true, nullable: true }),
+                            attributeMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 }),
+                            damageMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 }),
+                            overallMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 })
                         })
-                    ),
-                    finisherLimit: new fields.NumberField({ ...requiredInteger, initial: 10, min: 1 }),
-                    attackMode: new fields.StringField({ required: true, blank: true }),
-                    handsSupplied: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                    )
                 }),
-                damage:
-                    new fields.SchemaField({
-                        self: new fields.ArrayField(
-                            new fields.SchemaField({
-                                value: new fields.StringField({ ...blankString }),
-                                type: new fields.StringField({ ...blankString }),
-                                operator: new fields.StringField({ ...blankString })
-                            })
-                        )
-                    }),
                 guard: new fields.SchemaField({
                     self: new fields.SchemaField({
                         value: new fields.StringField({ ...blankString }),

@@ -8,7 +8,8 @@ ABBREW.durations = {
   round: { label: "ABBREW.Durations.round", value: 6 },
   minute: { label: "ABBREW.Durations.minute", value: 60 },
   hour: { label: "ABBREW.Durations.hour", value: 3600 },
-  day: { label: "ABBREW.Durations.day", value: 86400 }
+  day: { label: "ABBREW.Durations.day", value: 86400 },
+  permanent: { label: "ABBREW.Durations.permanent", value: -1 }
 }
 
 ABBREW.durationsLabels = {
@@ -342,10 +343,23 @@ ABBREW.traits = [
 
 ABBREW.skillTriggers = skillTriggers;
 
+ABBREW.attackModes = {
+  "attack": "ABBREW.AttackModes.attack",
+  "feint": "ABBREW.AttackModes.feint",
+  "overpower": "ABBREW.AttackModes.overpower"
+}
+
 ABBREW.proxiedSkills = {
   "attack": "Attack",
   "parry": "Parry",
   "feint": "Feint",
   "overpower": "Overpower",
   "finisher": "Finisher"
+}
+
+ABBREW.modify = {
+  "all": "Modify All",
+  "one": "Modify One",
+  "add": "Add",
+  "skip": "Skip"
 }

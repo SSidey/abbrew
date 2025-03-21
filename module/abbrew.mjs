@@ -14,6 +14,7 @@ import { registerSystemSettings } from './settings.mjs';
 import { AbbrewCreatureFormSheet } from './sheets/items/item-creature-form-sheet.mjs';
 import { AbbrewSkillDeckSheet } from './sheets/items/item-skill-deck-sheet.mjs';
 import { AbbrewAnatomySheet } from './sheets/items/item-anatomy-sheet.mjs';
+import { AbbrewSkillSheet } from './sheets/items/item-skill-sheet.mjs';
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -83,7 +84,7 @@ Hooks.once('init', function () {
   });
   Items.unregisterSheet('core', ItemSheet);
   Items.registerSheet('abbrew', AbbrewItemSheet, {
-    types: ["item", "feature", "spell", "skill", "armour", "weapon", "wound"],
+    types: ["item", "feature", "spell", "armour", "weapon", "wound"],
     makeDefault: true,
     label: 'ABBREW.SheetLabels.Item',
   });
@@ -101,6 +102,11 @@ Hooks.once('init', function () {
     types: ["anatomy"],
     makeDefault: true,
     label: "ABBREW.SheetLabels.Anatomy"
+  });
+  Items.registerSheet('abbrew', AbbrewSkillSheet, {
+    types: ["skill"],
+    makeDefault: true,
+    label: "ABBREW.SheetLabels.Skill"
   });
 
   _configureStatusEffects();

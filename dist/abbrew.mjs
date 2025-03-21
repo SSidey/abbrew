@@ -83,13 +83,15 @@ async function applySkillEffects(actor, skill) {
   let updates = {};
   const queuedSkills = actor.items.toObject().filter((i) => actor.system.queuedSkills.includes(i._id));
   const queuedSynergies = queuedSkills.filter((s) => s.system.skillModifiers.synergy).map((s) => ({ skill: s, synergy: getSafeJson(s.system.skillModifiers.synergy, []).map((s2) => s2.id) })).filter((s) => s.synergy.includes(skill._id)).map((s) => s.skill);
-  const passiveSkills = actor.items.toObject().filter((i) => i.system.activatable === false && i.system.skillTraits);
+  const passiveSkills = actor.items.toObject().filter((i) => i.system.activatable === false);
   const passiveSynergies = passiveSkills.filter((s) => s.system.skillModifiers.synergy).map((s) => ({ skill: s, synergy: getSafeJson(s.system.skillModifiers.synergy, []).map((s2) => s2.id) })).filter((s) => s.synergy.includes(skill._id)).map((s) => s.skill);
   const allSkills = [...passiveSynergies, ...queuedSynergies, skill].filter((s) => !s.system.action.charges.hasCharges || s.system.action.charges.value > 0);
+  const modifierSkills = [...passiveSynergies, ...queuedSynergies];
   const allSummaries = allSkills.map((s) => ({ name: s.name, description: s.system.description }));
   const usesSkills = allSkills.filter((s) => s.system.action.uses.hasUses).filter((s) => s._id !== skill._id);
   const chargedSkills = allSkills.filter((s) => s.system.action.charges.hasCharges);
   mergeGuardSelfModifiers(updates, allSkills, actor);
+  mergeWoundSelfModifiers(updates, allSkills, actor);
   await actor.update(updates);
   for (const index in usesSkills) {
     const skill2 = usesSkills[index];
@@ -109,9 +111,11 @@ async function applySkillEffects(actor, skill) {
   }
   let templateData = { allSummaries };
   let data = {};
-  if (skill.system.action.modifiers.attackProfile) {
-    const attackProfile = skill.system.action.modifiers.attackProfile;
-    const rollFormula = getRollFormula(actor.system.meta.tier.value, attackProfile, skill.system.action.modifiers.fortune);
+  if (skill.system.action.attackProfile) {
+    const baseAttackProfile = skill.system.action.attackProfile;
+    const fortune = mergeFortune(allSkills);
+    const attackProfile = mergeAttackProfiles(baseAttackProfile, modifierSkills);
+    const rollFormula = getRollFormula(actor.system.meta.tier.value, attackProfile, fortune);
     const roll = new Roll(rollFormula, skill.system.actor);
     const result = await roll.evaluate();
     const token = actor.token;
@@ -184,6 +188,88 @@ function mergeGuardSelfModifiers(updates, allSkills, actor) {
     updates["system.defense.guard.value"] = mergeModifiers(guardModifiers, currentGuard);
   }
 }
+function mergeWoundSelfModifiers(updates, allSkills, actor) {
+  const woundModifiers = allSkills.filter((s) => s.system.action.modifiers.wounds.self.length > 0).flatMap((s) => s.system.action.modifiers.wounds.self.filter((w) => w.type && w.value != null && w.operator).map((w) => ({ ...w, index: getOrderForOperator(w.operator) }))).sort(compareModifierIndices);
+  if (woundModifiers.length > 0) {
+    let updateWounds = actor.system.wounds;
+    updateWounds = woundModifiers.reduce((result, w) => result = mergeWoundsWithOperator(result, [{ type: w.type, value: w.value }], w.operator), updateWounds);
+    updates["system.wounds"] = updateWounds;
+  }
+}
+function mergeFortune(allSkills) {
+  return allSkills.reduce((result, s) => result += s.system.action.modifiers.fortune, 0);
+}
+function mergeAttackProfiles(attackProfile, allSkills) {
+  return allSkills.reduce((result, s) => mergeAttackProfile(result, s.system.action.modifiers.attackProfile), attackProfile);
+}
+function mergeAttackProfile(base, attackProfile) {
+  let baseAttackProfile = base;
+  if (attackProfile.attackType) {
+    baseAttackProfile.attackProfile = attackProfile.attackType;
+  }
+  if (attackProfile.attackMode) {
+    baseAttackProfile.attackMode = attackProfile.attackMode;
+  }
+  if (attackProfile.handsSupplied) {
+    baseAttackProfile.handsSupplied = attackProfile.handsSupplied;
+  }
+  if (attackProfile.finisherLimit.value != null && attackProfile.finisherLimit.operator) {
+    baseAttackProfile.finisherLimit.value = applyOperator(baseAttackProfile.finisherLimit.value, attackProfile.finisherLimit.value, attackProfile.finisherLimit.operator);
+  }
+  if (attackProfile.critical.value != null && attackProfile.critical.operator) {
+    baseAttackProfile.critical.value = applyOperator(baseAttackProfile.critical.value, attackProfile.critical.value, attackProfile.critical.operator);
+  }
+  if (attackProfile.lethal.value != null && attackProfile.lethal.operator) {
+    baseAttackProfile.lethal.value = applyOperator(baseAttackProfile.lethal.value, attackProfile.lethal.value, attackProfile.lethal.operator);
+  }
+  const baseDamageList = base.damage;
+  const modifyDamageList = attackProfile.damage.some((d) => d.modify === "all") ? new Array(baseDamageList.damage.length).fill(attackProfile.damage.find((d) => d.modify === "all")[0]) : attackProfile.damage.filter((d) => d.modify);
+  const last = Math.max(baseDamageList.length, modifyDamageList.length);
+  const updatedDamage = [];
+  for (let index = 0; index < last; index++) {
+    const baseElement = baseDamageList[index] ?? null;
+    const modifyElement = modifyDamageList[index] ?? null;
+    if (baseElement && (!modifyElement || modifyElement && modifyElement.modify === "skip")) {
+      updatedDamage.push(baseElement);
+    } else if (baseElement && modifyElement && (modifyElement.modify === "one" || modifyElement.modify === "all")) {
+      updatedDamage.push(applyModifierToDamageProfile(baseElement, modifyElement));
+    } else if (modifyElement && modifyElement.modify === "add") {
+      updatedDamage.push(baseElement);
+      const newDamage = damageProfileFromModifier(modifyElement);
+      if (newDamage) {
+        updatedDamage.push(newDamage);
+      }
+    }
+  }
+  baseAttackProfile.damage = updatedDamage;
+  return baseAttackProfile;
+}
+function applyModifierToDamageProfile(baseElement, modifyElement) {
+  const type = modifyElement.type ?? baseElement.type;
+  const damage = modifyElement.value ?? baseElement.value;
+  const attribute = modifyElement.attributeModifier.length ? modifyElement.attributeModifier.length : baseElement.attributeModifier;
+  return {
+    type,
+    value: damage,
+    attributeModifier: attribute,
+    attributeMultiplier: modifyElement.attributeMultiplier,
+    damageMultiplier: modifyElement.damageMultiplier,
+    overallMultiplier: modifyElement.overallMultiplier
+  };
+}
+function damageProfileFromModifier(modifyElement) {
+  if (!modifyElement.type) {
+    return null;
+  }
+  return {
+    type: modifyElement.type,
+    value: modifyElement.value ?? 0,
+    attributeModifier: modifyElement.attributeModifier,
+    attributeMultiplier: modifyElement.attributeMultiplier ?? 1,
+    damageMultiplier: modifyElement.damageMultiplier ?? 1,
+    overallMultiplier: modifyElement.overallMultiplier ?? 1
+  };
+}
 function getAttributeModifier(attackMode, attackProfile) {
   switch (attackMode) {
     case "overpower":
@@ -255,6 +341,9 @@ function getSkillDuration(skill) {
   var _a, _b, _c, _d, _e, _f;
   const precision = skill.system.action.duration.precision;
   const duration = {};
+  if (precision === "-1") {
+    return duration;
+  }
   if (precision === "0") {
     duration["turns"] = 1;
     duration["startRound"] = ((_a = game.combat) == null ? void 0 : _a.round) ?? 0;
@@ -263,7 +352,7 @@ function getSkillDuration(skill) {
     duration["duration"] = 0.01;
     return duration;
   }
-  const value = skill.system.action.duration.value;
+  const value = Math.max(1, skill.system.action.duration.value);
   duration["startTime"] = game.time.worldTime;
   if (precision === "6") {
     duration["rounds"] = value;
@@ -2479,14 +2568,13 @@ class AbbrewActorSheet extends ActorSheet {
     if (!await this.actor.canActorUseActions(actions)) {
       return;
     }
-    const skillTraits = CONFIG.ABBREW.skillTriggers.find((s) => s.subFeature === "attacks" && s.data === attackMode);
     const id = this.actor.system.proxiedSkills[attackMode];
     const attackSkill = {
       _id: id,
       name: item.name,
       system: {
         activatable: true,
-        skillTraits: JSON.stringify([skillTraits]),
+        skillTraits: [],
         skillType: "basic",
         attributeIncrease: "",
         attributeIncreaseLong: "",
@@ -2511,9 +2599,10 @@ class AbbrewActorSheet extends ActorSheet {
             max: 0
           },
           isActive: false,
+          attackProfile: { ...attackProfile, attackMode, handsSupplied: item.system.handsSupplied, critical: 11 - item.system.handsSupplied },
           modifiers: {
             fortune: 0,
-            attackProfile: { ...attackProfile, attackMode, handsSupplied: item.system.handsSupplied, critical: 11 - item.system.handsSupplied },
+            attackProfile: {},
             damage: {
               self: []
             },
@@ -2698,8 +2787,6 @@ class AbbrewItemSheet extends ItemSheet {
     html.find(".skill-configuration-section :input").prop("disabled", !this.item.system.configurable);
     this._activateArmourPoints(html);
     this._activateAnatomyParts(html);
-    this._activateSkillTraits(html);
-    this._activateSkillModifiers(html);
   }
   prepareActions(system) {
     let actions = system.actions;
@@ -2753,66 +2840,6 @@ class AbbrewItemSheet extends ItemSheet {
     };
     if (anatomyParts) {
       new Tagify(anatomyParts, anatomyPartsSettings);
-    }
-  }
-  _activateSkillTraits(html) {
-    const skillTraits = html[0].querySelector('input[name="system.skillTraits"]');
-    const skillTraitSettings = {
-      dropdown: {
-        maxItems: 20,
-        // <- mixumum allowed rendered suggestions
-        classname: "tags-look",
-        // <- custom classname for this dropdown, so it could be targeted
-        enabled: 0,
-        // <- show suggestions on focus
-        closeOnSelect: false,
-        // <- do not hide the suggestions dropdown once an item has been selected
-        includeSelectedTags: false
-        // <- Should the suggestions list Include already-selected tags (after filtering)
-      },
-      userInput: false,
-      // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
-      duplicates: true,
-      // <- Should duplicate tags be allowed or not
-      whitelist: [.../* Object.values( */
-      CONFIG.ABBREW.traits.map((trait) => ({
-        ...trait,
-        value: game.i18n.localize(trait.value)
-      }))]
-    };
-    if (skillTraits) {
-      new Tagify(skillTraits, skillTraitSettings);
-    }
-  }
-  _activateSkillModifiers(html) {
-    var _a, _b, _c, _d, _e;
-    const skillSynergy = html[0].querySelector('input[name="system.skillModifiers.synergy"]');
-    const skillDiscord = html[0].querySelector('input[name="system.skillModifiers.discord"]');
-    Object.entries((_b = (_a = this.item) == null ? void 0 : _a.actor) == null ? void 0 : _b.system.proxiedSkills).filter((ps) => ps[1]).map((ps) => ({ value: CONFIG.ABBREW.proxiedSkills[ps[0]], id: ps[1] }));
-    const settings = {
-      dropdown: {
-        maxItems: 20,
-        // <- mixumum allowed rendered suggestions
-        classname: "tags-look",
-        // <- custom classname for this dropdown, so it could be targeted
-        enabled: 0,
-        // <- show suggestions on focus
-        closeOnSelect: false,
-        // <- do not hide the suggestions dropdown once an item has been selected
-        includeSelectedTags: false
-        // <- Should the suggestions list Include already-selected tags (after filtering)
-      },
-      userInput: true,
-      // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
-      duplicates: false,
-      // <- Should duplicate tags be allowed or not
-      whitelist: [...((_e = (_d = (_c = this.item) == null ? void 0 : _c.actor) == null ? void 0 : _d.items) == null ? void 0 : _e.filter((i) => i.type === "skill").map((s) => ({ value: s.name, id: s._id }))) ?? []]
-    };
-    if (skillSynergy) {
-      new Tagify(skillSynergy, settings);
-    }
-    if (skillDiscord) {
-      new Tagify(skillDiscord, settings);
     }
   }
   /**
@@ -3039,7 +3066,8 @@ ABBREW.durations = {
   round: { label: "ABBREW.Durations.round", value: 6 },
   minute: { label: "ABBREW.Durations.minute", value: 60 },
   hour: { label: "ABBREW.Durations.hour", value: 3600 },
-  day: { label: "ABBREW.Durations.day", value: 86400 }
+  day: { label: "ABBREW.Durations.day", value: 86400 },
+  permanent: { label: "ABBREW.Durations.permanent", value: -1 }
 };
 ABBREW.durationsLabels = {
   instant: "ABBREW.Durations.instant",
@@ -3343,12 +3371,23 @@ ABBREW.traits = [
   ...valueReplacers
 ];
 ABBREW.skillTriggers = skillTriggers;
+ABBREW.attackModes = {
+  "attack": "ABBREW.AttackModes.attack",
+  "feint": "ABBREW.AttackModes.feint",
+  "overpower": "ABBREW.AttackModes.overpower"
+};
 ABBREW.proxiedSkills = {
   "attack": "Attack",
   "parry": "Parry",
   "feint": "Feint",
   "overpower": "Overpower",
   "finisher": "Finisher"
+};
+ABBREW.modify = {
+  "all": "Modify All",
+  "one": "Modify One",
+  "add": "Add",
+  "skip": "Skip"
 };
 class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   get traitsData() {
@@ -3745,30 +3784,52 @@ class AbbrewSkill extends AbbrewItemBase {
         max: new fields.NumberField({ ...requiredInteger, initial: 0 })
       }),
       isActive: new fields.BooleanField({ required: true }),
+      attackProfile: new fields.SchemaField({
+        name: new fields.StringField({ required: true, blank: true }),
+        attackType: new fields.StringField({ required: true, blank: true }),
+        lethal: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+        critical: new fields.NumberField({ ...requiredInteger, initial: 10, min: 5 }),
+        handsSupplied: new fields.NumberField({ ...requiredInteger, min: 0, max: 2, nullable: true }),
+        attackMode: new fields.StringField({ required: true, blank: true }),
+        damage: new fields.ArrayField(
+          new fields.SchemaField({
+            type: new fields.StringField({ required: true, blank: true }),
+            value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+            attributeModifier: new fields.StringField({ required: true, blank: true }),
+            attributeMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 }),
+            damageMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 }),
+            overallMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 })
+          })
+        ),
+        finisherLimit: new fields.NumberField({ ...requiredInteger, initial: 10, min: 1 })
+      }),
       modifiers: new fields.SchemaField({
         fortune: new fields.NumberField({ ...requiredInteger, initial: 0 }),
         attackProfile: new fields.SchemaField({
           attackType: new fields.StringField({ required: true, blank: true }),
-          lethal: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-          critical: new fields.NumberField({ ...requiredInteger, initial: 10, min: 5 }),
+          attackMode: new fields.StringField({ required: true, blank: true }),
+          handsSupplied: new fields.NumberField({ ...requiredInteger, min: 0, max: 2, nullable: true }),
+          finisherLimit: new fields.SchemaField({
+            value: new fields.NumberField({ ...requiredInteger, nullable: true }),
+            operator: new fields.StringField({ required: true, blank: true })
+          }),
+          lethal: new fields.SchemaField({
+            value: new fields.NumberField({ ...requiredInteger, initial: 0, nullable: true }),
+            operator: new fields.StringField({ required: true, blank: true })
+          }),
+          critical: new fields.SchemaField({
+            value: new fields.NumberField({ ...requiredInteger, initial: 10, nullable: true }),
+            operator: new fields.StringField({ required: true, blank: true })
+          }),
           damage: new fields.ArrayField(
             new fields.SchemaField({
-              type: new fields.StringField({ required: true, blank: true }),
-              value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-              attributeModifier: new fields.StringField({ required: true, blank: true }),
-              attributeMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 })
-            })
-          ),
-          finisherLimit: new fields.NumberField({ ...requiredInteger, initial: 10, min: 1 }),
-          attackMode: new fields.StringField({ required: true, blank: true }),
-          handsSupplied: new fields.NumberField({ ...requiredInteger, initial: 0 })
-        }),
-        damage: new fields.SchemaField({
-          self: new fields.ArrayField(
-            new fields.SchemaField({
-              value: new fields.StringField({ ...blankString }),
-              type: new fields.StringField({ ...blankString }),
-              operator: new fields.StringField({ ...blankString })
+              modify: new fields.StringField({ required: true, blank: true }),
+              type: new fields.StringField({ required: true, blank: true, nullable: true }),
+              value: new fields.NumberField({ ...requiredInteger, nullable: true, nullable: true }),
+              attributeModifier: new fields.StringField({ required: true, blank: true, nullable: true }),
+              attributeMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 }),
+              damageMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 }),
+              overallMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 })
             })
           )
         }),
@@ -3979,7 +4040,10 @@ class AbbrewAttackBase extends foundry.abstract.TypeDataModel {
           new fields.SchemaField({
             type: new fields.StringField({ required: true, blank: true }),
             value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-            attributeModifier: new fields.StringField({ required: true, blank: true })
+            attributeModifier: new fields.StringField({ required: true, blank: true }),
+            attributeMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 }),
+            damageMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 }),
+            overallMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 })
           })
         ),
         finisherLimit: new fields.NumberField({ ...requiredInteger, initial: 10, min: 1 }),
@@ -4279,15 +4343,15 @@ class AbbrewActor extends Actor {
       return 0;
     }
     if (isStrongAttack) {
-      return damage + inflexibility;
+      return Math.min(damage, inflexibility);
     }
     if (this.attackerGainsAdvantage(isFeint, action)) {
-      return 2 * (damage + inflexibility);
+      return 2 * Math.min(damage, inflexibility);
     }
     if (this.defenderGainsAdvantage(isFeint, action)) {
       return 0;
     }
-    return damage + inflexibility;
+    return Math.min(damage, inflexibility);
   }
   defenderGainsAdvantage(isFeint, action) {
     return isFeint === false && action === "parry";
@@ -4866,6 +4930,141 @@ class AbbrewAnatomySheet extends ItemSheet {
     });
   }
 }
+class AbbrewSkillSheet extends ItemSheet {
+  /** @override */
+  static get defaultOptions() {
+    return foundry.utils.mergeObject(super.defaultOptions, {
+      classes: ["abbrew", "sheet", "item"],
+      width: 520,
+      height: 480,
+      tabs: [
+        {
+          navSelector: ".sheet-tabs",
+          contentSelector: ".sheet-body",
+          initial: "description"
+        }
+      ]
+    });
+  }
+  /** @override */
+  get template() {
+    const path = "systems/abbrew/templates/item";
+    return `${path}/item-${this.item.type}-sheet.hbs`;
+  }
+  /* -------------------------------------------- */
+  /** @override */
+  getData() {
+    const context = super.getData();
+    const itemData = context.data;
+    context.rollData = this.item.getRollData();
+    context.system = itemData.system;
+    context.flags = itemData.flags;
+    context.effects = prepareActiveEffectCategories(this.item.effects);
+    context.config = CONFIG.ABBREW;
+    return context;
+  }
+  /* -------------------------------------------- */
+  /** @override */
+  activateListeners(html) {
+    super.activateListeners(html);
+    if (!this.isEditable)
+      return;
+    html.on(
+      "click",
+      ".effect-control",
+      (event) => onManageActiveEffect(event, this.item)
+    );
+    html.find(".damage-control").click((event) => {
+      const t = event.currentTarget;
+      if (t.dataset.action)
+        this._onDamageAction(t, t.dataset.action);
+    });
+    html.on("dragover", (event) => {
+      event.preventDefault();
+    });
+    this._activateSkillTraits(html);
+    this._activateSkillModifiers(html);
+  }
+  _activateSkillTraits(html) {
+    const skillTraits = html[0].querySelector('input[name="system.skillTraits"]');
+    const skillTraitSettings = {
+      dropdown: {
+        maxItems: 20,
+        // <- mixumum allowed rendered suggestions
+        classname: "tags-look",
+        // <- custom classname for this dropdown, so it could be targeted
+        enabled: 0,
+        // <- show suggestions on focus
+        closeOnSelect: false,
+        // <- do not hide the suggestions dropdown once an item has been selected
+        includeSelectedTags: false
+        // <- Should the suggestions list Include already-selected tags (after filtering)
+      },
+      userInput: false,
+      // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+      duplicates: true,
+      // <- Should duplicate tags be allowed or not
+      whitelist: [.../* Object.values( */
+      CONFIG.ABBREW.traits.map((trait) => ({
+        ...trait,
+        value: game.i18n.localize(trait.value)
+      }))]
+    };
+    if (skillTraits) {
+      new Tagify(skillTraits, skillTraitSettings);
+    }
+  }
+  _activateSkillModifiers(html) {
+    var _a, _b, _c, _d, _e;
+    const skillSynergy = html[0].querySelector('input[name="system.skillModifiers.synergy"]');
+    const skillDiscord = html[0].querySelector('input[name="system.skillModifiers.discord"]');
+    Object.entries((_b = (_a = this.item) == null ? void 0 : _a.actor) == null ? void 0 : _b.system.proxiedSkills).filter((ps) => ps[1]).map((ps) => ({ value: CONFIG.ABBREW.proxiedSkills[ps[0]], id: ps[1] }));
+    const settings = {
+      dropdown: {
+        maxItems: 20,
+        // <- mixumum allowed rendered suggestions
+        classname: "tags-look",
+        // <- custom classname for this dropdown, so it could be targeted
+        enabled: 0,
+        // <- show suggestions on focus
+        closeOnSelect: false,
+        // <- do not hide the suggestions dropdown once an item has been selected
+        includeSelectedTags: false
+        // <- Should the suggestions list Include already-selected tags (after filtering)
+      },
+      userInput: true,
+      // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+      duplicates: false,
+      // <- Should duplicate tags be allowed or not
+      whitelist: [...((_e = (_d = (_c = this.item) == null ? void 0 : _c.actor) == null ? void 0 : _d.items) == null ? void 0 : _e.filter((i) => i.type === "skill").map((s) => ({ value: s.name, id: s._id }))) ?? []]
+    };
+    if (skillSynergy) {
+      new Tagify(skillSynergy, settings);
+    }
+    if (skillDiscord) {
+      new Tagify(skillDiscord, settings);
+    }
+  }
+  _onDamageAction(target, action) {
+    switch (action) {
+      case "add-damage":
+        return this.addDamage(target);
+      case "remove-damage":
+        return this.removeDamage(target);
+    }
+  }
+  addDamage(target) {
+    const damage = this.item.system.action.modifiers.attackProfile.damage;
+    const update = [...damage, {}];
+    return this.item.update({ "system.action.modifiers.attackProfile.damage": update });
+  }
+  removeDamage(target) {
+    const damageId = target.closest("li").dataset.id;
+    const damage = this.item.system.action.modifiers.attackProfile.damage;
+    damage.splice(Number(damageId), 1);
+    return this.item.update({ "system.action.modifiers.attackProfile.damage": damage });
+  }
+}
 Hooks.once("init", function() {
   game.abbrew = {
     AbbrewActor,
@@ -4906,7 +5105,7 @@ Hooks.once("init", function() {
   });
   Items.unregisterSheet("core", ItemSheet);
   Items.registerSheet("abbrew", AbbrewItemSheet, {
-    types: ["item", "feature", "spell", "skill", "armour", "weapon", "wound"],
+    types: ["item", "feature", "spell", "armour", "weapon", "wound"],
     makeDefault: true,
     label: "ABBREW.SheetLabels.Item"
   });
@@ -4924,6 +5123,11 @@ Hooks.once("init", function() {
     types: ["anatomy"],
     makeDefault: true,
     label: "ABBREW.SheetLabels.Anatomy"
+  });
+  Items.registerSheet("abbrew", AbbrewSkillSheet, {
+    types: ["skill"],
+    makeDefault: true,
+    label: "ABBREW.SheetLabels.Skill"
   });
   _configureStatusEffects();
   return preloadHandlebarsTemplates();

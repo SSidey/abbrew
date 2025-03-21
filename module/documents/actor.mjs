@@ -207,18 +207,18 @@ export default class AbbrewActor extends Actor {
     }
 
     if (isStrongAttack) {
-      return damage + inflexibility;
+      return Math.min(damage, inflexibility);
     }
 
     if (this.attackerGainsAdvantage(isFeint, action)) {
-      return 2 * (damage + inflexibility);
+      return 2 * (Math.min(damage, inflexibility));
     }
 
     if (this.defenderGainsAdvantage(isFeint, action)) {
       return 0;
     }
 
-    return damage + inflexibility;
+    return Math.min(damage, inflexibility);
   }
 
   defenderGainsAdvantage(isFeint, action) {

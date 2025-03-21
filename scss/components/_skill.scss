@@ -93,3 +93,53 @@ div.skill-card.skill-active {
     align-self: center;
     text-align: center;
 }
+
+.skill-attack-profile {
+    display: grid;
+    grid-template-rows: repeat(3, 1fr);
+    margin-bottom: 5px;
+
+
+    .attack-profile-row {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-gap: 5px;
+
+        .attack-profile-element-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .attack-profile-element-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+}
+
+.skill-damage-list {
+    list-style: none;
+    padding-left: 0px;
+
+    .skill-damage-row {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+
+        .skill-damage-profile {
+            grid-column: 1 / 10;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-column-gap: 5px;
+            padding-right: 10px;
+
+            .damage-profile-element-2 {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .skill-damage-control {
+            grid-column: 10 / 11;
+        }
+    }
+}

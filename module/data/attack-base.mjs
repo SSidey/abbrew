@@ -23,6 +23,9 @@ export default class AbbrewAttackBase extends foundry.abstract.TypeDataModel {
                         type: new fields.StringField({ required: true, blank: true }),
                         value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
                         attributeModifier: new fields.StringField({ required: true, blank: true }),
+                        attributeMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 }),
+                        damageMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 }),
+                        overallMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 })
                     })
                 ),
                 finisherLimit: new fields.NumberField({ ...requiredInteger, initial: 10, min: 1 }),

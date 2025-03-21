@@ -486,9 +486,10 @@ export class AbbrewActorSheet extends ActorSheet {
             max: 0
           },
           isActive: false,
+          attackProfile: { ...attackProfile, attackMode: attackMode, handsSupplied: item.system.handsSupplied, critical: 11 - item.system.handsSupplied },
           modifiers: {
             fortune: 0,
-            attackProfile: { ...attackProfile, attackMode: attackMode, handsSupplied: item.system.handsSupplied, critical: 11 - item.system.handsSupplied },
+            attackProfile: {},
             damage: {
               self: []
             },

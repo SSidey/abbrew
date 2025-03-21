@@ -1,5 +1,6 @@
 import { applyOperator } from "./operators.mjs";
 import { getObjectValueByStringPath, getSafeJson, intersection } from "../helpers/utils.mjs"
+import { mergeWoundsWithOperator } from "./combat.mjs";
 
 export async function removeStackFromSkill(skill) {
     const stacks = skill.system.action.uses.value - 1;
@@ -48,18 +49,15 @@ export async function applySkillEffects(actor, skill) {
     const passiveSynergies = passiveSkills.filter(s => s.system.skillModifiers.synergy).map(s => ({ skill: s, synergy: getSafeJson(s.system.skillModifiers.synergy, []).map(s => s.id) })).filter(s => s.synergy.includes(skill._id)).map(s => s.skill)
     // Combine all relevant skills, filtering for those that are out of charges
     const allSkills = [...passiveSynergies, ...queuedSynergies, skill].filter(s => !s.system.action.charges.hasCharges || (s.system.action.charges.value > 0));
+    const modifierSkills = [...passiveSynergies, ...queuedSynergies];
     const allSummaries = allSkills.map(s => ({ name: s.name, description: s.system.description }));
     // Explicitly get any skills with charges for later use
     const usesSkills = allSkills.filter(s => s.system.action.uses.hasUses).filter(s => s._id !== skill._id);
     const chargedSkills = allSkills.filter(s => s.system.action.charges.hasCharges);
 
     mergeGuardSelfModifiers(updates, allSkills, actor);
+    mergeWoundSelfModifiers(updates, allSkills, actor);
 
-    // if (skill.system.action.modifiers.wounds.self.length > 0) {
-    //     let updateWounds = actor.system.wounds;
-    //     skill.system.action.modifiers.wounds.self.filter(w => w.value && w.type && w.operator).forEach(w => updateWounds = mergeWoundsWithOperator(updateWounds, [{ type: w.type, value: w.value }], w.operator));
-    //     updates["system.wounds"] = updateWounds;
-    // }
 
     await actor.update(updates);
     for (const index in usesSkills) {
@@ -81,9 +79,11 @@ export async function applySkillEffects(actor, skill) {
 
     let templateData = { allSummaries: allSummaries };
     let data = {};
-    if (skill.system.action.modifiers.attackProfile) {
-        const attackProfile = skill.system.action.modifiers.attackProfile;
-        const rollFormula = getRollFormula(actor.system.meta.tier.value, attackProfile, skill.system.action.modifiers.fortune);
+    if (skill.system.action.attackProfile) {
+        const baseAttackProfile = skill.system.action.attackProfile;
+        const fortune = mergeFortune(allSkills);
+        const attackProfile = mergeAttackProfiles(baseAttackProfile, modifierSkills);
+        const rollFormula = getRollFormula(actor.system.meta.tier.value, attackProfile, fortune);
         const roll = new Roll(rollFormula, skill.system.actor);
         const result = await roll.evaluate();
         const token = actor.token;
@@ -172,6 +172,100 @@ function mergeGuardSelfModifiers(updates, allSkills, actor) {
     }
 }
 
+function mergeWoundSelfModifiers(updates, allSkills, actor) {
+    const woundModifiers = allSkills.filter(s => s.system.action.modifiers.wounds.self.length > 0).flatMap(s => s.system.action.modifiers.wounds.self.filter(w => w.type && w.value != null && w.operator).map(w => ({ ...w, index: getOrderForOperator(w.operator) }))).sort(compareModifierIndices);
+    if (woundModifiers.length > 0) {
+        let updateWounds = actor.system.wounds;
+        updateWounds = woundModifiers.reduce((result, w) => result = mergeWoundsWithOperator(result, [{ type: w.type, value: w.value }], w.operator), updateWounds)
+        updates["system.wounds"] = updateWounds;
+    }
+}
+
+function mergeFortune(allSkills) {
+    return allSkills.reduce((result, s) => result += s.system.action.modifiers.fortune, 0);
+}
+
+function mergeAttackProfiles(attackProfile, allSkills) {
+    return allSkills.reduce((result, s) => mergeAttackProfile(result, s.system.action.modifiers.attackProfile), attackProfile)
+}
+
+function mergeAttackProfile(base, attackProfile) {
+    let baseAttackProfile = base;
+    if (attackProfile.attackType) {
+        baseAttackProfile.attackProfile = attackProfile.attackType;
+    }
+    if (attackProfile.attackMode) {
+        baseAttackProfile.attackMode = attackProfile.attackMode;
+    }
+    if (attackProfile.handsSupplied) {
+        baseAttackProfile.handsSupplied = attackProfile.handsSupplied;
+    }
+
+    if (attackProfile.finisherLimit.value != null && attackProfile.finisherLimit.operator) {
+        baseAttackProfile.finisherLimit.value = applyOperator(baseAttackProfile.finisherLimit.value, attackProfile.finisherLimit.value, attackProfile.finisherLimit.operator)
+    }
+    if (attackProfile.critical.value != null && attackProfile.critical.operator) {
+        baseAttackProfile.critical.value = applyOperator(baseAttackProfile.critical.value, attackProfile.critical.value, attackProfile.critical.operator)
+    }
+    if (attackProfile.lethal.value != null && attackProfile.lethal.operator) {
+        baseAttackProfile.lethal.value = applyOperator(baseAttackProfile.lethal.value, attackProfile.lethal.value, attackProfile.lethal.operator)
+    }
+
+    const baseDamageList = base.damage;
+    const modifyDamageList = attackProfile.damage.some(d => d.modify === "all") ? new Array(baseDamageList.damage.length).fill(attackProfile.damage.find(d => d.modify === "all")[0]) : attackProfile.damage.filter(d => d.modify);
+    const last = Math.max(baseDamageList.length, modifyDamageList.length);
+    const updatedDamage = [];
+    for (let index = 0; index < last; index++) {
+        const baseElement = baseDamageList[index] ?? null;
+        const modifyElement = modifyDamageList[index] ?? null;
+
+        if (baseElement && (!modifyElement || (modifyElement && modifyElement.modify === "skip"))) {
+            updatedDamage.push(baseElement);
+        } else if (baseElement && modifyElement && (modifyElement.modify === "one" || modifyElement.modify === "all")) {
+            updatedDamage.push(applyModifierToDamageProfile(baseElement, modifyElement));
+        } else if (modifyElement && modifyElement.modify === "add") {
+            updatedDamage.push(baseElement);
+            const newDamage = damageProfileFromModifier(modifyElement);
+            if (newDamage) {
+                updatedDamage.push(newDamage);
+            }
+        }
+    }
+
+    baseAttackProfile.damage = updatedDamage;
+
+    return baseAttackProfile;
+}
+
+function applyModifierToDamageProfile(baseElement, modifyElement) {
+    const type = modifyElement.type ?? baseElement.type;
+    const damage = modifyElement.value ?? baseElement.value;
+    const attribute = modifyElement.attributeModifier.length ? modifyElement.attributeModifier.length : baseElement.attributeModifier;
+    return ({
+        type: type,
+        value: damage,
+        attributeModifier: attribute,
+        attributeMultiplier: modifyElement.attributeMultiplier,
+        damageMultiplier: modifyElement.damageMultiplier,
+        overallMultiplier: modifyElement.overallMultiplier
+    });
+}
+
+function damageProfileFromModifier(modifyElement) {
+    if (!modifyElement.type) {
+        return null;
+    }
+
+    return ({
+        type: modifyElement.type,
+        value: modifyElement.value ?? 0,
+        attributeModifier: modifyElement.attributeModifier,
+        attributeMultiplier: modifyElement.attributeMultiplier ?? 1,
+        damageMultiplier: modifyElement.damageMultiplier ?? 1,
+        overallMultiplier: modifyElement.overallMultiplier ?? 1
+    });
+}
+
 function getAttributeModifier(attackMode, attackProfile) {
     switch (attackMode) {
         case "overpower":
@@ -254,6 +348,11 @@ async function addSkillToQueuedSkills(actor, skill) {
 function getSkillDuration(skill) {
     const precision = skill.system.action.duration.precision;
     const duration = {};
+    if (precision === "-1") {
+        return duration;
+    }
+
+    // TODO: remove on next standalone.
     // Return 1 Turn Duration for Instants, remove on next standalone.
     if (precision === "0") {
         duration["turns"] = 1;
@@ -264,7 +363,7 @@ function getSkillDuration(skill) {
         return duration;
     }
 
-    const value = skill.system.action.duration.value;
+    const value = Math.max(1, skill.system.action.duration.value);
     duration["startTime"] = game.time.worldTime;
 
     if (precision === "6") {

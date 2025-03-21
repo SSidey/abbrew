@@ -15,7 +15,8 @@
       "Item": "Abbrew Item Sheet",
       "CreatureForm": "Abbrew Creature Form Sheet",
       "SkillDeck": "Skill Deck",
-      "Anatomy": "Anatomy"
+      "Anatomy": "Anatomy",
+      "Skill": "Skill"
     },
     "Item": {
       "Spell": {
@@ -87,6 +88,11 @@
       "arc": "Arc",
       "thrust": "Thrust",
       "static": "Static"
+    },
+    "AttackModes": {
+      "attack": "Attack",
+      "feint": "Feint",
+      "overpower": "Overpower"
     },
     "EquipState": {
       "heldOne": "Held 1H",
@@ -210,7 +216,8 @@
       "round": "Round",
       "minute": "Minute",
       "hour": "Hour",
-      "day": "Day"
+      "day": "Day",
+      "permanent": "Permanent"
     }
   },
 
