@@ -189,24 +189,12 @@
         "instabilityImmunity": "Instability Immunity",
         "sinImmunity": "Sin Immunity"
       },
-      "SkillTriggers": {
-        "guardRestore": "On Guard Restore",
-        "attack": "On Attack",
-        "overpower": "On Overpower",
-        "feint": "On Feint",
-        "finisher": "On Finisher"
-      },
-      "SkillBlockers": {
-        "guardRestore": "Block On Guard Restore",
-        "parry": "Block Parry"
-      },
-      "SkillEnablers": {
-        "overpower": "Enable Overpower",
-        "parry": "Enable Parry",
-        "feint": "Enable Feint"
-      },
-      "ValueReplacers": {
-        "shieldTraining": "Shield Training"
+      "SkillTraining": {
+        "overpower": "Overpower Training",
+        "parry": "Parry Training",
+        "feint": "Feint Training",
+        "parryCounter": "Counter Parry Training",
+        "feintCounter": "Counter Feint Training"
       }
     },
     "Durations": {

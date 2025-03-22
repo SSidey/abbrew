@@ -1,5 +1,6 @@
 import { mergeActorWounds } from "../helpers/combat.mjs";
 import { isSkillBlocked } from "../helpers/skill.mjs";
+import { getAttackerAdvantageGuardResult, getAttackerAdvantageRiskResult, getDefenderAdvantageGuardResult, getDefenderAdvantageRiskResult } from "../helpers/trainedSkills.mjs";
 import { FINISHERS } from "../static/finishers.mjs";
 
 /**
@@ -54,12 +55,16 @@ export default class AbbrewActor extends Actor {
     let risk = this.system.defense.risk.raw;
     const inflexibility = this.system.defense.inflexibility.raw;
 
+    const attackingActorParryCounter = data.attackerSkillTraining.find(st => st.type === "parryCounter")?.value ?? 0;
+    const attackingActorFeint = data.attackerSkillTraining.find(st => st.type === "feint")?.value ?? 0;
+
     //TODO: Tidy this up
     let damage = this.applyModifiersToDamage(rolls, data, action);
-    const updateRisk = this.calculateRisk(damage, guard, risk, inflexibility, data.isFeint, data.isStrongAttack, action);
+    const updateRisk = this.calculateRisk(damage, guard, risk, inflexibility, data.isFeint, data.isStrongAttack, action, attackingActorParryCounter, attackingActorFeint);
     let overFlow = updateRisk > 100 ? updateRisk - 100 : 0;
 
-    const updates = { "system.defense.guard.value": await this.calculateGuard(damage + overFlow, guard, data.isFeint, data.isStrongAttack, action), "system.defense.risk.raw": updateRisk };
+
+    const updates = { "system.defense.guard.value": await this.calculateGuard(damage + overFlow, guard, data.isFeint, data.isStrongAttack, action, attackingActorParryCounter, attackingActorFeint), "system.defense.risk.raw": updateRisk };
     await this.update(updates);
     await this.renderAttackResultCard(data, action);
     return this;
@@ -173,11 +178,11 @@ export default class AbbrewActor extends Actor {
     }, 0);
   }
 
-  async calculateGuard(damage, guard, isFeint, isStrongAttack, action) {
-    return guard - this.calculateGuardReduction(damage, guard, isFeint, isStrongAttack, action);
+  async calculateGuard(damage, guard, isFeint, isStrongAttack, action, attackingActorParryCounter, attackingActorFeint) {
+    return guard - this.calculateGuardReduction(damage, guard, isFeint, isStrongAttack, action, attackingActorParryCounter, attackingActorFeint);
   }
 
-  calculateGuardReduction(damage, guard, isFeint, isStrongAttack, action) {
+  calculateGuardReduction(damage, guard, isFeint, isStrongAttack, action, attackingActorParryCounter, attackingActorFeint) {
     if (this.noneResult(isFeint, action)) {
       return 0;
     }
@@ -187,21 +192,21 @@ export default class AbbrewActor extends Actor {
     }
 
     if (this.attackerGainsAdvantage(isFeint, action)) {
-      return 0 + damage;
+      return getAttackerAdvantageGuardResult(this.system.skillTraining.find(st => st.type === "feintCounter")?.value ?? 0, attackingActorFeint, damage);
     }
 
     if (this.defenderGainsAdvantage(isFeint, action)) {
-      return 0;
+      return getDefenderAdvantageGuardResult(this.system.skillTraining.find(st => st.type === "parry")?.value ?? 0, attackingActorParryCounter, damage);
     }
 
     return 0 + damage;
   }
 
-  calculateRisk(damage, guard, risk, inflexibility, isFeint, isStrongAttack, action) {
-    return risk + this.calculateRiskIncrease(damage, guard, risk, inflexibility, isFeint, isStrongAttack, action);
+  calculateRisk(damage, guard, risk, inflexibility, isFeint, isStrongAttack, action, attackingActorParryCounter, attackingActorFeint) {
+    return risk + this.calculateRiskIncrease(damage, guard, risk, inflexibility, isFeint, isStrongAttack, action, attackingActorParryCounter, attackingActorFeint);
   }
 
-  calculateRiskIncrease(damage, guard, risk, inflexibility, isFeint, isStrongAttack, action) {
+  calculateRiskIncrease(damage, guard, risk, inflexibility, isFeint, isStrongAttack, action, attackingActorParryCounter, attackingActorFeint) {
     if (this.noneResult(isFeint, action)) {
       return 0;
     }
@@ -211,11 +216,11 @@ export default class AbbrewActor extends Actor {
     }
 
     if (this.attackerGainsAdvantage(isFeint, action)) {
-      return 2 * (Math.min(damage, inflexibility));
+      return getAttackerAdvantageRiskResult(this.system.skillTraining.find(st => st.type === "feintCounter")?.value ?? 0, attackingActorFeint, damage, inflexibility);
     }
 
     if (this.defenderGainsAdvantage(isFeint, action)) {
-      return 0;
+      return getDefenderAdvantageRiskResult(this.system.skillTraining.find(st => st.type === "parry")?.value ?? 0, attackingActorParryCounter, damage, inflexibility);
     }
 
     return Math.min(damage, inflexibility);

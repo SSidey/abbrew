@@ -128,7 +128,8 @@ export async function applySkillEffects(actor, skill) {
 
         const showAttack = ['attack', 'feint', 'finisher'].includes(attackMode);
         const isFeint = attackMode === 'feint';
-        const showParry = game.user.targets.some(t => t.actor.doesActorHaveSkillTrait("skillEnabler", "defensiveSkills", "enable", "parry"));
+        // TODO: Remove
+        const showParry = true;
         const isStrongAttack = attackMode === 'overpower';
         const showFinisher = attackMode === 'finisher' || totalSuccesses > 0;
         const isFinisher = attackMode === 'finisher';
@@ -149,7 +150,7 @@ export async function applySkillEffects(actor, skill) {
             showParry,
             actionCost: skill.system.action.actionCost
         };
-        data = { ...data, totalSuccesses, damage, isFeint, isStrongAttack, attackProfile, attackingActor: actor, actionCost: skill.system.action.actionCost };
+        data = { ...data, totalSuccesses, damage, isFeint, isStrongAttack, attackProfile, attackingActor: actor, actionCost: skill.system.action.actionCost, attackerSkillTraining: actor.system.skillTraining };
     }
 
     // TODO: Move this out of item and into a weapon.mjs / skill-card.mjs
@@ -170,7 +171,7 @@ export async function applySkillEffects(actor, skill) {
 }
 
 function mergeGuardSelfModifiers(updates, allSkills, actor) {
-    const guardModifiers = allSkills.filter(s => s.system.action.modifiers.guard.self.operator).map(s => ({ value: getSkillValueForPath("system.action.modifiers.guard.self.value", s, s.system.action.modifiers.guard.self.value, actor), operator: s.system.action.modifiers.guard.self.operator }));
+    const guardModifiers = allSkills.filter(s => s.system.action.modifiers.guard.self.operator).map(s => ({ value: getSkillValueForPath(s.system.action.modifiers.guard.self.value, actor), operator: s.system.action.modifiers.guard.self.operator }));
     if (guardModifiers) {
         const currentGuard = actor.system.defense.guard.value;
         updates["system.defense.guard.value"] = mergeModifiers(guardModifiers, currentGuard);
@@ -319,15 +320,7 @@ function compareModifierIndices(modifier1, modifier2) {
     return 0;
 }
 
-function getSkillValueForPath(path, skill, rawValue, actor) {
-    const skillTraits = getSafeJson(skill.system.skillTraits, []);
-    const valueReplacers = skillTraits.filter(st => st.feature === "valueReplacer" && st.subFeature === path && st.effect === "replace");
-    if (valueReplacers?.length) {
-        const valueReplacer = valueReplacers.shift();
-        const value = parsePath(valueReplacer.data, actor)
-        return value;
-    }
-
+function getSkillValueForPath(rawValue, actor) {
     return isNumeric(rawValue) ? parseInt(rawValue) : parsePath(rawValue, actor);
 }
 

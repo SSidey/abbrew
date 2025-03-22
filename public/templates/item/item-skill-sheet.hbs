@@ -18,7 +18,8 @@
 
     {{!-- Description Tab --}}
     <div class="tab" data-group="primary" data-tab="description">
-      {{editor enrichedDescription target="system.description" engine="prosemirror"  rollData=rollData button=true owner=owner
+      {{editor enrichedDescription target="system.description" engine="prosemirror" rollData=rollData button=true
+      owner=owner
       editable=editable}}
     </div>
 
@@ -32,12 +33,12 @@
       <div class="grid-span-2">
         <label class="resource-label">Synergy</label>
         <input type="text" name="system.skillModifiers.synergy" value="{{system.skillModifiers.synergy}}"
-          data-dtype="String" />
+          data-dtype="String" {{#unless (isGM)}}readonly{{/unless}} />
       </div>
       <div class="grid-span-2">
         <label class="resource-label">Discord</label>
         <input type="text" name="system.skillModifiers.discord" value="{{system.skillModifiers.discord}}"
-          data-dtype="String" />
+          data-dtype="String" {{#unless (isGM)}}readonly{{/unless}} />
       </div>
       {{!-- As you add new fields, add them in here! --}}
       {{!-- TODO: Something has broken the edit block --}}

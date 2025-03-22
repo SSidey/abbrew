@@ -132,7 +132,8 @@ export class AbbrewSkillSheet extends ItemSheet {
     _activateSkillModifiers(html) {
         const skillSynergy = html[0].querySelector('input[name="system.skillModifiers.synergy"]');
         const skillDiscord = html[0].querySelector('input[name="system.skillModifiers.discord"]');
-        const proxiedSkills = Object.entries(this.item?.actor?.system.proxiedSkills).filter(ps => ps[1]).map(ps => ({ value: CONFIG.ABBREW.proxiedSkills[ps[0]], id: ps[1] }));
+        // TODO: Could add the baseline skills here to make sure they exist
+        // const proxiedSkills = Object.entries(this.item?.actor?.system.proxiedSkills).filter(ps => ps[1]).map(ps => ({ value: CONFIG.ABBREW.proxiedSkills[ps[0]], id: ps[1] }));
         const settings = {
             dropdown: {
                 maxItems: 20,               // <- mixumum allowed rendered suggestions

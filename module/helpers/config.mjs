@@ -312,36 +312,18 @@ const lingeringWoundImmunities = [
   { key: "sinImmunity", value: "ABBREW.Traits.WoundImmunities.sinImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "sin" }
 ]
 
-const skillTriggers = [
-  { key: "guardRestoreTrigger", value: "ABBREW.Traits.SkillTriggers.guardRestore", feature: "skillTrigger", subFeature: "guard", effect: "", data: "guardRestore" },
-  { key: "attackTrigger", value: "ABBREW.Traits.SkillTriggers.attack", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "attack" },
-  { key: "overpowerTrigger", value: "ABBREW.Traits.SkillTriggers.overpower", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "overpower" },
-  { key: "feintTrigger", value: "ABBREW.Traits.SkillTriggers.feint", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "feint" },
-  { key: "finisherTrigger", value: "ABBREW.Traits.SkillTriggers.finisher", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "finisher" },
-]
-
-const skillBlockers = [
-  { key: "guardRestoreBlocker", value: "ABBREW.Traits.SkillBlockers.guardRestore", feature: "skillBlocker", subFeature: "guard", effect: "block", data: "guardRestore" },
-  { key: "parryBlocker", value: "ABBREW.Traits.SkillBlockers.parry", feature: "skillBlocker", subFeature: "defensiveSkills", effect: "block", data: "parry" },
-]
-
-const skillEnablers = [
-  { key: "overpowerEnable", value: "ABBREW.Traits.SkillEnablers.overpower", feature: "skillEnabler", subFeature: "offensiveSkills", effect: "enable", data: "overpower" }
-]
-
-const valueReplacers = [
-  { key: "shieldTrainingReplacer", value: "ABBREW.Traits.ValueReplacers.shieldTraining", feature: "valueReplacer", subFeature: "system.action.modifiers.guard.self.value", effect: "replace", data: "actor.system.heldArmourGuard" },
+const skillTraining = [
+  { key: "overpowerTraining", value: "ABBREW.Traits.SkillTraining.overpower", feature: "skillTraining", subFeature: "offensiveSkills", effect: "increase", data: "overpower" },
+  { key: "feintTraining", value: "ABBREW.Traits.SkillTraining.feint", feature: "skillTraining", subFeature: "offensiveSkills", effect: "increase", data: "feint" },
+  { key: "parryTraining", value: "ABBREW.Traits.SkillTraining.parry", feature: "skillTraining", subFeature: "defensiveSkills", effect: "increase", data: "parry" },
+  { key: "feintCounterTraining", value: "ABBREW.Traits.SkillTraining.feintCounter", feature: "skillTraining", subFeature: "offensiveSkills", effect: "increase", data: "feintCounter" },
+  { key: "parryCounterTraining", value: "ABBREW.Traits.SkillTraining.parryCounter", feature: "skillTraining", subFeature: "defensiveSkills", effect: "increase", data: "parryCounter" }
 ]
 
 ABBREW.traits = [
   ...lingeringWoundImmunities,
-  ...skillTriggers,
-  ...skillEnablers,
-  ...skillBlockers,
-  ...valueReplacers,
+  ...skillTraining,
 ]
-
-ABBREW.skillTriggers = skillTriggers;
 
 ABBREW.attackModes = {
   "attack": "ABBREW.AttackModes.attack",

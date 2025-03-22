@@ -151,7 +151,7 @@ async function applySkillEffects(actor, skill) {
     }, 0) + attackProfile.lethal;
     const showAttack = ["attack", "feint", "finisher"].includes(attackMode);
     const isFeint = attackMode === "feint";
-    const showParry = game.user.targets.some((t) => t.actor.doesActorHaveSkillTrait("skillEnabler", "defensiveSkills", "enable", "parry"));
+    const showParry = true;
     const isStrongAttack = attackMode === "overpower";
     const showFinisher = attackMode === "finisher" || totalSuccesses > 0;
     const isFinisher = attackMode === "finisher";
@@ -170,7 +170,7 @@ async function applySkillEffects(actor, skill) {
       showParry,
       actionCost: skill.system.action.actionCost
     };
-    data = { ...data, totalSuccesses, damage, isFeint, isStrongAttack, attackProfile, attackingActor: actor, actionCost: skill.system.action.actionCost };
+    data = { ...data, totalSuccesses, damage, isFeint, isStrongAttack, attackProfile, attackingActor: actor, actionCost: skill.system.action.actionCost, attackerSkillTraining: actor.system.skillTraining };
   }
   const html = await renderTemplate("systems/abbrew/templates/chat/skill-card.hbs", templateData);
   const speaker = ChatMessage.getSpeaker({ actor });
@@ -186,7 +186,7 @@ async function applySkillEffects(actor, skill) {
   return {};
 }
 function mergeGuardSelfModifiers(updates, allSkills, actor) {
-  const guardModifiers = allSkills.filter((s) => s.system.action.modifiers.guard.self.operator).map((s) => ({ value: getSkillValueForPath("system.action.modifiers.guard.self.value", s, s.system.action.modifiers.guard.self.value, actor), operator: s.system.action.modifiers.guard.self.operator }));
+  const guardModifiers = allSkills.filter((s) => s.system.action.modifiers.guard.self.operator).map((s) => ({ value: getSkillValueForPath(s.system.action.modifiers.guard.self.value, actor), operator: s.system.action.modifiers.guard.self.operator }));
   if (guardModifiers) {
     const currentGuard = actor.system.defense.guard.value;
     updates["system.defense.guard.value"] = mergeModifiers(guardModifiers, currentGuard);
@@ -315,14 +315,7 @@ function compareModifierIndices(modifier1, modifier2) {
   }
   return 0;
 }
-function getSkillValueForPath(path, skill, rawValue, actor) {
-  const skillTraits = getSafeJson(skill.system.skillTraits, []);
-  const valueReplacers2 = skillTraits.filter((st) => st.feature === "valueReplacer" && st.subFeature === path && st.effect === "replace");
-  if (valueReplacers2 == null ? void 0 : valueReplacers2.length) {
-    const valueReplacer = valueReplacers2.shift();
-    const value = parsePath(valueReplacer.data, actor);
-    return value;
-  }
+function getSkillValueForPath(rawValue, actor) {
   return isNumeric(rawValue) ? parseInt(rawValue) : parsePath(rawValue, actor);
 }
 async function trackSkillDuration(actor, skill) {
@@ -3263,31 +3256,17 @@ const lingeringWoundImmunities = [
   { key: "instabilityImmunity", value: "ABBREW.Traits.WoundImmunities.instabilityImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "instability" },
   { key: "sinImmunity", value: "ABBREW.Traits.WoundImmunities.sinImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "sin" }
 ];
-const skillTriggers = [
-  { key: "guardRestoreTrigger", value: "ABBREW.Traits.SkillTriggers.guardRestore", feature: "skillTrigger", subFeature: "guard", effect: "", data: "guardRestore" },
-  { key: "attackTrigger", value: "ABBREW.Traits.SkillTriggers.attack", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "attack" },
-  { key: "overpowerTrigger", value: "ABBREW.Traits.SkillTriggers.overpower", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "overpower" },
-  { key: "feintTrigger", value: "ABBREW.Traits.SkillTriggers.feint", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "feint" },
-  { key: "finisherTrigger", value: "ABBREW.Traits.SkillTriggers.finisher", feature: "skillTrigger", subFeature: "attacks", effect: "", data: "finisher" }
-];
-const skillBlockers = [
-  { key: "guardRestoreBlocker", value: "ABBREW.Traits.SkillBlockers.guardRestore", feature: "skillBlocker", subFeature: "guard", effect: "block", data: "guardRestore" },
-  { key: "parryBlocker", value: "ABBREW.Traits.SkillBlockers.parry", feature: "skillBlocker", subFeature: "defensiveSkills", effect: "block", data: "parry" }
-];
-const skillEnablers = [
-  { key: "overpowerEnable", value: "ABBREW.Traits.SkillEnablers.overpower", feature: "skillEnabler", subFeature: "offensiveSkills", effect: "enable", data: "overpower" }
-];
-const valueReplacers = [
-  { key: "shieldTrainingReplacer", value: "ABBREW.Traits.ValueReplacers.shieldTraining", feature: "valueReplacer", subFeature: "system.action.modifiers.guard.self.value", effect: "replace", data: "actor.system.heldArmourGuard" }
+const skillTraining = [
+  { key: "overpowerTraining", value: "ABBREW.Traits.SkillTraining.overpower", feature: "skillTraining", subFeature: "offensiveSkills", effect: "increase", data: "overpower" },
+  { key: "feintTraining", value: "ABBREW.Traits.SkillTraining.feint", feature: "skillTraining", subFeature: "offensiveSkills", effect: "increase", data: "feint" },
+  { key: "parryTraining", value: "ABBREW.Traits.SkillTraining.parry", feature: "skillTraining", subFeature: "defensiveSkills", effect: "increase", data: "parry" },
+  { key: "feintCounterTraining", value: "ABBREW.Traits.SkillTraining.feintCounter", feature: "skillTraining", subFeature: "offensiveSkills", effect: "increase", data: "feintCounter" },
+  { key: "parryCounterTraining", value: "ABBREW.Traits.SkillTraining.parryCounter", feature: "skillTraining", subFeature: "defensiveSkills", effect: "increase", data: "parryCounter" }
 ];
 ABBREW.traits = [
   ...lingeringWoundImmunities,
-  ...skillTriggers,
-  ...skillEnablers,
-  ...skillBlockers,
-  ...valueReplacers
+  ...skillTraining
 ];
-ABBREW.skillTriggers = skillTriggers;
 ABBREW.attackModes = {
   "attack": "ABBREW.AttackModes.attack",
   "feint": "ABBREW.AttackModes.feint",
@@ -3386,6 +3365,12 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       overpower: new fields.StringField({ ...blankString }),
       finisher: new fields.StringField({ ...blankString })
     });
+    schema.skillTraining = new fields.ArrayField(
+      new fields.SchemaField({
+        type: new fields.StringField({ ...blankString }),
+        value: new fields.NumberField({ ...requiredInteger })
+      })
+    );
     schema.attributes = new fields.SchemaField(Object.keys(CONFIG.ABBREW.attributes).reduce((obj, attribute) => {
       obj[attribute] = new fields.SchemaField({
         value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 9 }),
@@ -3406,6 +3391,13 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     }
     this.defense.risk.value = Math.floor(this.defense.risk.raw / 10);
     this.defense.resolve.max = 2 + Math.floor((this._getMaxFromPhysicalAttributes() + this._getMaxFromMentalAttributes()) / 2);
+    this.skillTraining = [
+      { type: "overpower", value: 0 },
+      { type: "parry", value: 0 },
+      { type: "feint", value: 0 },
+      { type: "parryCounter", value: 0 },
+      { type: "feintCounter", value: 0 }
+    ];
   }
   _getMaxFromPhysicalAttributes() {
     return this._getMaxFromAttributes(["str", "con", "dex", "agi"]);
@@ -3430,11 +3422,20 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     this._prepareMovement(anatomy);
     this._prepareDefenses();
     this._prepareResolve();
-    this.meta.skillList = this.parent.items.filter((i) => i.type === "skill").map((s) => ({ label: s.name, value: s._id }));
     Object.keys(this.proxiedSkills).forEach((ps) => {
       const item = this.parent.items.find((i) => i.name.toLowerCase() === ps);
       this.proxiedSkills[ps] = item == null ? void 0 : item._id;
     });
+    const skillTraining2 = this.parent.items.filter((i) => i.type === "skill").filter((s) => s.system.skillTraits).flatMap((s) => getSafeJson(s.system.skillTraits, []).filter((st) => st.feature === "skillTraining").map((st) => st.data)).reduce((result, st) => {
+      if (st in result) {
+        result[st] += 1;
+      } else {
+        result[st] = 1;
+      }
+      return result;
+    }, {});
+    const mappedTraining = Object.entries(skillTraining2).map((e) => ({ type: e[0], value: e[1] }));
+    this.skillTraining = foundry.utils.mergeObject(this.skillTraining, mappedTraining);
   }
   _prepareAnatomy() {
     const res = this.parent.items.filter((i) => i.type == "anatomy").reduce((result, a) => {
@@ -3994,8 +3995,7 @@ class AbbrewWeapon extends AbbrewPhysicalItem {
   }
   // Post Active Effects
   prepareDerivedData() {
-    this.isFeintTrained = this.doesParentActorHaveSkillTrait("skillEnabler", "offensiveSkills", "enable", "feint");
-    this.isOverpowerTrained = this.doesParentActorHaveSkillTrait("skillEnabler", "offensiveSkills", "enable", "overpower");
+    this.isOverpowerTrained = this.doesParentActorHaveSkillTrait("skillTraining", "offensiveSkills", "increase", "overpower");
   }
   doesParentActorHaveSkillTrait(feature, subFeature, effect, data) {
     var _a, _b;
@@ -4083,6 +4083,34 @@ class AbbrewCreatureForm extends AbbrewItemBase {
     return schema;
   }
 }
+function getDefenderAdvantageGuardResult(skillTraining2, attackCounterTraining, damage) {
+  const trainingResult = skillTraining2 - attackCounterTraining;
+  if (trainingResult > 0) {
+    return 0;
+  }
+  return 0;
+}
+function getDefenderAdvantageRiskResult(skillTraining2, attackCounterTraining, damage, inflexibility) {
+  const trainingResult = skillTraining2 - attackCounterTraining;
+  if (trainingResult > 0) {
+    return 0;
+  }
+  return Math.min(damage, inflexibility);
+}
+function getAttackerAdvantageGuardResult(counterTraining, attackerSkillTraining, damage) {
+  const trainingResult = attackerSkillTraining - counterTraining;
+  if (trainingResult > 0) {
+    return damage;
+  }
+  return damage;
+}
+function getAttackerAdvantageRiskResult(counterTraining, attackerSkillTraining, damage, inflexibility) {
+  const trainingResult = attackerSkillTraining - counterTraining;
+  if (trainingResult > 0) {
+    return 2 * Math.min(damage, inflexibility);
+  }
+  return Math.min(damage, inflexibility);
+}
 const FINISHERS = {
   "bludgeoning": {
     1: { "type": "bludgeoning", "wounds": [{ "type": "physical", "value": 1 }], "text": "Target is wounded" },
@@ -4143,14 +4171,17 @@ class AbbrewActor extends Actor {
     return { ...super.getRollData(), ...((_b = (_a = this.system).getRollData) == null ? void 0 : _b.call(_a)) ?? null };
   }
   async takeDamage(rolls, data, action) {
+    var _a, _b;
     Hooks.call("actorTakesDamage", this);
     let guard = this.system.defense.guard.value;
     let risk = this.system.defense.risk.raw;
     const inflexibility = this.system.defense.inflexibility.raw;
+    const attackingActorParryCounter = ((_a = data.attackerSkillTraining.find((st) => st.type === "parryCounter")) == null ? void 0 : _a.value) ?? 0;
+    const attackingActorFeint = ((_b = data.attackerSkillTraining.find((st) => st.type === "feint")) == null ? void 0 : _b.value) ?? 0;
     let damage = this.applyModifiersToDamage(rolls, data, action);
-    const updateRisk = this.calculateRisk(damage, guard, risk, inflexibility, data.isFeint, data.isStrongAttack, action);
+    const updateRisk = this.calculateRisk(damage, guard, risk, inflexibility, data.isFeint, data.isStrongAttack, action, attackingActorParryCounter, attackingActorFeint);
     let overFlow = updateRisk > 100 ? updateRisk - 100 : 0;
-    const updates = { "system.defense.guard.value": await this.calculateGuard(damage + overFlow, guard, data.isFeint, data.isStrongAttack, action), "system.defense.risk.raw": updateRisk };
+    const updates = { "system.defense.guard.value": await this.calculateGuard(damage + overFlow, guard, data.isFeint, data.isStrongAttack, action, attackingActorParryCounter, attackingActorFeint), "system.defense.risk.raw": updateRisk };
     await this.update(updates);
     await this.renderAttackResultCard(data, action);
     return this;
@@ -4234,10 +4265,11 @@ class AbbrewActor extends Actor {
       return result += dmg;
     }, 0);
   }
-  async calculateGuard(damage, guard, isFeint, isStrongAttack, action) {
-    return guard - this.calculateGuardReduction(damage, guard, isFeint, isStrongAttack, action);
+  async calculateGuard(damage, guard, isFeint, isStrongAttack, action, attackingActorParryCounter, attackingActorFeint) {
+    return guard - this.calculateGuardReduction(damage, guard, isFeint, isStrongAttack, action, attackingActorParryCounter, attackingActorFeint);
   }
-  calculateGuardReduction(damage, guard, isFeint, isStrongAttack, action) {
+  calculateGuardReduction(damage, guard, isFeint, isStrongAttack, action, attackingActorParryCounter, attackingActorFeint) {
+    var _a, _b;
     if (this.noneResult(isFeint, action)) {
       return 0;
     }
@@ -4245,17 +4277,18 @@ class AbbrewActor extends Actor {
       return 0 + damage;
     }
     if (this.attackerGainsAdvantage(isFeint, action)) {
-      return 0 + damage;
+      return getAttackerAdvantageGuardResult(((_a = this.system.skillTraining.find((st) => st.type === "feintCounter")) == null ? void 0 : _a.value) ?? 0, attackingActorFeint, damage);
     }
     if (this.defenderGainsAdvantage(isFeint, action)) {
-      return 0;
+      return getDefenderAdvantageGuardResult(((_b = this.system.skillTraining.find((st) => st.type === "parry")) == null ? void 0 : _b.value) ?? 0, attackingActorParryCounter);
     }
     return 0 + damage;
   }
-  calculateRisk(damage, guard, risk, inflexibility, isFeint, isStrongAttack, action) {
-    return risk + this.calculateRiskIncrease(damage, guard, risk, inflexibility, isFeint, isStrongAttack, action);
+  calculateRisk(damage, guard, risk, inflexibility, isFeint, isStrongAttack, action, attackingActorParryCounter, attackingActorFeint) {
+    return risk + this.calculateRiskIncrease(damage, guard, risk, inflexibility, isFeint, isStrongAttack, action, attackingActorParryCounter, attackingActorFeint);
   }
-  calculateRiskIncrease(damage, guard, risk, inflexibility, isFeint, isStrongAttack, action) {
+  calculateRiskIncrease(damage, guard, risk, inflexibility, isFeint, isStrongAttack, action, attackingActorParryCounter, attackingActorFeint) {
+    var _a, _b;
     if (this.noneResult(isFeint, action)) {
       return 0;
     }
@@ -4263,10 +4296,10 @@ class AbbrewActor extends Actor {
       return Math.min(damage, inflexibility);
     }
     if (this.attackerGainsAdvantage(isFeint, action)) {
-      return 2 * Math.min(damage, inflexibility);
+      return getAttackerAdvantageRiskResult(((_a = this.system.skillTraining.find((st) => st.type === "feintCounter")) == null ? void 0 : _a.value) ?? 0, attackingActorFeint, damage, inflexibility);
     }
     if (this.defenderGainsAdvantage(isFeint, action)) {
-      return 0;
+      return getDefenderAdvantageRiskResult(((_b = this.system.skillTraining.find((st) => st.type === "parry")) == null ? void 0 : _b.value) ?? 0, attackingActorParryCounter, damage, inflexibility);
     }
     return Math.min(damage, inflexibility);
   }
@@ -5102,10 +5135,9 @@ class AbbrewSkillSheet extends ItemSheet {
     }
   }
   _activateSkillModifiers(html) {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c;
     const skillSynergy = html[0].querySelector('input[name="system.skillModifiers.synergy"]');
     const skillDiscord = html[0].querySelector('input[name="system.skillModifiers.discord"]');
-    Object.entries((_b = (_a = this.item) == null ? void 0 : _a.actor) == null ? void 0 : _b.system.proxiedSkills).filter((ps) => ps[1]).map((ps) => ({ value: CONFIG.ABBREW.proxiedSkills[ps[0]], id: ps[1] }));
     const settings = {
       dropdown: {
         maxItems: 20,
@@ -5123,7 +5155,7 @@ class AbbrewSkillSheet extends ItemSheet {
       // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
       duplicates: false,
       // <- Should duplicate tags be allowed or not
-      whitelist: [...((_e = (_d = (_c = this.item) == null ? void 0 : _c.actor) == null ? void 0 : _d.items) == null ? void 0 : _e.filter((i) => i.type === "skill").map((s) => ({ value: s.name, id: s._id }))) ?? []]
+      whitelist: [...((_c = (_b = (_a = this.item) == null ? void 0 : _a.actor) == null ? void 0 : _b.items) == null ? void 0 : _c.filter((i) => i.type === "skill").map((s) => ({ value: s.name, id: s._id }))) ?? []]
     };
     if (skillSynergy) {
       new Tagify(skillSynergy, settings);

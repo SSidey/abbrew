@@ -1,3 +1,5 @@
+import { getSafeJson } from "../helpers/utils.mjs";
+
 export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
   get traitsData() {
@@ -88,6 +90,13 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       finisher: new fields.StringField({ ...blankString })
     });
 
+    schema.skillTraining = new fields.ArrayField(
+      new fields.SchemaField({
+        type: new fields.StringField({ ...blankString }),
+        value: new fields.NumberField({ ...requiredInteger })
+      })
+    )
+
     // Iterate over attribute names and create a new SchemaField for each.
     schema.attributes = new fields.SchemaField(Object.keys(CONFIG.ABBREW.attributes).reduce((obj, attribute) => {
       obj[attribute] = new fields.SchemaField({
@@ -116,6 +125,14 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     this.defense.risk.value = Math.floor(this.defense.risk.raw / 10);
 
     this.defense.resolve.max = 2 + Math.floor((this._getMaxFromPhysicalAttributes() + this._getMaxFromMentalAttributes()) / 2);
+
+    this.skillTraining = ([
+      { type: "overpower", value: 0 },
+      { type: "parry", value: 0 },
+      { type: "feint", value: 0 },
+      { type: "parryCounter", value: 0 },
+      { type: "feintCounter", value: 0 }
+    ])
   }
 
   _getMaxFromPhysicalAttributes() {
@@ -156,12 +173,15 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
     this._prepareResolve();
 
-    this.meta.skillList = this.parent.items.filter(i => i.type === "skill").map(s => ({ label: s.name, value: s._id }));
-
     Object.keys(this.proxiedSkills).forEach(ps => {
       const item = this.parent.items.find(i => i.name.toLowerCase() === ps);
       this.proxiedSkills[ps] = item?._id;
     });
+
+    const skillTraining = this.parent.items.filter(i => i.type === "skill").filter(s => s.system.skillTraits).flatMap(s => getSafeJson(s.system.skillTraits, []).filter(st => st.feature === "skillTraining").map(st => st.data)).reduce((result, st) => { if (st in result) { result[st] += 1; } else { result[st] = 1; } return result; }, {});
+    const mappedTraining = Object.entries(skillTraining).map(e => ({ type: e[0], value: e[1] }));
+    this.skillTraining = foundry.utils.mergeObject(this.skillTraining, mappedTraining);
+
   }
 
   _prepareAnatomy() {
