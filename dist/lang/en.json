@@ -117,7 +117,7 @@
       "reaction": "Reaction",
       "other": "Other"
     },
-    "Activatable": "Activatable",
+    "IsActivatable": "Activatable",
     "HasRequirement": "Has Requirement",
     "EquippedWeapon": "Equipped Weapon",
     "Wounds": {

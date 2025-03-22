@@ -60,6 +60,10 @@ async function removeStackFromSkill(skill) {
   await skill.delete();
 }
 async function activateSkill(actor, skill) {
+  if (!skill.system.isActivatable) {
+    ui.notifications.info(`${skill.name} can not be activated`);
+    return;
+  }
   if (isSkillBlocked(actor, skill)) {
     ui.notifications.info(`You are blocked from using ${skill.name}`);
     return;
@@ -83,7 +87,7 @@ async function applySkillEffects(actor, skill) {
   let updates = {};
   const queuedSkills = actor.items.toObject().filter((i) => actor.system.queuedSkills.includes(i._id));
   const queuedSynergies = queuedSkills.filter((s) => s.system.skillModifiers.synergy).map((s) => ({ skill: s, synergy: getSafeJson(s.system.skillModifiers.synergy, []).map((s2) => s2.id) })).filter((s) => s.synergy.includes(skill._id)).map((s) => s.skill);
-  const passiveSkills = actor.items.toObject().filter((i) => i.system.activatable === false);
+  const passiveSkills = actor.items.toObject().filter((i) => i.system.isActivatable === false);
   const passiveSynergies = passiveSkills.filter((s) => s.system.skillModifiers.synergy).map((s) => ({ skill: s, synergy: getSafeJson(s.system.skillModifiers.synergy, []).map((s2) => s2.id) })).filter((s) => s.synergy.includes(skill._id)).map((s) => s.skill);
   const allSkills = [...passiveSynergies, ...queuedSynergies, skill].filter((s) => !s.system.action.charges.hasCharges || s.system.action.charges.value > 0);
   const modifierSkills = [...passiveSynergies, ...queuedSynergies];
@@ -2546,125 +2550,13 @@ class AbbrewActorSheet extends ActorSheet {
     const target = event.target.closest(".skill");
     const id = target.dataset.itemId;
     const skill = this.actor.items.get(id);
-    if (skill.system.action.activationType === "stackRemoval") {
-      if (!await this.actor.canActorUseActions(skill.system.action.actionCost)) {
-        return;
-      }
-      removeStackFromSkill(skill);
-      return;
-    }
-    if (isSkillBlocked(this.actor, skill)) {
-      ui.notifications.info(`You are blocked from using ${skill.name}`);
-      return;
-    }
-    if (skill.system.action.charges.hasCharges && skill.system.action.charges.value > 0) {
-      await applySkillEffects(this.actor, skill);
-      return;
-    }
-    if (skill.system.action.uses.hasUses && !skill.system.action.uses.value > 0) {
-      ui.info("You don't have any more uses of that skill.");
-      return;
-    }
-    if (!await this.actor.canActorUseActions(skill.system.action.actionCost)) {
-      return;
-    }
-    await rechargeSkill(this.actor, skill);
-    await activateSkill(this.actor, skill);
+    await skill.handleSkillActivate(this.actor);
   }
   async _onAttackDamageAction(target, attackMode) {
     const itemId = target.closest("li.item").dataset.itemId;
     const attackProfileId = target.closest("li .attack-profile").dataset.attackProfileId;
     const item = this.actor.items.get(itemId);
-    const attackProfile = item.system.attackProfiles[attackProfileId];
-    const actions = attackMode === "overpower" ? item.system.exertActionCost : item.system.actionCost;
-    if (!await this.actor.canActorUseActions(actions)) {
-      return;
-    }
-    const id = this.actor.system.proxiedSkills[attackMode];
-    const attackSkill = {
-      _id: id,
-      name: item.name,
-      system: {
-        activatable: true,
-        skillTraits: [],
-        skillType: "basic",
-        attributeIncrease: "",
-        attributeIncreaseLong: "",
-        attributeRankIncrease: "",
-        action: {
-          activationType: "standalone",
-          actionCost: actions,
-          actionImage: item.img,
-          duration: {
-            precision: "0.01",
-            value: 0
-          },
-          uses: {
-            hasUses: false,
-            value: 0,
-            max: 0,
-            period: ""
-          },
-          charges: {
-            hasCharges: false,
-            value: 0,
-            max: 0
-          },
-          isActive: false,
-          attackProfile: { ...attackProfile, attackMode, handsSupplied: item.system.handsSupplied, critical: 11 - item.system.handsSupplied },
-          modifiers: {
-            fortune: 0,
-            attackProfile: {},
-            damage: {
-              self: []
-            },
-            guard: {
-              self: {
-                value: 0,
-                operator: ""
-              },
-              target: {
-                value: 0,
-                operator: ""
-              }
-            },
-            risk: {
-              self: {
-                value: 0,
-                operator: ""
-              },
-              target: {
-                value: 0,
-                operator: ""
-              }
-            },
-            wounds: {
-              self: [],
-              target: []
-            },
-            resolve: {
-              self: {
-                value: 0,
-                operator: ""
-              },
-              target: {
-                value: 0,
-                operator: ""
-              }
-            },
-            resources: {
-              self: [],
-              target: []
-            },
-            conceepts: {
-              self: [],
-              target: []
-            }
-          }
-        }
-      }
-    };
-    await applySkillEffects(this.actor, attackSkill);
+    await item.handleAttackDamageAction(this.actor, attackProfileId, attackMode);
   }
   /**
    * Handle creating a new Owned Item for the actor using initial data defined in the HTML dataset
@@ -3788,7 +3680,7 @@ class AbbrewSkill extends AbbrewItemBase {
       discord: new fields.StringField({ ...blankString })
     });
     schema.configurable = new fields.BooleanField({ required: true });
-    schema.activatable = new fields.BooleanField({ required: true, label: "ABBREW.Activatable" });
+    schema.isActivatable = new fields.BooleanField({ required: true, label: "ABBREW.IsActivatable" });
     schema.action = new fields.SchemaField({
       activationType: new fields.StringField({ ...blankString }),
       actionCost: new fields.StringField({ ...blankString }),
@@ -4672,6 +4564,124 @@ class AbbrewItem2 extends Item {
       console.log("general roll");
     }
   }
+  async handleSkillActivate(actor) {
+    if (this.system.action.activationType === "stackRemoval") {
+      if (!await actor.canActorUseActions(this.system.action.actionCost)) {
+        return;
+      }
+      removeStackFromSkill(this);
+      return;
+    }
+    if (isSkillBlocked(actor, this)) {
+      ui.notifications.info(`You are blocked from using ${this.name}`);
+      return;
+    }
+    if (this.system.action.charges.hasCharges && this.system.action.charges.value > 0) {
+      await applySkillEffects(actor, this);
+      return;
+    }
+    if (this.system.action.uses.hasUses && !this.system.action.uses.value > 0) {
+      ui.info(`You don't have any more uses of ${this.name}.`);
+      return;
+    }
+    if (!await actor.canActorUseActions(this.system.action.actionCost)) {
+      return;
+    }
+    await rechargeSkill(actor, this);
+    await activateSkill(actor, this);
+  }
+  async handleAttackDamageAction(actor, attackProfileId, attackMode) {
+    const attackProfile = this.system.attackProfiles[attackProfileId];
+    const actions = attackMode === "overpower" ? this.system.exertActionCost : this.system.actionCost;
+    if (!await actor.canActorUseActions(actions)) {
+      return;
+    }
+    const id = actor.system.proxiedSkills[attackMode];
+    const attackSkill = {
+      _id: id,
+      name: this.name,
+      system: {
+        isActivatable: true,
+        skillTraits: [],
+        skillType: "basic",
+        attributeIncrease: "",
+        attributeIncreaseLong: "",
+        attributeRankIncrease: "",
+        action: {
+          activationType: "standalone",
+          actionCost: actions,
+          actionImage: this.img,
+          duration: {
+            precision: "0.01",
+            value: 0
+          },
+          uses: {
+            hasUses: false,
+            value: 0,
+            max: 0,
+            period: ""
+          },
+          charges: {
+            hasCharges: false,
+            value: 0,
+            max: 0
+          },
+          isActive: false,
+          attackProfile: { ...attackProfile, attackMode, handsSupplied: this.system.handsSupplied, critical: 11 - this.system.handsSupplied },
+          modifiers: {
+            fortune: 0,
+            attackProfile: {},
+            damage: {
+              self: []
+            },
+            guard: {
+              self: {
+                value: 0,
+                operator: ""
+              },
+              target: {
+                value: 0,
+                operator: ""
+              }
+            },
+            risk: {
+              self: {
+                value: 0,
+                operator: ""
+              },
+              target: {
+                value: 0,
+                operator: ""
+              }
+            },
+            wounds: {
+              self: [],
+              target: []
+            },
+            resolve: {
+              self: {
+                value: 0,
+                operator: ""
+              },
+              target: {
+                value: 0,
+                operator: ""
+              }
+            },
+            resources: {
+              self: [],
+              target: []
+            },
+            conceepts: {
+              self: [],
+              target: []
+            }
+          }
+        }
+      }
+    };
+    await applySkillEffects(actor, attackSkill);
+  }
 }
 function registerSystemSettings() {
   game.settings.register("abbrew", "announceTurnStart", {
@@ -5146,6 +5156,7 @@ Hooks.once("init", function() {
   game.abbrew = {
     AbbrewActor,
     AbbrewItem: AbbrewItem2,
+    useSkillMacro,
     rollItemMacro
   };
   CONFIG.ABBREW = ABBREW;
@@ -5272,7 +5283,10 @@ Handlebars.registerHelper("isGM", function() {
   return game.user.isGM;
 });
 Hooks.once("ready", function() {
-  Hooks.on("hotbarDrop", (bar, data, slot) => createItemMacro(data, slot));
+  Hooks.on("hotbarDrop", (bar, data, slot) => {
+    createItemMacro(data, slot);
+    return false;
+  });
 });
 Hooks.on("combatStart", async (combat, updateData, updateOptions) => {
   const actors = combat.combatants.toObject().map((c) => canvas.tokens.get(c.tokenId).actor);
@@ -5369,6 +5383,11 @@ async function handleActorAnatomyDrop(actor, anatomy) {
   await actor.acceptAnatomy(anatomy);
 }
 async function createItemMacro(data, slot) {
+  if (data.type === "Macro") {
+    const macro = game.macros.find((m) => m._id === foundry.utils.parseUuid(data.uuid).id);
+    game.user.assignHotbarMacro(macro, slot);
+    return false;
+  }
   if (data.type !== "Item")
     return;
   if (!data.uuid.includes("Actor.") && !data.uuid.includes("Token.")) {
@@ -5377,12 +5396,16 @@ async function createItemMacro(data, slot) {
     );
   }
   const item = await Item.fromDropData(data);
-  let command = "";
   if (item.type === "skill") {
-    command = `game.abbrew.rollItemMacro("${data.uuid}");`;
+    await createSkillMacro(item, slot);
+    return false;
   } else {
-    command = `game.abbrew.rollItemMacro("${data.uuid}");`;
+    await createRollMacro(data, item, slot);
+    return false;
   }
+}
+async function createRollMacro(data, item, slot) {
+  command = `game.abbrew.rollItemMacro("${data.uuid}");`;
   let macro = game.macros.find(
     (m) => m.name === item.name && m.command === command
   );
@@ -5398,6 +5421,24 @@ async function createItemMacro(data, slot) {
   game.user.assignHotbarMacro(macro, slot);
   return false;
 }
+async function createSkillMacro(skill, slot) {
+  let command2 = "await game.abbrew.useSkillMacro(this);";
+  let macro = game.macros.find(
+    (m) => m.name === skill.name && skill.command === command2
+  );
+  if (!macro) {
+    const skillId = skill._id;
+    macro = await Macro.create({
+      name: skill.name,
+      type: "script",
+      scope: "actor",
+      img: skill.img,
+      command: command2,
+      flags: { "abbrew.itemMacro": true, "abbrew.skillMacro.skillId": skillId }
+    });
+  }
+  game.user.assignHotbarMacro(macro, slot);
+}
 function rollItemMacro(itemUuid) {
   const dropData = {
     type: "Item",
@@ -5412,6 +5453,26 @@ function rollItemMacro(itemUuid) {
     }
     item.roll();
   });
+}
+async function useSkillMacro(macroData) {
+  const skillId = macroData.flags.abbrew.skillMacro.skillId;
+  const actor = game.user.character ?? getControlledActor();
+  if (!actor) {
+    ui.warn(`You must select a token.`);
+  }
+  const skill = actor.items.find((i) => i._id === skillId);
+  if ((skill == null ? void 0 : skill.type) !== "skill") {
+    ui.warn(`${skill.name} is not a skill.`);
+    return;
+  }
+  await skill.handleSkillActivate(actor);
+}
+function getControlledActor() {
+  const tokens = canvas.tokens.controlled.filter((token) => token.actor);
+  if (tokens.length === 0) {
+    return null;
+  }
+  return tokens[0].actor;
 }
 function applyCustomEffects(actor, change) {
   console.log("CUSTOM");

@@ -26,6 +26,7 @@ Hooks.once('init', function () {
   game.abbrew = {
     AbbrewActor: documents.AbbrewActor,
     AbbrewItem: documents.AbbrewItem,
+    useSkillMacro,
     rollItemMacro,
   };
 
@@ -209,7 +210,7 @@ Handlebars.registerHelper('isGM', function () {
 
 Hooks.once('ready', function () {
   // Wait to register hotbar drop hook on ready so that modules could register earlier if they want to
-  Hooks.on('hotbarDrop', (bar, data, slot) => createItemMacro(data, slot));
+  Hooks.on('hotbarDrop', (bar, data, slot) => { createItemMacro(data, slot); return false; });
 });
 
 /* -------------------------------------------- */
@@ -351,6 +352,11 @@ async function handleActorAnatomyDrop(actor, anatomy) {
  * @returns {Promise}
  */
 async function createItemMacro(data, slot) {
+  if (data.type === 'Macro') {
+    const macro = game.macros.find(m => m._id === foundry.utils.parseUuid(data.uuid).id);
+    game.user.assignHotbarMacro(macro, slot);
+    return false;
+  }
   // First, determine if this is a valid owned item.
   if (data.type !== 'Item') return;
   if (!data.uuid.includes('Actor.') && !data.uuid.includes('Token.')) {
@@ -363,15 +369,19 @@ async function createItemMacro(data, slot) {
 
   let command = "";
   if (item.type === "skill") {
-    //TODO: Update with actual command
-    command = `game.abbrew.rollItemMacro("${data.uuid}");`;
+    await createSkillMacro(item, slot);
+    return false;
 
   } else {
-    command = `game.abbrew.rollItemMacro("${data.uuid}");`;
+    await createRollMacro(data, item, slot);
+    return false;
   }
+}
+
+async function createRollMacro(data, item, slot) {
+  command = `game.abbrew.rollItemMacro("${data.uuid}");`;
 
   // Create the macro command using the uuid.
-
   let macro = game.macros.find(
     (m) => m.name === item.name && m.command === command
   );
@@ -386,6 +396,25 @@ async function createItemMacro(data, slot) {
   }
   game.user.assignHotbarMacro(macro, slot);
   return false;
+}
+
+async function createSkillMacro(skill, slot) {
+  let command = "await game.abbrew.useSkillMacro(this);";
+  let macro = game.macros.find(
+    (m) => m.name === skill.name && skill.command === command
+  );
+  if (!macro) {
+    const skillId = skill._id;
+    macro = await Macro.create({
+      name: skill.name,
+      type: 'script',
+      scope: 'actor',
+      img: skill.img,
+      command: command,
+      flags: { 'abbrew.itemMacro': true, 'abbrew.skillMacro.skillId': skillId },
+    });
+  }
+  game.user.assignHotbarMacro(macro, slot);
 }
 
 /**
@@ -412,6 +441,31 @@ function rollItemMacro(itemUuid) {
     // Trigger the item roll
     item.roll();
   });
+}
+
+async function useSkillMacro(macroData) {
+  const skillId = macroData.flags.abbrew.skillMacro.skillId;
+
+  const actor = game.user.character ?? getControlledActor();
+  if (!actor) {
+    ui.warn(`You must select a token.`);
+  }
+
+  const skill = actor.items.find(i => i._id === skillId);
+  if (skill?.type !== "skill") {
+    ui.warn(`${skill.name} is not a skill.`);
+    return;
+  }
+
+  await skill.handleSkillActivate(actor);
+}
+
+function getControlledActor() {
+  const tokens = canvas.tokens.controlled.filter((token) => token.actor);
+  if (tokens.length === 0) {
+    return null;
+  }
+  return tokens[0].actor;
 }
 
 function applyCustomEffects(actor, change) {

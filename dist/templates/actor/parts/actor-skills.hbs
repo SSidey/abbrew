@@ -24,7 +24,7 @@
             <img src='{{item.img}}' title='{{item.name}}' />
           </a>
         </div>
-        {{#if item.system.activatable}}
+        {{#if item.system.isActivatable}}
         <button class="skill-activate" type="button"><span
             class="actions-icon action-{{item.system.action.actionImage}}">Activate</span></button>
         {{/if}}

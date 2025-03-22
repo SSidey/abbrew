@@ -13,6 +13,11 @@ export async function removeStackFromSkill(skill) {
 }
 
 export async function activateSkill(actor, skill) {
+    if (!skill.system.isActivatable) {
+        ui.notifications.info(`${skill.name} can not be activated`);
+        return;
+    }
+
     if (isSkillBlocked(actor, skill)) {
         ui.notifications.info(`You are blocked from using ${skill.name}`);
         return;
@@ -44,7 +49,7 @@ export async function applySkillEffects(actor, skill) {
     // Get all synergies that apply to the main skill
     const queuedSynergies = queuedSkills.filter(s => s.system.skillModifiers.synergy).map(s => ({ skill: s, synergy: getSafeJson(s.system.skillModifiers.synergy, []).map(s => s.id) })).filter(s => s.synergy.includes(skill._id)).map(s => s.skill)
     // Get all passives
-    const passiveSkills = actor.items.toObject().filter(i => i.system.activatable === false);
+    const passiveSkills = actor.items.toObject().filter(i => i.system.isActivatable === false);
     // Get passives that have synergy with the main skill
     const passiveSynergies = passiveSkills.filter(s => s.system.skillModifiers.synergy).map(s => ({ skill: s, synergy: getSafeJson(s.system.skillModifiers.synergy, []).map(s => s.id) })).filter(s => s.synergy.includes(skill._id)).map(s => s.skill)
     // Combine all relevant skills, filtering for those that are out of charges

@@ -426,134 +426,14 @@ export class AbbrewActorSheet extends ActorSheet {
     const id = target.dataset.itemId;
     const skill = this.actor.items.get(id);
 
-    if (skill.system.action.activationType === "stackRemoval") {
-      if (!await this.actor.canActorUseActions(skill.system.action.actionCost)) {
-        return;
-      }
-      removeStackFromSkill(skill);
-      return;
-    }
-
-    if (isSkillBlocked(this.actor, skill)) {
-      ui.notifications.info(`You are blocked from using ${skill.name}`);
-      return;
-    }
-
-    if (skill.system.action.charges.hasCharges && skill.system.action.charges.value > 0) {
-      await applySkillEffects(this.actor, skill);
-      return;
-    }
-
-    if (skill.system.action.uses.hasUses && !skill.system.action.uses.value > 0) {
-      ui.info("You don't have any more uses of that skill.");
-      return;
-    }
-
-    if (!await this.actor.canActorUseActions(skill.system.action.actionCost)) {
-      return;
-    }
-
-    await rechargeSkill(this.actor, skill);
-    await activateSkill(this.actor, skill);
+    await skill.handleSkillActivate(this.actor);
   }
 
   async _onAttackDamageAction(target, attackMode) {
     const itemId = target.closest('li.item').dataset.itemId;
     const attackProfileId = target.closest('li .attack-profile').dataset.attackProfileId;
     const item = this.actor.items.get(itemId);
-    const attackProfile = item.system.attackProfiles[attackProfileId];
-    const actions = attackMode === "overpower" ? item.system.exertActionCost : item.system.actionCost;
-    if (!await this.actor.canActorUseActions(actions)) {
-      return;
-    }
-
-    const id = this.actor.system.proxiedSkills[attackMode];
-
-    const attackSkill = {
-      _id: id,
-      name: item.name,
-      system: {
-        activatable: true,
-        skillTraits: [],
-        skillType: "basic",
-        attributeIncrease: "",
-        attributeIncreaseLong: "",
-        attributeRankIncrease: "",
-        action: {
-          activationType: "standalone",
-          actionCost: actions,
-          actionImage: item.img,
-          duration: {
-            precision: "0.01",
-            value: 0
-          },
-          uses: {
-            hasUses: false,
-            value: 0,
-            max: 0,
-            period: ""
-          },
-          charges: {
-            hasCharges: false,
-            value: 0,
-            max: 0
-          },
-          isActive: false,
-          attackProfile: { ...attackProfile, attackMode: attackMode, handsSupplied: item.system.handsSupplied, critical: 11 - item.system.handsSupplied },
-          modifiers: {
-            fortune: 0,
-            attackProfile: {},
-            damage: {
-              self: []
-            },
-            guard: {
-              self: {
-                value: 0,
-                operator: ""
-              },
-              target: {
-                value: 0,
-                operator: ""
-              }
-            },
-            risk: {
-              self: {
-                value: 0,
-                operator: ""
-              },
-              target: {
-                value: 0,
-                operator: ""
-              }
-            },
-            wounds: {
-              self: [],
-              target: []
-            },
-            resolve: {
-              self: {
-                value: 0,
-                operator: ""
-              },
-              target: {
-                value: 0,
-                operator: ""
-              }
-            },
-            resources: {
-              self: [],
-              target: []
-            },
-            conceepts: {
-              self: [],
-              target: []
-            }
-          }
-        }
-      }
-    }
-
-    await applySkillEffects(this.actor, attackSkill);
+    await item.handleAttackDamageAction(this.actor, attackProfileId, attackMode);
   }
 
   /**

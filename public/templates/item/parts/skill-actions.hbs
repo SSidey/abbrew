@@ -1,14 +1,14 @@
 <label class="slide-toggle roboto-upper">
-    <input type="checkbox" class="action-activatable" name="system.activatable" {{ checked system.activatable }}>
-    <span>{{localize "ABBREW.Activatable"}}</span>
-    {{#if system.activatable}}
+    <input type="checkbox" class="action-activatable" name="system.isActivatable" {{ checked system.isActivatable }}>
+    <span>{{localize "ABBREW.IsActivatable"}}</span>
+    {{#if system.isActivatable}}
     <i class="fa fa-toggle-on"></i>
     {{else}}
     <i class="fa fa-toggle-off"></i>
     {{/if}}
 </label>
 <div class="item action">
-    {{#if system.activatable}}
+    {{#if system.isActivatable}}
     <div class="form-group">
         <label>{{ localize "ABBREW.SkillActivationType" }}</label>
         <select name="system.action.activationType">

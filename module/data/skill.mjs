@@ -14,7 +14,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
             discord: new fields.StringField({ ...blankString })
         });
         schema.configurable = new fields.BooleanField({ required: true });
-        schema.activatable = new fields.BooleanField({ required: true, label: "ABBREW.Activatable" });
+        schema.isActivatable = new fields.BooleanField({ required: true, label: "ABBREW.IsActivatable" });
         schema.action = new fields.SchemaField({
             activationType: new fields.StringField({ ...blankString }),
             actionCost: new fields.StringField({ ...blankString }),
