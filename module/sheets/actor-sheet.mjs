@@ -36,7 +36,7 @@ export class AbbrewActorSheet extends ActorSheet {
   /* -------------------------------------------- */
 
   /** @override */
-  getData() {
+  async getData() {
     // Retrieve the data structure from the base sheet. You can inspect or log
     // the context variable to see the structure, but some key properties for
     // sheets are the actor object, the data object, whether or not it's
@@ -61,8 +61,21 @@ export class AbbrewActorSheet extends ActorSheet {
       this._prepareItems(context);
     }
 
-    // Add roll data for TinyMCE editors.
-    context.rollData = context.actor.getRollData();
+    // Enrich biography info for display
+    // Enrichment turns text like `[[/r 1d20]]` into buttons
+    context.enrichedBiography = await TextEditor.enrichHTML(
+      this.actor.system.biography,
+      {
+        // Whether to show secret blocks in the finished html
+        secrets: this.document.isOwner,
+        // Necessary in v11, can be removed in v12
+        async: true,
+        // Data to fill in for inline rolls
+        rollData: this.actor.getRollData(),
+        // Relative UUID resolution
+        relativeTo: this.actor,
+      }
+    );
 
     // Prepare active effects
     context.effects = prepareActiveEffectCategories(

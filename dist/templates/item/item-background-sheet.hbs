@@ -20,7 +20,8 @@
             {{!-- To render inline rolls in a TinyMCE editor, you need to pass the parent actor's (if any) roll data to
             the
             rollData prop. --}}
-            {{editor system.description target="system.description" rollData=rollData button=true owner=owner
+            {{editor enrichedDescription target="system.description" engine="prosemirror" rollData=rollData button=true
+            owner=owner
             editable=editable}}
         </div>
 
@@ -64,7 +65,8 @@
                 <div class="skill-deck-summary">
                     <div class="image-container"><img src="{{system.creatureForm.image}}" /></div>
                     <div class="name"><span>{{system.creatureForm.name}}</span></div>
-                    <a class='item-control creature-form-delete' title='{{localize "DOCUMENT.Delete" type=' creatureForm'}}'>
+                    <a class='item-control creature-form-delete' title='{{localize "DOCUMENT.Delete" type='
+                        creatureForm'}}'>
                         <i class='fas fa-trash'></i>
                     </a>
                 </div>

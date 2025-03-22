@@ -18,7 +18,7 @@
 
     {{!-- Description Tab --}}
     <div class="tab" data-group="primary" data-tab="description">
-      {{editor system.description target="system.description" rollData=rollData button=true owner=owner
+      {{editor enrichedDescription target="system.description" engine="prosemirror"  rollData=rollData button=true owner=owner
       editable=editable}}
     </div>
 
@@ -26,17 +26,21 @@
     <div class="tab attributes" data-group="primary" data-tab="attributes">
       <div class="grid-span-2">
         <label class="resource-label">Skill Traits</label>
-        <input type="text" name="system.skillTraits" value="{{system.skillTraits}}" data-dtype="String" />
+        <input type="text" name="system.skillTraits" value="{{system.skillTraits}}" data-dtype="String" {{#unless
+          (isGM)}}readonly{{/unless}} />
       </div>
       <div class="grid-span-2">
         <label class="resource-label">Synergy</label>
-        <input type="text" name="system.skillModifiers.synergy" value="{{system.skillModifiers.synergy}}" data-dtype="String" />
+        <input type="text" name="system.skillModifiers.synergy" value="{{system.skillModifiers.synergy}}"
+          data-dtype="String" />
       </div>
       <div class="grid-span-2">
         <label class="resource-label">Discord</label>
-        <input type="text" name="system.skillModifiers.discord" value="{{system.skillModifiers.discord}}" data-dtype="String" />
+        <input type="text" name="system.skillModifiers.discord" value="{{system.skillModifiers.discord}}"
+          data-dtype="String" />
       </div>
       {{!-- As you add new fields, add them in here! --}}
+      {{!-- TODO: Something has broken the edit block --}}
       <label class="slide-toggle roboto-upper">
         <input type="checkbox" id="configurable" name="system.configurable" {{ checked system.configurable }}>
         {{#if system.configurable}}

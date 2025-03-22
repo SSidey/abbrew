@@ -2245,7 +2245,7 @@ class AbbrewActorSheet extends ActorSheet {
   }
   /* -------------------------------------------- */
   /** @override */
-  getData() {
+  async getData() {
     const context = super.getData();
     const actorData = context.data;
     context.system = actorData.system;
@@ -2257,7 +2257,19 @@ class AbbrewActorSheet extends ActorSheet {
     if (actorData.type == "npc") {
       this._prepareItems(context);
     }
-    context.rollData = context.actor.getRollData();
+    context.enrichedBiography = await TextEditor.enrichHTML(
+      this.actor.system.biography,
+      {
+        // Whether to show secret blocks in the finished html
+        secrets: this.document.isOwner,
+        // Necessary in v11, can be removed in v12
+        async: true,
+        // Data to fill in for inline rolls
+        rollData: this.actor.getRollData(),
+        // Relative UUID resolution
+        relativeTo: this.actor
+      }
+    );
     context.effects = prepareActiveEffectCategories(
       // A generator that returns all effects stored on the actor
       // as well as any items
@@ -2727,13 +2739,26 @@ class AbbrewItemSheet extends ItemSheet {
   }
   /* -------------------------------------------- */
   /** @override */
-  getData() {
+  async getData() {
     const context = super.getData();
     const itemData = context.data;
     context.rollData = this.item.getRollData();
     context.system = itemData.system;
     context.actions = this.prepareActions(itemData.system);
     context.flags = itemData.flags;
+    context.enrichedDescription = await TextEditor.enrichHTML(
+      this.item.system.description,
+      {
+        // Whether to show secret blocks in the finished html
+        secrets: this.document.isOwner,
+        // Necessary in v11, can be removed in v12
+        async: true,
+        // Data to fill in for inline rolls
+        rollData: this.item.getRollData(),
+        // Relative UUID resolution
+        relativeTo: this.item
+      }
+    );
     context.effects = prepareActiveEffectCategories(this.item.effects);
     context.config = CONFIG.ABBREW;
     return context;
@@ -4681,12 +4706,25 @@ class AbbrewCreatureFormSheet extends ItemSheet {
   }
   /* -------------------------------------------- */
   /** @override */
-  getData() {
+  async getData() {
     const context = super.getData();
     const itemData = context.data;
     context.rollData = this.item.getRollData();
     context.system = itemData.system;
     context.flags = itemData.flags;
+    context.enrichedDescription = await TextEditor.enrichHTML(
+      this.item.system.description,
+      {
+        // Whether to show secret blocks in the finished html
+        secrets: this.document.isOwner,
+        // Necessary in v11, can be removed in v12
+        async: true,
+        // Data to fill in for inline rolls
+        rollData: this.item.getRollData(),
+        // Relative UUID resolution
+        relativeTo: this.item
+      }
+    );
     context.effects = prepareActiveEffectCategories(this.item.effects);
     context.config = CONFIG.ABBREW;
     return context;
@@ -4754,12 +4792,25 @@ class AbbrewSkillDeckSheet extends ItemSheet {
   }
   /* -------------------------------------------- */
   /** @override */
-  getData() {
+  async getData() {
     const context = super.getData();
     const itemData = context.data;
     context.rollData = this.item.getRollData();
     context.system = itemData.system;
     context.flags = itemData.flags;
+    context.enrichedDescription = await TextEditor.enrichHTML(
+      this.item.system.description,
+      {
+        // Whether to show secret blocks in the finished html
+        secrets: this.document.isOwner,
+        // Necessary in v11, can be removed in v12
+        async: true,
+        // Data to fill in for inline rolls
+        rollData: this.item.getRollData(),
+        // Relative UUID resolution
+        relativeTo: this.item
+      }
+    );
     context.effects = prepareActiveEffectCategories(this.item.effects);
     context.config = CONFIG.ABBREW;
     return context;
@@ -4832,12 +4883,25 @@ class AbbrewAnatomySheet extends ItemSheet {
   }
   /* -------------------------------------------- */
   /** @override */
-  getData() {
+  async getData() {
     const context = super.getData();
     const itemData = context.data;
     context.rollData = this.item.getRollData();
     context.system = itemData.system;
     context.flags = itemData.flags;
+    context.enrichedDescription = await TextEditor.enrichHTML(
+      this.item.system.description,
+      {
+        // Whether to show secret blocks in the finished html
+        secrets: this.document.isOwner,
+        // Necessary in v11, can be removed in v12
+        async: true,
+        // Data to fill in for inline rolls
+        rollData: this.item.getRollData(),
+        // Relative UUID resolution
+        relativeTo: this.item
+      }
+    );
     context.effects = prepareActiveEffectCategories(this.item.effects);
     context.config = CONFIG.ABBREW;
     return context;
@@ -4953,12 +5017,25 @@ class AbbrewSkillSheet extends ItemSheet {
   }
   /* -------------------------------------------- */
   /** @override */
-  getData() {
+  async getData() {
     const context = super.getData();
     const itemData = context.data;
     context.rollData = this.item.getRollData();
     context.system = itemData.system;
     context.flags = itemData.flags;
+    context.enrichedDescription = await TextEditor.enrichHTML(
+      this.item.system.description,
+      {
+        // Whether to show secret blocks in the finished html
+        secrets: this.document.isOwner,
+        // Necessary in v11, can be removed in v12
+        async: true,
+        // Data to fill in for inline rolls
+        rollData: this.item.getRollData(),
+        // Relative UUID resolution
+        relativeTo: this.item
+      }
+    );
     context.effects = prepareActiveEffectCategories(this.item.effects);
     context.config = CONFIG.ABBREW;
     return context;
@@ -5185,11 +5262,14 @@ Handlebars.registerHelper("json", function(context) {
   return JSON.stringify(context, void 0, 2);
 });
 Handlebars.registerHelper("gm", function(opts) {
-  if (game.users.current === game.users.activeGM) {
+  if (game.user.isGM) {
     return opts.fn(this);
   } else {
     return opts.inverse(this);
   }
+});
+Handlebars.registerHelper("isGM", function() {
+  return game.user.isGM;
 });
 Hooks.once("ready", function() {
   Hooks.on("hotbarDrop", (bar, data, slot) => createItemMacro(data, slot));
@@ -5297,7 +5377,12 @@ async function createItemMacro(data, slot) {
     );
   }
   const item = await Item.fromDropData(data);
-  const command = `game.abbrew.rollItemMacro("${data.uuid}");`;
+  let command = "";
+  if (item.type === "skill") {
+    command = `game.abbrew.rollItemMacro("${data.uuid}");`;
+  } else {
+    command = `game.abbrew.rollItemMacro("${data.uuid}");`;
+  }
   let macro = game.macros.find(
     (m) => m.name === item.name && m.command === command
   );

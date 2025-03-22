@@ -192,12 +192,16 @@ Handlebars.registerHelper('json', function (context) {
 });
 
 Handlebars.registerHelper('gm', function (opts) {
-  if (game.users.current === game.users.activeGM) {
+  if (game.user.isGM) {
     return opts.fn(this);
   } else {
     return opts.inverse(this);
   }
 });
+
+Handlebars.registerHelper('isGM', function () {
+  return game.user.isGM;
+})
 
 /* -------------------------------------------- */
 /*  Ready Hook                                  */
@@ -357,8 +361,17 @@ async function createItemMacro(data, slot) {
   // If it is, retrieve it based on the uuid.
   const item = await Item.fromDropData(data);
 
+  let command = "";
+  if (item.type === "skill") {
+    //TODO: Update with actual command
+    command = `game.abbrew.rollItemMacro("${data.uuid}");`;
+
+  } else {
+    command = `game.abbrew.rollItemMacro("${data.uuid}");`;
+  }
+
   // Create the macro command using the uuid.
-  const command = `game.abbrew.rollItemMacro("${data.uuid}");`;
+
   let macro = game.macros.find(
     (m) => m.name === item.name && m.command === command
   );
