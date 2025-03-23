@@ -1,4 +1,4 @@
-import { activateSkill, applySkillEffects, isSkillBlocked, rechargeSkill, removeStackFromSkill } from '../helpers/skill.mjs';
+import { getAttackSkillWithActions, getModifiedSkillActionCost, getParrySkillWithActions, handleSkillActivate } from '../helpers/skill.mjs';
 import { doesNestedFieldExist, arrayDifference, getNumericParts, getSafeJson } from '../helpers/utils.mjs';
 /**
  * Extend the basic Item with some very simple modifications.
@@ -118,6 +118,7 @@ export default class AbbrewItem extends Item {
   static async _onAcceptDamageAction(rolls, data, action) {
     const tokens = canvas.tokens.controlled.filter((token) => token.actor);
     if (tokens.length === 0) {
+      ui.notifications.info("Please select a token to accept the effect.");
       return;
     }
 
@@ -129,9 +130,11 @@ export default class AbbrewItem extends Item {
       return;
     }
 
-    const actions = this.getActionCostForAccept(data, action);
-    if (actions > 0 && !await actor.canActorUseActions(actions)) {
-      return;
+    if (action === "parry") {
+      const actions = this.getActionCostForAccept(data, action);
+      if (actions > 0 && !await actor.canActorUseActions(getModifiedSkillActionCost(actor, getParrySkillWithActions(actor, actions)))) {
+        return;
+      }
     }
     await actor.takeDamage(rolls, data, action);
   }
@@ -196,131 +199,14 @@ export default class AbbrewItem extends Item {
     }
   }
 
-  async handleSkillActivate(actor) {
-    if (this.system.action.activationType === "stackRemoval") {
-      if (!await actor.canActorUseActions(this.system.action.actionCost)) {
-        return;
-      }
-      removeStackFromSkill(this);
-      return;
-    }
-
-    if (isSkillBlocked(actor, this)) {
-      ui.notifications.info(`You are blocked from using ${this.name}`);
-      return;
-    }
-
-    if (this.system.action.charges.hasCharges && this.system.action.charges.value > 0) {
-      await applySkillEffects(actor, this);
-      return;
-    }
-
-    if (this.system.action.uses.hasUses && !this.system.action.uses.value > 0) {
-      ui.info(`You don't have any more uses of ${this.name}.`);
-      return;
-    }
-
-    if (!await actor.canActorUseActions(this.system.action.actionCost)) {
-      return;
-    }
-
-    await rechargeSkill(actor, this);
-    await activateSkill(actor, this);
-  }
-
   async handleAttackDamageAction(actor, attackProfileId, attackMode) {
     const attackProfile = this.system.attackProfiles[attackProfileId];
-    const actions = attackMode === "overpower" ? this.system.exertActionCost : this.system.actionCost;
-    if (!await actor.canActorUseActions(actions)) {
-      return;
-    }
+    const actionCost = attackMode === "overpower" ? this.system.exertActionCost : this.system.actionCost;
 
     const id = actor.system.proxiedSkills[attackMode];
 
-    const attackSkill = {
-      _id: id,
-      name: this.name,
-      system: {
-        isActivatable: true,
-        skillTraits: [],
-        skillType: "basic",
-        attributeIncrease: "",
-        attributeIncreaseLong: "",
-        attributeRankIncrease: "",
-        action: {
-          activationType: "standalone",
-          actionCost: actions,
-          actionImage: this.img,
-          duration: {
-            precision: "0.01",
-            value: 0
-          },
-          uses: {
-            hasUses: false,
-            value: 0,
-            max: 0,
-            period: ""
-          },
-          charges: {
-            hasCharges: false,
-            value: 0,
-            max: 0
-          },
-          isActive: false,
-          attackProfile: { ...attackProfile, attackMode: attackMode, handsSupplied: this.system.handsSupplied, critical: 11 - this.system.handsSupplied },
-          modifiers: {
-            fortune: 0,
-            attackProfile: {},
-            damage: {
-              self: []
-            },
-            guard: {
-              self: {
-                value: 0,
-                operator: ""
-              },
-              target: {
-                value: 0,
-                operator: ""
-              }
-            },
-            risk: {
-              self: {
-                value: 0,
-                operator: ""
-              },
-              target: {
-                value: 0,
-                operator: ""
-              }
-            },
-            wounds: {
-              self: [],
-              target: []
-            },
-            resolve: {
-              self: {
-                value: 0,
-                operator: ""
-              },
-              target: {
-                value: 0,
-                operator: ""
-              }
-            },
-            resources: {
-              self: [],
-              target: []
-            },
-            conceepts: {
-              self: [],
-              target: []
-            }
-          }
-        }
-      }
-    }
+    const attackSkill = getAttackSkillWithActions(id, this.name, actionCost, this.img, attackProfile, attackMode, this.system.handsSupplied);
 
-    await applySkillEffects(actor, attackSkill);
+    await handleSkillActivate(actor, attackSkill);
   }
 }

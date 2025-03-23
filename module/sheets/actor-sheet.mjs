@@ -3,9 +3,8 @@ import {
   onManageActiveEffect,
   prepareActiveEffectCategories,
 } from '../helpers/effects.mjs';
-import { activateSkill, applySkillEffects, isSkillBlocked, rechargeSkill, removeStackFromSkill } from '../helpers/skill.mjs';
 import Tagify from '@yaireo/tagify'
-import { getSafeJson, intersection } from '../helpers/utils.mjs';
+import { handleSkillActivate } from '../helpers/skill.mjs';
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -426,7 +425,7 @@ export class AbbrewActorSheet extends ActorSheet {
     const id = target.dataset.itemId;
     const skill = this.actor.items.get(id);
 
-    await skill.handleSkillActivate(this.actor);
+    await handleSkillActivate(this.actor, skill);
   }
 
   async _onAttackDamageAction(target, attackMode) {

@@ -15,6 +15,7 @@ import { AbbrewCreatureFormSheet } from './sheets/items/item-creature-form-sheet
 import { AbbrewSkillDeckSheet } from './sheets/items/item-skill-deck-sheet.mjs';
 import { AbbrewAnatomySheet } from './sheets/items/item-anatomy-sheet.mjs';
 import { AbbrewSkillSheet } from './sheets/items/item-skill-sheet.mjs';
+import { handleSkillActivate } from './helpers/skill.mjs';
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -290,7 +291,7 @@ Hooks.on("preDeleteActiveEffect", async (effect, options, userId) => { });
 Hooks.on("dropActorSheetData", async (actor, sheet, data) => {
   console.log(data);
   if (data.type === "Item") {
-    const id = data.uuid.split(".").pop(); // TODO: Check incase this breaks things.splice(1).shift();
+    const id = data.uuid.split(".").pop();
     const item = game.items.get(id);
     if (item) {
       switch (item.type) {
@@ -457,7 +458,7 @@ async function useSkillMacro(macroData) {
     return;
   }
 
-  await skill.handleSkillActivate(actor);
+  await handleSkillActivate(actor, skill);
 }
 
 function getControlledActor() {

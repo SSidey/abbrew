@@ -338,6 +338,10 @@ export default class AbbrewActor extends Actor {
   }
 
   async canActorUseActions(actions) {
+    if (!game.combat && actions <= 5) {
+      return true;
+    }
+
     let remainingActions = this.system.actions;
     if (actions > remainingActions) {
       ui.notifications.info("You do not have enough actions to do that.");

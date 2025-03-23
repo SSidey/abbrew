@@ -56,6 +56,10 @@ export default class AbbrewSkill extends AbbrewItemBase {
             }),
             modifiers: new fields.SchemaField({
                 fortune: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                actionCost: new fields.SchemaField({
+                    value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                    operator: new fields.StringField({ ...blankString }),
+                }),
                 attackProfile: new fields.SchemaField({
                     attackType: new fields.StringField({ required: true, blank: true }),
                     attackMode: new fields.StringField({ required: true, blank: true }),
@@ -181,6 +185,9 @@ export default class AbbrewSkill extends AbbrewItemBase {
 
     prepareBaseData() {
         super.prepareBaseData();
+        if (this.isActivatable) {
+            this.action.actionCostOperator = "";
+        }
     }
 
     // Post Active Effects

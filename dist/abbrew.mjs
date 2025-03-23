@@ -51,6 +51,33 @@ function getSafeJson(json, defaultValue) {
   }
   return JSON.parse(json);
 }
+async function handleSkillActivate(actor, skill) {
+  if (!skill.system.isActivatable) {
+    ui.notifications.info(`${skill.name} can not be activated`);
+    return false;
+  }
+  if (isSkillBlocked(actor, skill)) {
+    ui.notifications.info(`You are blocked from using ${skill.name}`);
+    return false;
+  }
+  if (skill.system.action.charges.hasCharges && skill.system.action.charges.value > 0) {
+    await applySkillEffects(actor, skill);
+    return true;
+  }
+  if (skill.system.action.uses.hasUses && !skill.system.action.uses.value > 0) {
+    ui.info(`You don't have any more uses of ${skill.name}.`);
+    return false;
+  }
+  if (!await actor.canActorUseActions(getModifiedSkillActionCost(actor, skill))) {
+    return false;
+  }
+  if (skill.system.action.activationType === "stackRemoval") {
+    removeStackFromSkill(skill);
+    return true;
+  }
+  await rechargeSkill(actor, skill);
+  return await activateSkill(actor, skill);
+}
 async function removeStackFromSkill(skill) {
   const stacks = skill.system.action.uses.value - 1;
   if (stacks > 0) {
@@ -60,24 +87,30 @@ async function removeStackFromSkill(skill) {
   await skill.delete();
 }
 async function activateSkill(actor, skill) {
-  if (!skill.system.isActivatable) {
-    ui.notifications.info(`${skill.name} can not be activated`);
-    return;
-  }
-  if (isSkillBlocked(actor, skill)) {
-    ui.notifications.info(`You are blocked from using ${skill.name}`);
-    return;
-  }
   if (skill.system.action.activationType === "synergy") {
     await trackSkillDuration(actor, skill);
     await addSkillToQueuedSkills(actor, skill);
-    return;
+    return true;
   }
-  if (skill.system.action.duration.precision !== "0" && skill.system.action.duration.value !== 0) {
-    await trackSkillDuration(actor, skill);
+  if (await trackSkillDuration(actor, skill)) {
     await addSkillToActiveSkills(actor, skill);
   }
   await applySkillEffects(actor, skill);
+  return true;
+}
+function getModifiedSkillActionCost(actor, skill) {
+  const minActions = parseInt(skill.system.action.actionCost) === 0 ? 0 : 1;
+  return Math.max(minActions, getModifierSkills(actor, skill).filter((s) => s.system.action.modifiers.actionCost.operator).map((s) => s.system.action.modifiers.actionCost).reduce((result, actionCost) => {
+    result = applyOperator(result, actionCost.value, actionCost.operator);
+    return result;
+  }, skill.system.action.actionCost));
+}
+function getModifierSkills(actor, skill) {
+  const queuedSkills = actor.items.toObject().filter((i) => actor.system.queuedSkills.includes(i._id));
+  const queuedSynergies = queuedSkills.filter((s) => s.system.skillModifiers.synergy).map((s) => ({ skill: s, synergy: getSafeJson(s.system.skillModifiers.synergy, []).map((s2) => s2.id) })).filter((s) => s.synergy.includes(skill._id)).map((s) => s.skill);
+  const passiveSkills = actor.items.toObject().filter((i) => i.system.isActivatable === false);
+  const passiveSynergies = passiveSkills.filter((s) => s.system.skillModifiers.synergy).map((s) => ({ skill: s, synergy: getSafeJson(s.system.skillModifiers.synergy, []).map((s2) => s2.id) })).filter((s) => s.synergy.includes(skill._id)).map((s) => s.skill);
+  return [...passiveSynergies, ...queuedSynergies];
 }
 async function applySkillEffects(actor, skill) {
   if (isSkillBlocked(actor, skill)) {
@@ -85,12 +118,8 @@ async function applySkillEffects(actor, skill) {
     return;
   }
   let updates = {};
-  const queuedSkills = actor.items.toObject().filter((i) => actor.system.queuedSkills.includes(i._id));
-  const queuedSynergies = queuedSkills.filter((s) => s.system.skillModifiers.synergy).map((s) => ({ skill: s, synergy: getSafeJson(s.system.skillModifiers.synergy, []).map((s2) => s2.id) })).filter((s) => s.synergy.includes(skill._id)).map((s) => s.skill);
-  const passiveSkills = actor.items.toObject().filter((i) => i.system.isActivatable === false);
-  const passiveSynergies = passiveSkills.filter((s) => s.system.skillModifiers.synergy).map((s) => ({ skill: s, synergy: getSafeJson(s.system.skillModifiers.synergy, []).map((s2) => s2.id) })).filter((s) => s.synergy.includes(skill._id)).map((s) => s.skill);
-  const allSkills = [...passiveSynergies, ...queuedSynergies, skill].filter((s) => !s.system.action.charges.hasCharges || s.system.action.charges.value > 0);
-  const modifierSkills = [...passiveSynergies, ...queuedSynergies];
+  const modifierSkills = getModifierSkills(actor, skill);
+  const allSkills = [...modifierSkills, skill].filter((s) => !s.system.action.charges.hasCharges || s.system.action.charges.value > 0);
   const allSummaries = allSkills.map((s) => ({ name: s.name, description: s.system.description }));
   const usesSkills = allSkills.filter((s) => s.system.action.uses.hasUses).filter((s) => s._id !== skill._id);
   const chargedSkills = allSkills.filter((s) => s.system.action.charges.hasCharges);
@@ -112,6 +141,13 @@ async function applySkillEffects(actor, skill) {
     let currentCharges = skill2.system.action.charges.value;
     const item = actor.items.find((i) => i._id === skill2._id);
     await item.update({ "system.action.charges.value": currentCharges -= 1 });
+  }
+  for (const index in modifierSkills) {
+    const skill2 = modifierSkills[index];
+    if (skill2.system.action.duration.precision === "0") {
+      const effect = actor.effects.find((e) => e.flags.abbrew.skill.trackDuration === skill2._id);
+      await effect.delete();
+    }
   }
   let templateData = { allSummaries };
   let data = {};
@@ -320,9 +356,11 @@ function getSkillValueForPath(rawValue, actor) {
 }
 async function trackSkillDuration(actor, skill) {
   const duration = getSkillDuration(skill);
-  if (duration) {
+  if (duration && !(skill.system.action.activationType === "standalone" && skill.system.action.duration.precision === "0")) {
     await createDurationActiveEffect(actor, skill, duration);
+    return true;
   }
+  return false;
 }
 async function addSkillToActiveSkills(actor, skill) {
   const skills = actor.system.activeSkills;
@@ -436,6 +474,178 @@ function isSkillBlocked(actor, skill) {
   const skillDiscord = actor.items.filter((i) => i.type === "skill").filter((s) => s.system.skillModifiers.discord).flatMap((s) => getSafeJson(s.system.skillModifiers.discord, []).map((s2) => s2.id));
   const skillId = skill._id;
   return skillDiscord.includes(skillId);
+}
+function getAttackSkillWithActions(id, name, actionCost, image, attackProfile, attackMode, handsSupplied) {
+  return {
+    _id: id,
+    name,
+    system: {
+      isActivatable: true,
+      skillTraits: [],
+      skillType: "basic",
+      attributeIncrease: "",
+      attributeIncreaseLong: "",
+      attributeRankIncrease: "",
+      action: {
+        activationType: "standalone",
+        actionCost,
+        actionImage: image,
+        duration: {
+          precision: "0",
+          value: 0
+        },
+        uses: {
+          hasUses: false,
+          value: 0,
+          max: 0,
+          period: ""
+        },
+        charges: {
+          hasCharges: false,
+          value: 0,
+          max: 0
+        },
+        isActive: false,
+        attackProfile: { ...attackProfile, attackMode, handsSupplied, critical: 11 - handsSupplied },
+        modifiers: {
+          fortune: 0,
+          attackProfile: {},
+          damage: {
+            self: []
+          },
+          guard: {
+            self: {
+              value: 0,
+              operator: ""
+            },
+            target: {
+              value: 0,
+              operator: ""
+            }
+          },
+          risk: {
+            self: {
+              value: 0,
+              operator: ""
+            },
+            target: {
+              value: 0,
+              operator: ""
+            }
+          },
+          wounds: {
+            self: [],
+            target: []
+          },
+          resolve: {
+            self: {
+              value: 0,
+              operator: ""
+            },
+            target: {
+              value: 0,
+              operator: ""
+            }
+          },
+          resources: {
+            self: [],
+            target: []
+          },
+          conceepts: {
+            self: [],
+            target: []
+          }
+        }
+      }
+    }
+  };
+}
+function getParrySkillWithActions(actor, actionCost) {
+  const id = actor.system.proxiedSkills["parry"];
+  const skill = actor.items.filter((i) => i.type === "skill").find((s) => s._id === id);
+  return {
+    _id: id,
+    name: "Parry",
+    system: {
+      isActivatable: true,
+      skillTraits: [],
+      skillType: "basic",
+      attributeIncrease: "",
+      attributeIncreaseLong: "",
+      attributeRankIncrease: "",
+      action: {
+        activationType: "standalone",
+        actionCost,
+        actionImage: skill.img,
+        duration: {
+          precision: "0",
+          value: 0
+        },
+        uses: {
+          hasUses: false,
+          value: 0,
+          max: 0,
+          period: ""
+        },
+        charges: {
+          hasCharges: false,
+          value: 0,
+          max: 0
+        },
+        isActive: false,
+        attackProfile: {},
+        modifiers: {
+          fortune: 0,
+          attackProfile: {},
+          damage: {
+            self: []
+          },
+          guard: {
+            self: {
+              value: 0,
+              operator: ""
+            },
+            target: {
+              value: 0,
+              operator: ""
+            }
+          },
+          risk: {
+            self: {
+              value: 0,
+              operator: ""
+            },
+            target: {
+              value: 0,
+              operator: ""
+            }
+          },
+          wounds: {
+            self: [],
+            target: []
+          },
+          resolve: {
+            self: {
+              value: 0,
+              operator: ""
+            },
+            target: {
+              value: 0,
+              operator: ""
+            }
+          },
+          resources: {
+            self: [],
+            target: []
+          },
+          conceepts: {
+            self: [],
+            target: []
+          }
+        }
+      }
+    }
+  };
 }
 async function handleCombatStart(actors) {
   for (const index in actors) {
@@ -2543,7 +2753,7 @@ class AbbrewActorSheet extends ActorSheet {
     const target = event.target.closest(".skill");
     const id = target.dataset.itemId;
     const skill = this.actor.items.get(id);
-    await skill.handleSkillActivate(this.actor);
+    await handleSkillActivate(this.actor, skill);
   }
   async _onAttackDamageAction(target, attackMode) {
     const itemId = target.closest("li.item").dataset.itemId;
@@ -3723,6 +3933,10 @@ class AbbrewSkill extends AbbrewItemBase {
       }),
       modifiers: new fields.SchemaField({
         fortune: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+        actionCost: new fields.SchemaField({
+          value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+          operator: new fields.StringField({ ...blankString })
+        }),
         attackProfile: new fields.SchemaField({
           attackType: new fields.StringField({ required: true, blank: true }),
           attackMode: new fields.StringField({ required: true, blank: true }),
@@ -3846,6 +4060,9 @@ class AbbrewSkill extends AbbrewItemBase {
   }
   prepareBaseData() {
     super.prepareBaseData();
+    if (this.isActivatable) {
+      this.action.actionCostOperator = "";
+    }
   }
   // Post Active Effects
   prepareDerivedData() {
@@ -4399,6 +4616,9 @@ class AbbrewActor extends Actor {
     }
   }
   async canActorUseActions(actions) {
+    if (!game.combat && actions <= 5) {
+      return true;
+    }
     let remainingActions = this.system.actions;
     if (actions > remainingActions) {
       ui.notifications.info("You do not have enough actions to do that.");
@@ -4531,6 +4751,7 @@ class AbbrewItem2 extends Item {
   static async _onAcceptDamageAction(rolls, data, action) {
     const tokens = canvas.tokens.controlled.filter((token) => token.actor);
     if (tokens.length === 0) {
+      ui.notifications.info("Please select a token to accept the effect.");
       return;
     }
     const actor = tokens[0].actor;
@@ -4538,9 +4759,11 @@ class AbbrewItem2 extends Item {
       ui.notifications.info("You are prevented from parrying.");
       return;
     }
-    const actions = this.getActionCostForAccept(data, action);
-    if (actions > 0 && !await actor.canActorUseActions(actions)) {
-      return;
+    if (action === "parry") {
+      const actions = this.getActionCostForAccept(data, action);
+      if (actions > 0 && !await actor.canActorUseActions(getModifiedSkillActionCost(actor, getParrySkillWithActions(actor, actions)))) {
+        return;
+      }
     }
     await actor.takeDamage(rolls, data, action);
   }
@@ -4597,123 +4820,12 @@ class AbbrewItem2 extends Item {
       console.log("general roll");
     }
   }
-  async handleSkillActivate(actor) {
-    if (this.system.action.activationType === "stackRemoval") {
-      if (!await actor.canActorUseActions(this.system.action.actionCost)) {
-        return;
-      }
-      removeStackFromSkill(this);
-      return;
-    }
-    if (isSkillBlocked(actor, this)) {
-      ui.notifications.info(`You are blocked from using ${this.name}`);
-      return;
-    }
-    if (this.system.action.charges.hasCharges && this.system.action.charges.value > 0) {
-      await applySkillEffects(actor, this);
-      return;
-    }
-    if (this.system.action.uses.hasUses && !this.system.action.uses.value > 0) {
-      ui.info(`You don't have any more uses of ${this.name}.`);
-      return;
-    }
-    if (!await actor.canActorUseActions(this.system.action.actionCost)) {
-      return;
-    }
-    await rechargeSkill(actor, this);
-    await activateSkill(actor, this);
-  }
   async handleAttackDamageAction(actor, attackProfileId, attackMode) {
     const attackProfile = this.system.attackProfiles[attackProfileId];
-    const actions = attackMode === "overpower" ? this.system.exertActionCost : this.system.actionCost;
-    if (!await actor.canActorUseActions(actions)) {
-      return;
-    }
+    const actionCost = attackMode === "overpower" ? this.system.exertActionCost : this.system.actionCost;
     const id = actor.system.proxiedSkills[attackMode];
-    const attackSkill = {
-      _id: id,
-      name: this.name,
-      system: {
-        isActivatable: true,
-        skillTraits: [],
-        skillType: "basic",
-        attributeIncrease: "",
-        attributeIncreaseLong: "",
-        attributeRankIncrease: "",
-        action: {
-          activationType: "standalone",
-          actionCost: actions,
-          actionImage: this.img,
-          duration: {
-            precision: "0.01",
-            value: 0
-          },
-          uses: {
-            hasUses: false,
-            value: 0,
-            max: 0,
-            period: ""
-          },
-          charges: {
-            hasCharges: false,
-            value: 0,
-            max: 0
-          },
-          isActive: false,
-          attackProfile: { ...attackProfile, attackMode, handsSupplied: this.system.handsSupplied, critical: 11 - this.system.handsSupplied },
-          modifiers: {
-            fortune: 0,
-            attackProfile: {},
-            damage: {
-              self: []
-            },
-            guard: {
-              self: {
-                value: 0,
-                operator: ""
-              },
-              target: {
-                value: 0,
-                operator: ""
-              }
-            },
-            risk: {
-              self: {
-                value: 0,
-                operator: ""
-              },
-              target: {
-                value: 0,
-                operator: ""
-              }
-            },
-            wounds: {
-              self: [],
-              target: []
-            },
-            resolve: {
-              self: {
-                value: 0,
-                operator: ""
-              },
-              target: {
-                value: 0,
-                operator: ""
-              }
-            },
-            resources: {
-              self: [],
-              target: []
-            },
-            conceepts: {
-              self: [],
-              target: []
-            }
-          }
-        }
-      }
-    };
-    await applySkillEffects(actor, attackSkill);
+    const attackSkill = getAttackSkillWithActions(id, this.name, actionCost, this.img, attackProfile, attackMode, this.system.handsSupplied);
+    await handleSkillActivate(actor, attackSkill);
   }
 }
 function registerSystemSettings() {
@@ -5497,7 +5609,7 @@ async function useSkillMacro(macroData) {
     ui.warn(`${skill.name} is not a skill.`);
     return;
   }
-  await skill.handleSkillActivate(actor);
+  await handleSkillActivate(actor, skill);
 }
 function getControlledActor() {
   const tokens = canvas.tokens.controlled.filter((token) => token.actor);
