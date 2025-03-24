@@ -51,6 +51,65 @@ function getSafeJson(json, defaultValue) {
   }
   return JSON.parse(json);
 }
+async function renderSheetForTaggedData(event, actor) {
+  const inspectionClass = "tagify__tag";
+  const element = _checkThroughParentsForClass(event.target, inspectionClass, 2);
+  const itemId = element.__tagifyTagData.id;
+  const sourceId = element.__tagifyTagData.sourceId;
+  if (itemId) {
+    const item = actor.items.find((i) => i._id === itemId);
+    if (item) {
+      item.sheet.render(true);
+    }
+  } else if (sourceId) {
+    const source = fromUuidSync(sourceId);
+    const compendiumPackName = source.pack;
+    const id = source._id;
+    if (!compendiumPackName && source && id) {
+      source.sheet.render(true);
+    } else {
+      const pack = game.packs.get(compendiumPackName);
+      await pack.getIndex();
+      await pack.getDocument(id).then((item) => item.sheet.render(true));
+    }
+  }
+}
+async function renderSheetForStoredItem(event, actor) {
+  const inspectionClass = "skill-deck-skill";
+  const element = _checkThroughParentsForClass(event.target, inspectionClass, 3);
+  const itemId = element.dataset.itemId;
+  const sourceId = element.dataset.sourceId;
+  if (itemId && !sourceId) {
+    const item = actor.items.find((i) => i._id === itemId);
+    if (item) {
+      item.sheet.render(true);
+    }
+  } else if (sourceId) {
+    const source = fromUuidSync(sourceId);
+    const compendiumPackName = source.pack;
+    const id = source._id;
+    if (!compendiumPackName && source && id) {
+      source.sheet.render(true);
+    } else {
+      const pack = game.packs.get(compendiumPackName);
+      await pack.getIndex();
+      await pack.getDocument(id).then((item) => item.sheet.render(true));
+    }
+  }
+}
+function _checkThroughParentsForClass(element, inspectionClass, depth) {
+  let returnElement = _elementClassListContainsClass(element, inspectionClass);
+  if (!returnElement && depth > 0) {
+    returnElement = _checkThroughParentsForClass(element.parentElement, inspectionClass, depth - 1);
+  }
+  if (returnElement) {
+    return returnElement;
+  }
+  return null;
+}
+function _elementClassListContainsClass(element, inspectionClass) {
+  return Object.values(element.classList).includes(inspectionClass) ? element : null;
+}
 async function handleSkillActivate(actor, skill) {
   if (!skill.system.isActivatable) {
     ui.notifications.info(`${skill.name} can not be activated`);
@@ -430,6 +489,9 @@ async function createDurationActiveEffect(actor, skill, duration) {
 }
 async function rechargeSkill(actor, skill) {
   const item = actor.items.find((i) => i._id === skill._id);
+  if (!item) {
+    return;
+  }
   let updates = {};
   if (skill.system.action.charges.hasCharges) {
     const maxCharges = skill.system.action.charges.max;
@@ -2884,27 +2946,6 @@ class AbbrewItemSheet extends ItemSheet {
       if (t.dataset.action)
         this._onAttackProfileAction(t, t.dataset.action);
     });
-    html.find(".skill-action-control").click((event) => {
-      const t = event.currentTarget;
-      if (t.dataset.action)
-        this._onSkillActionAction(t, t.dataset.action);
-    });
-    html.find(".skill-action-resource-control").click((event) => {
-      const t = event.currentTarget;
-      if (t.dataset.action)
-        this._onSkillActionResourceRequirementAction(t, t.dataset.action);
-    });
-    html.find(".skill-action-modifier-wound-control").click((event) => {
-      const t = event.currentTarget;
-      if (t.dataset.action)
-        this._onSkillActionModifierWoundAction(t, t.dataset.action);
-    });
-    html.find(".skill-action-modifier-damage-control").click((event) => {
-      const t = event.currentTarget;
-      if (t.dataset.action)
-        this._onSkillActionModifierDamageAction(t, t.dataset.action);
-    });
-    html.find(".skill-configuration-section :input").prop("disabled", !this.item.system.configurable);
     this._activateArmourPoints(html);
     this._activateAnatomyParts(html);
   }
@@ -3035,33 +3076,6 @@ class AbbrewItemSheet extends ItemSheet {
           return this.removeSkillActionResourceRequirement(target);
       }
     }
-  }
-  /**
-    * Handle one of the add or remove wound reduction buttons.
-    * @param {Element} target  Button or context menu entry that triggered this action.
-    * @param {string} action   Action being triggered.
-    * @returns {Promise|void}
-    */
-  _onSkillActionModifierWoundAction(target, action) {
-    if (this.item.system.configurable) {
-      switch (action) {
-        case "add-skill-action-modifier-wound":
-          return this.addSkillActionModifierWound(target);
-        case "remove-skill-action-modifier-wound":
-          return this.removeSkillActionModifierWound(target);
-      }
-    }
-  }
-  addSkillActionModifierWound(target) {
-    let action = foundry.utils.deepClone(this.item.system.action);
-    action.modifiers.wounds.self = [...action.modifiers.wounds.self, {}];
-    return this.item.update({ "system.action": action });
-  }
-  removeSkillActionModifierWound(target) {
-    const id = target.closest("li").dataset.id;
-    const action = foundry.utils.deepClone(this.item.system.action);
-    action.modifiers.wounds.self.splice(Number(id), 1);
-    return this.item.update({ "system.action": action });
   }
   /**
     * Handle one of the add or remove damage reduction buttons.
@@ -3467,6 +3481,13 @@ const lingeringWoundImmunities = [
   { key: "sinImmunity", value: "ABBREW.Traits.WoundImmunities.sinImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "sin" }
 ];
 const skillTraining = [
+  { key: "attackBaseTraining", value: "ABBREW.Traits.SkillTraining.attackBase", feature: "skillTraining", subFeature: "offensiveSkills", effect: "base", data: "attack" },
+  { key: "finisherBaseTraining", value: "ABBREW.Traits.SkillTraining.finisherBase", feature: "skillTraining", subFeature: "offensiveSkills", effect: "base", data: "finisher" },
+  { key: "feintBaseTraining", value: "ABBREW.Traits.SkillTraining.feintBase", feature: "skillTraining", subFeature: "offensiveSkills", effect: "base", data: "feint" },
+  { key: "parryBaseTraining", value: "ABBREW.Traits.SkillTraining.parryBase", feature: "skillTraining", subFeature: "defensiveSkills", effect: "base", data: "parry" },
+  { key: "overpowerBaseTraining", value: "ABBREW.Traits.SkillTraining.overpowerBase", feature: "skillTraining", subFeature: "offensiveSkills", effect: "base", data: "overpower" },
+  { key: "attackTraining", value: "ABBREW.Traits.SkillTraining.attack", feature: "skillTraining", subFeature: "offensiveSkills", effect: "increase", data: "attack" },
+  { key: "finisherTraining", value: "ABBREW.Traits.SkillTraining.finisher", feature: "skillTraining", subFeature: "offensiveSkills", effect: "increase", data: "finisher" },
   { key: "overpowerTraining", value: "ABBREW.Traits.SkillTraining.overpower", feature: "skillTraining", subFeature: "offensiveSkills", effect: "increase", data: "overpower" },
   { key: "feintTraining", value: "ABBREW.Traits.SkillTraining.feint", feature: "skillTraining", subFeature: "offensiveSkills", effect: "increase", data: "feint" },
   { key: "parryTraining", value: "ABBREW.Traits.SkillTraining.parry", feature: "skillTraining", subFeature: "defensiveSkills", effect: "increase", data: "parry" },
@@ -3602,9 +3623,11 @@ class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     this.defense.risk.value = Math.floor(this.defense.risk.raw / 10);
     this.defense.resolve.max = 2 + Math.floor((this._getMaxFromPhysicalAttributes() + this._getMaxFromMentalAttributes()) / 2);
     this.skillTraining = [
+      { type: "attack", value: 0 },
       { type: "overpower", value: 0 },
       { type: "parry", value: 0 },
       { type: "feint", value: 0 },
+      { type: "finisher", value: 0 },
       { type: "parryCounter", value: 0 },
       { type: "feintCounter", value: 0 }
     ];
@@ -3771,10 +3794,14 @@ class AbbrewItemBase extends foundry.abstract.TypeDataModel {
     const fields = foundry.data.fields;
     schema.description = new fields.StringField({ required: true, blank: true });
     schema.traits = new fields.StringField({ required: true, blank: true });
+    schema.abbrewId = new fields.StringField({ required: true, blank: true });
     return schema;
   }
   // Prior to Active Effects
   prepareBaseData() {
+    if (this.abbrewId === "") {
+      this.abbrewId = this.generateAbbrewId();
+    }
   }
   // Post Active Effects
   prepareDerivedData() {
@@ -3786,6 +3813,9 @@ class AbbrewItemBase extends foundry.abstract.TypeDataModel {
   */
   static migrateData(source) {
     return super.migrateData(source);
+  }
+  generateAbbrewId() {
+    return `abbrew.${this.parent.type}.${this.parent.name.toLowerCase().replace(/\s/g, "")}.${this.parent._id}`;
   }
 }
 let AbbrewItem$1 = class AbbrewItem extends AbbrewItemBase {
@@ -3892,6 +3922,15 @@ class AbbrewSkill extends AbbrewItemBase {
     });
     schema.configurable = new fields.BooleanField({ required: true });
     schema.isActivatable = new fields.BooleanField({ required: true, label: "ABBREW.IsActivatable" });
+    schema.skills = new fields.ArrayField(
+      new fields.SchemaField({
+        name: new fields.StringField({ required: true, blank: true }),
+        skillType: new fields.StringField({ required: true, blank: true }),
+        id: new fields.StringField({ required: true, blank: true }),
+        image: new fields.StringField({ required: true, blank: true }),
+        sourceId: new fields.StringField({ required: true, blank: true })
+      })
+    );
     schema.action = new fields.SchemaField({
       activationType: new fields.StringField({ ...blankString }),
       actionCost: new fields.StringField({ ...blankString }),
@@ -4201,9 +4240,10 @@ class AbbrewWeapon extends AbbrewPhysicalItem {
     schema.weapon = new fields.SchemaField({
       size: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 9 })
     });
+    schema.isAttackTrained = new fields.BooleanField({ required: true, nullable: false, initial: false });
+    schema.isFinisherTrained = new fields.BooleanField({ required: true, nullable: false, initial: false });
     schema.isFeintTrained = new fields.BooleanField({ required: true, nullable: false, initial: false });
     schema.isOverpowerTrained = new fields.BooleanField({ required: true, nullable: false, initial: false });
-    schema.isParryTrained = new fields.BooleanField({ required: true, nullable: false, initial: false });
     AbbrewAttackBase.addAttackSchema(schema);
   }
   // Prior to Active Effects
@@ -4212,7 +4252,10 @@ class AbbrewWeapon extends AbbrewPhysicalItem {
   }
   // Post Active Effects
   prepareDerivedData() {
-    this.isOverpowerTrained = this.doesParentActorHaveSkillTrait("skillTraining", "offensiveSkills", "increase", "overpower");
+    this.isAttackTrained = this.doesParentActorHaveSkillTrait("skillTraining", "offensiveSkills", "base", "attack") ?? false;
+    this.isFinisherTrained = this.doesParentActorHaveSkillTrait("skillTraining", "offensiveSkills", "base", "finisher") ?? false;
+    this.isFeintTrained = this.doesParentActorHaveSkillTrait("skillTraining", "offensiveSkills", "base", "feint") ?? false;
+    this.isOverpowerTrained = this.doesParentActorHaveSkillTrait("skillTraining", "offensiveSkills", "base", "overpower") ?? false;
   }
   doesParentActorHaveSkillTrait(feature, subFeature, effect, data) {
     var _a, _b;
@@ -4241,7 +4284,8 @@ class AbbrewSkillDeck extends AbbrewItemBase {
         name: new fields.StringField({ required: true, blank: true }),
         skillType: new fields.StringField({ required: true, blank: true }),
         id: new fields.StringField({ required: true, blank: true }),
-        image: new fields.StringField({ required: true, blank: true })
+        image: new fields.StringField({ required: true, blank: true }),
+        sourceId: new fields.StringField({ required: true, blank: true })
       })
     );
     return schema;
@@ -4276,7 +4320,8 @@ class AbbrewBackground extends AbbrewSkillDeck {
     schema.creatureForm = new fields.SchemaField({
       name: new fields.StringField({ required: true, blank: true }),
       id: new fields.StringField({ required: true, blank: true }),
-      image: new fields.StringField({ required: true, blank: true })
+      image: new fields.StringField({ required: true, blank: true }),
+      sourceId: new fields.StringField({ required: true, blank: true })
     });
     return schema;
   }
@@ -4604,9 +4649,31 @@ class AbbrewActor extends Actor {
     }
   }
   async acceptSkillDeck(skillDeck) {
-    const skills = skillDeck.system.skills.map((s) => game.items.get(s.id));
+    const skills = await Promise.all(skillDeck.system.skills.map(async (s) => await this.getGameItem(s)));
     for (const index in skills) {
       await Item.create(skills[index], { parent: this });
+    }
+  }
+  async getGameItem(skill) {
+    const itemId = skill.id;
+    const sourceId = skill.sourceId;
+    if (itemId && !sourceId) {
+      const item = game.items.find((i) => i._id === itemId);
+      if (item) {
+        return item;
+      }
+    } else if (sourceId) {
+      const source = fromUuidSync(sourceId);
+      const compendiumPackName = source.pack;
+      const id = source._id;
+      if (!compendiumPackName && source && id) {
+        return source;
+      } else {
+        const pack = game.packs.get(compendiumPackName);
+        await pack.getIndex();
+        const item = await pack.getDocument(id);
+        return item;
+      }
     }
   }
   async acceptAnatomy(anatomy) {
@@ -4755,6 +4822,10 @@ class AbbrewItem2 extends Item {
       return;
     }
     const actor = tokens[0].actor;
+    if (action === "parry" && !actor.doesActorHaveSkillTrait("skillTraining", "defensiveSkills", "base", "parry")) {
+      ui.notifications.info("Please ensure you have the parry skill.");
+      return;
+    }
     if (action === "parry" && actor.doesActorHaveSkillDiscord("Parry")) {
       ui.notifications.info("You are prevented from parrying.");
       return;
@@ -4778,14 +4849,15 @@ class AbbrewItem2 extends Item {
     await tokens[0].actor.takeFinisher(rolls, data);
   }
   async _onCreate(data, options, userId) {
+    var _a;
     if (data.type === "skill") {
       const synergies = getSafeJson(data.system.skillModifiers.synergy, []).map((s) => {
-        var _a;
-        return { value: s.value, id: (_a = this.actor.items.find((i) => i.name === s.value)) == null ? void 0 : _a._id };
+        var _a2;
+        return { value: s.value, id: (_a2 = this.actor.items.find((i) => i.name === s.value)) == null ? void 0 : _a2._id, sourceId: s.sourceId };
       }).filter((s) => s.id);
       const discord = getSafeJson(data.system.skillModifiers.discord, []).map((s) => {
-        var _a;
-        return { value: s.value, id: (_a = this.actor.items.find((i) => i.name === s.value)) == null ? void 0 : _a._id };
+        var _a2;
+        return { value: s.value, id: (_a2 = this.actor.items.find((i) => i.name === s.value)) == null ? void 0 : _a2._id, sourceId: s.sourceId };
       }).filter((s) => s.id);
       const update = {};
       if (synergies.length > 0) {
@@ -4797,6 +4869,7 @@ class AbbrewItem2 extends Item {
       if (Object.keys(update).length > 0) {
         await this.update(update);
       }
+      await ((_a = this.actor) == null ? void 0 : _a.acceptSkillDeck(data));
     }
   }
   /**
@@ -4995,6 +5068,9 @@ class AbbrewSkillDeckSheet extends ItemSheet {
     html.on("click", ".creature-form-delete", async (ev) => {
       await this.item.update({ "system.creatureForm": { name: "", id: "", image: "" } });
     });
+    html.on("click", ".skill-deck-skill .skill-deck-summary .image-container, .skill-deck-skill .skill-deck-summary .name", async (event) => {
+      await renderSheetForStoredItem(event, this.actor);
+    });
     html.on("drop", async (event) => {
       if (!this.item.testUserPermission(game.user, "OWNER")) {
         return;
@@ -5002,14 +5078,13 @@ class AbbrewSkillDeckSheet extends ItemSheet {
       const droppedData = event.originalEvent.dataTransfer.getData("text");
       const eventJson = JSON.parse(droppedData);
       if (eventJson && eventJson.type === "Item") {
-        const itemId = eventJson.uuid.split(".").pop();
-        const item = game.items.get(itemId);
+        const item = fromUuidSync(eventJson.uuid);
         if (item.type === "skill") {
           const storedSkills = this.item.system.skills;
-          const updateSkills = [...storedSkills, { name: item.name, id: itemId, image: item.img, skillType: item.system.skillType }];
+          const updateSkills = [...storedSkills, { name: item.name, id: item._id, image: item.img, sourceId: item.uuid }];
           await this.item.update({ "system.skills": updateSkills });
         } else if (item.type === "creatureForm") {
-          await this.item.update({ "system.creatureForm": { name: item.name, id: itemId, image: item.img } });
+          await this.item.update({ "system.creatureForm": { name: item.name, id: item._id, image: item.img, sourceId: item.uuid } });
         }
       }
     });
@@ -5150,6 +5225,10 @@ class AbbrewAnatomySheet extends ItemSheet {
   }
 }
 class AbbrewSkillSheet extends ItemSheet {
+  constructor() {
+    super(...arguments);
+    __publicField(this, "tagify");
+  }
   /** @override */
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
@@ -5206,13 +5285,95 @@ class AbbrewSkillSheet extends ItemSheet {
       ".effect-control",
       (event) => onManageActiveEffect(event, this.item)
     );
+    html.find(".skill-action-resource-control").click((event) => {
+      const t = event.currentTarget;
+      if (t.dataset.action)
+        this._onSkillActionResourceRequirementAction(t, t.dataset.action);
+    });
+    html.find(".skill-action-modifier-wound-control").click((event) => {
+      const t = event.currentTarget;
+      if (t.dataset.action)
+        this._onSkillActionModifierWoundAction(t, t.dataset.action);
+    });
+    html.find(".skill-action-modifier-damage-control").click((event) => {
+      const t = event.currentTarget;
+      if (t.dataset.action)
+        this._onSkillActionModifierDamageAction(t, t.dataset.action);
+    });
     html.find(".damage-control").click((event) => {
       const t = event.currentTarget;
       if (t.dataset.action)
         this._onDamageAction(t, t.dataset.action);
     });
+    html.find(".attack-profile-control").click((event) => {
+      const t = event.currentTarget;
+      if (t.dataset.action)
+        this._onAttackProfileAction(t, t.dataset.action);
+    });
+    html.find(".skill-configuration-section :input").prop("disabled", !this.item.system.configurable);
+    html.on("click", ".tagify__tag div", async (event) => {
+      await renderSheetForTaggedData(event, this.actor);
+    });
     html.on("dragover", (event) => {
       event.preventDefault();
+    });
+    html.on("drop", "ol.skill-deck-skills", async (event) => {
+      if (!this.item.testUserPermission(game.user, "OWNER")) {
+        return;
+      }
+      const droppedData = event.originalEvent.dataTransfer.getData("text");
+      const eventJson = JSON.parse(droppedData);
+      if (eventJson && eventJson.type === "Item") {
+        const item = fromUuidSync(eventJson.uuid);
+        if (item.type === "skill") {
+          const storedSkills = this.item.system.skills;
+          const updateSkills = [...storedSkills, { name: item.name, id: item._id, image: item.img, sourceId: item.uuid }];
+          await this.item.update({ "system.skills": updateSkills });
+        }
+      }
+    });
+    html.on("click", ".skill-deck-skill .skill-deck-summary .image-container, .skill-deck-skill .skill-deck-summary .name", async (event) => {
+      await renderSheetForStoredItem(event, this.actor);
+    });
+    html.on("click", ".skill-delete", async (ev) => {
+      const li = $(ev.currentTarget).parents(".skill-deck-skill");
+      if (li.data("id") || li.data("id") === 0) {
+        const skills = this.item.system.skills;
+        skills.splice(li.data("id"), 1);
+        await this.item.update({ "system.skills": skills });
+      }
+    });
+    html.on("drop", "tags.tagify", async (event) => {
+      if (!this.item.testUserPermission(game.user, "OWNER")) {
+        return;
+      }
+      const target = event.target;
+      let inputElement = null;
+      if (Object.values(target.classList).includes("tagify__input")) {
+        inputElement = target.parentElement.nextElementSibling;
+      } else if (Object.values(target.classList).includes("tagify")) {
+        inputElement = target.nextElementSibling;
+      } else {
+        return;
+      }
+      if (inputElement.readOnly) {
+        return;
+      }
+      const droppedData = event.originalEvent.dataTransfer.getData("text");
+      const eventJson = JSON.parse(droppedData);
+      if (eventJson && eventJson.type === "Item") {
+        const item = fromUuidSync(eventJson.uuid);
+        if (inputElement.dataset.droptype !== item.type) {
+          return;
+        }
+        const value = item.name;
+        const path = inputElement.name;
+        const inputValue = getSafeJson(getObjectValueByStringPath(this.item, path), []);
+        const updateValue = [...inputValue, { value, id: "", sourceId: eventJson.uuid }];
+        const update = {};
+        update[path] = JSON.stringify(updateValue);
+        await this.item.update(update);
+      }
     });
     this._activateSkillTraits(html);
     this._activateSkillModifiers(html);
@@ -5232,7 +5393,7 @@ class AbbrewSkillSheet extends ItemSheet {
         includeSelectedTags: false
         // <- Should the suggestions list Include already-selected tags (after filtering)
       },
-      userInput: false,
+      userInput: true,
       // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
       duplicates: true,
       // <- Should duplicate tags be allowed or not
@@ -5247,7 +5408,6 @@ class AbbrewSkillSheet extends ItemSheet {
     }
   }
   _activateSkillModifiers(html) {
-    var _a, _b, _c;
     const skillSynergy = html[0].querySelector('input[name="system.skillModifiers.synergy"]');
     const skillDiscord = html[0].querySelector('input[name="system.skillModifiers.discord"]');
     const settings = {
@@ -5263,11 +5423,10 @@ class AbbrewSkillSheet extends ItemSheet {
         includeSelectedTags: false
         // <- Should the suggestions list Include already-selected tags (after filtering)
       },
-      userInput: true,
+      userInput: false,
       // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
-      duplicates: false,
+      duplicates: false
       // <- Should duplicate tags be allowed or not
-      whitelist: [...((_c = (_b = (_a = this.item) == null ? void 0 : _a.actor) == null ? void 0 : _b.items) == null ? void 0 : _c.filter((i) => i.type === "skill").map((s) => ({ value: s.name, id: s._id }))) ?? []]
     };
     if (skillSynergy) {
       new Tagify(skillSynergy, settings);
@@ -5275,6 +5434,33 @@ class AbbrewSkillSheet extends ItemSheet {
     if (skillDiscord) {
       new Tagify(skillDiscord, settings);
     }
+  }
+  /**
+    * Handle one of the add or remove wound reduction buttons.
+    * @param {Element} target  Button or context menu entry that triggered this action.
+    * @param {string} action   Action being triggered.
+    * @returns {Promise|void}
+    */
+  _onSkillActionModifierWoundAction(target, action) {
+    if (this.item.system.configurable) {
+      switch (action) {
+        case "add-skill-action-modifier-wound":
+          return this.addSkillActionModifierWound(target);
+        case "remove-skill-action-modifier-wound":
+          return this.removeSkillActionModifierWound(target);
+      }
+    }
+  }
+  addSkillActionModifierWound(target) {
+    let action = foundry.utils.deepClone(this.item.system.action);
+    action.modifiers.wounds.self = [...action.modifiers.wounds.self, {}];
+    return this.item.update({ "system.action": action });
+  }
+  removeSkillActionModifierWound(target) {
+    const id = target.closest("li").dataset.id;
+    const action = foundry.utils.deepClone(this.item.system.action);
+    action.modifiers.wounds.self.splice(Number(id), 1);
+    return this.item.update({ "system.action": action });
   }
   _onDamageAction(target, action) {
     switch (action) {
@@ -5549,7 +5735,7 @@ async function createItemMacro(data, slot) {
   }
 }
 async function createRollMacro(data, item, slot) {
-  command = `game.abbrew.rollItemMacro("${data.uuid}");`;
+  const command = `game.abbrew.rollItemMacro("${data.uuid}");`;
   let macro = game.macros.find(
     (m) => m.name === item.name && m.command === command
   );
@@ -5566,9 +5752,9 @@ async function createRollMacro(data, item, slot) {
   return false;
 }
 async function createSkillMacro(skill, slot) {
-  let command2 = "await game.abbrew.useSkillMacro(this);";
+  let command = "await game.abbrew.useSkillMacro(this);";
   let macro = game.macros.find(
-    (m) => m.name === skill.name && skill.command === command2
+    (m) => m.name === skill.name && skill.command === command
   );
   if (!macro) {
     const skillId = skill._id;
@@ -5577,7 +5763,7 @@ async function createSkillMacro(skill, slot) {
       type: "script",
       scope: "actor",
       img: skill.img,
-      command: command2,
+      command,
       flags: { "abbrew.itemMacro": true, "abbrew.skillMacro.skillId": skillId }
     });
   }

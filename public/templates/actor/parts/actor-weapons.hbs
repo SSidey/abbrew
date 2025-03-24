@@ -23,8 +23,10 @@
         {{#each item.system.attackProfiles as |attackProfile attackProfileId|}}
         <ol class="attack-profiles">
           <li class="attack-profile" data-attack-profile-id="{{attackProfileId}}">
+            {{#if item.system.isAttackTrained}}
             <button type="button" class="attack-damage-button"><span
                 class="actions-icon action-{{item.system.actionCost}}a">{{attackProfile.name}}</span></button>
+            {{/if}}
             {{#if item.system.isOverpowerTrained}}
             {{#if hasStrongAttack}}
             <button type="button" class="attack-overpower-button">
@@ -34,10 +36,14 @@
             <div></div>
             {{/if}}
             {{/if}}
+            {{#if item.system.isFeintTrained}}
             <button type="button" class="attack-feint-button"><span
                 class="actions-icon action-{{item.system.actionCost}}a">Feint</span></button>
+            {{/if}}
+            {{#if item.system.isFinisherTrained}}
             <button type="button" class="attack-finisher-button"><span
                 class="actions-icon action-{{item.system.actionCost}}a">Finisher</span></button>
+            {{/if}}
           </li>
         </ol>
         {{/each}}

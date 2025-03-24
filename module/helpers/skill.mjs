@@ -453,6 +453,10 @@ async function createDurationActiveEffect(actor, skill, duration) {
 
 export async function rechargeSkill(actor, skill) {
     const item = actor.items.find(i => i._id === skill._id);
+    if (!item) {
+        return;
+    }
+
     let updates = {};
     if (skill.system.action.charges.hasCharges) {
         const maxCharges = skill.system.action.charges.max;

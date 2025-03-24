@@ -2,6 +2,7 @@ import {
     onManageActiveEffect,
     prepareActiveEffectCategories,
 } from '../../helpers/effects.mjs';
+import { renderSheetForStoredItem } from '../../helpers/utils.mjs';
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -111,6 +112,10 @@ export class AbbrewSkillDeckSheet extends ItemSheet {
             await this.item.update({ "system.creatureForm": { name: "", id: "", image: "" } });
         });
 
+        html.on('click', '.skill-deck-skill .skill-deck-summary .image-container, .skill-deck-skill .skill-deck-summary .name', async (event) => {
+            await renderSheetForStoredItem(event, this.actor);
+        });
+
         html.on('drop', async (event) => {
             if (!this.item.testUserPermission(game.user, 'OWNER')) {
                 return;
@@ -119,14 +124,13 @@ export class AbbrewSkillDeckSheet extends ItemSheet {
             const droppedData = event.originalEvent.dataTransfer.getData("text")
             const eventJson = JSON.parse(droppedData);
             if (eventJson && eventJson.type === "Item") {
-                const itemId = eventJson.uuid.split(".").pop()
-                const item = game.items.get(itemId);
+                const item = fromUuidSync(eventJson.uuid);
                 if (item.type === "skill") {
                     const storedSkills = this.item.system.skills;
-                    const updateSkills = [...storedSkills, { name: item.name, id: itemId, image: item.img, skillType: item.system.skillType }];
+                    const updateSkills = [...storedSkills, { name: item.name, id: item._id, image: item.img, sourceId: item.uuid }];
                     await this.item.update({ "system.skills": updateSkills });
                 } else if (item.type === "creatureForm") {
-                    await this.item.update({ "system.creatureForm": { name: item.name, id: itemId, image: item.img } });
+                    await this.item.update({ "system.creatureForm": { name: item.name, id: item._id, image: item.img, sourceId: item.uuid } });
                 }
             }
         })

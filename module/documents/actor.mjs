@@ -1,6 +1,7 @@
 import { mergeActorWounds } from "../helpers/combat.mjs";
 import { isSkillBlocked } from "../helpers/skill.mjs";
 import { getAttackerAdvantageGuardResult, getAttackerAdvantageRiskResult, getDefenderAdvantageGuardResult, getDefenderAdvantageRiskResult } from "../helpers/trainedSkills.mjs";
+import { getSafeJson } from "../helpers/utils.mjs";
 import { FINISHERS } from "../static/finishers.mjs";
 
 /**
@@ -324,9 +325,32 @@ export default class AbbrewActor extends Actor {
   }
 
   async acceptSkillDeck(skillDeck) {
-    const skills = skillDeck.system.skills.map(s => game.items.get(s.id));
+    const skills = await Promise.all(skillDeck.system.skills.map(async s => await this.getGameItem(s)));
     for (const index in skills) {
       await Item.create(skills[index], { parent: this })
+    }
+  }
+
+  async getGameItem(skill) {
+    const itemId = skill.id;
+    const sourceId = skill.sourceId;
+    if (itemId && !sourceId) {
+      const item = game.items.find(i => i._id === itemId);
+      if (item) {
+        return item;
+      }
+    } else if (sourceId) {
+      const source = fromUuidSync(sourceId);
+      const compendiumPackName = source.pack;
+      const id = source._id;
+      if (!compendiumPackName && source && id) {
+        return source;
+      } else {
+        const pack = game.packs.get(compendiumPackName);
+        await pack.getIndex();
+        const item = await pack.getDocument(id);
+        return item;
+      }
     }
   }
 

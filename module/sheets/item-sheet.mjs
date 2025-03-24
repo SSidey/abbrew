@@ -109,28 +109,6 @@ export class AbbrewItemSheet extends ItemSheet {
       if (t.dataset.action) this._onAttackProfileAction(t, t.dataset.action);
     });
 
-    html.find(".skill-action-control").click(event => {
-      const t = event.currentTarget;
-      if (t.dataset.action) this._onSkillActionAction(t, t.dataset.action);
-    });
-
-    html.find(".skill-action-resource-control").click(event => {
-      const t = event.currentTarget;
-      if (t.dataset.action) this._onSkillActionResourceRequirementAction(t, t.dataset.action);
-    });
-
-    html.find(".skill-action-modifier-wound-control").click(event => {
-      const t = event.currentTarget;
-      if (t.dataset.action) this._onSkillActionModifierWoundAction(t, t.dataset.action);
-    });
-
-    html.find(".skill-action-modifier-damage-control").click(event => {
-      const t = event.currentTarget;
-      if (t.dataset.action) this._onSkillActionModifierDamageAction(t, t.dataset.action);
-    });
-
-    html.find(".skill-configuration-section :input").prop("disabled", !this.item.system.configurable);
-
     this._activateArmourPoints(html);
     this._activateAnatomyParts(html);
   }
@@ -261,37 +239,6 @@ export class AbbrewItemSheet extends ItemSheet {
           break;
       }
     }
-  }
-
-  /**
-    * Handle one of the add or remove wound reduction buttons.
-    * @param {Element} target  Button or context menu entry that triggered this action.
-    * @param {string} action   Action being triggered.
-    * @returns {Promise|void}
-    */
-  _onSkillActionModifierWoundAction(target, action) {
-    if (this.item.system.configurable) {
-      switch (action) {
-        case 'add-skill-action-modifier-wound':
-          return this.addSkillActionModifierWound(target);
-        case 'remove-skill-action-modifier-wound':
-          return this.removeSkillActionModifierWound(target);
-      }
-    }
-  }
-
-  addSkillActionModifierWound(target) {
-    let action = foundry.utils.deepClone(this.item.system.action);
-    action.modifiers.wounds.self = [...action.modifiers.wounds.self, {}];
-    return this.item.update({ "system.action": action });
-
-  }
-
-  removeSkillActionModifierWound(target) {
-    const id = target.closest("li").dataset.id;
-    const action = foundry.utils.deepClone(this.item.system.action);
-    action.modifiers.wounds.self.splice(Number(id), 1);
-    return this.item.update({ "system.action": action });
   }
 
   /**

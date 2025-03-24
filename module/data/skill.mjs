@@ -15,6 +15,15 @@ export default class AbbrewSkill extends AbbrewItemBase {
         });
         schema.configurable = new fields.BooleanField({ required: true });
         schema.isActivatable = new fields.BooleanField({ required: true, label: "ABBREW.IsActivatable" });
+        schema.skills = new fields.ArrayField(
+            new fields.SchemaField({
+                name: new fields.StringField({ required: true, blank: true }),
+                skillType: new fields.StringField({ required: true, blank: true }),
+                id: new fields.StringField({ required: true, blank: true }),
+                image: new fields.StringField({ required: true, blank: true }),
+                sourceId: new fields.StringField({ required: true, blank: true })
+            })
+        );
         schema.action = new fields.SchemaField({
             activationType: new fields.StringField({ ...blankString }),
             actionCost: new fields.StringField({ ...blankString }),

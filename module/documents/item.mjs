@@ -124,7 +124,11 @@ export default class AbbrewItem extends Item {
 
     const actor = tokens[0].actor;
 
-    // TODO: Make parry and feint baseline but weaker, training improves the effect
+    if (action === "parry" && !actor.doesActorHaveSkillTrait("skillTraining", "defensiveSkills", "base", "parry")) {
+      ui.notifications.info("Please ensure you have the parry skill.");
+      return;
+    }
+
     if (action === "parry" && actor.doesActorHaveSkillDiscord("Parry")) {
       ui.notifications.info("You are prevented from parrying.");
       return;
@@ -154,8 +158,8 @@ export default class AbbrewItem extends Item {
 
   async _onCreate(data, options, userId) {
     if (data.type === "skill") {
-      const synergies = getSafeJson(data.system.skillModifiers.synergy, []).map(s => ({ value: s.value, id: this.actor.items.find(i => i.name === s.value)?._id })).filter(s => s.id);
-      const discord = getSafeJson(data.system.skillModifiers.discord, []).map(s => ({ value: s.value, id: this.actor.items.find(i => i.name === s.value)?._id })).filter(s => s.id);
+      const synergies = getSafeJson(data.system.skillModifiers.synergy, []).map(s => ({ value: s.value, id: this.actor.items.find(i => i.name === s.value)?._id, sourceId: s.sourceId })).filter(s => s.id);
+      const discord = getSafeJson(data.system.skillModifiers.discord, []).map(s => ({ value: s.value, id: this.actor.items.find(i => i.name === s.value)?._id, sourceId: s.sourceId })).filter(s => s.id);
       const update = {};
       if (synergies.length > 0) {
         update["system.skillModifiers.synergy"] = JSON.stringify(synergies);
@@ -167,6 +171,8 @@ export default class AbbrewItem extends Item {
       if (Object.keys(update).length > 0) {
         await this.update(update);
       }
+
+      await this.actor?.acceptSkillDeck(data);
     }
   }
 

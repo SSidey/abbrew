@@ -190,6 +190,13 @@
         "sinImmunity": "Sin Immunity"
       },
       "SkillTraining": {
+        "attackBase": "Attack Base",
+        "finisherBase": "Finisher Base",
+        "overpowerBase": "Overpower Base",
+        "parryBase": "Parry Base",
+        "feintBase": "Feint Base",
+        "attack": "Attack Training",
+        "finisher": "Finisher Training",
         "overpower": "Overpower Training",
         "parry": "Parry Training",
         "feint": "Feint Training",

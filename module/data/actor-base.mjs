@@ -127,9 +127,11 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     this.defense.resolve.max = 2 + Math.floor((this._getMaxFromPhysicalAttributes() + this._getMaxFromMentalAttributes()) / 2);
 
     this.skillTraining = ([
+      { type: "attack", value: 0 },
       { type: "overpower", value: 0 },
       { type: "parry", value: 0 },
       { type: "feint", value: 0 },
+      { type: "finisher", value: 0 },
       { type: "parryCounter", value: 0 },
       { type: "feintCounter", value: 0 }
     ])

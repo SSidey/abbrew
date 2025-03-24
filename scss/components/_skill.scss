@@ -94,6 +94,14 @@ div.skill-card.skill-active {
     text-align: center;
 }
 
+.skill-element-max-input {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    margin-bottom: 5px;
+    grid-gap: 10px;
+    align-items: center;
+}
+
 .skill-paired-row {
     display: grid;
     grid-template-columns: repeat(2, 1fr);

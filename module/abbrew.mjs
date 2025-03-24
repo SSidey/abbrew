@@ -380,7 +380,7 @@ async function createItemMacro(data, slot) {
 }
 
 async function createRollMacro(data, item, slot) {
-  command = `game.abbrew.rollItemMacro("${data.uuid}");`;
+  const command = `game.abbrew.rollItemMacro("${data.uuid}");`;
 
   // Create the macro command using the uuid.
   let macro = game.macros.find(

@@ -7,12 +7,16 @@ export default class AbbrewItemBase extends foundry.abstract.TypeDataModel {
 
     schema.description = new fields.StringField({ required: true, blank: true });
     schema.traits = new fields.StringField({ required: true, blank: true });
+    schema.abbrewId = new fields.StringField({ required: true, blank: true });
 
     return schema;
   }
 
   // Prior to Active Effects
   prepareBaseData() {
+    if (this.abbrewId === "") {
+      this.abbrewId = this.generateAbbrewId();
+    }
   }
 
   // Post Active Effects
@@ -26,5 +30,9 @@ export default class AbbrewItemBase extends foundry.abstract.TypeDataModel {
  */
   static migrateData(source) {
     return super.migrateData(source);
+  }
+
+  generateAbbrewId() {
+    return `abbrew.${this.parent.type}.${this.parent.name.toLowerCase().replace(/\s/g, '')}.${this.parent._id}`
   }
 }

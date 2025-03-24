@@ -18,9 +18,10 @@ export default class AbbrewWeapon extends AbbrewPhysicalItem {
     schema.weapon = new fields.SchemaField({
       size: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 9 })
     });
+    schema.isAttackTrained = new fields.BooleanField({ required: true, nullable: false, initial: false });
+    schema.isFinisherTrained = new fields.BooleanField({ required: true, nullable: false, initial: false });
     schema.isFeintTrained = new fields.BooleanField({ required: true, nullable: false, initial: false });
     schema.isOverpowerTrained = new fields.BooleanField({ required: true, nullable: false, initial: false });
-    schema.isParryTrained = new fields.BooleanField({ required: true, nullable: false, initial: false });
 
     AbbrewAttackBase.addAttackSchema(schema);
   }
@@ -33,7 +34,10 @@ export default class AbbrewWeapon extends AbbrewPhysicalItem {
 
   // Post Active Effects
   prepareDerivedData() {
-    this.isOverpowerTrained = this.doesParentActorHaveSkillTrait("skillTraining", "offensiveSkills", "increase", "overpower");
+    this.isAttackTrained = this.doesParentActorHaveSkillTrait("skillTraining", "offensiveSkills", "base", "attack") ?? false;
+    this.isFinisherTrained = this.doesParentActorHaveSkillTrait("skillTraining", "offensiveSkills", "base", "finisher") ?? false;
+    this.isFeintTrained = this.doesParentActorHaveSkillTrait("skillTraining", "offensiveSkills", "base", "feint") ?? false;
+    this.isOverpowerTrained = this.doesParentActorHaveSkillTrait("skillTraining", "offensiveSkills", "base", "overpower") ?? false;
   }
 
   doesParentActorHaveSkillTrait(feature, subFeature, effect, data) {

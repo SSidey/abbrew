@@ -20,7 +20,8 @@
       {{!-- To render inline rolls in a TinyMCE editor, you need to pass the parent actor's (if any) roll data to
       the
       rollData prop. --}}
-      {{editor enrichedDescription target="system.description" engine="prosemirror" rollData=rollData button=true owner=owner
+      {{editor enrichedDescription target="system.description" engine="prosemirror" rollData=rollData button=true
+      owner=owner
       editable=editable}}
     </div>
 
@@ -30,7 +31,7 @@
         <h3>Skills</h3>
         <ol class="skill-deck-skills">
           {{#each system.skills as |skill id|}}
-          <li class="skill-deck-skill" data-id="{{id}}">
+          <li class="skill-deck-skill" data-id="{{id}}" data-item-id="{{skill.id}}" data-source-id="{{skill.sourceId}}">
             <div class="skill-deck-summary">
               <div class="image-container"><img src="{{skill.image}}" /></div>
               <div class="name"><span>{{skill.name}}</span></div>

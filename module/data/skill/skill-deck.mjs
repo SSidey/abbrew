@@ -11,7 +11,8 @@ export default class AbbrewSkillDeck extends AbbrewItemBase {
                 name: new fields.StringField({ required: true, blank: true }),
                 skillType: new fields.StringField({ required: true, blank: true }),
                 id: new fields.StringField({ required: true, blank: true }),
-                image: new fields.StringField({ required: true, blank: true })
+                image: new fields.StringField({ required: true, blank: true }),
+                sourceId: new fields.StringField({ required: true, blank: true })
             })
         );
 

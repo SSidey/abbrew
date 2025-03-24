@@ -63,3 +63,70 @@ export function intersection(a, b) {
     const foo = b.filter(value => setA.has(value));
     return foo;
 }
+
+/* -------------------------------------------- */
+
+export async function renderSheetForTaggedData(event, actor) {
+    const inspectionClass = "tagify__tag";
+    const element = _checkThroughParentsForClass(event.target, inspectionClass, 2);
+    const itemId = element.__tagifyTagData.id;
+    const sourceId = element.__tagifyTagData.sourceId;
+    if (itemId) {
+        const item = actor.items.find(i => i._id === itemId);
+        if (item) {
+            item.sheet.render(true);
+        }
+    } else if (sourceId) {
+        const source = fromUuidSync(sourceId);
+        const compendiumPackName = source.pack;
+        const id = source._id;
+        if (!compendiumPackName && source && id) {
+            source.sheet.render(true);
+        } else {
+            const pack = game.packs.get(compendiumPackName);
+            await pack.getIndex();
+            await pack.getDocument(id).then(item => item.sheet.render(true));
+        }
+    }
+}
+
+export async function renderSheetForStoredItem(event, actor) {
+    const inspectionClass = "skill-deck-skill";
+    const element = _checkThroughParentsForClass(event.target, inspectionClass, 3);
+    const itemId = element.dataset.itemId;
+    const sourceId = element.dataset.sourceId
+    if (itemId && !sourceId) {
+        const item = actor.items.find(i => i._id === itemId);
+        if (item) {
+            item.sheet.render(true);
+        }
+    } else if (sourceId) {
+        const source = fromUuidSync(sourceId);
+        const compendiumPackName = source.pack;
+        const id = source._id;
+        if (!compendiumPackName && source && id) {
+            source.sheet.render(true);
+        } else {
+            const pack = game.packs.get(compendiumPackName);
+            await pack.getIndex();
+            await pack.getDocument(id).then(item => item.sheet.render(true));
+        }
+    }
+}
+
+function _checkThroughParentsForClass(element, inspectionClass, depth) {
+    let returnElement = _elementClassListContainsClass(element, inspectionClass);
+    if (!returnElement && depth > 0) {
+        returnElement = _checkThroughParentsForClass(element.parentElement, inspectionClass, depth - 1);
+    }
+
+    if (returnElement) {
+        return returnElement;
+    }
+
+    return null;
+}
+
+function _elementClassListContainsClass(element, inspectionClass) {
+    return Object.values(element.classList).includes(inspectionClass) ? element : null;
+}

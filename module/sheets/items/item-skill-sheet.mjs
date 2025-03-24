@@ -3,6 +3,7 @@ import {
     prepareActiveEffectCategories,
 } from '../../helpers/effects.mjs';
 import Tagify from '@yaireo/tagify'
+import { getObjectValueByStringPath, getSafeJson, renderSheetForStoredItem, renderSheetForTaggedData } from '../../helpers/utils.mjs';
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -93,14 +94,106 @@ export class AbbrewSkillSheet extends ItemSheet {
             onManageActiveEffect(event, this.item)
         );
 
+        html.find(".skill-action-resource-control").click(event => {
+            const t = event.currentTarget;
+            if (t.dataset.action) this._onSkillActionResourceRequirementAction(t, t.dataset.action);
+        });
+
+        html.find(".skill-action-modifier-wound-control").click(event => {
+            const t = event.currentTarget;
+            if (t.dataset.action) this._onSkillActionModifierWoundAction(t, t.dataset.action);
+        });
+
+        html.find(".skill-action-modifier-damage-control").click(event => {
+            const t = event.currentTarget;
+            if (t.dataset.action) this._onSkillActionModifierDamageAction(t, t.dataset.action);
+        });
+
         html.find(".damage-control").click(event => {
             const t = event.currentTarget;
             if (t.dataset.action) this._onDamageAction(t, t.dataset.action);
         });
 
+        html.find(".attack-profile-control").click(event => {
+            const t = event.currentTarget;
+            if (t.dataset.action) this._onAttackProfileAction(t, t.dataset.action);
+        });
+
+        html.find(".skill-configuration-section :input").prop("disabled", !this.item.system.configurable);
+
+        html.on("click", ".tagify__tag div", async (event) => {
+            await renderSheetForTaggedData(event, this.actor);
+        })
+
         html.on('dragover', (event) => {
             event.preventDefault();
         });
+
+        html.on('drop', 'ol.skill-deck-skills', async (event) => {
+            if (!this.item.testUserPermission(game.user, 'OWNER')) {
+                return;
+            }
+
+            const droppedData = event.originalEvent.dataTransfer.getData("text")
+            const eventJson = JSON.parse(droppedData);
+            if (eventJson && eventJson.type === "Item") {
+                const item = fromUuidSync(eventJson.uuid);
+                if (item.type === "skill") {
+                    const storedSkills = this.item.system.skills;
+                    const updateSkills = [...storedSkills, { name: item.name, id: item._id, image: item.img, sourceId: item.uuid }];
+                    await this.item.update({ "system.skills": updateSkills });
+                }
+            }
+        });
+
+        html.on('click', '.skill-deck-skill .skill-deck-summary .image-container, .skill-deck-skill .skill-deck-summary .name', async (event) => {
+            await renderSheetForStoredItem(event, this.actor);
+        });
+
+        html.on('click', '.skill-delete', async (ev) => {
+            const li = $(ev.currentTarget).parents('.skill-deck-skill');
+            if (li.data('id') || li.data('id') === 0) {
+                const skills = this.item.system.skills;
+                skills.splice(li.data('id'), 1);
+                await this.item.update({ "system.skills": skills });
+            }
+        });
+
+        html.on('drop', 'tags.tagify', async (event) => {
+            if (!this.item.testUserPermission(game.user, 'OWNER')) {
+                return;
+            }
+
+            const target = event.target;
+            let inputElement = null;
+            if (Object.values(target.classList).includes("tagify__input")) {
+                inputElement = target.parentElement.nextElementSibling;
+            } else if (Object.values(target.classList).includes("tagify")) {
+                inputElement = target.nextElementSibling;
+            } else {
+                return;
+            }
+
+            if (inputElement.readOnly) {
+                return;
+            }
+
+            const droppedData = event.originalEvent.dataTransfer.getData("text")
+            const eventJson = JSON.parse(droppedData);
+            if (eventJson && eventJson.type === "Item") {
+                const item = fromUuidSync(eventJson.uuid);
+                if (inputElement.dataset.droptype !== item.type) {
+                    return;
+                }
+                const value = item.name;
+                const path = inputElement.name;
+                const inputValue = getSafeJson(getObjectValueByStringPath(this.item, path), []);
+                const updateValue = [...inputValue, { value: value, id: "", sourceId: eventJson.uuid }];
+                const update = {};
+                update[path] = JSON.stringify(updateValue);
+                await this.item.update(update);
+            }
+        })
 
         this._activateSkillTraits(html);
         this._activateSkillModifiers(html);
@@ -116,7 +209,7 @@ export class AbbrewSkillSheet extends ItemSheet {
                 closeOnSelect: false,       // <- do not hide the suggestions dropdown once an item has been selected
                 includeSelectedTags: false   // <- Should the suggestions list Include already-selected tags (after filtering)
             },
-            userInput: false,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+            userInput: true,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
             duplicates: true,             // <- Should duplicate tags be allowed or not
             whitelist: [.../* Object.values( */CONFIG.ABBREW.traits/* ) */.map(trait => ({
                 ...trait,
@@ -142,9 +235,8 @@ export class AbbrewSkillSheet extends ItemSheet {
                 closeOnSelect: false,       // <- do not hide the suggestions dropdown once an item has been selected
                 includeSelectedTags: false   // <- Should the suggestions list Include already-selected tags (after filtering)
             },
-            userInput: true,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+            userInput: false,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
             duplicates: false,             // <- Should duplicate tags be allowed or not
-            whitelist: [...this.item?.actor?.items?.filter(i => i.type === "skill").map(s => ({ value: s.name, id: s._id })) ?? []],
         };
         if (skillSynergy) {
             var taggedSkillSynergy = new Tagify(skillSynergy, settings);
@@ -152,6 +244,37 @@ export class AbbrewSkillSheet extends ItemSheet {
         if (skillDiscord) {
             var taggedSkillDiscord = new Tagify(skillDiscord, settings);
         }
+    }
+
+    /**
+      * Handle one of the add or remove wound reduction buttons.
+      * @param {Element} target  Button or context menu entry that triggered this action.
+      * @param {string} action   Action being triggered.
+      * @returns {Promise|void}
+      */
+    _onSkillActionModifierWoundAction(target, action) {
+        if (this.item.system.configurable) {
+            switch (action) {
+                case 'add-skill-action-modifier-wound':
+                    return this.addSkillActionModifierWound(target);
+                case 'remove-skill-action-modifier-wound':
+                    return this.removeSkillActionModifierWound(target);
+            }
+        }
+    }
+
+    addSkillActionModifierWound(target) {
+        let action = foundry.utils.deepClone(this.item.system.action);
+        action.modifiers.wounds.self = [...action.modifiers.wounds.self, {}];
+        return this.item.update({ "system.action": action });
+
+    }
+
+    removeSkillActionModifierWound(target) {
+        const id = target.closest("li").dataset.id;
+        const action = foundry.utils.deepClone(this.item.system.action);
+        action.modifiers.wounds.self.splice(Number(id), 1);
+        return this.item.update({ "system.action": action });
     }
 
     _onDamageAction(target, action) {
@@ -176,4 +299,6 @@ export class AbbrewSkillSheet extends ItemSheet {
         damage.splice(Number(damageId), 1);
         return this.item.update({ "system.action.modifiers.attackProfile.damage": damage });
     }
+
+    tagify
 }
