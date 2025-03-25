@@ -162,10 +162,16 @@
                         <div class="damage-profile-element-2">
                             <label>Modify</label>
                             <select name="system.action.modifiers.attackProfile.damage.{{j}}.modify">
-                                {{selectOptions ../config.modify selected=damage.modify blank="Skip" localize=true}}
+                                {{selectOptions ../config.modify selected=damage.modify localize=true}}
                             </select>
                         </div>
-                        <div></div>
+                        <div class="damage-profile-element-2">
+                            {{#if (or (eq damage.modify "all") (eq damage.modify "one"))}}
+                            <select name="system.action.modifiers.attackProfile.damage.{{j}}.modifyType">
+                                {{selectOptions ../config.concepts selected=damage.modifyType blank="" localize=true}}
+                            </select>
+                            {{/if}}
+                        </div>
                         {{#unless (eq damage.modify "skip")}}
                         <div class="damage-profile-element-2">
                             <label>Overall Multiplier</label>

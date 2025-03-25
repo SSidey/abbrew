@@ -104,8 +104,6 @@ export default class AbbrewItem extends Item {
     const messageId = card.closest(".message").dataset.messageId;
     const message = game.messages.get(messageId);
     const action = button.dataset.action;
-    const actor = game.actors.get(card.dataset.actorId);
-    const item = game.items.get(card.dataset.itemId);
 
     switch (action) {
       case 'damage': await this._onAcceptDamageAction(message.rolls, message.flags.data, action); break;

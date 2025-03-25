@@ -31,7 +31,8 @@
         <h3>Anatomy</h3>
         <ol class="creature-form-anatomy-list">
           {{#each system.anatomy as |anatomy id|}}
-          <li class="creature-form-anatomy" data-id="{{id}}">
+          <li class="creature-form-anatomy" data-id="{{id}}" data-item-id="{{anatomy.id}}"
+            data-source-id="{{anatomy.sourceId}}">
             <div class="anatomy-summary">
               <div class="image-container"><img src="{{anatomy.image}}" /></div>
               <div class="name"><span>{{anatomy.name}}</span></div>

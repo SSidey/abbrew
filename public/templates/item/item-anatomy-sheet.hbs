@@ -54,6 +54,25 @@
         </div>
       </div>
       {{> "systems/abbrew/templates/item/parts/item-defenses.hbs" showEquipType=false}}
+      <div>
+        <h3>Natural Weapons</h3>
+        <ol class="anatomy-weapon-list">
+          {{#each system.naturalWeapons as |weapon id|}}
+          <li class="anatomy-weapon" data-id="{{id}}" data-item-id="{{weapon.id}}" data-source-id="{{weapon.sourceId}}">
+            <div class="anatomy-weapon-summary">
+              <div class="image-container"><img src="{{weapon.image}}" /></div>
+              <div class="name"><span>{{weapon.name}}</span></div>
+              <a class='item-control anatomy-weapon-delete' title='{{localize "DOCUMENT.Delete" type="weapon"}}'>
+                <i class='fas fa-trash'></i>
+              </a>
+            </div>
+          </li>
+          {{/each}}
+          <li class="empty-drop-list-element">
+            <span>+ Natural Weapon</span>
+          </li>
+        </ol>
+      </div>
     </div>
   </section>
 </form>

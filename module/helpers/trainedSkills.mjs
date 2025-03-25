@@ -7,13 +7,13 @@ export function getDefenderAdvantageGuardResult(skillTraining, attackCounterTrai
     return 0;
 }
 
-export function getDefenderAdvantageRiskResult(skillTraining, attackCounterTraining, damage, inflexibility) {
+export function getDefenderAdvantageRiskResult(skillTraining, attackCounterTraining, damage, inflexibility, guard) {
     const trainingResult = skillTraining - attackCounterTraining;
     if (trainingResult > 0) {
         return 0;
     }
 
-    return Math.min(damage, inflexibility);
+    return guard > 0 ? Math.min(damage, inflexibility) : damage;
 }
 
 export function getAttackerAdvantageGuardResult(counterTraining, attackerSkillTraining, damage) {
@@ -25,11 +25,11 @@ export function getAttackerAdvantageGuardResult(counterTraining, attackerSkillTr
     return damage;
 }
 
-export function getAttackerAdvantageRiskResult(counterTraining, attackerSkillTraining, damage, inflexibility) {
+export function getAttackerAdvantageRiskResult(counterTraining, attackerSkillTraining, damage, inflexibility, guard) {
     const trainingResult = attackerSkillTraining - counterTraining;
     if (trainingResult > 0) {
-        return 2 * Math.min(damage, inflexibility);
+        return guard > 0 ? 2 * Math.min(damage, inflexibility) : 2 * damage;
     }
 
-    return Math.min(damage, inflexibility);
+    return guard > 0 ? Math.min(damage, inflexibility) : damage;
 }

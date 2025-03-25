@@ -62,20 +62,11 @@ async function renderSheetForTaggedData(event, actor) {
       item.sheet.render(true);
     }
   } else if (sourceId) {
-    const source = fromUuidSync(sourceId);
-    const compendiumPackName = source.pack;
-    const id = source._id;
-    if (!compendiumPackName && source && id) {
-      source.sheet.render(true);
-    } else {
-      const pack = game.packs.get(compendiumPackName);
-      await pack.getIndex();
-      await pack.getDocument(id).then((item) => item.sheet.render(true));
-    }
+    const source = await fromUuid(sourceId);
+    source.sheet.render(true);
   }
 }
-async function renderSheetForStoredItem(event, actor) {
-  const inspectionClass = "skill-deck-skill";
+async function renderSheetForStoredItem(event, actor, inspectionClass) {
   const element = _checkThroughParentsForClass(event.target, inspectionClass, 3);
   const itemId = element.dataset.itemId;
   const sourceId = element.dataset.sourceId;
@@ -85,16 +76,8 @@ async function renderSheetForStoredItem(event, actor) {
       item.sheet.render(true);
     }
   } else if (sourceId) {
-    const source = fromUuidSync(sourceId);
-    const compendiumPackName = source.pack;
-    const id = source._id;
-    if (!compendiumPackName && source && id) {
-      source.sheet.render(true);
-    } else {
-      const pack = game.packs.get(compendiumPackName);
-      await pack.getIndex();
-      await pack.getDocument(id).then((item) => item.sheet.render(true));
-    }
+    const source = await fromUuid(sourceId);
+    source.sheet.render(true);
   }
 }
 function _checkThroughParentsForClass(element, inspectionClass, depth) {
@@ -322,7 +305,41 @@ function mergeAttackProfile(base, attackProfile) {
     baseAttackProfile.lethal.value = applyOperator(baseAttackProfile.lethal.value, attackProfile.lethal.value, attackProfile.lethal.operator);
   }
   const baseDamageList = base.damage;
-  const modifyDamageList = attackProfile.damage.some((d) => d.modify === "all") ? new Array(baseDamageList.damage.length).fill(attackProfile.damage.find((d) => d.modify === "all")[0]) : attackProfile.damage.filter((d) => d.modify);
+  let modifyDamageList = attackProfile.damage.filter((d) => d.modify);
+  if (attackProfile.damage.some((d) => d.modify === "all" && d.modifyType === "")) {
+    modifyDamageList = new Array(baseDamageList.length).fill(attackProfile.damage.find((d) => d.modify === "all"));
+  } else {
+    const allTypeModifiers = attackProfile.damage.filter((d) => d.modify === "all" && d.modifyType !== "");
+    var flags = [], output = [], l = allTypeModifiers.length, i;
+    for (i = 0; i < l; i++) {
+      if (flags[allTypeModifiers[i].modifyType])
+        continue;
+      flags[allTypeModifiers[i].modifyType] = true;
+      output.push(allTypeModifiers[i]);
+    }
+    let allTypeFilteredModifiers = attackProfile.damage.filter((d) => ["skip", "add"].includes(d.modify));
+    let modifyOnce = attackProfile.damage.filter((d) => d.modify === "one" && !(d.modify === "one" && flags.includes(d.modifyType)));
+    const replacedIndices = baseDamageList.reduce(
+      (result, m, i2) => {
+        let replacement = output.find((fm) => fm.modifyType === m.type);
+        if (!replacement) {
+          const index = modifyOnce.findIndex((mo) => mo.modifyType === m.type);
+          const replacements = index > -1 ? modifyOnce.splice(index, 1) : [];
+          replacement = replacements.length === 1 ? replacements[0] : null;
+        }
+        result[i2] = replacement ? replacement : null;
+        return result;
+      },
+      []
+    );
+    modifyDamageList = replacedIndices.reduce(
+      (result, m, i2) => {
+        result[i2] = m ? m : allTypeFilteredModifiers.shift();
+        return result;
+      },
+      []
+    );
+  }
   const last = Math.max(baseDamageList.length, modifyDamageList.length);
   const updatedDamage = [];
   for (let index = 0; index < last; index++) {
@@ -344,9 +361,9 @@ function mergeAttackProfile(base, attackProfile) {
   return baseAttackProfile;
 }
 function applyModifierToDamageProfile(baseElement, modifyElement) {
-  const type = modifyElement.type ?? baseElement.type;
+  const type = modifyElement.type.length > 0 ? modifyElement.type : baseElement.type;
   const damage = modifyElement.value ?? baseElement.value;
-  const attribute = modifyElement.attributeModifier.length ? modifyElement.attributeModifier.length : baseElement.attributeModifier;
+  const attribute = modifyElement.attributeModifier.length > 0 ? modifyElement.attributeModifier : baseElement.attributeModifier;
   return {
     type,
     value: damage,
@@ -3511,10 +3528,10 @@ ABBREW.proxiedSkills = {
   "finisher": "Finisher"
 };
 ABBREW.modify = {
+  "skip": "Skip",
   "all": "Modify All",
   "one": "Modify One",
-  "add": "Add",
-  "skip": "Skip"
+  "add": "Add"
 };
 class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   get traitsData() {
@@ -3995,6 +4012,7 @@ class AbbrewSkill extends AbbrewItemBase {
           damage: new fields.ArrayField(
             new fields.SchemaField({
               modify: new fields.StringField({ required: true, blank: true }),
+              modifyType: new fields.StringField({ required: true, blank: true }),
               type: new fields.StringField({ required: true, blank: true, nullable: true }),
               value: new fields.NumberField({ ...requiredInteger, nullable: true, nullable: true }),
               attributeModifier: new fields.StringField({ required: true, blank: true, nullable: true }),
@@ -4184,7 +4202,8 @@ class AbbrewAnatomy extends AbbrewPhysicalItem {
       new fields.SchemaField({
         name: new fields.StringField({ required: true, blank: true }),
         id: new fields.StringField({ required: true, blank: true }),
-        image: new fields.StringField({ required: true, blank: true })
+        image: new fields.StringField({ required: true, blank: true }),
+        sourceId: new fields.StringField({ required: true, blank: true })
       })
     );
     return schema;
@@ -4339,7 +4358,8 @@ class AbbrewCreatureForm extends AbbrewItemBase {
       new fields.SchemaField({
         name: new fields.StringField({ required: true, blank: true }),
         id: new fields.StringField({ required: true, blank: true }),
-        image: new fields.StringField({ required: true, blank: true })
+        image: new fields.StringField({ required: true, blank: true }),
+        sourceId: new fields.StringField({ required: true, blank: true })
       })
     );
     return schema;
@@ -4352,12 +4372,12 @@ function getDefenderAdvantageGuardResult(skillTraining2, attackCounterTraining, 
   }
   return 0;
 }
-function getDefenderAdvantageRiskResult(skillTraining2, attackCounterTraining, damage, inflexibility) {
+function getDefenderAdvantageRiskResult(skillTraining2, attackCounterTraining, damage, inflexibility, guard) {
   const trainingResult = skillTraining2 - attackCounterTraining;
   if (trainingResult > 0) {
     return 0;
   }
-  return Math.min(damage, inflexibility);
+  return guard > 0 ? Math.min(damage, inflexibility) : damage;
 }
 function getAttackerAdvantageGuardResult(counterTraining, attackerSkillTraining, damage) {
   const trainingResult = attackerSkillTraining - counterTraining;
@@ -4366,12 +4386,12 @@ function getAttackerAdvantageGuardResult(counterTraining, attackerSkillTraining,
   }
   return damage;
 }
-function getAttackerAdvantageRiskResult(counterTraining, attackerSkillTraining, damage, inflexibility) {
+function getAttackerAdvantageRiskResult(counterTraining, attackerSkillTraining, damage, inflexibility, guard) {
   const trainingResult = attackerSkillTraining - counterTraining;
   if (trainingResult > 0) {
-    return 2 * Math.min(damage, inflexibility);
+    return guard > 0 ? 2 * Math.min(damage, inflexibility) : 2 * damage;
   }
-  return Math.min(damage, inflexibility);
+  return guard > 0 ? Math.min(damage, inflexibility) : damage;
 }
 const FINISHERS = {
   "bludgeoning": {
@@ -4555,15 +4575,15 @@ class AbbrewActor extends Actor {
       return 0;
     }
     if (isStrongAttack) {
-      return Math.min(damage, inflexibility);
+      return guard > 0 ? Math.min(damage, inflexibility) : damage;
     }
     if (this.attackerGainsAdvantage(isFeint, action)) {
-      return getAttackerAdvantageRiskResult(((_a = this.system.skillTraining.find((st) => st.type === "feintCounter")) == null ? void 0 : _a.value) ?? 0, attackingActorFeint, damage, inflexibility);
+      return getAttackerAdvantageRiskResult(((_a = this.system.skillTraining.find((st) => st.type === "feintCounter")) == null ? void 0 : _a.value) ?? 0, attackingActorFeint, damage, inflexibility, guard);
     }
     if (this.defenderGainsAdvantage(isFeint, action)) {
-      return getDefenderAdvantageRiskResult(((_b = this.system.skillTraining.find((st) => st.type === "parry")) == null ? void 0 : _b.value) ?? 0, attackingActorParryCounter, damage, inflexibility);
+      return getDefenderAdvantageRiskResult(((_b = this.system.skillTraining.find((st) => st.type === "parry")) == null ? void 0 : _b.value) ?? 0, attackingActorParryCounter, damage, inflexibility, guard);
     }
-    return Math.min(damage, inflexibility);
+    return guard > 0 ? Math.min(damage, inflexibility) : damage;
   }
   defenderGainsAdvantage(isFeint, action) {
     return isFeint === false && action === "parry";
@@ -4639,45 +4659,23 @@ class AbbrewActor extends Actor {
     }
   }
   async acceptCreatureForm(creatureForm) {
-    const anatomy = creatureForm.system.anatomy.map((a) => game.items.get(a.id));
+    const anatomy = await Promise.all(creatureForm.system.anatomy.map(async (a) => await fromUuid(a.sourceId)));
     for (const index in anatomy) {
       await Item.create(anatomy[index], { parent: this });
-      const weapons = anatomy[index].system.naturalWeapons.map((w) => game.items.get(w.id));
+      const weapons = await Promise.all(anatomy[index].system.naturalWeapons.map(async (w) => await fromUuid(w.sourceId)));
       for (const weaponIndex in weapons) {
         await Item.create(weapons[weaponIndex], { parent: this });
       }
     }
   }
   async acceptSkillDeck(skillDeck) {
-    const skills = await Promise.all(skillDeck.system.skills.map(async (s) => await this.getGameItem(s)));
+    const skills = await Promise.all(skillDeck.system.skills.map(async (s) => await fromUuid(s.sourceId)));
     for (const index in skills) {
       await Item.create(skills[index], { parent: this });
     }
   }
-  async getGameItem(skill) {
-    const itemId = skill.id;
-    const sourceId = skill.sourceId;
-    if (itemId && !sourceId) {
-      const item = game.items.find((i) => i._id === itemId);
-      if (item) {
-        return item;
-      }
-    } else if (sourceId) {
-      const source = fromUuidSync(sourceId);
-      const compendiumPackName = source.pack;
-      const id = source._id;
-      if (!compendiumPackName && source && id) {
-        return source;
-      } else {
-        const pack = game.packs.get(compendiumPackName);
-        await pack.getIndex();
-        const item = await pack.getDocument(id);
-        return item;
-      }
-    }
-  }
   async acceptAnatomy(anatomy) {
-    const naturalWeapons = anatomy.system.naturalWeapons.map((w) => game.items.get(w.id));
+    const naturalWeapons = await Promise.all(anatomy.system.naturalWeapons.map(async (w) => await fromUuid(w.sourceId)));
     for (const index in naturalWeapons) {
       await Item.create(naturalWeapons[index], { parent: this });
     }
@@ -4798,8 +4796,6 @@ class AbbrewItem2 extends Item {
     const messageId = card.closest(".message").dataset.messageId;
     const message = game.messages.get(messageId);
     const action = button.dataset.action;
-    game.actors.get(card.dataset.actorId);
-    game.items.get(card.dataset.itemId);
     switch (action) {
       case "damage":
         await this._onAcceptDamageAction(message.rolls, message.flags.data, action);
@@ -4979,6 +4975,9 @@ class AbbrewCreatureFormSheet extends ItemSheet {
         await this.item.update({ "system.anatomy": anatomy });
       }
     });
+    html.on("click", ".creature-form-anatomy .anatomy-summary .image-container, .creature-form-anatomy .anatomy-summary .name", async (event) => {
+      await renderSheetForStoredItem(event, this.actor, "creature-form-anatomy");
+    });
     html.on("drop", async (event) => {
       if (!this.item.testUserPermission(game.user, "OWNER")) {
         return;
@@ -4986,11 +4985,10 @@ class AbbrewCreatureFormSheet extends ItemSheet {
       const droppedData = event.originalEvent.dataTransfer.getData("text");
       const eventJson = JSON.parse(droppedData);
       if (eventJson && eventJson.type === "Item") {
-        const itemId = eventJson.uuid.split(".").pop();
-        const item = game.items.get(itemId);
+        const item = await fromUuid(eventJson.uuid);
         if (item.type === "anatomy") {
           const storedAnatomy = this.item.system.anatomy;
-          const newAnatomy = [...storedAnatomy, { name: item.name, id: itemId, image: item.img }];
+          const newAnatomy = [...storedAnatomy, { name: item.name, id: item._id, image: item.img, sourceId: item.uuid }];
           await this.item.update({ "system.anatomy": newAnatomy });
         }
       }
@@ -5069,7 +5067,7 @@ class AbbrewSkillDeckSheet extends ItemSheet {
       await this.item.update({ "system.creatureForm": { name: "", id: "", image: "" } });
     });
     html.on("click", ".skill-deck-skill .skill-deck-summary .image-container, .skill-deck-skill .skill-deck-summary .name", async (event) => {
-      await renderSheetForStoredItem(event, this.actor);
+      await renderSheetForStoredItem(event, this.actor, "skill-deck-skill");
     });
     html.on("drop", async (event) => {
       if (!this.item.testUserPermission(game.user, "OWNER")) {
@@ -5078,7 +5076,7 @@ class AbbrewSkillDeckSheet extends ItemSheet {
       const droppedData = event.originalEvent.dataTransfer.getData("text");
       const eventJson = JSON.parse(droppedData);
       if (eventJson && eventJson.type === "Item") {
-        const item = fromUuidSync(eventJson.uuid);
+        const item = await fromUuid(eventJson.uuid);
         if (item.type === "skill") {
           const storedSkills = this.item.system.skills;
           const updateSkills = [...storedSkills, { name: item.name, id: item._id, image: item.img, sourceId: item.uuid }];
@@ -5206,6 +5204,17 @@ class AbbrewAnatomySheet extends ItemSheet {
     html.on("dragover", (event) => {
       event.preventDefault();
     });
+    html.on("click", ".anatomy-weapon-delete", async (ev) => {
+      const li = $(ev.currentTarget).parents(".anatomy-weapon");
+      if (li.data("id") || li.data("id") === 0) {
+        const naturalWeapons = this.item.system.naturalWeapons;
+        naturalWeapons.splice(li.data("id"), 1);
+        await this.item.update({ "system.naturalWeapons": naturalWeapons });
+      }
+    });
+    html.on("click", ".anatomy-weapon .anatomy-weapon-summary .image-container, .anatomy-weapon .anatomy-weapon-summary .name", async (event) => {
+      await renderSheetForStoredItem(event, this.actor, "anatomy-weapon");
+    });
     html.on("drop", async (event) => {
       if (!this.item.testUserPermission(game.user, "OWNER")) {
         return;
@@ -5213,11 +5222,10 @@ class AbbrewAnatomySheet extends ItemSheet {
       const droppedData = event.originalEvent.dataTransfer.getData("text");
       const eventJson = JSON.parse(droppedData);
       if (eventJson && eventJson.type === "Item") {
-        const itemId = eventJson.uuid.split(".").pop();
-        const item = game.items.get(itemId);
+        const item = await fromUuid(eventJson.uuid);
         if (item.type === "weapon") {
           const storedWeapons = this.item.system.naturalWeapons;
-          const updateWeapons = [...storedWeapons, { name: item.name, id: itemId, image: item.img }];
+          const updateWeapons = [...storedWeapons, { name: item.name, id: item.id, image: item.img, sourceId: item.uuid }];
           await this.item.update({ "system.naturalWeapons": updateWeapons });
         }
       }
@@ -5324,7 +5332,7 @@ class AbbrewSkillSheet extends ItemSheet {
       const droppedData = event.originalEvent.dataTransfer.getData("text");
       const eventJson = JSON.parse(droppedData);
       if (eventJson && eventJson.type === "Item") {
-        const item = fromUuidSync(eventJson.uuid);
+        const item = await fromUuid(eventJson.uuid);
         if (item.type === "skill") {
           const storedSkills = this.item.system.skills;
           const updateSkills = [...storedSkills, { name: item.name, id: item._id, image: item.img, sourceId: item.uuid }];
@@ -5333,7 +5341,7 @@ class AbbrewSkillSheet extends ItemSheet {
       }
     });
     html.on("click", ".skill-deck-skill .skill-deck-summary .image-container, .skill-deck-skill .skill-deck-summary .name", async (event) => {
-      await renderSheetForStoredItem(event, this.actor);
+      await renderSheetForStoredItem(event, this.actor, "skill-deck-skill");
     });
     html.on("click", ".skill-delete", async (ev) => {
       const li = $(ev.currentTarget).parents(".skill-deck-skill");
@@ -5362,7 +5370,7 @@ class AbbrewSkillSheet extends ItemSheet {
       const droppedData = event.originalEvent.dataTransfer.getData("text");
       const eventJson = JSON.parse(droppedData);
       if (eventJson && eventJson.type === "Item") {
-        const item = fromUuidSync(eventJson.uuid);
+        const item = await fromUuid(eventJson.uuid);
         if (inputElement.dataset.droptype !== item.type) {
           return;
         }
@@ -5668,8 +5676,7 @@ Hooks.on("preDeleteActiveEffect", async (effect, options, userId) => {
 Hooks.on("dropActorSheetData", async (actor, sheet, data) => {
   console.log(data);
   if (data.type === "Item") {
-    const id = data.uuid.split(".").pop();
-    const item = game.items.get(id);
+    const item = await fromUuid(data.uuid);
     if (item) {
       switch (item.type) {
         case "wound":
@@ -5699,7 +5706,7 @@ async function handleActorBackgroundDrop(actor, background) {
   await actor.acceptBackground(background);
   await actor.acceptSkillDeck(background);
   if (background.system.creatureForm.id) {
-    const creatureForm = game.items.get(background.system.creatureForm.id);
+    const creatureForm = await fromUuid(background.system.creatureForm.sourceId);
     await actor.acceptCreatureForm(creatureForm);
   }
 }

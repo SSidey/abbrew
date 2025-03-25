@@ -77,21 +77,12 @@ export async function renderSheetForTaggedData(event, actor) {
             item.sheet.render(true);
         }
     } else if (sourceId) {
-        const source = fromUuidSync(sourceId);
-        const compendiumPackName = source.pack;
-        const id = source._id;
-        if (!compendiumPackName && source && id) {
-            source.sheet.render(true);
-        } else {
-            const pack = game.packs.get(compendiumPackName);
-            await pack.getIndex();
-            await pack.getDocument(id).then(item => item.sheet.render(true));
-        }
+        const source = await fromUuid(sourceId);
+        source.sheet.render(true);
     }
 }
 
-export async function renderSheetForStoredItem(event, actor) {
-    const inspectionClass = "skill-deck-skill";
+export async function renderSheetForStoredItem(event, actor, inspectionClass) {
     const element = _checkThroughParentsForClass(event.target, inspectionClass, 3);
     const itemId = element.dataset.itemId;
     const sourceId = element.dataset.sourceId
@@ -101,16 +92,8 @@ export async function renderSheetForStoredItem(event, actor) {
             item.sheet.render(true);
         }
     } else if (sourceId) {
-        const source = fromUuidSync(sourceId);
-        const compendiumPackName = source.pack;
-        const id = source._id;
-        if (!compendiumPackName && source && id) {
-            source.sheet.render(true);
-        } else {
-            const pack = game.packs.get(compendiumPackName);
-            await pack.getIndex();
-            await pack.getDocument(id).then(item => item.sheet.render(true));
-        }
+        const source = await fromUuid(sourceId);
+        source.sheet.render(true);
     }
 }
 

@@ -347,8 +347,8 @@ ABBREW.proxiedSkills = {
 }
 
 ABBREW.modify = {
+  "skip": "Skip",
   "all": "Modify All",
   "one": "Modify One",
-  "add": "Add",
-  "skip": "Skip"
+  "add": "Add"
 }

@@ -113,7 +113,7 @@ export class AbbrewSkillDeckSheet extends ItemSheet {
         });
 
         html.on('click', '.skill-deck-skill .skill-deck-summary .image-container, .skill-deck-skill .skill-deck-summary .name', async (event) => {
-            await renderSheetForStoredItem(event, this.actor);
+            await renderSheetForStoredItem(event, this.actor, "skill-deck-skill");
         });
 
         html.on('drop', async (event) => {
@@ -124,7 +124,7 @@ export class AbbrewSkillDeckSheet extends ItemSheet {
             const droppedData = event.originalEvent.dataTransfer.getData("text")
             const eventJson = JSON.parse(droppedData);
             if (eventJson && eventJson.type === "Item") {
-                const item = fromUuidSync(eventJson.uuid);
+                const item = await fromUuid(eventJson.uuid);
                 if (item.type === "skill") {
                     const storedSkills = this.item.system.skills;
                     const updateSkills = [...storedSkills, { name: item.name, id: item._id, image: item.img, sourceId: item.uuid }];

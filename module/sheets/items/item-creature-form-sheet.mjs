@@ -2,6 +2,7 @@ import {
     onManageActiveEffect,
     prepareActiveEffectCategories,
 } from '../../helpers/effects.mjs';
+import { renderSheetForStoredItem } from '../../helpers/utils.mjs';
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -106,6 +107,10 @@ export class AbbrewCreatureFormSheet extends ItemSheet {
             }
         });
 
+        html.on('click', '.creature-form-anatomy .anatomy-summary .image-container, .creature-form-anatomy .anatomy-summary .name', async (event) => {
+            await renderSheetForStoredItem(event, this.actor, "creature-form-anatomy");
+        });
+
         html.on('drop', async (event) => {
             if (!this.item.testUserPermission(game.user, 'OWNER')) {
                 return;
@@ -114,11 +119,10 @@ export class AbbrewCreatureFormSheet extends ItemSheet {
             const droppedData = event.originalEvent.dataTransfer.getData("text")
             const eventJson = JSON.parse(droppedData);
             if (eventJson && eventJson.type === "Item") {
-                const itemId = eventJson.uuid.split(".").pop()
-                const item = game.items.get(itemId);
+                const item = await fromUuid(eventJson.uuid);
                 if (item.type === "anatomy") {
                     const storedAnatomy = this.item.system.anatomy;
-                    const newAnatomy = [...storedAnatomy, { name: item.name, id: itemId, image: item.img }];
+                    const newAnatomy = [...storedAnatomy, { name: item.name, id: item._id, image: item.img, sourceId: item.uuid }];
                     await this.item.update({ "system.anatomy": newAnatomy });
                 }
             }

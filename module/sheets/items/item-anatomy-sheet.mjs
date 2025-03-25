@@ -3,6 +3,7 @@ import {
   prepareActiveEffectCategories,
 } from '../../helpers/effects.mjs';
 import Tagify from '@yaireo/tagify'
+import { renderSheetForStoredItem } from '../../helpers/utils.mjs';
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -153,6 +154,21 @@ export class AbbrewAnatomySheet extends ItemSheet {
       event.preventDefault();
     });
 
+    // Delete Skill Summary
+    html.on('click', '.anatomy-weapon-delete', async (ev) => {
+      const li = $(ev.currentTarget).parents('.anatomy-weapon');
+      if (li.data('id') || li.data('id') === 0) {
+        const naturalWeapons = this.item.system.naturalWeapons;
+        naturalWeapons.splice(li.data('id'), 1);
+        await this.item.update({ "system.naturalWeapons": naturalWeapons });
+      }
+    });
+
+
+    html.on('click', '.anatomy-weapon .anatomy-weapon-summary .image-container, .anatomy-weapon .anatomy-weapon-summary .name', async (event) => {
+      await renderSheetForStoredItem(event, this.actor, "anatomy-weapon");
+    });
+
     html.on('drop', async (event) => {
       if (!this.item.testUserPermission(game.user, 'OWNER')) {
         return;
@@ -161,11 +177,10 @@ export class AbbrewAnatomySheet extends ItemSheet {
       const droppedData = event.originalEvent.dataTransfer.getData("text")
       const eventJson = JSON.parse(droppedData);
       if (eventJson && eventJson.type === "Item") {
-        const itemId = eventJson.uuid.split(".").pop()
-        const item = game.items.get(itemId);
+        const item = await fromUuid(eventJson.uuid);
         if (item.type === "weapon") {
           const storedWeapons = this.item.system.naturalWeapons;
-          const updateWeapons = [...storedWeapons, { name: item.name, id: itemId, image: item.img }];
+          const updateWeapons = [...storedWeapons, { name: item.name, id: item.id, image: item.img, sourceId: item.uuid }];
           await this.item.update({ "system.naturalWeapons": updateWeapons });
         }
       }

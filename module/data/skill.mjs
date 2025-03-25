@@ -88,6 +88,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
                     damage: new fields.ArrayField(
                         new fields.SchemaField({
                             modify: new fields.StringField({ required: true, blank: true }),
+                            modifyType: new fields.StringField({ required: true, blank: true }),
                             type: new fields.StringField({ required: true, blank: true, nullable: true }),
                             value: new fields.NumberField({ ...requiredInteger, nullable: true, nullable: true }),
                             attributeModifier: new fields.StringField({ required: true, blank: true, nullable: true }),

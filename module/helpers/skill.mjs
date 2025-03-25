@@ -258,7 +258,37 @@ function mergeAttackProfile(base, attackProfile) {
     }
 
     const baseDamageList = base.damage;
-    const modifyDamageList = attackProfile.damage.some(d => d.modify === "all") ? new Array(baseDamageList.damage.length).fill(attackProfile.damage.find(d => d.modify === "all")[0]) : attackProfile.damage.filter(d => d.modify);
+    let modifyDamageList = attackProfile.damage.filter(d => d.modify);
+    if (attackProfile.damage.some(d => d.modify === "all" && d.modifyType === "")) {
+        modifyDamageList = new Array(baseDamageList.length).fill(attackProfile.damage.find(d => d.modify === "all"));
+    } else {
+        const allTypeModifiers = attackProfile.damage.filter(d => d.modify === "all" && d.modifyType !== "");
+        var flags = [], output = [], l = allTypeModifiers.length, i;
+        for (i = 0; i < l; i++) {
+            if (flags[allTypeModifiers[i].modifyType]) continue;
+            flags[allTypeModifiers[i].modifyType] = true;
+            output.push(allTypeModifiers[i]);
+        }
+        let allTypeFilteredModifiers = attackProfile.damage.filter(d => ["skip", "add"].includes(d.modify));
+        let modifyOnce = attackProfile.damage.filter(d => d.modify === "one" && !(d.modify === "one" && flags.includes(d.modifyType)));
+        const replacedIndices = baseDamageList.reduce((result, m, i) => {
+            let replacement = output.find(fm => fm.modifyType === m.type);
+            if (!replacement) {
+                const index = modifyOnce.findIndex(mo => mo.modifyType === m.type);
+                const replacements = index > -1 ? modifyOnce.splice(index, 1) : [];
+                replacement = replacements.length === 1 ? replacements[0] : null;
+            }
+            result[i] = replacement ? replacement : null;
+            return result;
+        }, []
+        );
+        modifyDamageList = replacedIndices.reduce((result, m, i) => {
+            result[i] = m ? m : allTypeFilteredModifiers.shift();
+            return result;
+        }, []
+        );
+    }
+
     const last = Math.max(baseDamageList.length, modifyDamageList.length);
     const updatedDamage = [];
     for (let index = 0; index < last; index++) {
@@ -284,9 +314,9 @@ function mergeAttackProfile(base, attackProfile) {
 }
 
 function applyModifierToDamageProfile(baseElement, modifyElement) {
-    const type = modifyElement.type ?? baseElement.type;
+    const type = modifyElement.type.length > 0 ? modifyElement.type : baseElement.type;
     const damage = modifyElement.value ?? baseElement.value;
-    const attribute = modifyElement.attributeModifier.length ? modifyElement.attributeModifier.length : baseElement.attributeModifier;
+    const attribute = modifyElement.attributeModifier.length > 0 ? modifyElement.attributeModifier : baseElement.attributeModifier;
     return ({
         type: type,
         value: damage,

@@ -14,7 +14,8 @@ export default class AbbrewCreatureForm extends AbbrewItemBase {
             new fields.SchemaField({
                 name: new fields.StringField({ required: true, blank: true }),
                 id: new fields.StringField({ required: true, blank: true }),
-                image: new fields.StringField({ required: true, blank: true })
+                image: new fields.StringField({ required: true, blank: true }),
+                sourceId: new fields.StringField({ required: true, blank: true })
             })
         );
 

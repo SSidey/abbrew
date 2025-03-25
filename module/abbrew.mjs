@@ -291,8 +291,7 @@ Hooks.on("preDeleteActiveEffect", async (effect, options, userId) => { });
 Hooks.on("dropActorSheetData", async (actor, sheet, data) => {
   console.log(data);
   if (data.type === "Item") {
-    const id = data.uuid.split(".").pop();
-    const item = game.items.get(id);
+    const item = await fromUuid(data.uuid);
     if (item) {
       switch (item.type) {
         case "wound":
@@ -324,7 +323,7 @@ async function handleActorBackgroundDrop(actor, background) {
   await actor.acceptBackground(background);
   await actor.acceptSkillDeck(background);
   if (background.system.creatureForm.id) {
-    const creatureForm = game.items.get(background.system.creatureForm.id);
+    const creatureForm = await fromUuid(background.system.creatureForm.sourceId);
     await actor.acceptCreatureForm(creatureForm);
   }
 }

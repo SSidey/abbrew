@@ -1,7 +1,6 @@
 import { mergeActorWounds } from "../helpers/combat.mjs";
 import { isSkillBlocked } from "../helpers/skill.mjs";
 import { getAttackerAdvantageGuardResult, getAttackerAdvantageRiskResult, getDefenderAdvantageGuardResult, getDefenderAdvantageRiskResult } from "../helpers/trainedSkills.mjs";
-import { getSafeJson } from "../helpers/utils.mjs";
 import { FINISHERS } from "../static/finishers.mjs";
 
 /**
@@ -213,18 +212,18 @@ export default class AbbrewActor extends Actor {
     }
 
     if (isStrongAttack) {
-      return Math.min(damage, inflexibility);
+      return guard > 0 ? Math.min(damage, inflexibility) : damage;
     }
 
     if (this.attackerGainsAdvantage(isFeint, action)) {
-      return getAttackerAdvantageRiskResult(this.system.skillTraining.find(st => st.type === "feintCounter")?.value ?? 0, attackingActorFeint, damage, inflexibility);
+      return getAttackerAdvantageRiskResult(this.system.skillTraining.find(st => st.type === "feintCounter")?.value ?? 0, attackingActorFeint, damage, inflexibility, guard);
     }
 
     if (this.defenderGainsAdvantage(isFeint, action)) {
-      return getDefenderAdvantageRiskResult(this.system.skillTraining.find(st => st.type === "parry")?.value ?? 0, attackingActorParryCounter, damage, inflexibility);
+      return getDefenderAdvantageRiskResult(this.system.skillTraining.find(st => st.type === "parry")?.value ?? 0, attackingActorParryCounter, damage, inflexibility, guard);
     }
 
-    return Math.min(damage, inflexibility);
+    return guard > 0 ? Math.min(damage, inflexibility) : damage;
   }
 
   defenderGainsAdvantage(isFeint, action) {
@@ -313,11 +312,11 @@ export default class AbbrewActor extends Actor {
   }
 
   async acceptCreatureForm(creatureForm) {
-    const anatomy = creatureForm.system.anatomy.map(a => game.items.get(a.id));
+    const anatomy = await Promise.all(creatureForm.system.anatomy.map(async a => await fromUuid(a.sourceId)));
     for (const index in anatomy) {
       await Item.create(anatomy[index], { parent: this });
 
-      const weapons = anatomy[index].system.naturalWeapons.map(w => game.items.get(w.id));
+      const weapons = await Promise.all(anatomy[index].system.naturalWeapons.map(async w => await fromUuid(w.sourceId)));
       for (const weaponIndex in weapons) {
         await Item.create(weapons[weaponIndex], { parent: this });
       }
@@ -325,37 +324,14 @@ export default class AbbrewActor extends Actor {
   }
 
   async acceptSkillDeck(skillDeck) {
-    const skills = await Promise.all(skillDeck.system.skills.map(async s => await this.getGameItem(s)));
+    const skills = await Promise.all(skillDeck.system.skills.map(async s => await fromUuid(s.sourceId)));
     for (const index in skills) {
       await Item.create(skills[index], { parent: this })
     }
   }
 
-  async getGameItem(skill) {
-    const itemId = skill.id;
-    const sourceId = skill.sourceId;
-    if (itemId && !sourceId) {
-      const item = game.items.find(i => i._id === itemId);
-      if (item) {
-        return item;
-      }
-    } else if (sourceId) {
-      const source = fromUuidSync(sourceId);
-      const compendiumPackName = source.pack;
-      const id = source._id;
-      if (!compendiumPackName && source && id) {
-        return source;
-      } else {
-        const pack = game.packs.get(compendiumPackName);
-        await pack.getIndex();
-        const item = await pack.getDocument(id);
-        return item;
-      }
-    }
-  }
-
   async acceptAnatomy(anatomy) {
-    const naturalWeapons = anatomy.system.naturalWeapons.map(w => game.items.get(w.id));
+    const naturalWeapons = await Promise.all(anatomy.system.naturalWeapons.map(async w => await fromUuid(w.sourceId)));
     for (const index in naturalWeapons) {
       await Item.create(naturalWeapons[index], { parent: this })
     }
