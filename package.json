@@ -5,6 +5,9 @@
   "scripts": {
     "dev": "vite",
     "build": "gulp build",
+    "build:clean": "node ./utils/packs.mjs package clean",
+    "build:db": "node ./utils/packs.mjs package pack",
+    "build:json": "node ./utils/packs.mjs package unpack",
     "preview": "vite preview",
     "compile": "gulp css",
     "watch": "gulp watch",

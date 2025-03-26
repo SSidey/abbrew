@@ -1,3 +1,6 @@
+# Build Artifcats
+!packs/_source/
+
 # IDE
 .idea/
 .vs/
