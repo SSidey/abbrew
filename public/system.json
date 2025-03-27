@@ -46,6 +46,97 @@
           "types": ["anatomy"]
         }
       }
+    },
+    {
+      "name": "backgrounds",
+      "label": "Backgrounds",
+      "system": "abbrew",
+      "path": "packs/backgrounds",
+      "type": "Item",
+      "private": false,
+      "flags": {
+        "abbrew": {
+          "types": ["background"]
+        }
+      }
+    },
+    {
+      "name": "conditions",
+      "label": "Conditions",
+      "system": "abbrew",
+      "path": "packs/conditions",
+      "type": "Item",
+      "private": false,
+      "flags": {
+        "abbrew": {
+          "types": ["skill"]
+        }
+      }
+    },
+    {
+      "name": "creatureforms",
+      "label": "Creature Forms",
+      "system": "abbrew",
+      "path": "packs/creatureforms",
+      "type": "Item",
+      "private": false,
+      "flags": {
+        "abbrew": {
+          "types": ["creatureForm"]
+        }
+      }
+    },
+    {
+      "name": "equipment",
+      "label": "Equipment",
+      "system": "abbrew",
+      "path": "packs/equipment",
+      "type": "Item",
+      "private": false,
+      "flags": {
+        "abbrew": {
+          "types": ["armour", "weapon"]
+        }
+      }
+    },
+    {
+      "name": "skilldecks",
+      "label": "Skill Decks",
+      "system": "abbrew",
+      "path": "packs/skilldecks",
+      "type": "Item",
+      "private": false,
+      "flags": {
+        "abbrew": {
+          "types": ["skillDeck"]
+        }
+      }
+    },
+    {
+      "name": "skills",
+      "label": "Skills",
+      "system": "abbrew",
+      "path": "packs/skills",
+      "type": "Item",
+      "private": false,
+      "flags": {
+        "abbrew": {
+          "types": ["skill"]
+        }
+      }
+    },
+    {
+      "name": "wounds",
+      "label": "Wounds",
+      "system": "abbrew",
+      "path": "packs/wounds",
+      "type": "Item",
+      "private": false,
+      "flags": {
+        "abbrew": {
+          "types": ["wound"]
+        }
+      }
     }
   ],
   "packFolders": [],

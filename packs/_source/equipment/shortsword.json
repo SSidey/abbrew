@@ -1,0 +1,84 @@
+{
+  "name": "Shortsword",
+  "type": "weapon",
+  "system": {
+    "description": "",
+    "traits": "",
+    "equipType": "held",
+    "attackProfiles": [
+      {
+        "name": "Slash",
+        "attackType": "arc",
+        "finisherLimit": 4,
+        "hasStrongAttack": true,
+        "damage": [
+          {
+            "type": "slashing",
+            "value": 4,
+            "attributeModifier": "str",
+            "attributeMultiplier": 1,
+            "damageMultiplier": 1,
+            "overallMultiplier": 1
+          }
+        ],
+        "lethal": 0,
+        "critical": 10
+      },
+      {
+        "name": "Stab",
+        "attackType": "thrust",
+        "finisherLimit": 10,
+        "hasStrongAttack": false,
+        "damage": [
+          {
+            "type": "piercing",
+            "value": 4,
+            "attributeModifier": "str",
+            "attributeMultiplier": 1,
+            "damageMultiplier": 1,
+            "overallMultiplier": 1
+          }
+        ],
+        "lethal": 0,
+        "critical": 10
+      }
+    ],
+    "weapon": {
+      "size": 4
+    },
+    "armourPoints": "",
+    "equipState": "stowed",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "handsRequired": "none",
+    "handsSupplied": 0,
+    "actionCost": 0,
+    "exertActionCost": 0,
+    "validEquipStates": [],
+    "isAttackTrained": false,
+    "isFinisherTrained": false,
+    "isFeintTrained": false,
+    "isOverpowerTrained": false
+  },
+  "img": "icons/svg/item-bag.svg",
+  "effects": [],
+  "folder": null,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743075348244,
+    "modifiedTime": 1743075436106,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_id": "6iQLPlRxcvCEe1YT",
+  "sort": 300000,
+  "_key": "!items!6iQLPlRxcvCEe1YT"
+}

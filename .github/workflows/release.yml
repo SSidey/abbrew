@@ -2,7 +2,7 @@ name: Release
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
 
 jobs:
   build:
@@ -14,95 +14,101 @@ jobs:
         node-version: [20.x]
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    
-    - name: Generate Semantic Version
-      id: semantic-version
-      uses: paulhatch/semantic-version@v5.4.0
-      with:
-        # The prefix to use to identify tags
-        tag_prefix: "v"
-        # A string which, if present in a git commit, indicates that a change represents a
-        # major (breaking) change, supports regular expressions wrapped with '/'
-        major_pattern: "(MAJOR)"
-        # A string which indicates the flags used by the `major_pattern` regular expression. Supported flags: idgs
-        major_regexp_flags: ""
-        # Same as above except indicating a minor change, supports regular expressions wrapped with '/'
-        minor_pattern: "(MINOR)"
-        # A string which indicates the flags used by the `minor_pattern` regular expression. Supported flags: idgs
-        minor_regexp_flags: ""
-        # A string to determine the format of the version output
-        version_format: "${major}.${minor}.${patch}-prerelease${increment}"
-        # Named version, will be used as suffix for name version tag
-        namespace: abbrew
-        # If this is set to true, *every* commit will be treated as a new version.
-        bump_each_commit: false
-        # If bump_each_commit is also set to true, setting this value will cause the version to increment only if the pattern specified is matched.
-        bump_each_commit_patch_pattern: ""
-        # If true, the body of commits will also be searched for major/minor patterns to determine the version type.
-        search_commit_body: false
-        # The output method used to generate list of users, 'csv' or 'json'.
-        user_format_type: "json"
-        # Prevents pre-v1.0.0 version from automatically incrementing the major version.
-        # If enabled, when the major version is 0, major releases will be treated as minor and minor as patch. Note that the version_type output is unchanged.
-        enable_prerelease_mode: true
-        # If enabled, diagnostic information will be added to the action output.
-        debug: false
-        # If true, the branch will be used to select the maximum version.
-        version_from_branch: false
-        
-    - name: System Json Variable Substitution
-      uses: microsoft/variable-substitution@v1
-      with:
-        files: '**/public/system.json'
-      env:
-        version: ${{ steps.semantic-version.outputs.version }}
-        download: "https://github.com/SSidey/abbrew/releases/download/${{ steps.semantic-version.outputs.version }}/${{ steps.semantic-version.outputs.version }}.zip"
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
+      - name: Generate Semantic Version
+        id: semantic-version
+        uses: paulhatch/semantic-version@v5.4.0
+        with:
+          # The prefix to use to identify tags
+          tag_prefix: "v"
+          # A string which, if present in a git commit, indicates that a change represents a
+          # major (breaking) change, supports regular expressions wrapped with '/'
+          major_pattern: "(MAJOR)"
+          # A string which indicates the flags used by the `major_pattern` regular expression. Supported flags: idgs
+          major_regexp_flags: ""
+          # Same as above except indicating a minor change, supports regular expressions wrapped with '/'
+          minor_pattern: "(MINOR)"
+          # A string which indicates the flags used by the `minor_pattern` regular expression. Supported flags: idgs
+          minor_regexp_flags: ""
+          # A string to determine the format of the version output
+          version_format: "${major}.${minor}.${patch}-prerelease${increment}"
+          # Named version, will be used as suffix for name version tag
+          namespace: abbrew
+          # If this is set to true, *every* commit will be treated as a new version.
+          bump_each_commit: false
+          # If bump_each_commit is also set to true, setting this value will cause the version to increment only if the pattern specified is matched.
+          bump_each_commit_patch_pattern: ""
+          # If true, the body of commits will also be searched for major/minor patterns to determine the version type.
+          search_commit_body: false
+          # The output method used to generate list of users, 'csv' or 'json'.
+          user_format_type: "json"
+          # Prevents pre-v1.0.0 version from automatically incrementing the major version.
+          # If enabled, when the major version is 0, major releases will be treated as minor and minor as patch. Note that the version_type output is unchanged.
+          enable_prerelease_mode: true
+          # If enabled, diagnostic information will be added to the action output.
+          debug: false
+          # If true, the branch will be used to select the maximum version.
+          version_from_branch: false
 
-    - name: Build
-      run: |
-        npm install
-        gulp build
+      - name: System Json Variable Substitution
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: "**/public/system.json"
+        env:
+          version: ${{ steps.semantic-version.outputs.version }}
+          download: "https://github.com/SSidey/abbrew/releases/download/${{ steps.semantic-version.outputs.version }}/${{ steps.semantic-version.outputs.version }}.zip"
 
-    - name: Commit files
-      run: |
-        git config user.name "GitHub Actions Bot" 
-        git config user.email "<>"
-        git add -A
-        git commit -m "Update gulp output files and version"
-        
-    - name: Push changes
-      uses: ad-m/github-push-action@master
-      with:
-        branch: master
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        # force: true
+      - name: Commit files
+        run: |
+          git config user.name "GitHub Actions Bot" 
+          git config user.email "<>"
+          git add -A
+          git commit -m "Update gulp output files and version"
 
-    - name: Zip package
-      id: zip-step
-      run: zip ${{ steps.semantic-version.outputs.version }}.zip -r dist
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          branch: master
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # force: true
+      
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
 
-    - name: Update Release with Files
-      id: create_version_release
-      uses: ncipollo/release-action@v1
-      with:
-        allowUpdates: false # Set this to false if you want to prevent updating existing releases
-        name: ${{ steps.semantic-version.outputs.version }}
-        draft: false
-        prerelease: true
-        omitDraftDuringUpdate: true
-        omitPrereleaseDuringUpdate: true
-        token: ${{ secrets.GITHUB_TOKEN }}
-        artifacts: '${{ github.workspace }}/public/system.json, ./${{ steps.semantic-version.outputs.version }}.zip'
-        tag: ${{ steps.semantic-version.outputs.version }}
-        body: |
-          Abbrew prerelease ${{ steps.semantic-version.outputs.version }}
+      - name: Install Dependencies
+        run: npm ci
 
+      - name: Build Packs
+        run: |
+          npm run build:db --if-present
+
+      - name: Build
+        run: |
+          npm install
+          gulp build
+
+      - name: Zip package
+        id: zip-step
+        run: zip ${{ steps.semantic-version.outputs.version }}.zip -r dist
+
+      - name: Update Release with Files
+        id: create_version_release
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: false # Set this to false if you want to prevent updating existing releases
+          name: ${{ steps.semantic-version.outputs.version }}
+          draft: false
+          prerelease: true
+          omitDraftDuringUpdate: true
+          omitPrereleaseDuringUpdate: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: "${{ github.workspace }}/public/system.json, ./${{ steps.semantic-version.outputs.version }}.zip"
+          tag: ${{ steps.semantic-version.outputs.version }}
+          body: |
+            Abbrew prerelease ${{ steps.semantic-version.outputs.version }}

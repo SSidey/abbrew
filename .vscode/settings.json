@@ -7,5 +7,8 @@
 "eslint.options": {
     "configFile": ".eslintrc.json"
 },
-"eslint.lintTask.enable": true
+"eslint.lintTask.enable": true,
+"github-actions.workflows.pinned.workflows": [
+  ".github/workflows/release.yml"
+]
 }

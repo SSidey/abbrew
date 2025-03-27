@@ -1,0 +1,35 @@
+{
+  "folder": null,
+  "name": "Burn",
+  "type": "wound",
+  "img": "systems/abbrew/assets/icons/wounds/burn.webp",
+  "system": {
+    "description": "",
+    "traits": "",
+    "wound": {
+      "type": "burn",
+      "value": 1
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    }
+  },
+  "effects": [],
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743072494050,
+    "modifiedTime": 1743072505105,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "ownership": {
+    "default": 0
+  },
+  "_id": "VgXSwIQQwUDwJzC7",
+  "sort": 1500000,
+  "_key": "!items!VgXSwIQQwUDwJzC7"
+}

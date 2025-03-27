@@ -1,0 +1,35 @@
+{
+  "name": "Bleed",
+  "type": "wound",
+  "img": "systems/abbrew/assets/icons/wounds/bleed.webp",
+  "system": {
+    "description": "",
+    "traits": "",
+    "wound": {
+      "type": "bleed",
+      "value": 1
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743072493178,
+    "modifiedTime": 1743072505105,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "ownership": {
+    "default": 0
+  },
+  "_id": "ZfuwOW1bFAChJOot",
+  "sort": 1300000,
+  "_key": "!items!ZfuwOW1bFAChJOot"
+}

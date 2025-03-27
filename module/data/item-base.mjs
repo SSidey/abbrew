@@ -7,15 +7,19 @@ export default class AbbrewItemBase extends foundry.abstract.TypeDataModel {
 
     schema.description = new fields.StringField({ required: true, blank: true });
     schema.traits = new fields.StringField({ required: true, blank: true });
-    schema.abbrewId = new fields.StringField({ required: true, blank: true });
+    schema.abbrewId = new fields.SchemaField({
+      value: new fields.StringField({ required: true, blank: true }),
+      uuid: new fields.StringField({ required: true, blank: true })
+    });
 
     return schema;
   }
 
   // Prior to Active Effects
   prepareBaseData() {
-    if (this.abbrewId === "") {
+    if (this.abbrewId.value === "") {
       this.abbrewId = this.generateAbbrewId();
+      this.abbrewId.uuid = this.parent._id;
     }
   }
 

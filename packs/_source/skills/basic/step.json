@@ -1,0 +1,142 @@
+{
+  "folder": "xv4pBYEWqvTp5C2J",
+  "name": "Step",
+  "type": "skill",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "<p>Move up to your size.</p>",
+    "traits": "",
+    "configurable": true,
+    "action": {
+      "activationType": "standalone",
+      "actionCost": "1",
+      "modifiers": {
+        "guard": {
+          "self": {
+            "value": "",
+            "operator": ""
+          },
+          "target": {
+            "value": "",
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": 0,
+            "operator": ""
+          },
+          "target": {
+            "value": 0,
+            "operator": ""
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": 0,
+            "operator": ""
+          },
+          "target": {
+            "value": 0,
+            "operator": ""
+          }
+        },
+        "resources": [],
+        "concepts": {
+          "self": [],
+          "target": []
+        },
+        "attackProfile": {
+          "finisherLimit": {
+            "value": 0,
+            "operator": ""
+          },
+          "handsSupplied": 0,
+          "attackType": "",
+          "attackMode": "",
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "damage": []
+        },
+        "fortune": 0,
+        "actionCost": {
+          "value": 0,
+          "operator": ""
+        }
+      },
+      "actionImage": "",
+      "duration": {
+        "precision": "0",
+        "value": 0
+      },
+      "uses": {
+        "hasUses": false,
+        "value": 0,
+        "max": 0,
+        "period": ""
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "attackProfile": {
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": null,
+        "attackMode": "",
+        "damage": [],
+        "finisherLimit": 10
+      }
+    },
+    "skillType": "basic",
+    "path": {
+      "value": "",
+      "archetype": ""
+    },
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "skillTraits": "",
+    "skillModifiers": {
+      "synergy": "",
+      "discord": ""
+    },
+    "isActivatable": true,
+    "skills": []
+  },
+  "effects": [],
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743073136357,
+    "modifiedTime": 1743075708712,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "ownership": {
+    "default": 0
+  },
+  "_id": "jv5DDww4KxR8YbQK",
+  "sort": 106250,
+  "_key": "!items!jv5DDww4KxR8YbQK"
+}

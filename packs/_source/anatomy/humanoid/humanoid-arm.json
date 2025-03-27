@@ -1,0 +1,62 @@
+{
+  "folder": "2bA9aIdDyocqHlce",
+  "name": "Humanoid Arm",
+  "type": "anatomy",
+  "_id": "POvgbGBWEUJJRaIW",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "equipType": "",
+    "armourPoints": "",
+    "handsRequired": "",
+    "equipState": "stowed",
+    "handsSupplied": 0,
+    "actionCost": 0,
+    "exertActionCost": 0,
+    "validEquipStates": [],
+    "parts": "[{\"value\":\"Arm\"}]",
+    "isBroken": false,
+    "isDismembered": false,
+    "hands": 1,
+    "speed": 0,
+    "revealed": {
+      "isRevealed": false,
+      "difficulty": 0,
+      "tier": 0
+    },
+    "defense": {
+      "guard": 0,
+      "inflexibility": 0,
+      "protection": []
+    },
+    "naturalWeapons": [
+      {
+        "name": "Unarmed",
+        "id": "51paUWJDkpZTzJ0l",
+        "image": "icons/svg/item-bag.svg",
+        "sourceId": "Compendium.abbrew.equipment.Item.51paUWJDkpZTzJ0l"
+      }
+    ]
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743075194922,
+    "modifiedTime": 1743075510883,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!POvgbGBWEUJJRaIW"
+}

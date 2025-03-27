@@ -1,0 +1,84 @@
+{
+  "folder": null,
+  "name": "Longsword",
+  "type": "weapon",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "equipType": "held",
+    "armourPoints": "",
+    "equipState": "stowed",
+    "weapon": {
+      "size": 6
+    },
+    "attackProfiles": [
+      {
+        "name": "Slash",
+        "attackType": "arc",
+        "finisherLimit": 8,
+        "hasStrongAttack": true,
+        "damage": [
+          {
+            "type": "slashing",
+            "value": 6,
+            "attributeModifier": "str",
+            "attributeMultiplier": 1,
+            "damageMultiplier": 1,
+            "overallMultiplier": 1
+          }
+        ],
+        "lethal": 0,
+        "critical": 10
+      },
+      {
+        "name": "Stab",
+        "attackType": "thrust",
+        "finisherLimit": 10,
+        "hasStrongAttack": false,
+        "damage": [
+          {
+            "type": "piercing",
+            "value": 5,
+            "attributeModifier": "str",
+            "attributeMultiplier": 1,
+            "damageMultiplier": 1,
+            "overallMultiplier": 1
+          }
+        ],
+        "lethal": 0,
+        "critical": 10
+      }
+    ],
+    "handsRequired": "versatile",
+    "handsSupplied": 0,
+    "actionCost": 0,
+    "exertActionCost": 0,
+    "validEquipStates": [],
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "isAttackTrained": false,
+    "isFinisherTrained": false,
+    "isFeintTrained": false,
+    "isOverpowerTrained": false
+  },
+  "effects": [],
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743075307575,
+    "modifiedTime": 1743075407199,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "ownership": {
+    "default": 0
+  },
+  "_id": "qUyOgvskI4CjwrJz",
+  "sort": 500000,
+  "_key": "!items!qUyOgvskI4CjwrJz"
+}
