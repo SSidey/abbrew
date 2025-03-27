@@ -4,7 +4,7 @@ export function addAttributesToSchema(schema) {
 
     schema.attributes = new fields.SchemaField(Object.keys(CONFIG.ABBREW.attributes).reduce((obj, attribute) => {
         obj[attribute] = new fields.SchemaField({
-            value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 2 }),
+            value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
             label: new fields.StringField({ required: true, blank: true }),
             isEnabled: new fields.BooleanField({ required: true, nullable: false, initial: false })
         });
