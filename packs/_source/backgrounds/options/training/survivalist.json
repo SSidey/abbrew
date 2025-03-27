@@ -1,0 +1,80 @@
+{
+  "folder": "g9lLoljSavATN0TJ",
+  "name": "Survivalist",
+  "type": "background",
+  "_id": "bJ4pwymKCeUyDFwW",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "skills": [],
+    "attributes": {
+      "str": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      },
+      "dex": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      },
+      "agi": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "con": {
+        "value": 2,
+        "label": "",
+        "isEnabled": true
+      },
+      "int": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "wil": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      },
+      "wit": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "vis": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      }
+    },
+    "creatureForm": {
+      "name": "",
+      "id": "",
+      "image": "",
+      "sourceId": ""
+    }
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743077451928,
+    "modifiedTime": 1743077451928,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!bJ4pwymKCeUyDFwW"
+}

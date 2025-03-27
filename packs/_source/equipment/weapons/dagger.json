@@ -1,0 +1,84 @@
+{
+  "folder": "Phat68gueYIk67lc",
+  "name": "Dagger",
+  "type": "weapon",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "equipType": "held",
+    "armourPoints": "",
+    "equipState": "stowed",
+    "weapon": {
+      "size": 2
+    },
+    "attackProfiles": [
+      {
+        "name": "Slash",
+        "attackType": "arc",
+        "finisherLimit": 2,
+        "hasStrongAttack": false,
+        "damage": [
+          {
+            "type": "slashing",
+            "value": 2,
+            "attributeModifier": "str",
+            "attributeMultiplier": 1,
+            "damageMultiplier": 1,
+            "overallMultiplier": 1
+          }
+        ],
+        "lethal": 0,
+        "critical": 10
+      },
+      {
+        "name": "Stab",
+        "attackType": "thrust",
+        "finisherLimit": 10,
+        "hasStrongAttack": false,
+        "damage": [
+          {
+            "type": "piercing",
+            "value": 3,
+            "attributeModifier": "str",
+            "attributeMultiplier": 1,
+            "damageMultiplier": 1,
+            "overallMultiplier": 1
+          }
+        ],
+        "lethal": 0,
+        "critical": 10
+      }
+    ],
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "handsRequired": "none",
+    "handsSupplied": 0,
+    "actionCost": 0,
+    "exertActionCost": 0,
+    "validEquipStates": [],
+    "isAttackTrained": false,
+    "isFinisherTrained": false,
+    "isFeintTrained": false,
+    "isOverpowerTrained": false
+  },
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743075360599,
+    "modifiedTime": 1743076005600,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_id": "kQFrvnG9djLFUEVU",
+  "sort": 100000,
+  "_key": "!items!kQFrvnG9djLFUEVU"
+}

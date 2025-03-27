@@ -1,0 +1,80 @@
+{
+  "folder": "CA370Hk29Aj8IeJ5",
+  "name": "Gnome",
+  "type": "background",
+  "_id": "tJIWXYmRvN2mfcHI",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "skills": [],
+    "attributes": {
+      "str": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "dex": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      },
+      "agi": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "con": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "int": {
+        "value": 2,
+        "label": "",
+        "isEnabled": true
+      },
+      "wil": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "wit": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      },
+      "vis": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      }
+    },
+    "creatureForm": {
+      "name": "Humanoid",
+      "id": "y5I3N1IZtZKr3463",
+      "image": "icons/svg/item-bag.svg",
+      "sourceId": "Compendium.abbrew.creatureforms.Item.y5I3N1IZtZKr3463"
+    }
+  },
+  "effects": [],
+  "sort": 150000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743077161298,
+    "modifiedTime": 1743080052846,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!tJIWXYmRvN2mfcHI"
+}

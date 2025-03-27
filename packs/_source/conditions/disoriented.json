@@ -1,0 +1,184 @@
+{
+  "name": "Disoriented",
+  "type": "skill",
+  "_id": "r7VMjvyw8EKDplwf",
+  "img": "systems/abbrew/assets/icons/statuses/disoriented.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "skillTraits": "",
+    "skillModifiers": {
+      "synergy": "[{\"value\":\"Parry\",\"id\":\"\",\"sourceId\":\"Compendium.abbrew.skills.Item.lTy5lovRwgSU5ERZ\"},{\"value\":\"Restore Guard\",\"id\":\"\",\"sourceId\":\"Compendium.abbrew.skills.Item.iUJqYFdrcfZyUr6S\"}]",
+      "discord": ""
+    },
+    "configurable": false,
+    "isActivatable": true,
+    "skills": [],
+    "action": {
+      "activationType": "stackRemoval",
+      "actionCost": "1",
+      "actionImage": "",
+      "duration": {
+        "precision": "0",
+        "value": 0
+      },
+      "uses": {
+        "hasUses": true,
+        "value": 1,
+        "max": 1,
+        "period": ""
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "attackProfile": {
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": null,
+        "attackMode": "",
+        "damage": [],
+        "finisherLimit": 10
+      },
+      "modifiers": {
+        "fortune": 0,
+        "actionCost": {
+          "value": 0,
+          "operator": ""
+        },
+        "attackProfile": {
+          "attackType": "",
+          "attackMode": "",
+          "handsSupplied": 0,
+          "finisherLimit": {
+            "value": 0,
+            "operator": ""
+          },
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "damage": []
+        },
+        "guard": {
+          "self": {
+            "value": "",
+            "operator": ""
+          },
+          "target": {
+            "value": "",
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": 0,
+            "operator": ""
+          },
+          "target": {
+            "value": 0,
+            "operator": ""
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": 0,
+            "operator": ""
+          },
+          "target": {
+            "value": 0,
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": []
+        }
+      }
+    },
+    "skillType": "temporary",
+    "path": {
+      "value": "",
+      "archetype": ""
+    },
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": ""
+  },
+  "effects": [
+    {
+      "name": "Disoriented",
+      "img": "systems/abbrew/assets/icons/statuses/disoriented.svg",
+      "origin": "Compendium.abbrew.conditions.Item.r7VMjvyw8EKDplwf",
+      "duration": {
+        "rounds": null,
+        "startTime": null,
+        "seconds": null,
+        "combat": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "disabled": false,
+      "_id": "mfqnPc0kjgyfJPeV",
+      "type": "base",
+      "system": {},
+      "changes": [],
+      "description": "",
+      "tint": "#ffffff",
+      "transfer": true,
+      "statuses": [
+        "disoriented"
+      ],
+      "sort": 0,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "coreVersion": "12.331",
+        "systemId": "abbrew",
+        "systemVersion": "0.0.2-prerelease31",
+        "createdTime": 1743076253901,
+        "modifiedTime": 1743076277489,
+        "lastModifiedBy": "abbrewpacks00000"
+      },
+      "_key": "!items.effects!r7VMjvyw8EKDplwf.mfqnPc0kjgyfJPeV"
+    }
+  ],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743076241070,
+    "modifiedTime": 1743076343107,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!r7VMjvyw8EKDplwf"
+}

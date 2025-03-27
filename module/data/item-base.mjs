@@ -18,7 +18,7 @@ export default class AbbrewItemBase extends foundry.abstract.TypeDataModel {
   // Prior to Active Effects
   prepareBaseData() {
     if (this.abbrewId.value === "") {
-      this.abbrewId = this.generateAbbrewId();
+      this.abbrewId.value = this.generateAbbrewId();
       this.abbrewId.uuid = this.parent._id;
     }
   }

@@ -1,0 +1,80 @@
+{
+  "folder": "kvbj4mwDOPBV55jR",
+  "name": "Betrayed by a Friend",
+  "type": "background",
+  "_id": "UmJoAEk0GHeD1qkY",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "skills": [],
+    "attributes": {
+      "str": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "dex": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      },
+      "agi": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "con": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "int": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      },
+      "wil": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      },
+      "wit": {
+        "value": 2,
+        "label": "",
+        "isEnabled": true
+      },
+      "vis": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      }
+    },
+    "creatureForm": {
+      "name": "",
+      "id": "",
+      "image": "",
+      "sourceId": ""
+    }
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743077412558,
+    "modifiedTime": 1743077412558,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!UmJoAEk0GHeD1qkY"
+}

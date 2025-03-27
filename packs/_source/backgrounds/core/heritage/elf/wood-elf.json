@@ -1,0 +1,80 @@
+{
+  "folder": "bfBYLi3m2CWnSvOe",
+  "name": "Wood Elf",
+  "type": "background",
+  "_id": "MNgDN9iyoG9Vp9kv",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "skills": [],
+    "attributes": {
+      "str": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "dex": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      },
+      "agi": {
+        "value": 2,
+        "label": "",
+        "isEnabled": true
+      },
+      "con": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      },
+      "int": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "wit": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      },
+      "vis": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "wil": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      }
+    },
+    "creatureForm": {
+      "name": "",
+      "id": "",
+      "image": "",
+      "sourceId": ""
+    }
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743077570174,
+    "modifiedTime": 1743077570174,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!MNgDN9iyoG9Vp9kv"
+}

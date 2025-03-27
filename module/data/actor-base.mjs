@@ -118,8 +118,9 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   prepareBaseData() {
     // Loop through attribute scores, and determine their base rank.
     for (const key in this.attributes) {
-      this.attributes[key].value = 0 + this.parent.items.filter(i => i.type === 'skill' && i.system.skillType === 'background' && i.system.attributeIncrease === key).length;
-      this.attributes[key].rank = this.attributes[key].value;
+      const totalIncrase = 0 + this.parent.items.filter(i => i.type === 'skill' && i.system.skillType === 'background' && i.system.attributeIncrease === key).length;
+      this.attributes[key].value = Math.min(9, totalIncrase);
+      this.attributes[key].rank = totalIncrase;
     }
 
     this.defense.risk.value = Math.floor(this.defense.risk.raw / 10);

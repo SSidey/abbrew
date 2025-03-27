@@ -1,0 +1,80 @@
+{
+  "folder": "cEDk9sIYzWehM96m",
+  "name": "Hardy",
+  "type": "background",
+  "_id": "ieeMQXx5MnAxWFrj",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "skills": [],
+    "attributes": {
+      "str": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      },
+      "dex": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      },
+      "agi": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "con": {
+        "value": 2,
+        "label": "",
+        "isEnabled": true
+      },
+      "int": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "wil": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      },
+      "wit": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "vis": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      }
+    },
+    "creatureForm": {
+      "name": "",
+      "id": "",
+      "image": "",
+      "sourceId": ""
+    }
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743077265027,
+    "modifiedTime": 1743077265027,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!ieeMQXx5MnAxWFrj"
+}
