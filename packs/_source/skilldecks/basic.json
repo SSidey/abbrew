@@ -10,50 +10,52 @@
       "value": "",
       "uuid": ""
     },
-    "skills": [
-      {
-        "name": "Attack",
-        "skillType": "",
-        "id": "XUpBl13SyrdUvgMb",
-        "image": "icons/svg/item-bag.svg",
-        "sourceId": "Compendium.abbrew.skills.Item.XUpBl13SyrdUvgMb"
-      },
-      {
-        "name": "Dodge",
-        "skillType": "",
-        "id": "ocw9C57R2vHbR9gc",
-        "image": "icons/svg/item-bag.svg",
-        "sourceId": "Compendium.abbrew.skills.Item.ocw9C57R2vHbR9gc"
-      },
-      {
-        "name": "Feint",
-        "skillType": "",
-        "id": "K0OOr4X7XjakQ6cn",
-        "image": "icons/svg/item-bag.svg",
-        "sourceId": "Compendium.abbrew.skills.Item.K0OOr4X7XjakQ6cn"
-      },
-      {
-        "name": "Finisher",
-        "skillType": "",
-        "id": "CyLt3Q0Ao82N1c6o",
-        "image": "icons/svg/item-bag.svg",
-        "sourceId": "Compendium.abbrew.skills.Item.CyLt3Q0Ao82N1c6o"
-      },
-      {
-        "name": "Parry",
-        "skillType": "",
-        "id": "lTy5lovRwgSU5ERZ",
-        "image": "icons/svg/item-bag.svg",
-        "sourceId": "Compendium.abbrew.skills.Item.lTy5lovRwgSU5ERZ"
-      },
-      {
-        "name": "Restore Guard",
-        "id": "iUJqYFdrcfZyUr6S",
-        "image": "icons/svg/item-bag.svg",
-        "sourceId": "Compendium.abbrew.skills.Item.iUJqYFdrcfZyUr6S",
-        "skillType": ""
-      }
-    ]
+    "skills": {
+      "granted": [
+        {
+          "name": "Attack",
+          "skillType": "",
+          "id": "XUpBl13SyrdUvgMb",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.XUpBl13SyrdUvgMb"
+        },
+        {
+          "name": "Dodge",
+          "skillType": "",
+          "id": "ocw9C57R2vHbR9gc",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.ocw9C57R2vHbR9gc"
+        },
+        {
+          "name": "Feint",
+          "skillType": "",
+          "id": "K0OOr4X7XjakQ6cn",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.K0OOr4X7XjakQ6cn"
+        },
+        {
+          "name": "Finisher",
+          "skillType": "",
+          "id": "CyLt3Q0Ao82N1c6o",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.CyLt3Q0Ao82N1c6o"
+        },
+        {
+          "name": "Parry",
+          "skillType": "",
+          "id": "lTy5lovRwgSU5ERZ",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.lTy5lovRwgSU5ERZ"
+        },
+        {
+          "name": "Restore Guard",
+          "id": "iUJqYFdrcfZyUr6S",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.iUJqYFdrcfZyUr6S",
+          "skillType": ""
+        }
+      ]
+    }
   },
   "effects": [],
   "folder": null,
@@ -68,7 +70,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075611467,
-    "modifiedTime": 1743075672368,
+    "modifiedTime": 1743459406695,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!G5YE4JNGGEfq0d5Z"

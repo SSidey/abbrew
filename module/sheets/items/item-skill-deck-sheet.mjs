@@ -101,9 +101,9 @@ export class AbbrewSkillDeckSheet extends ItemSheet {
         html.on('click', '.skill-delete', async (ev) => {
             const li = $(ev.currentTarget).parents('.skill-deck-skill');
             if (li.data('id') || li.data('id') === 0) {
-                const skills = this.item.system.skills;
+                const skills = this.item.system.skills.granted;
                 skills.splice(li.data('id'), 1);
-                await this.item.update({ "system.skills": skills });
+                await this.item.update({ "system.skills.granted": skills });
             }
         });
 
@@ -126,9 +126,9 @@ export class AbbrewSkillDeckSheet extends ItemSheet {
             if (eventJson && eventJson.type === "Item") {
                 const item = await fromUuid(eventJson.uuid);
                 if (item.type === "skill") {
-                    const storedSkills = this.item.system.skills;
+                    const storedSkills = this.item.system.skills.granted;
                     const updateSkills = [...storedSkills, { name: item.name, id: item._id, image: item.img, sourceId: item.uuid }];
-                    await this.item.update({ "system.skills": updateSkills });
+                    await this.item.update({ "system.skills.granted": updateSkills });
                 } else if (item.type === "creatureForm") {
                     await this.item.update({ "system.creatureForm": { name: item.name, id: item._id, image: item.img, sourceId: item.uuid } });
                 }

@@ -324,7 +324,7 @@ export default class AbbrewActor extends Actor {
   }
 
   async acceptSkillDeck(skillDeck) {
-    const skills = await Promise.all(skillDeck.system.skills.map(async s => await fromUuid(s.sourceId)));
+    const skills = await Promise.all(skillDeck.system.skills.granted.map(async s => await fromUuid(s.sourceId)));
     for (const index in skills) {
       await Item.create(skills[index], { parent: this })
     }

@@ -79,7 +79,7 @@
             <div>
                 <h3>Skills</h3>
                 <ol class="skill-deck-skills">
-                    {{#each system.skills as |skill id|}}
+                    {{#each system.skills.granted as |skill id|}}
                     <li class="skill-deck-skill" data-id="{{id}}" data-item-id="{{skill.id}}"
                         data-source-id="{{skill.sourceId}}">
                         <div class="skill-deck-summary">

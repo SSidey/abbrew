@@ -134,14 +134,18 @@ export class AbbrewSkillSheet extends ItemSheet {
                 return;
             }
 
-            const droppedData = event.originalEvent.dataTransfer.getData("text")
+            const droppedData = event.originalEvent.dataTransfer.getData("text");
+            const collection = event.currentTarget.dataset.collectionName;
             const eventJson = JSON.parse(droppedData);
             if (eventJson && eventJson.type === "Item") {
                 const item = await fromUuid(eventJson.uuid);
                 if (item.type === "skill") {
-                    const storedSkills = this.item.system.skills;
+                    const storedSkills = getObjectValueByStringPath(this.item, `system.skills.${collection}`);
                     const updateSkills = [...storedSkills, { name: item.name, id: item._id, image: item.img, sourceId: item.uuid }];
-                    await this.item.update({ "system.skills": updateSkills });
+                    const updateKey = `system.skills.${collection}`
+                    const update = {};
+                    update[updateKey] = updateSkills;
+                    await this.item.update(update);
                 }
             }
         });
@@ -152,10 +156,13 @@ export class AbbrewSkillSheet extends ItemSheet {
 
         html.on('click', '.skill-delete', async (ev) => {
             const li = $(ev.currentTarget).parents('.skill-deck-skill');
+            const ol = li.parents('.skill-deck-skills');
             if (li.data('id') || li.data('id') === 0) {
-                const skills = this.item.system.skills;
+                const skills = getObjectValueByStringPath(this.item, `system.skills.${ol.data('collectionName')}`);
                 skills.splice(li.data('id'), 1);
-                await this.item.update({ "system.skills": skills });
+                const update = {};
+                update[`system.skills.${ol.data('collectionName')}`] = skills;
+                await this.item.update(update);
             }
         });
 

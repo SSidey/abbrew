@@ -156,20 +156,6 @@ export default class AbbrewItem extends Item {
 
   async _onCreate(data, options, userId) {
     if (data.type === "skill") {
-      const synergies = getSafeJson(data.system.skillModifiers.synergy, []).map(s => ({ value: s.value, id: this.actor.items.find(i => i.name === s.value)?._id, sourceId: s.sourceId })).filter(s => s.id);
-      const discord = getSafeJson(data.system.skillModifiers.discord, []).map(s => ({ value: s.value, id: this.actor.items.find(i => i.name === s.value)?._id, sourceId: s.sourceId })).filter(s => s.id);
-      const update = {};
-      if (synergies.length > 0) {
-        update["system.skillModifiers.synergy"] = JSON.stringify(synergies);
-      }
-      if (discord.length > 0) {
-        update["system.skillModifiers.discord"] = JSON.stringify(discord);
-      }
-
-      if (Object.keys(update).length > 0) {
-        await this.update(update);
-      }
-
       await this.actor?.acceptSkillDeck(data);
     }
   }

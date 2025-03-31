@@ -16,7 +16,7 @@
 </div>
 <div class="skill-paired-row">
     <div class="skill-element-2">
-        <label>Synergy Action Cost</label>
+        <label>Action Cost Modifier</label>
         <input type="number" name="system.action.modifiers.actionCost.value"
             value="{{system.action.modifiers.actionCost.value}}" data-dtype="Number" />
     </div>
@@ -29,13 +29,13 @@
     </div>
 </div>
 <div class="item action">
-    {{#if system.isActivatable}}
     <div class="form-group">
         <label>{{ localize "ABBREW.SkillActivationType" }}</label>
         <select name="system.action.activationType">
             {{selectOptions config.skillActivationTypes selected=system.action.activationType localize=true}}
         </select>
     </div>
+    {{#if system.isActivatable}}
     <div>
         <h3>Duration</h3>
         <select name="system.action.duration.precision">

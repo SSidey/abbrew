@@ -118,9 +118,9 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   prepareBaseData() {
     // Loop through attribute scores, and determine their base rank.
     for (const key in this.attributes) {
-      const totalIncrase = 0 + this.parent.items.filter(i => i.type === 'skill' && i.system.skillType === 'background' && i.system.attributeIncrease === key).length;
-      this.attributes[key].value = Math.min(9, totalIncrase);
-      this.attributes[key].rank = totalIncrase;
+      const totalIncrease = 0 + this.parent.items.filter(i => i.type === 'skill' && i.system.skillType === 'background' && i.system.attributeIncrease === key).length;
+      this.attributes[key].value = Math.min(9, totalIncrease);
+      this.attributes[key].rank = totalIncrease;
     }
 
     this.defense.risk.value = Math.floor(this.defense.risk.raw / 10);
@@ -178,7 +178,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
     Object.keys(this.proxiedSkills).forEach(ps => {
       const item = this.parent.items.find(i => i.name.toLowerCase() === ps);
-      this.proxiedSkills[ps] = item?._id;
+      this.proxiedSkills[ps] = item?.system.abbrewId.uuid;
     });
 
     const skillTraining = this.parent.items.filter(i => i.type === "skill").filter(s => s.system.skillTraits).flatMap(s => getSafeJson(s.system.skillTraits, []).filter(st => st.feature === "skillTraining").map(st => st.data)).reduce((result, st) => { if (st in result) { result[st] += 1; } else { result[st] = 1; } return result; }, {});

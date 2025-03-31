@@ -1,0 +1,148 @@
+{
+  "folder": "xv4pBYEWqvTp5C2J",
+  "name": "Overpower",
+  "type": "skill",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "abbrew.skill.overpower.rROAymZJjdomFnKc",
+      "uuid": "rROAymZJjdomFnKc"
+    },
+    "skillTraits": "[{\"key\":\"overpowerBaseTraining\",\"value\":\"Overpower Base\",\"feature\":\"skillTraining\",\"subFeature\":\"offensiveSkills\",\"effect\":\"base\",\"data\":\"overpower\"}]",
+    "skillModifiers": {
+      "synergy": "",
+      "discord": ""
+    },
+    "configurable": false,
+    "isActivatable": false,
+    "skills": {
+      "granted": [],
+      "paired": []
+    },
+    "action": {
+      "activationType": "",
+      "actionCost": "",
+      "actionImage": "",
+      "duration": {
+        "precision": "",
+        "value": 0
+      },
+      "uses": {
+        "hasUses": false,
+        "value": 0,
+        "max": 0,
+        "period": ""
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "attackProfile": {
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": null,
+        "attackMode": "",
+        "damage": [],
+        "finisherLimit": 10
+      },
+      "modifiers": {
+        "fortune": 0,
+        "actionCost": {
+          "value": 0,
+          "operator": ""
+        },
+        "attackProfile": {
+          "attackType": "",
+          "attackMode": "",
+          "handsSupplied": 0,
+          "finisherLimit": {
+            "value": 0,
+            "operator": ""
+          },
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "damage": []
+        },
+        "guard": {
+          "self": {
+            "value": "",
+            "operator": ""
+          },
+          "target": {
+            "value": "",
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": 0,
+            "operator": ""
+          },
+          "target": {
+            "value": 0,
+            "operator": ""
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": 0,
+            "operator": ""
+          },
+          "target": {
+            "value": 0,
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": []
+        }
+      }
+    },
+    "skillType": "basic",
+    "path": {
+      "value": "",
+      "archetype": ""
+    },
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": ""
+  },
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743458661221,
+    "modifiedTime": 1743458696768,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_id": "Nv1PxBfxFdkkF0jo",
+  "sort": 0,
+  "_key": "!items!Nv1PxBfxFdkkF0jo"
+}

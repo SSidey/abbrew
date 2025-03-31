@@ -69,11 +69,11 @@ function getModifierSkills(actor, skill) {
     // Get all queued synergy skills
     const queuedSkills = actor.items.toObject().filter(i => actor.system.queuedSkills.includes(i._id));
     // Get all synergies that apply to the main skill
-    const queuedSynergies = queuedSkills.filter(s => s.system.skillModifiers.synergy).map(s => ({ skill: s, synergy: getSafeJson(s.system.skillModifiers.synergy, []).map(s => s.id) })).filter(s => s.synergy.includes(skill._id)).map(s => s.skill)
+    const queuedSynergies = queuedSkills.filter(s => s.system.skillModifiers.synergy).map(s => ({ skill: s, synergy: JSON.parse(s.system.skillModifiers.synergy).map(s => foundry.utils.parseUuid(s.sourceId).id) })).filter(s => s.synergy.includes(skill._id)).map(s => s.skill)
     // Get all passives
     const passiveSkills = actor.items.toObject().filter(i => i.system.isActivatable === false);
     // Get passives that have synergy with the main skill
-    const passiveSynergies = passiveSkills.filter(s => s.system.skillModifiers.synergy).map(s => ({ skill: s, synergy: getSafeJson(s.system.skillModifiers.synergy, []).map(s => s.id) })).filter(s => s.synergy.includes(skill._id)).map(s => s.skill)
+    const passiveSynergies = passiveSkills.filter(s => s.system.skillModifiers.synergy).map(s => ({ skill: s, synergy: JSON.parse(s.system.skillModifiers.synergy).map(s => foundry.utils.parseUuid(s.sourceId).id) })).filter(s => s.synergy.includes(skill._id)).map(s => s.skill)
     // Combine all relevant skills, filtering for those that are out of charges    
     return [...passiveSynergies, ...queuedSynergies];
 }
@@ -117,8 +117,14 @@ export async function applySkillEffects(actor, skill) {
     for (const index in modifierSkills) {
         const skill = modifierSkills[index];
         if (skill.system.action.duration.precision === "0") {
-            const effect = actor.effects.find(e => e.flags.abbrew.skill.trackDuration === skill._id);
+            const effect = actor.effects.find(e => e.flags?.abbrew?.skill?.trackDuration === skill._id);
             await effect.delete();
+        }
+        if (skill.system.skills.paired.length > 0) {
+            skill.system.skills.paired.forEach(async ps => {
+                const pairedSkill = actor.items.filter(i => i.type === "skill" && i.system.isActivatable).find(s => s.system.abbrewId.uuid === foundry.utils.parseUuid(ps.sourceId).id);
+                await handleSkillActivate(actor, pairedSkill);
+            });
         }
     }
 
@@ -140,7 +146,7 @@ export async function applySkillEffects(actor, skill) {
                 attributeModifier = Math.floor(attributeMultiplier * actor.system.attributes[d.attributeModifier].value);
             }
 
-            const finalDamage = attributeModifier + d.value;
+            const finalDamage = d.overallMultiplier * (attributeModifier + (d.damageMultiplier * d.value));
 
             return { damageType: d.type, value: finalDamage };
         });
@@ -207,6 +213,7 @@ export async function applySkillEffects(actor, skill) {
         content: html,
         flags: { data: data }
     });
+
     return {};
 }
 
