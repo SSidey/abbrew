@@ -35,7 +35,7 @@
             {{selectOptions config.skillActivationTypes selected=system.action.activationType localize=true}}
         </select>
     </div>
-    {{#if system.isActivatable}}
+    {{#if system.isActivatable}} {{!-- TODO: Shouldn't need to be activatable for this, activation type passive? --}}
     <div>
         <h3>Duration</h3>
         <select name="system.action.duration.precision">
@@ -100,6 +100,126 @@
         </div>
         <div>
             <h3>Attack Profile</h3>
+            <div class="skill-attack-profile">
+                <div class="attack-profile-row">
+                    <div class="attack-profile-element-2">
+                        <label>Attack Type</label>
+                        <select name="system.action.attackProfile.attackType">
+                            {{selectOptions config.attackTypes selected=system.action.attackProfile.attackType
+                            blank="" localize=true}}
+                        </select>
+                    </div>
+                    <div class="attack-profile-element-3">
+                        <label>Finisher Limit</label>
+                        <input type="text" name="system.action.attackProfile.finisherLimit"
+                            value="{{system.action.attackProfile.finisherLimit}}" data-dtype="String" />
+                    </div>
+                </div>
+                <div class="attack-profile-row">
+                    <div class="attack-profile-element-2">
+                        <label>Attack Mode</label>
+                        <select name="system.action.attackProfile.attackMode">
+                            {{selectOptions config.attackModes selected=system.action.attackProfile.attackMode
+                            blank=""
+                            localize=true}}
+                        </select>
+                    </div>
+                    <div class="attack-profile-element-3">
+                        <label>Critical</label>
+                        <input type="text" name="system.action.attackProfile.critical"
+                            value="{{system.action.attackProfile.critical}}" data-dtype="String" />
+                    </div>
+                </div>
+                <div class="attack-profile-row">
+                    <div class="attack-profile-element-2">
+                        <label>Hands Supplied</label>
+                        <input type="text" name="system.action.attackProfile.handsSupplied"
+                            value="{{system.action.attackProfile.handsSupplied}}" data-dtype="String" />
+                    </div>
+                    <div class="attack-profile-element-3">
+                        <label>Lethal</label>
+                        <input type="text" name="system.action.attackProfile.lethal"
+                            value="{{system.action.attackProfile.lethal}}" data-dtype="String" />
+                    </div>
+                </div>
+            </div>
+            <ol class="skill-damage-list">
+                {{#each system.action.attackProfile.damage as |damage j|}}
+                <li class="item skill-damage-row" data-id="{{j}}">
+                    <div class="skill-damage-profile">
+                        <div class="damage-profile-element-2">
+                            <label>Overall Multiplier</label>
+                            <input type="text" name="system.action.attackProfile.damage.{{j}}.overallMultiplier"
+                                value="{{damage.overallMultiplier}}" data-dtype="String" />
+                        </div>
+                        <div class="damage-profile-element-2">
+                            <label>{{ localize "ABBREW.Damage" }}</label>
+                            <input type="text" name="system.action.attackProfile.damage.{{j}}.value"
+                                value="{{damage.value}}" data-dtype="Number" />
+                        </div>
+                        <div class="damage-profile-element-2">
+                            <label>{{ localize "ABBREW.Type" }}</label>
+                            <select name="system.action.attackProfile.damage.{{j}}.type">
+                                {{selectOptions ../config.concepts selected=damage.type blank="" localize=true}}
+                            </select>
+                        </div>
+                        <div class="damage-profile-element-2">
+                            <label>Damage Multiplier</label>
+                            <input type="text" name="system.action.attackProfile.damage.{{j}}.damageMultiplier"
+                                value="{{damage.damageMultiplier}}" data-dtype="String" />
+                        </div>
+                        <div class="damage-profile-element-2">
+                            <label>Attribute</label>
+                            <select name="system.action.attackProfile.damage.{{j}}.attributeModifier">
+                                {{selectOptions ../config.attributes selected=damage.attributeModifier blank=""
+                                localize=true}}
+                            </select>
+                        </div>
+                        <div class="damage-profile-element-2">
+                            <label>Attribute Multiplier</label>
+                            <input type="text" name="system.action.attackProfile.damage.{{j}}.attributeMultiplier"
+                                value="{{damage.attributeMultiplier}}" data-dtype="String" />
+                        </div>
+                    </div>
+                    <div class="skill-damage-control">
+                        <a class="damage-control remove-damage" data-action="remove-damage">
+                            <i class="fa-solid fa-minus"></i>
+                        </a>
+                    </div>
+                </li>
+                {{/each}}
+                <li class="damage add">
+                    <div class="form-group">
+                        <label>
+                            <a class="damage-control" data-action="add-damage">
+                                Add Damage
+                                <i class="fa-solid fa-plus"></i>
+                            </a>
+                        </label>
+                    </div>
+                </li>
+            </ol>
+        </div>
+        {{#if (eq system.action.activationType "synergy")}}
+        <div>
+            <h3>Attack Profile Modifiers</h3>
+            <div>
+                <label class="slide-toggle roboto-upper">
+                    <input type="checkbox" name="system.action.modifiers.attackProfile.combineAttacks.isEnabled" {{
+                        checked system.action.modifiers.attackProfile.combineAttacks.isEnabled }}>
+                    <span>{{attribute.label}}</span>
+                    {{#if system.action.modifiers.attackProfile.combineAttacks.isEnabled}}
+                    <i class="fa fa-toggle-on"></i>
+                    {{else}}
+                    <i class="fa fa-toggle-off"></i>
+                    {{/if}}
+                </label>
+                {{#if system.action.modifiers.attackProfile.combineAttacks.isEnabled}}
+                <label>Number Combined</label>
+                <input type="number" name="system.action.modifiers.attackProfile.combineAttacks.value"
+                    value="{{system.action.modifiers.attackProfile.combineAttacks.value}}" data-dtype="Number" />
+                {{/if}}
+            </div>
             <div class="skill-attack-profile">
                 <div class="attack-profile-row">
                     <div class="attack-profile-element-2">
@@ -217,7 +337,7 @@
                         {{/unless}}
                     </div>
                     <div class="skill-damage-control">
-                        <a class="damage-control remove-damage" data-action="remove-damage">
+                        <a class="damage-control remove-damage" data-action="remove-modifier-damage">
                             <i class="fa-solid fa-minus"></i>
                         </a>
                     </div>
@@ -226,7 +346,7 @@
                 <li class="damage add">
                     <div class="form-group">
                         <label>
-                            <a class="damage-control" data-action="add-damage">
+                            <a class="damage-control" data-action="add-modifier-damage">
                                 Add Damage
                                 <i class="fa-solid fa-plus"></i>
                             </a>
@@ -235,6 +355,7 @@
                 </li>
             </ol>
         </div>
+        {{/if}}
         <div>
             <h3>Guard</h3>
             <div>

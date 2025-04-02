@@ -195,6 +195,46 @@ export default class AbbrewItem extends Item {
 
     const id = actor.system.proxiedSkills[attackMode];
 
+    let combineForSkill = actor.items.filter(i => i.type === "skill").find(s => s._id === actor.system.combinedAttacks.combineFor);
+
+    if (!combineForSkill) {
+      const combineAttackSkills = actor.items.filter(i => i.type === "skill" && actor.system.queuedSkills.includes(i._id)).filter(s => s.system.action.modifiers.attackProfile.combineAttacks.isEnabled);
+      if (combineAttackSkills.length > 0) {
+        combineForSkill = combineAttackSkills[0];
+        await actor.update({ "system.combinedAttacks.combineFor": combineForSkill._id });
+      }
+    }
+
+    const combineSkill = combineForSkill ? ({ name: combineForSkill.name, image: combineForSkill.img, id: combineForSkill._id, value: combineForSkill.system.action.modifiers.attackProfile.combineAttacks.value, actionCost: combineForSkill.system.action.actionCost, attackMode: combineForSkill.system.action.attackProfile.attackMode, handsSupplied: combineForSkill.system.action.attackProfile.handsSupplied, durationPrecision: combineForSkill.system.action.duration.precision }) : undefined;
+
+    if (combineSkill) {
+      const toCombine = combineSkill.value;
+      const combined = actor.system.combinedAttacks.combined;
+      if (actor.system.combinedAttacks.combined === 0 && !actor.system.combinedAttacks.base) {
+        const base = { id: combineSkill.id, name: combineSkill.name, actionCost: combineSkill.actionCost, image: combineSkill.image, attackMode: combineSkill.attackMode, handsSupplied: combineSkill.handsSupplied, attackProfile: attackProfile };
+        await actor.update({ "system.combinedAttacks.combined": combined + 1, "system.combinedAttacks.base": base });
+        return;
+      }
+
+      const combinedDamage = actor.system.combinedAttacks.additionalDamage;
+      const fullCombinedDamage = [...combinedDamage, ...attackProfile.damage];
+      const totalCombined = combined + 1;
+      if (totalCombined < toCombine) {
+        await actor.update({ "system.combinedAttacks.combined": totalCombined, "system.combinedAttacks.additionalDamage": fullCombinedDamage })
+      }
+
+      let base = actor.system.combinedAttacks.base;
+      base.attackProfile.damage = [...base.attackProfile.damage, ...fullCombinedDamage];
+      const attackSkill = getAttackSkillWithActions(base.id, base.name, base.actionCost, base.image, base.attackProfile, base.attackMode, base.handsSupplied);
+      if (combineSkill.durationPrecision === "0") {
+        const effect = actor.effects.find(e => e.flags?.abbrew?.skill?.trackDuration === combineSkill.id);
+        await effect?.delete();
+      }
+      await actor.update({ "system.combinedAttacks.combined": 0, "system.combinedAttacks.combineFor": null, "system.combinedAttacks.base": null, "system.combinedAttacks.additionalDamage": [] })
+      await handleSkillActivate(actor, attackSkill, false);
+      return;
+    }
+
     const attackSkill = getAttackSkillWithActions(id, this.name, actionCost, this.img, attackProfile, attackMode, this.system.handsSupplied);
 
     await handleSkillActivate(actor, attackSkill);

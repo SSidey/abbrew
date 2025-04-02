@@ -28,6 +28,7 @@ export const preloadHandlebarsTemplates = async function () {
     'systems/abbrew/templates/chat/skill-card.hbs',
     'systems/abbrew/templates/chat/finisher-card.hbs',
     'systems/abbrew/templates/chat/lost-resolve-card.hbs',
-    'systems/abbrew/templates/chat/attack-result-card.hbs'
+    'systems/abbrew/templates/chat/attack-result-card.hbs',
+    'systems/abbrew/templates/chat/notification-card.hbs',
   ]);
 };

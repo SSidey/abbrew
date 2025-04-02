@@ -1,8 +1,8 @@
 import { applyOperator } from "./operators.mjs";
-import { getObjectValueByStringPath, getSafeJson, intersection } from "../helpers/utils.mjs"
+import { getObjectValueByStringPath, getSafeJson } from "../helpers/utils.mjs"
 import { mergeWoundsWithOperator } from "./combat.mjs";
 
-export async function handleSkillActivate(actor, skill) {
+export async function handleSkillActivate(actor, skill, checkActions = true) {
     if (!skill.system.isActivatable) {
         ui.notifications.info(`${skill.name} can not be activated`);
         return false;
@@ -23,8 +23,10 @@ export async function handleSkillActivate(actor, skill) {
         return false;
     }
 
-    if (!await actor.canActorUseActions(getModifiedSkillActionCost(actor, skill))) {
-        return false;
+    if (checkActions) {
+        if (!await actor.canActorUseActions(getModifiedSkillActionCost(actor, skill))) {
+            return false;
+        }
     }
 
     if (skill.system.action.activationType === "stackRemoval") {
@@ -43,6 +45,11 @@ export async function removeStackFromSkill(skill) {
         return;
     }
 
+    // TODO: Need to stop it falling off, didn't seem to work.
+    if (skill.system.action.uses.period !== "") {
+        return;
+    }
+
     await skill.delete();
 }
 
@@ -50,6 +57,27 @@ async function activateSkill(actor, skill) {
     if (skill.system.action.activationType === "synergy") {
         await trackSkillDuration(actor, skill);
         await addSkillToQueuedSkills(actor, skill);
+        const templateData = {
+            actor: actor,
+            tokenId: actor.token?.uuid || null,
+            actionCost: skill.system.action.actionCost,
+            title: skill.name,
+            message: skill.system.description
+        };
+
+        const html = await renderTemplate("systems/abbrew/templates/chat/notification-card.hbs", templateData);
+
+        const speaker = ChatMessage.getSpeaker({ actor: actor });
+        const rollMode = game.settings.get('core', 'rollMode');
+        const label = `[${skill.system.skillType}] ${skill.name}`;
+        ChatMessage.create({
+            speaker: speaker,
+            rollMode: rollMode,
+            flavor: label,
+            content: html,
+            flags: {}
+        });
+
         return true;
     }
 

@@ -83,6 +83,10 @@ export default class AbbrewSkill extends AbbrewItemBase {
                     operator: new fields.StringField({ ...blankString }),
                 }),
                 attackProfile: new fields.SchemaField({
+                    combineAttacks: new fields.SchemaField({
+                        isEnabled: new fields.BooleanField({ required: true }),
+                        value: new fields.NumberField({ ...requiredInteger, min: 2, nullable: true }),
+                    }),
                     attackType: new fields.StringField({ required: true, blank: true }),
                     attackMode: new fields.StringField({ required: true, blank: true }),
                     handsSupplied: new fields.NumberField({ ...requiredInteger, min: 0, max: 2, nullable: true }),
@@ -232,10 +236,6 @@ export default class AbbrewSkill extends AbbrewItemBase {
     }
 
     getActionImageName(cost) {
-        if (cost === "0" || cost > 5) {
-            return "fa";
-        }
-
         return "" + cost + "a";
     }
 }

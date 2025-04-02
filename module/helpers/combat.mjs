@@ -150,6 +150,7 @@ async function turnStart(actor) {
 
     await updateTurnStartWounds(actor);
 
+    await rechargePerRoundSkills(actor);
     await applyActiveSkills(actor);
 }
 
@@ -182,6 +183,13 @@ async function applyActiveSkills(actor) {
     const activeSkills = actor.system.activeSkills.flatMap(s => actor.items.filter(i => i._id === s));
     for (const index in activeSkills) {
         await applySkillEffects(actor, activeSkills[index]);
+    }
+}
+
+async function rechargePerRoundSkills(actor) {
+    const roundUseSkills = actor.items.filter(i => i.type === "skill" && i.system.action.uses.hasUses && ["0.01", "6"].includes(i.system.action.uses.period));
+    for (const index in roundUseSkills) {
+        await roundUseSkills[index].update({ "system.action.uses.value": roundUseSkills[index].system.action.uses.max });
     }
 }
 

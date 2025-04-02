@@ -290,17 +290,33 @@ export class AbbrewSkillSheet extends ItemSheet {
                 return this.addDamage(target);
             case 'remove-damage':
                 return this.removeDamage(target);
-                break;
+            case 'add-modifier-damage':
+                return this.addModifierDamage(target);;
+            case 'remove-modifier-damage':
+                return this.removeModifierDamage(target);;
         }
     }
 
     addDamage(target) {
+        const damage = this.item.system.action.attackProfile.damage;
+        const update = [...damage, {}];
+        return this.item.update({ "system.action.attackProfile.damage": update });
+    }
+
+    removeDamage(target) {
+        const damageId = target.closest("li").dataset.id;
+        const damage = this.item.system.action.attackProfile.damage;
+        damage.splice(Number(damageId), 1);
+        return this.item.update({ "system.action.attackProfile.damage": damage });
+    }
+
+    addModifierDamage(target) {
         const damage = this.item.system.action.modifiers.attackProfile.damage;
         const update = [...damage, {}];
         return this.item.update({ "system.action.modifiers.attackProfile.damage": update });
     }
 
-    removeDamage(target) {
+    removeremoveModifierDamageDamage(target) {
         const damageId = target.closest("li").dataset.id;
         const damage = this.item.system.action.modifiers.attackProfile.damage;
         damage.splice(Number(damageId), 1);

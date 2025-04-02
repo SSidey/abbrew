@@ -30,6 +30,47 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     schema.queuedSkills = new fields.ArrayField(
       new fields.StringField({ required: true, blank: true })
     );
+    schema.combinedAttacks = new fields.SchemaField({
+      combineFor: new fields.StringField({ required: true, blank: true, nullable: true }),
+      combined: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+      base: new fields.SchemaField({
+        id: new fields.StringField({ required: true, blank: true }),
+        name: new fields.StringField({ required: true, blank: true }),
+        actionCost: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+        image: new fields.StringField({ required: true, blank: true }),
+        attackMode: new fields.StringField({ required: true, blank: true }),
+        handsSupplied: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+        attackProfile: new fields.SchemaField({
+          name: new fields.StringField({ required: true, blank: true }),
+          attackType: new fields.StringField({ required: true, blank: true }),
+          lethal: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+          critical: new fields.NumberField({ ...requiredInteger, initial: 10, min: 5 }),
+          damage: new fields.ArrayField(
+            new fields.SchemaField({
+              type: new fields.StringField({ required: true, blank: true }),
+              value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+              attributeModifier: new fields.StringField({ required: true, blank: true }),
+              attributeMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 }),
+              damageMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 }),
+              overallMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 })
+            })
+          ),
+          finisherLimit: new fields.NumberField({ ...requiredInteger, initial: 10, min: 1 }),
+          hasStrongAttack: new fields.BooleanField({ required: true, nullable: false, initial: true })
+        })
+      },
+        { nullable: true, initial: null }),
+      additionalDamage: new fields.ArrayField(
+        new fields.SchemaField({
+          type: new fields.StringField({ ...blankString }),
+          value: new fields.NumberField({ ...requiredInteger }),
+          attributeModifier: new fields.StringField({ ...blankString }),
+          attributeMultiplier: new fields.NumberField({ ...requiredInteger }),
+          damageMultiplier: new fields.NumberField({ ...requiredInteger }),
+          overallMultiplier: new fields.NumberField({ ...requiredInteger }),
+        })
+      )
+    })
     schema.defense = new fields.SchemaField({
       guard: new fields.SchemaField({
         value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
