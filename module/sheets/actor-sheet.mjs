@@ -21,7 +21,7 @@ export class AbbrewActorSheet extends ActorSheet {
         {
           navSelector: '.sheet-tabs',
           contentSelector: '.sheet-body',
-          initial: 'skills',
+          initial: 'overview',
         },
       ],
     });

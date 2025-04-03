@@ -1,0 +1,152 @@
+{
+  "name": "Haste",
+  "type": "skill",
+  "system": {
+    "skillType": "temporary",
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "abbrew.skill.newskill.fwcx4hl848WO4A7U",
+      "uuid": "fwcx4hl848WO4A7U"
+    },
+    "skillTraits": "",
+    "skillModifiers": {
+      "synergy": "[{\"value\":\"Attack\",\"id\":\"XUpBl13SyrdUvgMb\",\"sourceId\":\"Compendium.abbrew.skills.Item.XUpBl13SyrdUvgMb\"},{\"value\":\"Feint\",\"id\":\"K0OOr4X7XjakQ6cn\",\"sourceId\":\"Compendium.abbrew.skills.Item.K0OOr4X7XjakQ6cn\"},{\"value\":\"Move\",\"id\":\"ttDyhN1XtKKSjkXk\",\"sourceId\":\"Compendium.abbrew.skills.Item.ttDyhN1XtKKSjkXk\"},{\"value\":\"Step\",\"id\":\"jv5DDww4KxR8YbQK\",\"sourceId\":\"Compendium.abbrew.skills.Item.jv5DDww4KxR8YbQK\"},{\"value\":\"Overpower\",\"id\":\"rROAymZJjdomFnKc\",\"sourceId\":\"Compendium.abbrew.skills.Item.Nv1PxBfxFdkkF0jo\"},{\"value\":\"Finisher\",\"id\":\"CyLt3Q0Ao82N1c6o\",\"sourceId\":\"Compendium.abbrew.skills.Item.CyLt3Q0Ao82N1c6o\"},{\"value\":\"Parry\",\"id\":\"lTy5lovRwgSU5ERZ\",\"sourceId\":\"Compendium.abbrew.skills.Item.lTy5lovRwgSU5ERZ\"}]",
+      "discord": ""
+    },
+    "configurable": true,
+    "isActivatable": false,
+    "skills": {
+      "granted": [],
+      "paired": []
+    },
+    "action": {
+      "activationType": "synergy",
+      "actionCost": "0",
+      "actionImage": "",
+      "duration": {
+        "precision": "60",
+        "value": 1
+      },
+      "uses": {
+        "hasUses": true,
+        "value": 1,
+        "max": 1,
+        "period": "round"
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "attackProfile": {
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": 0,
+        "attackMode": "",
+        "damage": [],
+        "finisherLimit": 10
+      },
+      "modifiers": {
+        "fortune": 0,
+        "actionCost": {
+          "value": 1,
+          "operator": "minus"
+        },
+        "attackProfile": {
+          "combineAttacks": {
+            "isEnabled": false,
+            "value": null
+          },
+          "attackType": "",
+          "attackMode": "",
+          "handsSupplied": 0,
+          "finisherLimit": {
+            "value": 0,
+            "operator": ""
+          },
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "damage": []
+        },
+        "guard": {
+          "self": {
+            "value": "",
+            "operator": ""
+          },
+          "target": {
+            "value": "",
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": 0,
+            "operator": ""
+          },
+          "target": {
+            "value": 0,
+            "operator": ""
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": 0,
+            "operator": ""
+          },
+          "target": {
+            "value": 0,
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": []
+        }
+      }
+    },
+    "path": {
+      "value": "",
+      "archetype": ""
+    },
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": ""
+  },
+  "img": "icons/svg/item-bag.svg",
+  "effects": [],
+  "folder": "mgNTuXhAiV1upRAh",
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743711622026,
+    "modifiedTime": 1743713108891,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_id": "gGwNbDdkafpU6rNm",
+  "sort": 0,
+  "_key": "!items!gGwNbDdkafpU6rNm"
+}

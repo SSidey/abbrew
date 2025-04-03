@@ -45,12 +45,9 @@ export async function removeStackFromSkill(skill) {
         return;
     }
 
-    // TODO: Need to stop it falling off, didn't seem to work.
-    if (skill.system.action.uses.period !== "") {
-        return;
+    if (skill.system.skillType === "temporary" && skill.system.action.activationType !== "passive") {
+        await skill.delete();
     }
-
-    await skill.delete();
 }
 
 async function activateSkill(actor, skill) {
@@ -89,21 +86,27 @@ async function activateSkill(actor, skill) {
 }
 
 export function getModifiedSkillActionCost(actor, skill) {
-    const minActions = parseInt(skill.system.action.actionCost) === 0 ? 0 : 1;
+    // Question: Why was this a thing
+    // const minActions = parseInt(skill.system.action.actionCost) === 0 ? 0 : 1;
+    const minActions = 0;
     return Math.max(minActions, getModifierSkills(actor, skill).filter(s => s.system.action.modifiers.actionCost.operator).map(s => s.system.action.modifiers.actionCost).reduce((result, actionCost) => { result = applyOperator(result, actionCost.value, actionCost.operator); return result; }, skill.system.action.actionCost));
 }
 
 function getModifierSkills(actor, skill) {
     // Get all queued synergy skills
-    const queuedSkills = actor.items.toObject().filter(i => actor.system.queuedSkills.includes(i._id));
+    const queuedSkills = actor.items.toObject().filter(i => actor.system.queuedSkills.includes(i._id)).filter(s => skillHasUsesRemaining(s));
     // Get all synergies that apply to the main skill
     const queuedSynergies = queuedSkills.filter(s => s.system.skillModifiers.synergy).map(s => ({ skill: s, synergy: JSON.parse(s.system.skillModifiers.synergy).map(s => foundry.utils.parseUuid(s.sourceId).id) })).filter(s => s.synergy.includes(skill._id)).map(s => s.skill)
     // Get all passives
-    const passiveSkills = actor.items.toObject().filter(i => i.system.isActivatable === false);
+    const passiveSkills = actor.items.toObject().filter(i => i.type === "skill" && i.system.isActivatable === false).filter(s => skillHasUsesRemaining(s));
     // Get passives that have synergy with the main skill
-    const passiveSynergies = passiveSkills.filter(s => s.system.skillModifiers.synergy).map(s => ({ skill: s, synergy: JSON.parse(s.system.skillModifiers.synergy).map(s => foundry.utils.parseUuid(s.sourceId).id) })).filter(s => s.synergy.includes(skill._id)).map(s => s.skill)
+    const passiveSynergies = passiveSkills.filter(s => s.system.skillModifiers.synergy).map(s => ({ skill: s, synergy: JSON.parse(s.system.skillModifiers.synergy).flatMap(s => [s.id, foundry.utils.parseUuid(s.sourceId).id]) })).filter(s => s.synergy.includes(skill._id)).map(s => s.skill)
     // Combine all relevant skills, filtering for those that are out of charges    
     return [...passiveSynergies, ...queuedSynergies];
+}
+
+function skillHasUsesRemaining(skill) {
+    return (!skill.system.action.uses.hasUses && !skill.system.action.charges.hasCharges) || (skill.system.action.uses.hasUses && skill.system.action.uses.value > 0) || (skill.system.action.charges.hasCharges && skill.system.action.charges.value > 0);
 }
 
 export async function applySkillEffects(actor, skill) {
@@ -146,7 +149,7 @@ export async function applySkillEffects(actor, skill) {
         const skill = modifierSkills[index];
         if (skill.system.action.duration.precision === "0") {
             const effect = actor.effects.find(e => e.flags?.abbrew?.skill?.trackDuration === skill._id);
-            await effect.delete();
+            await effect?.delete();
         }
         if (skill.system.skills.paired.length > 0) {
             skill.system.skills.paired.forEach(async ps => {

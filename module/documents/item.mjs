@@ -1,4 +1,4 @@
-import { getAttackSkillWithActions, getModifiedSkillActionCost, getParrySkillWithActions, handleSkillActivate } from '../helpers/skill.mjs';
+import { getAttackSkillWithActions, getModifiedSkillActionCost, getParrySkillWithActions, handleSkillActivate, trackSkillDuration } from '../helpers/skill.mjs';
 import { doesNestedFieldExist, arrayDifference, getNumericParts, getSafeJson } from '../helpers/utils.mjs';
 /**
  * Extend the basic Item with some very simple modifications.
@@ -157,6 +157,9 @@ export default class AbbrewItem extends Item {
   async _onCreate(data, options, userId) {
     if (data.type === "skill") {
       await this.actor?.acceptSkillDeck(data);
+      if (this.actor && !this.system.isActivatable && this.system.action.duration.value > 0) {
+        await trackSkillDuration(this.actor, this);
+      }
     }
   }
 

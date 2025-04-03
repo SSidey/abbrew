@@ -35,7 +35,6 @@
             {{selectOptions config.skillActivationTypes selected=system.action.activationType localize=true}}
         </select>
     </div>
-    {{#if system.isActivatable}} {{!-- TODO: Shouldn't need to be activatable for this, activation type passive? --}}
     <div>
         <h3>Duration</h3>
         <select name="system.action.duration.precision">
@@ -86,7 +85,6 @@
         <input type="text" name="system.action.charges.max" value="{{system.action.charges.max}}" data-dtype="Number" />
         {{/if}}
     </div>
-    {{/if}}
     <div>
         <div>
             <h3>Fortune</h3>

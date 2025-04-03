@@ -195,7 +195,7 @@ export class AbbrewSkillSheet extends ItemSheet {
                 const value = item.name;
                 const path = inputElement.name;
                 const inputValue = getSafeJson(getObjectValueByStringPath(this.item, path), []);
-                const updateValue = [...inputValue, { value: value, id: "", sourceId: eventJson.uuid }];
+                const updateValue = [...inputValue, { value: value, id: item.system.abbrewId.uuid, sourceId: eventJson.uuid }];
                 const update = {};
                 update[path] = JSON.stringify(updateValue);
                 await this.item.update(update);

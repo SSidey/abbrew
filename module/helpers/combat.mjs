@@ -1,5 +1,6 @@
 import { applyOperator } from "./operators.mjs";
 import { applySkillEffects } from "./skill.mjs";
+import { handleSkillExpiry } from "./time.mjs";
 
 export async function handleCombatStart(actors) {
     for (const index in actors) {
@@ -148,6 +149,7 @@ async function turnStart(actor) {
         ChatMessage.create({ content: `${actor.name} starts their turn`, speaker: ChatMessage.getSpeaker({ actor: actor }) });
     }
 
+    await handleSkillExpiry();
     await updateTurnStartWounds(actor);
 
     await rechargePerRoundSkills(actor);
@@ -187,7 +189,7 @@ async function applyActiveSkills(actor) {
 }
 
 async function rechargePerRoundSkills(actor) {
-    const roundUseSkills = actor.items.filter(i => i.type === "skill" && i.system.action.uses.hasUses && ["0.01", "6"].includes(i.system.action.uses.period));
+    const roundUseSkills = actor.items.filter(i => i.type === "skill" && i.system.action.uses.hasUses && ["turn", "round"].includes(i.system.action.uses.period))
     for (const index in roundUseSkills) {
         await roundUseSkills[index].update({ "system.action.uses.value": roundUseSkills[index].system.action.uses.max });
     }

@@ -16,6 +16,7 @@ import { AbbrewSkillDeckSheet } from './sheets/items/item-skill-deck-sheet.mjs';
 import { AbbrewAnatomySheet } from './sheets/items/item-anatomy-sheet.mjs';
 import { AbbrewSkillSheet } from './sheets/items/item-skill-sheet.mjs';
 import { handleSkillActivate } from './helpers/skill.mjs';
+import { onWorldTimeUpdate } from './helpers/time.mjs';
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -272,6 +273,14 @@ Hooks.on("updateActor", async (actor, updates, options, userId) => {
 
 });
 
+Hooks.on("updateWorldTime", async (worldTime, td, options, userId) => {
+  if (game.combat && game.combat.active) {
+    return;
+  }
+
+  await onWorldTimeUpdate(worldTime, td, options, userId);
+});
+
 Hooks.on("updateItem", (document, options, userId) => { });
 
 Hooks.on("preUpdateItem", () => { })
@@ -282,11 +291,16 @@ Hooks.on("deleteActiveEffect", async (effect, options, userId) => {
   await actor.handleDeleteActiveEffect(effect);
 });
 
-Hooks.on("updateActiveEffect", () => { })
+Hooks.on("updateActiveEffect", (effect, update, options, user) => {
+  console.log("Woo");
+})
 
-Hooks.on("preUpdateActiveEffect", (effect, update, options, user) => { });
+Hooks.on("preUpdateActiveEffect", (effect, update, options, user) => {
+});
 
-Hooks.on("preDeleteActiveEffect", async (effect, options, userId) => { });
+Hooks.on("preDeleteActiveEffect", async (effect, options, userId) => {
+  console.log(effect);
+});
 
 Hooks.on("dropActorSheetData", async (actor, sheet, data) => {
   console.log(data);
