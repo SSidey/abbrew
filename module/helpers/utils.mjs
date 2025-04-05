@@ -72,11 +72,14 @@ export async function renderSheetForTaggedData(event, actor) {
     const itemId = element.__tagifyTagData.id;
     const sourceId = element.__tagifyTagData.sourceId;
     if (itemId) {
-        const item = actor.items.find(i => i._id === itemId);
+        const item = actor?.items.find(i => i._id === itemId);
         if (item) {
             item.sheet.render(true);
+            return;
         }
-    } else if (sourceId) {
+    }
+
+    if (sourceId) {
         const source = await fromUuid(sourceId);
         source.sheet.render(true);
     }
@@ -112,4 +115,27 @@ function _checkThroughParentsForClass(element, inspectionClass, depth) {
 
 function _elementClassListContainsClass(element, inspectionClass) {
     return Object.values(element.classList).includes(inspectionClass) ? element : null;
+}
+
+export function compareModifierIndices(modifier1, modifier2) {
+    if (modifier1.order < modifier2.order) {
+        return -1;
+    } else if (modifier1.order > modifier2.order) {
+        return 1;
+    }
+
+    return 0;
+}
+
+export function getOrderForOperator(operator) {
+    switch (operator) {
+        case "equal":
+            return 0;
+        case "add":
+            return 1;
+        case "minus":
+            return 2;
+        default:
+            return -1;
+    }
 }

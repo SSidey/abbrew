@@ -1,0 +1,158 @@
+{
+  "folder": "kh2yWp8gJ6sBRx6Z",
+  "name": "Increased Faith",
+  "type": "skill",
+  "_id": "GDYvHDXB4J2zFFgE",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "abbrew.skill.increasedfaith.GDYvHDXB4J2zFFgE",
+      "uuid": "GDYvHDXB4J2zFFgE"
+    },
+    "skillTraits": "",
+    "skillModifiers": {
+      "synergy": "",
+      "discord": ""
+    },
+    "configurable": false,
+    "isActivatable": false,
+    "skills": {
+      "granted": [],
+      "paired": []
+    },
+    "resource": {
+      "capacity": 5,
+      "operator": "add",
+      "relatedResource": "[{\"value\":\"Faith\",\"id\":\"kA1SK7pW64oepEjs\",\"sourceId\":\"Compendium.abbrew.skills.Item.kA1SK7pW64oepEjs\"}]"
+    },
+    "action": {
+      "activationType": "standalone",
+      "actionCost": "",
+      "actionImage": "",
+      "duration": {
+        "precision": "0",
+        "value": 0,
+        "expireOnStartOfTurn": true
+      },
+      "uses": {
+        "hasUses": false,
+        "value": 0,
+        "max": 0,
+        "period": ""
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "attackProfile": {
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": null,
+        "attackMode": "",
+        "damage": [],
+        "finisherLimit": 10
+      },
+      "modifiers": {
+        "fortune": 0,
+        "actionCost": {
+          "value": 0,
+          "operator": ""
+        },
+        "attackProfile": {
+          "combineAttacks": {
+            "isEnabled": false,
+            "value": null
+          },
+          "attackType": "",
+          "attackMode": "",
+          "handsSupplied": null,
+          "finisherLimit": {
+            "value": null,
+            "operator": ""
+          },
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "damage": []
+        },
+        "guard": {
+          "self": {
+            "value": "",
+            "operator": ""
+          },
+          "target": {
+            "value": "",
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": 0,
+            "operator": ""
+          },
+          "target": {
+            "value": 0,
+            "operator": ""
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": 0,
+            "operator": ""
+          },
+          "target": {
+            "value": 0,
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": []
+        }
+      }
+    },
+    "skillType": "resource",
+    "path": {
+      "value": "",
+      "archetype": ""
+    },
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": ""
+  },
+  "effects": [],
+  "sort": 200000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743813562788,
+    "modifiedTime": 1743814721274,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!GDYvHDXB4J2zFFgE"
+}

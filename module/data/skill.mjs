@@ -23,7 +23,6 @@ export default class AbbrewSkill extends AbbrewItemBase {
                     id: new fields.StringField({ required: true, blank: true }),
                     image: new fields.StringField({ required: true, blank: true }),
                     sourceId: new fields.StringField({ required: true, blank: true }),
-                    gid: new fields.StringField({ required: true, blank: true })
                 })
             ),
             paired: new fields.ArrayField(
@@ -33,10 +32,14 @@ export default class AbbrewSkill extends AbbrewItemBase {
                     id: new fields.StringField({ required: true, blank: true }),
                     image: new fields.StringField({ required: true, blank: true }),
                     sourceId: new fields.StringField({ required: true, blank: true }),
-                    gid: new fields.StringField({ required: true, blank: true })
                 })
             )
         });
+        schema.resource = new fields.SchemaField({
+            capacity: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+            operator: new fields.StringField({ required: true, blank: true }),
+            relatedResource: new fields.StringField({ nullable: true, initial: null })
+        })
         schema.action = new fields.SchemaField({
             activationType: new fields.StringField({ ...blankString }),
             actionCost: new fields.StringField({ ...blankString }),
@@ -44,6 +47,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
             duration: new fields.SchemaField({
                 precision: new fields.StringField({ ...blankString }),
                 value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                expireOnStartOfTurn: new fields.BooleanField({ required: true, initial: true })
             }),
             uses: new fields.SchemaField({
                 hasUses: new fields.BooleanField({ required: true, initial: false }),
@@ -165,14 +169,16 @@ export default class AbbrewSkill extends AbbrewItemBase {
                 resources: new fields.SchemaField({
                     self: new fields.ArrayField(
                         new fields.SchemaField({
-                            name: new fields.StringField({ ...blankString }),
+                            summary: new fields.StringField({ required: true, blank: true }),
+                            name: new fields.StringField({ required: true, blank: true }),
                             value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
                             operator: new fields.StringField({ ...blankString }),
                         })
                     ),
                     target: new fields.ArrayField(
                         new fields.SchemaField({
-                            name: new fields.StringField({ ...blankString }),
+                            summary: new fields.StringField({ required: true, blank: true }),
+                            name: new fields.StringField({ required: true, blank: true }),
                             value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
                             operator: new fields.StringField({ ...blankString }),
                         })

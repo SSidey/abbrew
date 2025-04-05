@@ -1,5 +1,5 @@
 import { applyOperator } from "./operators.mjs";
-import { getObjectValueByStringPath, getSafeJson } from "../helpers/utils.mjs"
+import { compareModifierIndices, getObjectValueByStringPath, getOrderForOperator, getSafeJson } from "../helpers/utils.mjs"
 import { mergeWoundsWithOperator } from "./combat.mjs";
 
 export async function handleSkillActivate(actor, skill, checkActions = true) {
@@ -125,8 +125,10 @@ export async function applySkillEffects(actor, skill) {
     const chargedSkills = allSkills.filter(s => s.system.action.charges.hasCharges);
 
     mergeGuardSelfModifiers(updates, allSkills, actor);
+    mergeRiskSelfModifiers(updates, allSkills, actor);
+    mergeResolveSelfModifiers(updates, allSkills, actor);
     mergeWoundSelfModifiers(updates, allSkills, actor);
-
+    mergeResourceSelfModifiers(updates, allSkills, actor);
 
     await actor.update(updates);
     for (const index in usesSkills) {
@@ -256,12 +258,52 @@ function mergeGuardSelfModifiers(updates, allSkills, actor) {
     }
 }
 
+function mergeRiskSelfModifiers(updates, allSkills, actor) {
+    const riskModifiers = allSkills.filter(s => s.system.action.modifiers.risk.self.operator).map(s => ({ value: getSkillValueForPath(s.system.action.modifiers.risk.self.value, actor), operator: s.system.action.modifiers.risk.self.operator }));
+    if (riskModifiers) {
+        const currentRisk = actor.system.defense.risk.value;
+        updates["system.defense.risk.value"] = mergeModifiers(riskModifiers, currentRisk);
+    }
+}
+
+function mergeResolveSelfModifiers(updates, allSkills, actor) {
+    const resolveModifiers = allSkills.filter(s => s.system.action.modifiers.resolve.self.operator).map(s => ({ value: getSkillValueForPath(s.system.action.modifiers.guard.resolve.value, actor), operator: s.system.action.modifiers.resolve.self.operator }));
+    if (resolveModifiers) {
+        const currentResolve = actor.system.defense.resolve.value;
+        updates["system.defense.resolve.value"] = mergeModifiers(resolveModifiers, currentResolve);
+    }
+}
+
 function mergeWoundSelfModifiers(updates, allSkills, actor) {
     const woundModifiers = allSkills.filter(s => s.system.action.modifiers.wounds.self.length > 0).flatMap(s => s.system.action.modifiers.wounds.self.filter(w => w.type && w.value != null && w.operator).map(w => ({ ...w, index: getOrderForOperator(w.operator) }))).sort(compareModifierIndices);
     if (woundModifiers.length > 0) {
         let updateWounds = actor.system.wounds;
         updateWounds = woundModifiers.reduce((result, w) => result = mergeWoundsWithOperator(result, [{ type: w.type, value: w.value }], w.operator), updateWounds)
         updates["system.wounds"] = updateWounds;
+    }
+}
+
+function mergeResourceSelfModifiers(updates, allSkills, actor) {
+    const resourceModifiers = allSkills.filter(s => s.system.action.modifiers.resources.self.length > 0).flatMap(r => r.system.action.modifiers.resources.self).filter(r => r.summary).map(r => ({ id: JSON.parse(r.summary)[0].id, value: r.value, operator: r.operator, index: getOrderForOperator(r.operator) })).filter(r => actor.system.resources.owned.some(o => o.id === r.id)).sort(compareModifierIndices);
+    if (resourceModifiers.length > 0) {
+        const baseValues = actor.system.resources.values ?? [];
+        let updateResources = baseValues.filter(r => r.id).reduce((result, resource) => {
+            result[resource.id] = resource.value;
+            return result;
+        }, {});
+
+        updateResources = resourceModifiers.reduce((result, resource) => {
+            if (resource.id in result) {
+                const initialCapacity = result[resource.id].capacity;
+                // TODO: Add max/min to apply operator? Would allow for one place to track it.
+                result[resource.id].value = applyOperator(initialCapacity, resource.system.resource.capacity, resource.system.resource.operator);
+            } else {
+                result[resource.id] = ({ value: applyOperator(0, resource.value, resource.operator) });
+            }
+
+            return result;
+        }, updateResources)
+        updates["system.resources.values"] = Object.entries(updateResources).map(e => ({ id: e[0], value: e[1].value }));
     }
 }
 
@@ -405,29 +447,6 @@ function mergeModifiers(modifiers, value) {
     return sortedModifiers.reduce((result, modifier) => applyOperator(result, modifier.value, modifier.operator), value)
 }
 
-function getOrderForOperator(operator) {
-    switch (operator) {
-        case "equal":
-            return 0;
-        case "add":
-            return 1;
-        case "minus":
-            return 2;
-        default:
-            return -1;
-    }
-}
-
-function compareModifierIndices(modifier1, modifier2) {
-    if (modifier1.order < modifier2.order) {
-        return -1;
-    } else if (modifier1.order > modifier2.order) {
-        return 1;
-    }
-
-    return 0;
-}
-
 function getSkillValueForPath(rawValue, actor) {
     return isNumeric(rawValue) ? parseInt(rawValue) : parsePath(rawValue, actor);
 }
@@ -513,7 +532,7 @@ async function createDurationActiveEffect(actor, skill, duration) {
         tint: '',
         transfer: false,
         statuses: [],
-        flags: { abbrew: { skill: { type: skill.system.action.activationType, trackDuration: skill._id } } }
+        flags: { abbrew: { skill: { type: skill.system.action.activationType, trackDuration: skill._id, expiresOn: skill.system.action.duration.expireOnStartOfTurn ? "start" : "end" } } }
     };
 
     await actor.createEmbeddedDocuments('ActiveEffect', [conditionEffectData]);

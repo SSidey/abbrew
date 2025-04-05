@@ -7,8 +7,13 @@ export async function onWorldTimeUpdate(worldTime, td, options, userId) {
     await processExpiredEffects(expiredEffects);
 }
 
-export async function handleSkillExpiry() {
-    const expiredEffects = findExpiredEffects();
+export async function handleSkillExpiry(turnPhase, actor) {
+    let expiredEffects = findExpiredEffects();
+    if (turnPhase === "end") {
+        expiredEffects = expiredEffects.filter(e => e.flags.abbrew.skill.expiresOn === "end" && foundry.utils.parseUuid(e.origin).id === actor?._id);
+    } else {
+        expiredEffects = expiredEffects.filter(e => e.flags.abbrew.skill.expiresOn !== "end");
+    }
     await processExpiredEffects(expiredEffects);
 }
 

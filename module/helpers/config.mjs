@@ -66,6 +66,11 @@ ABBREW.operators = {
   minus: "ABBREW.Operators.minus",
 }
 
+ABBREW.woundOperators = {
+  ...ABBREW.operators,
+  suppress: "ABBREW.Operators.suppress"
+}
+
 ABBREW.Defense = {
   guard: 'ABBREW.Defense.guard'
 }

@@ -1,0 +1,21 @@
+{
+  "name": "Acolyte",
+  "sorting": "a",
+  "folder": "iXCBf4MHtJoUAZxo",
+  "type": "Item",
+  "_id": "kh2yWp8gJ6sBRx6Z",
+  "description": "",
+  "sort": 0,
+  "color": null,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null
+  },
+  "_key": "!folders!kh2yWp8gJ6sBRx6Z"
+}

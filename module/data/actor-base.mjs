@@ -1,4 +1,5 @@
-import { getSafeJson } from "../helpers/utils.mjs";
+import { applyOperator } from "../helpers/operators.mjs";
+import { compareModifierIndices, getOrderForOperator, getSafeJson } from "../helpers/utils.mjs";
 
 export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
@@ -110,6 +111,21 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       }),
       fatalWounds: new fields.StringField({ required: true, blank: true })
     });
+    schema.resources = new fields.SchemaField({
+      owned: new fields.ArrayField(
+        new fields.SchemaField({
+          id: new fields.StringField({ required: true, blank: true }),
+          name: new fields.StringField({ required: true, blank: true }),
+          max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 })
+        })
+      ),
+      values: new fields.ArrayField(
+        new fields.SchemaField({
+          id: new fields.StringField({ required: true, blank: true }),
+          value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+        })
+      )
+    })
 
     schema.biography = new fields.StringField({ required: true, blank: true });
 
@@ -177,6 +193,34 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       { type: "parryCounter", value: 0 },
       { type: "feintCounter", value: 0 }
     ])
+
+    this.resources.owned = this._getOwnedResources();
+  }
+
+  _getOwnedResources() {
+    const baseResources = this.parent.items
+      .filter(i => i.type === "skill" && i.system.skillType === "resource" && i.system.resource.capacity != null && !i.system.resource.relatedResource)
+      .reduce((result, resource) => {
+        result[resource.system.abbrewId.uuid] = ({ name: resource.name, max: resource.system.resource.capacity });
+        return result;
+      }, {});
+
+    const modifierResources = this.parent.items
+      .filter(i => i.type === "skill" && i.system.skillType === "resource" && i.system.resource.operator && i.system.resource.relatedResource)
+      .map(r => ({ ...r, id: JSON.parse(r.system.resource.relatedResource)[0].id, index: getOrderForOperator(r.operator) }))
+      .sort(compareModifierIndices)
+
+    const resources = modifierResources
+      .reduce((result, resource) => {
+        if (resource.id in result) {
+          const initialCapacity = result[resource.id].max;
+          result[resource.id].max = applyOperator(initialCapacity, resource.system.resource.capacity, resource.system.resource.operator);
+        }
+
+        return result;
+      }, baseResources);
+
+    return Object.entries(resources).map(e => ({ id: e[0], name: e[1].name, max: Math.max(0, e[1].max) }));
   }
 
   _getMaxFromPhysicalAttributes() {

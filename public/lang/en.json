@@ -49,7 +49,8 @@
     "Operators": {
       "equal": "Set",
       "add": "Increase",
-      "minus": "Reduce"
+      "minus": "Reduce",
+      "suppress": "Suppress"
     },
     "AttributeRankIncrease": "Attribute Rank Increase",
     "SkillType": "Skill Type",

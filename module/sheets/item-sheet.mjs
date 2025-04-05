@@ -241,39 +241,6 @@ export class AbbrewItemSheet extends ItemSheet {
     }
   }
 
-  /**
-    * Handle one of the add or remove damage reduction buttons.
-    * @param {Element} target  Button or context menu entry that triggered this action.
-    * @param {string} action   Action being triggered.
-    * @returns {Promise|void}
-    */
-  _onSkillActionModifierDamageAction(target, action) {
-    if (this.item.system.configurable) {
-      switch (action) {
-        case 'add-skill-action-modifier-damage':
-          return this.addSkillActionModifierDamage(target);
-        case 'remove-skill-action-modifier-damage':
-          return this.removeSkillActionModifierDamage(target);
-      }
-    }
-  }
-
-  addSkillActionModifierDamage(target) {
-    const actionId = target.closest(".action").dataset.id;
-    let actions = foundry.utils.deepClone(this.item.system.actions);
-    actions[actionId].modifiers.damage = [...actions[actionId].modifiers.damage, {}];
-    return this.item.update({ "system.actions": actions });
-
-  }
-
-  removeSkillActionModifierDamage(target) {
-    const id = target.closest("li").dataset.id;
-    const actionId = target.closest(".action").dataset.id;
-    const actions = foundry.utils.deepClone(this.item.system.actions);
-    actions[actionId].modifiers.damage.splice(Number(id), 1);
-    return this.item.update({ "system.actions": actions });
-  }
-
   addSkillActionResourceRequirement(target) {
     const actionId = target.closest(".action").dataset.id;
     let actions = foundry.utils.deepClone(this.item.system.actions);

@@ -109,6 +109,11 @@ export class AbbrewSkillSheet extends ItemSheet {
             if (t.dataset.action) this._onSkillActionModifierDamageAction(t, t.dataset.action);
         });
 
+        html.find(".skill-action-modifier-resource-control").click(event => {
+            const t = event.currentTarget;
+            if (t.dataset.action) this._onSkillActionModifierResourceAction(t, t.dataset.action);
+        });
+
         html.find(".damage-control").click(event => {
             const t = event.currentTarget;
             if (t.dataset.action) this._onDamageAction(t, t.dataset.action);
@@ -204,6 +209,7 @@ export class AbbrewSkillSheet extends ItemSheet {
 
         this._activateSkillTraits(html);
         this._activateSkillModifiers(html);
+        this._activateResourceDrop(html);
     }
 
     _activateSkillTraits(html) {
@@ -253,6 +259,27 @@ export class AbbrewSkillSheet extends ItemSheet {
         }
     }
 
+    _activateResourceDrop(html) {
+        const resourceDrop = html[0].querySelector('input.resource-drop');
+        // TODO: Could add the baseline skills here to make sure they exist
+        // const proxiedSkills = Object.entries(this.item?.actor?.system.proxiedSkills).filter(ps => ps[1]).map(ps => ({ value: CONFIG.ABBREW.proxiedSkills[ps[0]], id: ps[1] }));
+        const settings = {
+            dropdown: {
+                maxItems: 20,               // <- mixumum allowed rendered suggestions
+                classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
+                enabled: 0,                 // <- show suggestions on focus
+                closeOnSelect: false,       // <- do not hide the suggestions dropdown once an item has been selected
+                includeSelectedTags: false   // <- Should the suggestions list Include already-selected tags (after filtering)
+            },
+            userInput: false,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+            duplicates: false,             // <- Should duplicate tags be allowed or not
+            maxTags: 1,
+        };
+        if (resourceDrop) {
+            var taggedResourceDrop = new Tagify(resourceDrop, settings);
+        }
+    }
+
     /**
       * Handle one of the add or remove wound reduction buttons.
       * @param {Element} target  Button or context menu entry that triggered this action.
@@ -262,25 +289,64 @@ export class AbbrewSkillSheet extends ItemSheet {
     _onSkillActionModifierWoundAction(target, action) {
         if (this.item.system.configurable) {
             switch (action) {
-                case 'add-skill-action-modifier-wound':
-                    return this.addSkillActionModifierWound(target);
-                case 'remove-skill-action-modifier-wound':
-                    return this.removeSkillActionModifierWound(target);
+                case 'add-skill-action-modifier-wound-self':
+                    return this.addSkillActionModifierWound(target, "self");
+                case 'remove-skill-action-modifier-wound-self':
+                    return this.removeSkillActionModifierWound(target, "self");
+                case 'add-skill-action-modifier-wound-target':
+                    return this.addSkillActionModifierWound(target, "target");
+                case 'remove-skill-action-modifier-wound-target':
+                    return this.removeSkillActionModifierWound(target, "target");
             }
         }
     }
 
-    addSkillActionModifierWound(target) {
+    addSkillActionModifierWound(target, actionTarget) {
         let action = foundry.utils.deepClone(this.item.system.action);
-        action.modifiers.wounds.self = [...action.modifiers.wounds.self, {}];
+        action.modifiers.wounds[actionTarget] = [...action.modifiers.wounds.self, {}];
         return this.item.update({ "system.action": action });
 
     }
 
-    removeSkillActionModifierWound(target) {
+    removeSkillActionModifierWound(target, actionTarget) {
         const id = target.closest("li").dataset.id;
         const action = foundry.utils.deepClone(this.item.system.action);
-        action.modifiers.wounds.self.splice(Number(id), 1);
+        action.modifiers.wounds[actionTarget].splice(Number(id), 1);
+        return this.item.update({ "system.action": action });
+    }
+
+    /**
+      * Handle one of the add or remove wound reduction buttons.
+      * @param {Element} target  Button or context menu entry that triggered this action.
+      * @param {string} action   Action being triggered.
+      * @returns {Promise|void}
+      */
+    _onSkillActionModifierResourceAction(target, action) {
+        if (this.item.system.configurable) {
+            switch (action) {
+                case 'add-skill-action-modifier-resource-self':
+                    return this.addSkillActionModifierResource(target, "self");
+                case 'remove-skill-action-modifier-resource-self':
+                    return this.removeSkillActionModifierResource(target, "self");
+                case 'add-skill-action-modifier-resource-target':
+                    return this.addSkillActionModifierResource(target, "target");
+                case 'remove-skill-action-modifier-resource-target':
+                    return this.removeSkillActionModifierResource(target, "target");
+            }
+        }
+    }
+
+    addSkillActionModifierResource(target, actionTarget) {
+        let action = foundry.utils.deepClone(this.item.system.action);
+        action.modifiers.resources[actionTarget] = [...action.modifiers.resources[actionTarget], {}];
+        return this.item.update({ "system.action": action });
+
+    }
+
+    removeSkillActionModifierResource(target, actionTarget) {
+        const id = target.closest("li").dataset.id;
+        const action = foundry.utils.deepClone(this.item.system.action);
+        action.modifiers.resources[actionTarget].splice(Number(id), 1);
         return this.item.update({ "system.action": action });
     }
 
@@ -316,7 +382,7 @@ export class AbbrewSkillSheet extends ItemSheet {
         return this.item.update({ "system.action.modifiers.attackProfile.damage": update });
     }
 
-    removeremoveModifierDamageDamage(target) {
+    removeModifierDamage(target) {
         const damageId = target.closest("li").dataset.id;
         const damage = this.item.system.action.modifiers.attackProfile.damage;
         damage.splice(Number(damageId), 1);

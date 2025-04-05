@@ -141,6 +141,7 @@ async function setActorToOffGuard(actor) {
 
 async function turnEnd(actor) {
     // TODO: Conditions could modify this?
+    await handleSkillExpiry("end", actor);
     await actor.update({ "system.actions": 5 });
 }
 
@@ -149,7 +150,7 @@ async function turnStart(actor) {
         ChatMessage.create({ content: `${actor.name} starts their turn`, speaker: ChatMessage.getSpeaker({ actor: actor }) });
     }
 
-    await handleSkillExpiry();
+    await handleSkillExpiry("start", actor);
     await updateTurnStartWounds(actor);
 
     await rechargePerRoundSkills(actor);
