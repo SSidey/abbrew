@@ -195,6 +195,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     ])
 
     this.resources.owned = this._getOwnedResources();
+    this._limitResourceValues();
   }
 
   _getOwnedResources() {
@@ -221,6 +222,17 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       }, baseResources);
 
     return Object.entries(resources).map(e => ({ id: e[0], name: e[1].name, max: Math.max(0, e[1].max) }));
+  }
+
+  _limitResourceValues() {
+    for (const index in this.resources.owned) {
+      const ownedResource = this.resources.owned[index];
+      const id = ownedResource.id;
+      const max = ownedResource.max;
+      const valueIndex = this.resources.values.findIndex(r => r.id === id);
+      const valueResource = this.resources.values[valueIndex];
+      this.resources.values[valueIndex] = ({ id: valueResource.id, value: Math.min(max, valueResource.value) });
+    }
   }
 
   _getMaxFromPhysicalAttributes() {

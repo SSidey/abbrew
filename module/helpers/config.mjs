@@ -340,7 +340,8 @@ ABBREW.traits = [
 ABBREW.attackModes = {
   "attack": "ABBREW.AttackModes.attack",
   "feint": "ABBREW.AttackModes.feint",
-  "overpower": "ABBREW.AttackModes.overpower"
+  "overpower": "ABBREW.AttackModes.overpower",
+  "finisher": "ABBREW.AttackModes.finisher"
 }
 
 ABBREW.proxiedSkills = {

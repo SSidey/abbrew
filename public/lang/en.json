@@ -93,7 +93,8 @@
     "AttackModes": {
       "attack": "Attack",
       "feint": "Feint",
-      "overpower": "Overpower"
+      "overpower": "Overpower",
+      "finisher": "Finisher"
     },
     "EquipState": {
       "heldOne": "Held 1H",

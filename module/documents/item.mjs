@@ -138,7 +138,8 @@ export default class AbbrewItem extends Item {
         return;
       }
     }
-    await actor.takeDamage(rolls, data, action);
+
+    await actor.takeAttackAction(data, rolls, action);
   }
 
   static getActionCostForAccept(data, action) {
@@ -208,7 +209,7 @@ export default class AbbrewItem extends Item {
       }
     }
 
-    const combineSkill = combineForSkill ? ({ name: combineForSkill.name, image: combineForSkill.img, id: combineForSkill._id, value: combineForSkill.system.action.modifiers.attackProfile.combineAttacks.value, actionCost: combineForSkill.system.action.actionCost, attackMode: combineForSkill.system.action.attackProfile.attackMode, handsSupplied: combineForSkill.system.action.attackProfile.handsSupplied, durationPrecision: combineForSkill.system.action.duration.precision }) : undefined;
+    const combineSkill = combineForSkill ? ({ name: combineForSkill.name, image: combineForSkill.img, id: combineForSkill._id, value: combineForSkill.system.action.modifiers.attackProfile.combineAttacks.value, actionCost: combineForSkill.system.action.actionCost, attackMode: combineForSkill.system.action.modifiers.attackProfile.attackMode, handsSupplied: combineForSkill.system.action.modifiers.attackProfile.handsSupplied, durationPrecision: combineForSkill.system.action.duration.precision }) : undefined;
 
     if (combineSkill) {
       const toCombine = combineSkill.value;

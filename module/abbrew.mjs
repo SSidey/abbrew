@@ -327,6 +327,23 @@ Hooks.on("dropActorSheetData", async (actor, sheet, data) => {
     }
   }
 });
+// TODO: Display resources somewhere.
+/* -------------------------------------------- */
+/*  Module Specific Hooks                                 */
+/* -------------------------------------------- */
+
+// Visual Active Effects
+
+Hooks.on("visual-active-effects.createEffectButtons", function (eff, buttons) {
+  // if (eff.name === "Steve") {
+  buttons.push({
+    label: "Toggle",
+    callback: function () {
+      eff.update({ disabled: !eff.disabled });
+    }
+  });
+  // }
+});
 
 async function handleActorWoundDrop(actor, item) {
   const wound = item.system.wound;
@@ -462,12 +479,13 @@ async function useSkillMacro(macroData) {
 
   const actor = game.user.character ?? getControlledActor();
   if (!actor) {
-    ui.warn(`You must select a token.`);
+    ui.notifications.warn(`You must select a token.`);
+    return;
   }
 
   const skill = actor.items.find(i => i._id === skillId);
   if (skill?.type !== "skill") {
-    ui.warn(`${skill.name} is not a skill.`);
+    ui.notifications.warn(`${skill.name} is not a skill.`);
     return;
   }
 

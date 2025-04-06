@@ -6,6 +6,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
         const fields = foundry.data.fields;
         const schema = super.defineSchema();
         const blankString = { required: true, blank: true }
+        const requiredNumber = { required: true, nullable: false };
         const requiredInteger = { required: true, nullable: false, integer: true };
 
         schema.skillTraits = new fields.StringField({ ...blankString });
@@ -68,14 +69,26 @@ export default class AbbrewSkill extends AbbrewItemBase {
                 critical: new fields.NumberField({ ...requiredInteger, initial: 10, min: 5 }),
                 handsSupplied: new fields.NumberField({ ...requiredInteger, min: 0, max: 2, nullable: true }),
                 attackMode: new fields.StringField({ required: true, blank: true }),
+                finisher: new fields.SchemaField({
+                    type: new fields.StringField({ required: true, blank: true }),
+                    cost: new fields.NumberField({ nullable: true, min: 0, integer: true }),
+                    description: new fields.StringField({ required: true, blank: true }),
+                    wounds: new fields.ArrayField(
+                        new fields.SchemaField({
+                            type: new fields.StringField({ ...blankString }),
+                            value: new fields.StringField({ ...blankString }),
+                            operator: new fields.StringField({ ...blankString })
+                        })
+                    )
+                }),
                 damage: new fields.ArrayField(
                     new fields.SchemaField({
                         type: new fields.StringField({ required: true, blank: true }),
-                        value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+                        value: new fields.StringField({ required: true, blank: true }),
                         attributeModifier: new fields.StringField({ required: true, blank: true }),
-                        attributeMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 }),
-                        damageMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 }),
-                        overallMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 }),
+                        attributeMultiplier: new fields.NumberField({ ...requiredNumber, initial: 1, min: 0 }),
+                        damageMultiplier: new fields.NumberField({ ...requiredNumber, initial: 1, min: 0 }),
+                        overallMultiplier: new fields.NumberField({ ...requiredNumber, initial: 1, min: 0 }),
                     })
                 ),
                 finisherLimit: new fields.NumberField({ ...requiredInteger, initial: 10, min: 1 })
@@ -106,16 +119,26 @@ export default class AbbrewSkill extends AbbrewItemBase {
                         value: new fields.NumberField({ ...requiredInteger, initial: 10, nullable: true }),
                         operator: new fields.StringField({ required: true, blank: true })
                     }),
+                    finisher: new fields.SchemaField({
+                        cost: new fields.NumberField({ nullable: true, min: 0, integer: true }),
+                        wounds: new fields.ArrayField(
+                            new fields.SchemaField({
+                                type: new fields.StringField({ ...blankString }),
+                                value: new fields.StringField({ ...blankString }),
+                                operator: new fields.StringField({ ...blankString })
+                            })
+                        )
+                    }),
                     damage: new fields.ArrayField(
                         new fields.SchemaField({
                             modify: new fields.StringField({ required: true, blank: true }),
                             modifyType: new fields.StringField({ required: true, blank: true }),
                             type: new fields.StringField({ required: true, blank: true, nullable: true }),
-                            value: new fields.NumberField({ ...requiredInteger, nullable: true, nullable: true }),
+                            value: new fields.StringField({ required: true, blank: true }),
                             attributeModifier: new fields.StringField({ required: true, blank: true, nullable: true }),
-                            attributeMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 }),
-                            damageMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 }),
-                            overallMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 })
+                            attributeMultiplier: new fields.NumberField({ ...requiredNumber, initial: 1, min: 0 }),
+                            damageMultiplier: new fields.NumberField({ ...requiredNumber, initial: 1, min: 0 }),
+                            overallMultiplier: new fields.NumberField({ ...requiredNumber, initial: 1, min: 0 })
                         })
                     )
                 }),
@@ -170,7 +193,6 @@ export default class AbbrewSkill extends AbbrewItemBase {
                     self: new fields.ArrayField(
                         new fields.SchemaField({
                             summary: new fields.StringField({ required: true, blank: true }),
-                            name: new fields.StringField({ required: true, blank: true }),
                             value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
                             operator: new fields.StringField({ ...blankString }),
                         })
@@ -178,7 +200,6 @@ export default class AbbrewSkill extends AbbrewItemBase {
                     target: new fields.ArrayField(
                         new fields.SchemaField({
                             summary: new fields.StringField({ required: true, blank: true }),
-                            name: new fields.StringField({ required: true, blank: true }),
                             value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
                             operator: new fields.StringField({ ...blankString }),
                         })

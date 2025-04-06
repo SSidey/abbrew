@@ -19,7 +19,11 @@ export async function handleSkillActivate(actor, skill, checkActions = true) {
     }
 
     if (skill.system.action.uses.hasUses && !skill.system.action.uses.value > 0) {
-        ui.info(`You don't have any more uses of ${skill.name}.`);
+        ui.notifications.info(`You don't have any more uses of ${skill.name}.`);
+        return false;
+    }
+
+    if (!doesActorMeetSkillRequirements(actor, skill)) {
         return false;
     }
 
@@ -36,6 +40,20 @@ export async function handleSkillActivate(actor, skill, checkActions = true) {
 
     await rechargeSkill(actor, skill);
     return await activateSkill(actor, skill);
+}
+
+function doesActorMeetSkillRequirements(actor, skill) {
+    const insufficientResources = skill.system.action.modifiers.resources.self.filter(r => r.operator === "minus").map(r => { const summary = JSON.parse(r.summary)[0]; return ({ id: summary.id, name: summary.value, value: r.value }) }).filter(r => !actor.system.resources.values.some(vr => vr.id === r.id) || (actor.system.resources.values.some(vr => vr.id === r.id) && actor.system.resources.values.find(vr => vr.id === r.id).value < r.value));
+    if (insufficientResources.length > 0) {
+        const resourceNames = new Intl.ListFormat("en-GB", {
+            style: "long",
+            type: "conjunction",
+        }).format(insufficientResources.map(r => r.name))
+        ui.notifications.info(`You do not have enough ${resourceNames} to use ${skill.name}`);
+        return false;
+    }
+
+    return true;
 }
 
 export async function removeStackFromSkill(skill) {
@@ -96,11 +114,11 @@ function getModifierSkills(actor, skill) {
     // Get all queued synergy skills
     const queuedSkills = actor.items.toObject().filter(i => actor.system.queuedSkills.includes(i._id)).filter(s => skillHasUsesRemaining(s));
     // Get all synergies that apply to the main skill
-    const queuedSynergies = queuedSkills.filter(s => s.system.skillModifiers.synergy).map(s => ({ skill: s, synergy: JSON.parse(s.system.skillModifiers.synergy).map(s => foundry.utils.parseUuid(s.sourceId).id) })).filter(s => s.synergy.includes(skill._id)).map(s => s.skill)
+    const queuedSynergies = queuedSkills.filter(s => s.system.skillModifiers.synergy).map(s => ({ skill: s, synergy: JSON.parse(s.system.skillModifiers.synergy).flatMap(s => [s.id, foundry.utils.parseUuid(s.sourceId).id]) })).filter(s => s.synergy.includes(skill.system.abbrewId.uuid)).map(s => s.skill)
     // Get all passives
     const passiveSkills = actor.items.toObject().filter(i => i.type === "skill" && i.system.isActivatable === false).filter(s => skillHasUsesRemaining(s));
     // Get passives that have synergy with the main skill
-    const passiveSynergies = passiveSkills.filter(s => s.system.skillModifiers.synergy).map(s => ({ skill: s, synergy: JSON.parse(s.system.skillModifiers.synergy).flatMap(s => [s.id, foundry.utils.parseUuid(s.sourceId).id]) })).filter(s => s.synergy.includes(skill._id)).map(s => s.skill)
+    const passiveSynergies = passiveSkills.filter(s => s.system.skillModifiers.synergy).map(s => ({ skill: s, synergy: JSON.parse(s.system.skillModifiers.synergy).flatMap(s => [s.id, foundry.utils.parseUuid(s.sourceId).id]) })).filter(s => s.synergy.includes(skill.system.abbrewId.uuid)).map(s => s.skill)
     // Combine all relevant skills, filtering for those that are out of charges    
     return [...passiveSynergies, ...queuedSynergies];
 }
@@ -110,6 +128,7 @@ function skillHasUsesRemaining(skill) {
 }
 
 export async function applySkillEffects(actor, skill) {
+    await actor.unsetFlag("abbrew", "combat.damage.lastDealt");
     if (isSkillBlocked(actor, skill)) {
         ui.notifications.info(`You are blocked from using ${skill.name}`);
         return;
@@ -124,13 +143,14 @@ export async function applySkillEffects(actor, skill) {
     const usesSkills = allSkills.filter(s => s.system.action.uses.hasUses).filter(s => s._id !== skill._id);
     const chargedSkills = allSkills.filter(s => s.system.action.charges.hasCharges);
 
-    mergeGuardSelfModifiers(updates, allSkills, actor);
-    mergeRiskSelfModifiers(updates, allSkills, actor);
-    mergeResolveSelfModifiers(updates, allSkills, actor);
-    mergeWoundSelfModifiers(updates, allSkills, actor);
-    mergeResourceSelfModifiers(updates, allSkills, actor);
-
+    const prePhaseFilter = getPhaseFilter("pre");
+    mergeGuardSelfModifiers(updates, allSkills, actor, prePhaseFilter);
+    mergeRiskSelfModifiers(updates, allSkills, actor, prePhaseFilter);
+    mergeResolveSelfModifiers(updates, allSkills, actor, prePhaseFilter);
+    mergeWoundSelfModifiers(updates, allSkills, actor, prePhaseFilter);
+    mergeResourceSelfModifiers(updates, allSkills, actor, prePhaseFilter);
     await actor.update(updates);
+
     for (const index in usesSkills) {
         const skill = usesSkills[index];
         let currentCharges = skill.system.action.charges.value;
@@ -173,16 +193,29 @@ export async function applySkillEffects(actor, skill) {
         const token = actor.token;
         const attackMode = attackProfile.attackMode;
         const attributeMultiplier = getAttributeModifier(attackMode, attackProfile);
-        const damage = attackProfile.damage.map(d => {
+        const damage = Object.entries(attackProfile.damage.map(d => {
             let attributeModifier = 0;
             if (d.attributeModifier) {
                 attributeModifier = Math.floor(attributeMultiplier * actor.system.attributes[d.attributeModifier].value);
             }
-
-            const finalDamage = d.overallMultiplier * (attributeModifier + (d.damageMultiplier * d.value));
+            /* 
+                        Expects either a number value which will be returned early, or:
+                        actor.<actorId>
+             */
+            const finalDamage = Math.floor(d.overallMultiplier * (attributeModifier + (d.damageMultiplier * parsePath(d.value, actor))));
 
             return { damageType: d.type, value: finalDamage };
-        });
+        }).reduce((result, damage) => {
+            if (damage.damageType in result) {
+                result[damage.damageType] += damage.value;
+            } else {
+                result[damage.damageType] = damage.value;
+            }
+
+            return result;
+        }, {})).map(e => ({ damageType: e[0], value: e[1] }));
+
+        await actor.setFlag("abbrew", "combat.damage.lastDealt", damage);
 
         const resultDice = result.dice[0].results.map(die => {
             let baseClasses = "roll die d10";
@@ -204,6 +237,15 @@ export async function applySkillEffects(actor, skill) {
             return total;
         }, 0) + attackProfile.lethal;
 
+
+        const targetUpdates = [];
+        const targetPhaseFilter = getPhaseFilter("target");
+        mergeGuardTargetModifiers(targetUpdates, allSkills, actor, targetPhaseFilter);
+        mergeRiskTargetModifiers(targetUpdates, allSkills, actor, targetPhaseFilter);
+        mergeResolveTargetModifiers(targetUpdates, allSkills, actor, targetPhaseFilter);
+        const targetWounds = mergeWoundTargetModifiers(allSkills, actor, targetPhaseFilter);
+        const targetResources = mergeTargetResources(allSkills, actor, targetPhaseFilter);
+        const finisher = attackMode === "finisher" ? mergeFinishers(baseAttackProfile, modifierSkills, actor) : null;
 
         const showAttack = ['attack', 'feint', 'finisher'].includes(attackMode);
         const isFeint = attackMode === 'feint';
@@ -229,7 +271,9 @@ export async function applySkillEffects(actor, skill) {
             showParry,
             actionCost: skill.system.action.actionCost
         };
-        data = { ...data, totalSuccesses, damage, isFeint, isStrongAttack, attackProfile, attackingActor: actor, actionCost: skill.system.action.actionCost, attackerSkillTraining: actor.system.skillTraining };
+        data = {
+            ...data, totalSuccesses, damage, isFeint, isStrongAttack, attackProfile, attackingActor: actor, actionCost: skill.system.action.actionCost, attackerSkillTraining: actor.system.skillTraining, targetUpdates: targetUpdates, targetWounds: targetWounds, finisher: finisher, targetResources: targetResources
+        };
     }
 
     // TODO: Move this out of item and into a weapon.mjs / skill-card.mjs
@@ -247,35 +291,121 @@ export async function applySkillEffects(actor, skill) {
         flags: { data: data }
     });
 
+    updates = {};
+
+    const postPhaseFilter = getPhaseFilter("post");
+    mergeGuardSelfModifiers(updates, allSkills, actor, postPhaseFilter);
+    mergeRiskSelfModifiers(updates, allSkills, actor, postPhaseFilter);
+    mergeResolveSelfModifiers(updates, allSkills, actor, postPhaseFilter);
+    mergeWoundSelfModifiers(updates, allSkills, actor, postPhaseFilter);
+    await actor.update(updates);
+
     return {};
 }
 
-function mergeGuardSelfModifiers(updates, allSkills, actor) {
-    const guardModifiers = allSkills.filter(s => s.system.action.modifiers.guard.self.operator).map(s => ({ value: getSkillValueForPath(s.system.action.modifiers.guard.self.value, actor), operator: s.system.action.modifiers.guard.self.operator }));
+function mergeFinishers(baseAttackProfile, modifierSkills, actor) {
+    const modifierAttackProfiles = modifierSkills.map(s => s.system.action.modifiers.attackProfile);
+
+    const allAttackProfiles = [baseAttackProfile, ...modifierAttackProfiles];
+    const finisherCost = mergeFinisherCost(allAttackProfiles);
+    const finisherType = mergeFinisherType(allAttackProfiles);
+    const finisherDescription = mergeFinisherDescriptions(allAttackProfiles);
+    const finisherWounds = mergeFinisherWounds(allAttackProfiles, actor);
+
+    const finisher = {};
+    finisher[finisherCost] = { type: finisherType, wounds: finisherWounds, text: finisherDescription };
+    return finisher;
+}
+
+function mergeFinisherCost(allAttackProfiles) {
+    return allAttackProfiles.reduce((result, attackProfile) => result += attackProfile.finisher.cost, 0);
+}
+
+function mergeFinisherType(allAttackProfiles) {
+    return allAttackProfiles.reduce((result, attackProfile) => { result = attackProfile.finisher.type; return result; }, "untyped");
+}
+
+function mergeFinisherDescriptions(allAttackProfiles) {
+    return allAttackProfiles.map(a => a.finisher.description).filter(d => d).join("</br>");
+}
+
+function mergeFinisherWounds(allAttackProfiles, actor) {
+    return mergeWoundsForTarget(allAttackProfiles.map(a => a.finisher.wounds), actor);
+}
+
+function mergeWoundsForTarget(woundArrays, actor) {
+    return Object.entries(woundArrays.reduce((result, woundArray) => {
+        woundArray.forEach(w => {
+            if (w.type in result) {
+                result[w.type] = applyOperator(result[w.type], parsePath(w.value, actor), w.operator);
+            } else {
+                result[w.type] = applyOperator(0, parsePath(w.value, actor), w.operator);
+            }
+        });
+
+        return result;
+    }, {})).map(e => ({ type: e[0], value: e[1] }));
+}
+
+function getPhaseFilter(damagePhase) {
+    switch (damagePhase) {
+        case "target":
+            return (v) => true;
+        case "post":
+            return (v) => typeof v === "string" && v.includes("damage");
+        case "pre":
+        default:
+            return (v) => typeof v === "number" || (typeof v === "string" && !v.includes("damage"));
+    }
+}
+
+function mergeGuardSelfModifiers(updates, allSkills, actor, phaseFilter) {
+    const guardModifiers = allSkills.filter(s => s.system.action.modifiers.guard.self.operator).filter(s => phaseFilter(s.system.action.modifiers.guard.self.value)).map(s => ({ value: getSkillValueForPath(s.system.action.modifiers.guard.self.value, actor), operator: s.system.action.modifiers.guard.self.operator }));
     if (guardModifiers) {
         const currentGuard = actor.system.defense.guard.value;
         updates["system.defense.guard.value"] = mergeModifiers(guardModifiers, currentGuard);
     }
 }
 
-function mergeRiskSelfModifiers(updates, allSkills, actor) {
-    const riskModifiers = allSkills.filter(s => s.system.action.modifiers.risk.self.operator).map(s => ({ value: getSkillValueForPath(s.system.action.modifiers.risk.self.value, actor), operator: s.system.action.modifiers.risk.self.operator }));
-    if (riskModifiers) {
-        const currentRisk = actor.system.defense.risk.value;
-        updates["system.defense.risk.value"] = mergeModifiers(riskModifiers, currentRisk);
+function mergeGuardTargetModifiers(updates, allSkills, actor, phaseFilter) {
+    const guardModifiers = allSkills.filter(s => s.system.action.modifiers.guard.target.operator).filter(s => phaseFilter(s.system.action.modifiers.guard.target.value)).map(s => ({ value: getSkillValueForPath(s.system.action.modifiers.guard.target.value, actor), operator: s.system.action.modifiers.guard.target.operator }));
+    if (guardModifiers) {
+        updates.push({ path: "system.defense.guard.value", value: mergeModifiers(guardModifiers, 0) });
     }
 }
 
-function mergeResolveSelfModifiers(updates, allSkills, actor) {
-    const resolveModifiers = allSkills.filter(s => s.system.action.modifiers.resolve.self.operator).map(s => ({ value: getSkillValueForPath(s.system.action.modifiers.guard.resolve.value, actor), operator: s.system.action.modifiers.resolve.self.operator }));
+function mergeRiskSelfModifiers(updates, allSkills, actor, phaseFilter) {
+    const riskModifiers = allSkills.filter(s => s.system.action.modifiers.risk.self.operator).filter(s => phaseFilter(s.system.action.modifiers.risk.self.value)).map(s => ({ value: getSkillValueForPath(s.system.action.modifiers.risk.self.value, actor), operator: s.system.action.modifiers.risk.self.operator }));
+    if (riskModifiers) {
+        const currentRisk = actor.system.defense.risk.raw;
+        updates["system.defense.risk.raw"] = mergeModifiers(riskModifiers, currentRisk);
+    }
+}
+
+function mergeRiskTargetModifiers(updates, allSkills, actor, phaseFilter) {
+    const riskModifiers = allSkills.filter(s => s.system.action.modifiers.risk.target.operator).filter(s => phaseFilter(s.system.action.modifiers.risk.target.value)).map(s => ({ value: getSkillValueForPath(s.system.action.modifiers.risk.target.value, actor), operator: s.system.action.modifiers.risk.target.operator }));
+    if (riskModifiers) {
+        updates.push({ path: "system.defense.risk.raw", value: mergeModifiers(riskModifiers, 0) });
+    }
+}
+
+function mergeResolveSelfModifiers(updates, allSkills, actor, phaseFilter) {
+    const resolveModifiers = allSkills.filter(s => s.system.action.modifiers.resolve.self.operator).filter(s => phaseFilter(s.system.action.modifiers.resolve.self.value)).map(s => ({ value: getSkillValueForPath(s.system.action.modifiers.resolve.self.value, actor), operator: s.system.action.modifiers.resolve.self.operator }));
     if (resolveModifiers) {
         const currentResolve = actor.system.defense.resolve.value;
         updates["system.defense.resolve.value"] = mergeModifiers(resolveModifiers, currentResolve);
     }
 }
 
-function mergeWoundSelfModifiers(updates, allSkills, actor) {
-    const woundModifiers = allSkills.filter(s => s.system.action.modifiers.wounds.self.length > 0).flatMap(s => s.system.action.modifiers.wounds.self.filter(w => w.type && w.value != null && w.operator).map(w => ({ ...w, index: getOrderForOperator(w.operator) }))).sort(compareModifierIndices);
+function mergeResolveTargetModifiers(updates, allSkills, actor, phaseFilter) {
+    const resolveModifiers = allSkills.filter(s => s.system.action.modifiers.resolve.target.operator).filter(s => phaseFilter(s.system.action.modifiers.resolve.target.value)).map(s => ({ value: getSkillValueForPath(s.system.action.modifiers.resolve.target.value, actor), operator: s.system.action.modifiers.resolve.target.operator }));
+    if (resolveModifiers) {
+        updates.push({ path: "system.defense.resolve.value", value: mergeModifiers(resolveModifiers, 0) });
+    }
+}
+
+function mergeWoundSelfModifiers(updates, allSkills, actor, phaseFilter) {
+    const woundModifiers = allSkills.filter(s => s.system.action.modifiers.wounds.self.length > 0).flatMap(s => s.system.action.modifiers.wounds.self.filter(w => w.type && w.value != null && w.operator).filter(s => phaseFilter(s.value)).map(w => ({ ...w, index: getOrderForOperator(w.operator) }))).sort(compareModifierIndices);
     if (woundModifiers.length > 0) {
         let updateWounds = actor.system.wounds;
         updateWounds = woundModifiers.reduce((result, w) => result = mergeWoundsWithOperator(result, [{ type: w.type, value: w.value }], w.operator), updateWounds)
@@ -283,22 +413,44 @@ function mergeWoundSelfModifiers(updates, allSkills, actor) {
     }
 }
 
-function mergeResourceSelfModifiers(updates, allSkills, actor) {
-    const resourceModifiers = allSkills.filter(s => s.system.action.modifiers.resources.self.length > 0).flatMap(r => r.system.action.modifiers.resources.self).filter(r => r.summary).map(r => ({ id: JSON.parse(r.summary)[0].id, value: r.value, operator: r.operator, index: getOrderForOperator(r.operator) })).filter(r => actor.system.resources.owned.some(o => o.id === r.id)).sort(compareModifierIndices);
+function mergeWoundTargetModifiers(allSkills, actor, phaseFilter) {
+    const woundModifiers = allSkills.filter(s => s.system.action.modifiers.wounds.target.length > 0).map(s => s.system.action.modifiers.wounds.target.filter(w => w.type && w.value != null && w.operator).filter(s => phaseFilter(s.value)));
+    if (woundModifiers.length > 0) {
+        return mergeWoundsForTarget(woundModifiers, actor)
+    }
+}
+
+function mergeTargetResources(allSkills, actor, phaseFilter) {
+    const resources = allSkills.filter(s => s.system.action.modifiers.resources.target.length > 0).flatMap(s => s.system.action.modifiers.resources.target.filter(r => r.summary && r.summary !== "" && r.value != null && r.operator).filter(r => phaseFilter(r.value))).map(r => ({ id: JSON.parse(r.summary)[0].id, value: parsePath(r.value, actor), operator: r.operator, index: getOrderForOperator(r.operator) })).sort(compareModifierIndices);
+    if (resources.length > 0) {
+        return Object.entries(resources.reduce((result, resource) => {
+            const id = resource.id;
+            if (id in result) {
+                result[id] = applyOperator(result[resource.summary], resource.value, resource.operator);
+            } else {
+                result[id] = applyOperator(0, resource.value, resource.operator);
+            }
+
+            return result;
+        }, {})).map(e => ({ id: e[0], value: e[1] }));
+    }
+}
+
+function mergeResourceSelfModifiers(updates, allSkills, actor, phaseFilter) {
+    const resourceModifiers = allSkills.filter(s => s.system.action.modifiers.resources.self.length > 0).flatMap(r => r.system.action.modifiers.resources.self).filter(r => r.summary).map(r => ({ id: JSON.parse(r.summary)[0].id, value: r.value, operator: r.operator, index: getOrderForOperator(r.operator) })).filter(s => phaseFilter(s.value)).filter(r => actor.system.resources.owned.some(o => o.id === r.id)).sort(compareModifierIndices);
     if (resourceModifiers.length > 0) {
         const baseValues = actor.system.resources.values ?? [];
         let updateResources = baseValues.filter(r => r.id).reduce((result, resource) => {
-            result[resource.id] = resource.value;
+            result[resource.id] = ({ value: resource.value });
             return result;
         }, {});
 
         updateResources = resourceModifiers.reduce((result, resource) => {
             if (resource.id in result) {
-                const initialCapacity = result[resource.id].capacity;
-                // TODO: Add max/min to apply operator? Would allow for one place to track it.
-                result[resource.id].value = applyOperator(initialCapacity, resource.system.resource.capacity, resource.system.resource.operator);
+                const initialCapacity = result[resource.id].value;
+                result[resource.id].value = applyOperator(initialCapacity, resource.value, resource.operator, 0, actor.system.resources.owned.find(r => r.id === resource.id).max);
             } else {
-                result[resource.id] = ({ value: applyOperator(0, resource.value, resource.operator) });
+                result[resource.id] = ({ value: applyOperator(0, resource.value, resource.operator, 0, actor.system.resources.owned.find(r => r.id === resource.id).max) });
             }
 
             return result;
@@ -395,7 +547,7 @@ function mergeAttackProfile(base, attackProfile) {
 
 function applyModifierToDamageProfile(baseElement, modifyElement) {
     const type = modifyElement.type.length > 0 ? modifyElement.type : baseElement.type;
-    const damage = modifyElement.value ?? baseElement.value;
+    const damage = (modifyElement.value && modifyElement !== "") ? modifyElement.value : baseElement.value;
     const attribute = modifyElement.attributeModifier.length > 0 ? modifyElement.attributeModifier : baseElement.attributeModifier;
     return ({
         type: type,
@@ -412,9 +564,12 @@ function damageProfileFromModifier(modifyElement) {
         return null;
     }
 
+    let damage = modifyElement.value ?? 0;
+    damage = damage !== "" ? damage : 0;
+
     return ({
         type: modifyElement.type,
-        value: modifyElement.value ?? 0,
+        value: damage,
         attributeModifier: modifyElement.attributeModifier,
         attributeMultiplier: modifyElement.attributeMultiplier ?? 1,
         damageMultiplier: modifyElement.damageMultiplier ?? 1,
@@ -447,7 +602,10 @@ function mergeModifiers(modifiers, value) {
     return sortedModifiers.reduce((result, modifier) => applyOperator(result, modifier.value, modifier.operator), value)
 }
 
-function getSkillValueForPath(rawValue, actor) {
+function getSkillValueForPath(rawValue, actor) {/* 
+        Expects either a number value which will be returned early, or:
+        actor.<actorId>
+     */
     return isNumeric(rawValue) ? parseInt(rawValue) : parsePath(rawValue, actor);
 }
 
@@ -557,13 +715,37 @@ export async function rechargeSkill(actor, skill) {
     await item.update(updates);
 }
 
-function isNumeric(str) {
-    if (typeof str != "string") return false // we only process strings!  
-    return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
-        !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
+function isNumeric(value) {
+    if (typeof value === "number") {
+        return value;
+    }
+    if (typeof value !== "string") return false // we only process strings!  
+    return !isNaN(value) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+        !isNaN(parseFloat(value)) // ...and ensure strings of whitespace fail
 }
 
+// TODO: Add html changed hook and preparse the value, setting to 0 if not correct syntax?
+// TODO: Add format for status tracker? 
+/* 
+    Expects either a number value which will be returned early, or:
+    actor.<pathToValue e.g. system.defense.guard.value>
+    item.<pathToValue e.g. system.isActivatable>
+    resource.<resourceId e.g. this is the abbrewId.uuid>
+    damage.<"lastDealt"/"lastReceived"/"roundReceived", damageType e.g. "slashing">
+ */
 function parsePath(rawValue, actor) {
+    if (typeof rawValue != "string") {
+        return rawValue;
+    }
+
+    if (!isNaN(rawValue)) {
+        return parseFloat(rawValue);
+    }
+
+    if (rawValue === "") {
+        return 0;
+    }
+
     const entityType = rawValue.split('.').slice(0, 1).shift();
     const entity = (function () {
         switch (entityType) {
@@ -574,6 +756,14 @@ function parsePath(rawValue, actor) {
                 return id ? actor.items.filter(i => i._id === id).shift() : actor;
         }
     })();
+
+    switch (entityType) {
+        case 'resource':
+            return getResourceValue(actor, rawValue.split('.').slice(1).shift());
+        case 'damage':
+            return getLastDamageValue(actor, rawValue.split('.').slice(1, 2).shift(), rawValue.split('.').slice(2).shift());
+    }
+
     const path = (function () {
         switch (entityType) {
             case 'actor':
@@ -587,10 +777,34 @@ function parsePath(rawValue, actor) {
     }
 }
 
+function getResourceValue(actor, id) {
+    return actor.system.resources.values.find(r => r.id === id)?.value ?? 0;
+}
+
+function getLastDamageValue(actor, instance, damageType) {
+    if (!["lastDealt", "lastReceived", "roundReceived"].includes(instance)) {
+        return 0;
+    }
+    const damage = actor.flags.abbrew.combat.damage[instance];
+    if (!damage) {
+        return 0;
+    }
+
+    if (damageType === "all") {
+        return damage.map(d => d.value).reduce((partial, value) => partial += value, 0);
+    }
+
+    if (damage.some(d => d.damageType === damageType)) {
+        return damage.find(d => d.damageType === damageType).value;
+    }
+
+    return 0;
+}
+
 export function isSkillBlocked(actor, skill) {
     // TODO: May Require Refinement for durations.
     const skillDiscord = actor.items.filter(i => i.type === "skill").filter(s => s.system.skillModifiers.discord).flatMap(s => getSafeJson(s.system.skillModifiers.discord, []).map(s => s.id));
-    const skillId = skill._id;
+    const skillId = skill.system.abbrewId.uuid;
     return skillDiscord.includes(skillId);
 }
 
@@ -599,6 +813,9 @@ export function getAttackSkillWithActions(id, name, actionCost, image, attackPro
         _id: id,
         name: name,
         system: {
+            abbrewId: {
+                uuid: id
+            },
             isActivatable: true,
             skillTraits: [],
             skillType: "basic",

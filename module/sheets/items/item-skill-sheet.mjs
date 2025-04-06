@@ -75,6 +75,20 @@ export class AbbrewSkillSheet extends ItemSheet {
 
         context.config = CONFIG.ABBREW;
 
+        context.enrichedFinisherDescription = await TextEditor.enrichHTML(
+            this.item.system.action.attackProfile.finisher.description,
+            {
+                // Whether to show secret blocks in the finished html
+                secrets: this.document.isOwner,
+                // Necessary in v11, can be removed in v12
+                async: true,
+                // Data to fill in for inline rolls
+                rollData: this.actor.getRollData(),
+                // Relative UUID resolution
+                relativeTo: this.actor,
+            }
+        );
+
         return context;
     }
 
@@ -200,6 +214,20 @@ export class AbbrewSkillSheet extends ItemSheet {
                 const value = item.name;
                 const path = inputElement.name;
                 const inputValue = getSafeJson(getObjectValueByStringPath(this.item, path), []);
+                if (path.split(".").some(segment => !isNaN(segment))) {
+                    const pathSegments = path.split(".");
+                    const pathindex = pathSegments.findIndex(s => !isNaN(s));
+                    const index = pathSegments.find(s => !isNaN(s));
+                    const subPath = pathSegments.splice(pathindex + 1).join(".");
+                    const basePath = pathSegments.splice(0, pathindex).join(".");
+                    const baseElements = getObjectValueByStringPath(this.item, basePath);
+                    const updateValue = [...inputValue, { value: value, id: item.system.abbrewId.uuid, sourceId: eventJson.uuid }];
+                    baseElements[index][subPath] = JSON.stringify(updateValue);
+                    const update = {};
+                    update[basePath] = baseElements;
+                    await this.item.update(update);
+                    return;
+                }
                 const updateValue = [...inputValue, { value: value, id: item.system.abbrewId.uuid, sourceId: eventJson.uuid }];
                 const update = {};
                 update[path] = JSON.stringify(updateValue);
@@ -260,9 +288,7 @@ export class AbbrewSkillSheet extends ItemSheet {
     }
 
     _activateResourceDrop(html) {
-        const resourceDrop = html[0].querySelector('input.resource-drop');
-        // TODO: Could add the baseline skills here to make sure they exist
-        // const proxiedSkills = Object.entries(this.item?.actor?.system.proxiedSkills).filter(ps => ps[1]).map(ps => ({ value: CONFIG.ABBREW.proxiedSkills[ps[0]], id: ps[1] }));
+        const resourceDrop = html[0].querySelectorAll('input.resource-drop');
         const settings = {
             dropdown: {
                 maxItems: 20,               // <- mixumum allowed rendered suggestions
@@ -276,7 +302,11 @@ export class AbbrewSkillSheet extends ItemSheet {
             maxTags: 1,
         };
         if (resourceDrop) {
-            var taggedResourceDrop = new Tagify(resourceDrop, settings);
+            var taggedResourceDrops = [];
+            resourceDrop.forEach(drop => {
+                var taggedResourceDrop = new Tagify(drop, settings);
+                taggedResourceDrops.push(taggedResourceDrop);
+            });
         }
     }
 
@@ -297,13 +327,21 @@ export class AbbrewSkillSheet extends ItemSheet {
                     return this.addSkillActionModifierWound(target, "target");
                 case 'remove-skill-action-modifier-wound-target':
                     return this.removeSkillActionModifierWound(target, "target");
+                case 'add-skill-action-attackProfile-wound-finisher-modifier':
+                    return this.addSkillActionAtackProfileWound(target);
+                case 'remove-skill-action-attackProfile-wound-finisher-modifier':
+                    return this.removeSkillActionAtackProfileWound(target);
+                case 'add-skill-action-modifier-attackProfile-wound-finisher-modifier':
+                    return this.addSkillActionModifierAtackProfileWound(target);
+                case 'remove-skill-action-modifier-attackProfile-wound-finisher-modifier':
+                    return this.removeSkillActionModifierAtackProfileWound(target);
             }
         }
     }
 
     addSkillActionModifierWound(target, actionTarget) {
         let action = foundry.utils.deepClone(this.item.system.action);
-        action.modifiers.wounds[actionTarget] = [...action.modifiers.wounds.self, {}];
+        action.modifiers.wounds[actionTarget] = [...action.modifiers.wounds[actionTarget], {}];
         return this.item.update({ "system.action": action });
 
     }
@@ -312,6 +350,34 @@ export class AbbrewSkillSheet extends ItemSheet {
         const id = target.closest("li").dataset.id;
         const action = foundry.utils.deepClone(this.item.system.action);
         action.modifiers.wounds[actionTarget].splice(Number(id), 1);
+        return this.item.update({ "system.action": action });
+    }
+
+    addSkillActionAtackProfileWound() {
+        let action = foundry.utils.deepClone(this.item.system.action);
+        action.attackProfile.finisher.wounds = [...action.attackProfile.finisher.wounds, {}];
+        return this.item.update({ "system.action": action });
+
+    }
+
+    removeSkillActionAtackProfileWound(target) {
+        const id = target.closest("li").dataset.id;
+        const action = foundry.utils.deepClone(this.item.system.action);
+        action.attackProfile.finisher.wounds.splice(Number(id), 1);
+        return this.item.update({ "system.action": action });
+    }
+
+    addSkillActionModifierAtackProfileWound() {
+        let action = foundry.utils.deepClone(this.item.system.action);
+        action.modifiers.attackProfile.finisher.wounds = [...action.modifiers.attackProfile.finisher.wounds, {}];
+        return this.item.update({ "system.action": action });
+
+    }
+
+    removeSkillActionModifierAtackProfileWound(target) {
+        const id = target.closest("li").dataset.id;
+        const action = foundry.utils.deepClone(this.item.system.action);
+        action.modifiers.attackProfile.finisher.wounds.splice(Number(id), 1);
         return this.item.update({ "system.action": action });
     }
 

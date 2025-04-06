@@ -1,6 +1,7 @@
 import { mergeActorWounds } from "../helpers/combat.mjs";
 import { isSkillBlocked } from "../helpers/skill.mjs";
 import { getAttackerAdvantageGuardResult, getAttackerAdvantageRiskResult, getDefenderAdvantageGuardResult, getDefenderAdvantageRiskResult } from "../helpers/trainedSkills.mjs";
+import { getObjectValueByStringPath } from "../helpers/utils.mjs";
 import { FINISHERS } from "../static/finishers.mjs";
 
 /**
@@ -49,6 +50,48 @@ export default class AbbrewActor extends Actor {
     return { ...super.getRollData(), ...this.system.getRollData?.() ?? null };
   }
 
+  async takeActionUpdates(data) {
+    const updates = {};
+    data.targetUpdates.forEach(update => {
+      const current = getObjectValueByStringPath(this, update.path)
+      updates[update.path] = current + update.value;
+    });
+    await this.update(updates);
+  }
+
+  async takeActionWounds(data) {
+    if (data.targetWounds) {
+      const currentWounds = this.system.wounds;
+      const updateWounds = Object.entries(data.targetWounds.reduce((result, wound) => {
+        if (currentWounds.some(w => w.type === wound.type)) {
+          result[wound.type] = currentWounds.find(w => w.type === wound.type).value + wound.value;
+        } else {
+          result[wound.type] = wound.value;
+        }
+
+        return result;
+      }, currentWounds)).map(e => ({ type: e[0], value: e[1] })).filter(w => w.value > 0);
+      // TODO: Check this output, seems funky for the resources
+      await this.update({ "system.wounds": updateWounds });
+    }
+  }
+
+  async takeActionResources(data) {
+    if (data.targetResources) {
+      const baseResources = this.system.resources.values.reduce((result, resource) => { result[resource.id] = resource.value; return result; }, {});
+      const updateResources = Object.entries(data.targetResources.reduce((result, resource) => {
+        const id = resource.id;
+        if (id in baseResources) {
+          result[id] = Math.max(0, Math.min(baseResources[id] + resource.value, this.system.resources.owned.find(r => r.id === id).max));
+        }
+
+        return result;
+      }, baseResources)).map(e => ({ id: e[0], value: e[1] }));
+
+      await this.update({ "system.resources.values": updateResources });
+    }
+  }
+
   async takeDamage(rolls, data, action) {
     Hooks.call('actorTakesDamage', this);
     let guard = this.system.defense.guard.value;
@@ -59,6 +102,8 @@ export default class AbbrewActor extends Actor {
     const attackingActorFeint = data.attackerSkillTraining.find(st => st.type === "feint")?.value ?? 0;
 
     //TODO: Tidy this up
+    await this.setFlag("abbrew", "combat.damage.lastReceived", data.damage);
+    await this.setFlag("abbrew", "combat.damage.roundReceived", this.mergeDamageTakenForRound(data.damage));
     let damage = this.applyModifiersToDamage(rolls, data, action);
     const updateRisk = this.calculateRisk(damage, guard, risk, inflexibility, data.isFeint, data.isStrongAttack, action, attackingActorParryCounter, attackingActorFeint);
     let overFlow = updateRisk > 100 ? updateRisk - 100 : 0;
@@ -67,7 +112,20 @@ export default class AbbrewActor extends Actor {
     const updates = { "system.defense.guard.value": await this.calculateGuard(damage + overFlow, guard, data.isFeint, data.isStrongAttack, action, attackingActorParryCounter, attackingActorFeint), "system.defense.risk.raw": updateRisk };
     await this.update(updates);
     await this.renderAttackResultCard(data, action);
+    await this.activateDamageTakenSkill(data.damage);
     return this;
+  }
+
+  async activateDamageTakenSkill(damage) {
+    // TODO: Add skill, handle activation, should trigger any synergies, may need another activate function to allow for lastdamagetaken
+    // TODO: Proxied skills that are expected to be owned should have an id set by default, add that as whitelist to tagify, still allowing for drag/drop otherwise
+  }
+
+  async takeAttack(data, rolls, action) {
+    await this.takeActionUpdates(data);
+    await this.takeActionWounds(data);
+    await this.takeActionResources(data);
+    await this.takeDamage(rolls, data, action);
   }
 
   async takeFinisher(rolls, data) {
@@ -76,17 +134,45 @@ export default class AbbrewActor extends Actor {
       return;
     }
 
-    await this.takeDamage(rolls, data);
+    await this.takeActionUpdates(data);
+    await this.takeActionWounds(data);
+    await this.takeActionResources(data);
+    await this.takeDamage(rolls, data, "finisher");
 
     const risk = this.system.defense.risk.raw;
     const totalRisk = this.applyModifiersToRisk(rolls, data);
-    const availableFinishers = this.getAvailableFinishersForDamageType(data);
-    const finisherCost = this.getFinisherCost(availableFinishers, totalRisk, data.attackProfile);
-    const finisher = this.getFinisher(availableFinishers, finisherCost);
+    let finisherCost = 0;
+    let finisher = null;
+    const uniqueFinisher = Object.values(data.finisher)[0];
+    if (uniqueFinisher.type && uniqueFinisher.text) {
+      finisherCost = Object.keys(data.finisher)[0];
+      const finisherConstruct = data.finisher;
+      this.getFinisherCost(finisherConstruct, totalRisk, data.attackProfile);
+      finisher = this.getFinisher(finisherConstruct, finisherCost);
+    } else {
+      const availableFinishers = this.getAvailableFinishersForDamageType(data);
+      finisherCost = this.getFinisherCost(availableFinishers, totalRisk, data.attackProfile);
+      finisher = this.getFinisher(availableFinishers, finisherCost);
+    }
     await this.sendFinisherToChat(finisher, finisherCost);
     if (finisher) {
       return await this.applyFinisher(risk, finisher, finisherCost);
     }
+  }
+
+  mergeDamageTakenForRound(damage) {
+    const lastRoundReceived = this.flags.abbrew.combat.damage.lastRoundReceived ?? [];
+    const totalRoundReceivedDamage = Object.entries([...lastRoundReceived, ...damage].reduce((result, damage) => {
+      if (damage.damageType in result) {
+        result[damage.damageType] += damage.value;
+      } else {
+        result[damage.damageType] = damage.value;
+      }
+
+      return result;
+    }, {})).map(e => ({ damageType: e[0], value: e[1] }));
+
+    return totalRoundReceivedDamage;
   }
 
   applyModifiersToRisk(rolls, data) {

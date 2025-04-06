@@ -141,6 +141,7 @@ async function setActorToOffGuard(actor) {
 
 async function turnEnd(actor) {
     // TODO: Conditions could modify this?
+    await actor.unsetFlag("abbrew", "combat.damage.lastRoundReceived")
     await handleSkillExpiry("end", actor);
     await actor.update({ "system.actions": 5 });
 }

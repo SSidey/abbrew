@@ -177,6 +177,74 @@
                             value="{{system.action.attackProfile.lethal}}" data-dtype="String" />
                     </div>
                 </div>
+                {{#if (eq system.action.attackProfile.attackMode "finisher")}}
+                <div class="attack-profile-row">
+                    <div class="attack-profile-element-2">
+                        <label>Finisher Cost</label>
+                        <input type="text" name="system.action.attackProfile.finisher.cost"
+                            value="{{system.action.attackProfile.finisher.cost}}" data-dtype="String" />
+                    </div>
+                    <div class="attack-profile-element-2">
+                        <label>{{ localize "ABBREW.Type" }}</label>
+                        <select name="system.action.attackProfile.finisher.type">
+                            {{selectOptions config.concepts selected=system.action.attackProfile.finisher.type
+                            blank="" localize=true}}
+                        </select>
+                        <div></div>
+                    </div>
+                    <div class="attack-profile-element-max-input">
+                        <label>Finisher Description</label>
+                        {{editor enrichedFinisherDescription target="system.action.attackProfile.finisher.description"
+                        engine="prosemirror" button=true
+                        owner=owner editable=editable}}
+                    </div>
+                </div>
+                <div>
+                    <h4>Wounds</h4>
+                    <ol class="form-list wound-modifier-container">
+                        {{#each system.action.attackProfile.finisher.wounds as |wound k|}}
+                        <li class="item resource grid-3col" data-id="{{k}}">
+                            <div>
+                                <label>Value</label>
+                                <input type="text" name="system.action.attackProfile.finisher.wounds.{{k}}.value"
+                                    value="{{wound.value}}" data-dtype="Number" />
+                            </div>
+                            <div>
+                                <label>Type</label>
+                                <select name="system.action.attackProfile.finisher.wounds.{{k}}.type">
+                                    {{selectOptions ../config.wounds selected=wound.type
+                                    blank=""
+                                    localize=true}}
+                                </select>
+                            </div>
+                            <label>{{ localize "ABBREW.Operator" }}</label>
+                            <select name="system.action.attackProfile.finisher.wounds.{{k}}.operator">
+                                {{selectOptions ../config.operators selected=wound.operator
+                                blank=""
+                                localize=true}}
+                            </select>
+                            <div>
+                                <a class="skill-action-modifier-wound-control"
+                                    data-action="remove-skill-action-attackProfile-wound-finisher-modifier">
+                                    <i class="fa-solid fa-minus"></i>
+                                </a>
+                            </div>
+                        </li>
+                        {{/each}}
+                        <li class="skillModifierWound add">
+                            <div class="form-group">
+                                <label>
+                                    <a class="skill-action-modifier-wound-control"
+                                        data-action="add-skill-action-attackProfile-wound-finisher-modifier">
+                                        Add Wound Modifier
+                                        <i class="fa-solid fa-plus"></i>
+                                    </a>
+                                </label>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+                {{/if}}
             </div>
             <ol class="skill-damage-list">
                 {{#each system.action.attackProfile.damage as |damage j|}}
@@ -315,6 +383,62 @@
                         </select>
                     </div>
                 </div>
+                {{#if (eq system.action.modifiers.attackProfile.attackMode "finisher")}}
+                <div class="attack-profile-row">
+                    <div class="attack-profile-element-2">
+                        <label>Finisher Cost</label>
+                        <input type="text" name="system.action.modifiers.attackProfile.finisher.cost"
+                            value="{{system.action.modifiers.attackProfile.finisher.cost}}" data-dtype="String" />
+                    </div>
+                    <div></div>
+                    <div>
+                        <h4>Wounds</h4>
+                        <ol class="form-list wound-modifier-container">
+                            {{#each system.action.modifiers.attackProfile.finisher.wounds as |wound k|}}
+                            <li class="item resource grid-3col" data-id="{{k}}">
+                                <div>
+                                    <label>Value</label>
+                                    <input type="text"
+                                        name="system.action.modifiers.attackProfile.finisher.wounds.{{k}}.value"
+                                        value="{{wound.value}}" data-dtype="Number" />
+                                </div>
+                                <div>
+                                    <label>Type</label>
+                                    <select name="system.action.modifiers.attackProfile.finisher.wounds.{{k}}.type">
+                                        {{selectOptions ../config.wounds selected=wound.type
+                                        blank=""
+                                        localize=true}}
+                                    </select>
+                                </div>
+                                <label>{{ localize "ABBREW.Operator" }}</label>
+                                <select name="system.action.modifiers.attackProfile.finisher.wounds.{{k}}.operator">
+                                    {{selectOptions ../config.operators selected=wound.operator
+                                    blank=""
+                                    localize=true}}
+                                </select>
+                                <div>
+                                    <a class="skill-action-modifier-wound-control"
+                                        data-action="remove-skill-action-modifier-attackProfile-wound-finisher-modifier">
+                                        <i class="fa-solid fa-minus"></i>
+                                    </a>
+                                </div>
+                            </li>
+                            {{/each}}
+                            <li class="skillModifierWound add">
+                                <div class="form-group">
+                                    <label>
+                                        <a class="skill-action-modifier-wound-control"
+                                            data-action="add-skill-action-modifier-attackProfile-wound-finisher-modifier">
+                                            Add Wound Modifier
+                                            <i class="fa-solid fa-plus"></i>
+                                        </a>
+                                    </label>
+                                </div>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+                {{/if}}
             </div>
             <ol class="skill-damage-list">
                 {{#each system.action.modifiers.attackProfile.damage as |damage j|}}
@@ -483,7 +607,7 @@
                         </div>
                         <label>{{ localize "ABBREW.Operator" }}</label>
                         <select name="system.action.modifiers.wounds.self.{{k}}.operator">
-                            {{selectOptions ../config.operators selected=wound.operator
+                            {{selectOptions ../config.woundOperators selected=wound.operator
                             blank=""
                             localize=true}}
                         </select>
