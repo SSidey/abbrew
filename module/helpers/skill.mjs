@@ -656,7 +656,7 @@ function getSkillDuration(skill) {
         duration["rounds"] = value;
         duration["startRound"] = game.combat?.round ?? 0;
         duration["startTurn"] = game.combat?.turn ?? 0;
-        duration["type"] = "rounds";
+        duration["type"] = "turns";
         duration["duration"] = value;
         return duration;
     }

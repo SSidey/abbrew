@@ -151,11 +151,39 @@ async function turnStart(actor) {
         ChatMessage.create({ content: `${actor.name} starts their turn`, speaker: ChatMessage.getSpeaker({ actor: actor }) });
     }
 
+    await handleSkillToRounds(actor);
     await handleSkillExpiry("start", actor);
     await updateTurnStartWounds(actor);
 
     await rechargePerRoundSkills(actor);
     await applyActiveSkills(actor);
+}
+
+async function handleSkillToRounds(actor) {
+    const effects = actor.effects;
+    effects.entries().forEach(async e => {
+        const effect = e[1];
+        const preparedDuration = effect._prepareDuration();
+        if (preparedDuration.type === "seconds" && preparedDuration.remaining <= 60) {
+            const duration = { ...effect.duration };
+            const rounds = Math.floor(preparedDuration.remaining / 6);
+            duration["rounds"] = rounds;
+            duration["seconds"] = null;
+            duration["duration"] = rounds
+            // duration["startRound"] = game.combat?.round ?? 0;
+            // duration["startTurn"] = game.combat?.turn ?? 0;
+            duration["type"] = "turns";
+            duration["startTime"] = game.time.worldTime;
+            duration["startRound"] = game.combat.current.round;
+            const skills = actor.items.filter(i => i.type === "skill" && i._id === effect.flags?.abbrew?.skill?.trackDuration)
+            if (skills.length > 0 && !skills[0].system.action.duration.expireOnStartOfTurn) {
+                duration["turns"] = 1;
+                duration["duration"] += 0.01;
+            }
+            // duration["duration"] = value;
+            await effect.update({ "duration": duration })
+        }
+    });
 }
 
 async function updateTurnStartWounds(actor) {
@@ -174,9 +202,9 @@ async function updateTurnStartWounds(actor) {
 
             return appliedLingeringWounds;
         }, appliedLingeringWounds);
-        const acuteWounUpdate = Object.entries(appliedLingeringWounds).map(alw => ({ type: alw[0], value: alw[1] }));
-        const lingeringWoundUpdate = activeLingeringWounds.flatMap(lw => actor.system.wounds.filter(w => w.type === lw.type).map(w => ({ type: w.type, value: getLingeringWoundValueUpdate(w.value) })));
-        const fullWoundUpdate = [...acuteWounUpdate, ...lingeringWoundUpdate];
+        const acuteWoundUpdate = Object.entries(appliedLingeringWounds).map(alw => ({ type: alw[0], value: alw[1] }));
+        const lingeringWoundUpdate = activeLingeringWounds.flatMap(lw => actor.system.wounds.filter(w => w.type === lw.type).map(w => ({ type: w.type, value: getLingeringWoundValueUpdate(w.value) }))).filter(w => w.value > 0);
+        const fullWoundUpdate = [...acuteWoundUpdate, ...lingeringWoundUpdate];
         if (fullWoundUpdate.length > 0) {
             await updateActorWounds(actor, mergeActorWounds(actor, fullWoundUpdate));
         }
@@ -198,5 +226,5 @@ async function rechargePerRoundSkills(actor) {
 }
 
 function getLingeringWoundValueUpdate(woundValue) {
-    return woundValue > 1 ? -1 : 0;
+    return woundValue > 0 ? -1 : 0;
 }

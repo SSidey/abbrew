@@ -291,11 +291,39 @@ Hooks.on("deleteActiveEffect", async (effect, options, userId) => {
   await actor.handleDeleteActiveEffect(effect);
 });
 
+Hooks.on("dropCanvasData", (canvas, data) => {
+  console.log("Canvas Drop")
+});
+
 Hooks.on("updateActiveEffect", (effect, update, options, user) => {
   console.log("Woo");
+  // const effects = actor.effects;
+  // effects.entries().forEach(async e => {
+  //     const effect = e[1];
+  //     const preparedDuration = effect._prepareDuration();
+  //     if (preparedDuration.type === "seconds" && preparedDuration.remaining <= 60) {
+  //         const duration = { ...effect.duration };
+  //         const rounds = Math.floor(preparedDuration.remaining / 6);
+  //         duration["rounds"] = rounds;
+  //         duration["seconds"] = null;
+  //         duration["duration"] = rounds
+  //         // duration["startRound"] = game.combat?.round ?? 0;
+  //         // duration["startTurn"] = game.combat?.turn ?? 0;
+  //         duration["type"] = "turns";
+  //         duration["startTime"] = game.time.worldTime;
+  //         const skills = actor.items.filter(i => i.type === "skill" && i._id === effect.flags?.abbrew?.skill?.trackDuration)
+  //         if (skills.length > 0 && !skills[0].system.action.duration.expireOnStartOfTurn) {
+  //             duration["turns"] = 1;
+  //             duration["duration"] += 0.01;
+  //         }
+  //         // duration["duration"] = value;
+  //         await effect.update({ "duration": duration })
+  //     }
+  // });
 })
 
 Hooks.on("preUpdateActiveEffect", (effect, update, options, user) => {
+  console.log("preWoo");
 });
 
 Hooks.on("preDeleteActiveEffect", async (effect, options, userId) => {
