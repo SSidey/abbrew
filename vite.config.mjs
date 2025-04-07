@@ -25,7 +25,7 @@ const config = {
   optimizeDeps: {},
   build: {
     outDir: path.resolve(__dirname, "dist"),
-    emptyOutDir: true,
+    emptyOutDir: false,
     sourcemap: true,
     brotliSize: true,
     minify: false,

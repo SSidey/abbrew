@@ -43,6 +43,10 @@ const css = gulp.series(compileScss);
 /*		BUILDING  		*/
 /********************/
 
+async function cleanDist() {
+  return await del.deleteAsync(["dist/**", "!dist/packs"]);
+}
+
 function build() {
   return cp.spawn("npx", ["vite", "build"], { stdio: "inherit", shell: true });
 }
@@ -63,7 +67,7 @@ function watch() {
 }
 
 async function cleanPublicPacks() {
-  return await del.deleteAsync(['public/packs/**']);
+  return await del.deleteAsync(["public/packs/**", "public/packs"]);
 }
 
 /* ----------------------------------------- */
@@ -143,6 +147,7 @@ exports.default = gulp.series(
 );
 exports.build = gulp.series(
   compileScss,
+  cleanDist,
   build,
   cleanPublicPacks
 );
