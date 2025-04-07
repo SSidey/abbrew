@@ -35,6 +35,7 @@
   "dependencies": {
     "@foundryvtt/foundryvtt-cli": "^1.0.4",
     "@yaireo/tagify": "^4.24.0",
+    "del": "^8.0.0",
     "vite": "^5.2.8"
   }
 }

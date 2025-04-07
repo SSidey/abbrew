@@ -139,7 +139,7 @@ export default class AbbrewItem extends Item {
       }
     }
 
-    await actor.takeAttackAction(data, rolls, action);
+    await actor.takeAttack(data, rolls, action);
   }
 
   static getActionCostForAccept(data, action) {

@@ -40,11 +40,17 @@ export function mergeWoundsWithOperator(wounds, incomingWounds, operator) {
 }
 
 export async function updateActorWounds(actor, updateWounds) {
-    await actor.update({ "system.wounds": updateWounds });
+    const woundImmunities = getWoundImmunities(actor);
+    const woundsAfterImmunity = updateWounds.filter(w => !woundImmunities.includes(w.type));
+    await actor.update({ "system.wounds": woundsAfterImmunity });
+}
+
+async function getWoundImmunities(actor) {
+    return actor.items.filter(i => i.type === "skill" && getSafeJson(i.system.skillTraits, false)).map(s => JSON.parse(s.system.skillTraits)).filter(s => s.some(st => st.feature === "wound" && st.effect === "immunity")).flatMap(s => s.data);
 }
 
 export async function checkActorFatalWounds(actor) {
-    const woundImmunities = actor.items.filter(i => i.type === "skill" && getSafeJson(i.system.skillTraits, false)).map(s => JSON.parse(s.system.skillTraits)).filter(s => s.some(st => st.feature === "wound" && st.subFeature === "lingeringWound" && st.effect === "immunity")).flatMap(s => s.data);
+    const woundImmunities = getWoundImmunities(actor);
     const acuteWounds = CONFIG.ABBREW.acuteWounds;
     const activeFatalWounds = actor.system.wounds.filter(w => acuteWounds.includes(w.type)).filter(w => !woundImmunities.includes(w.type));
     // PLAYTEST: This was the original, if you exceed your max resolve in a specific fatal wound, instead of sum of fatal wounds
@@ -68,7 +74,8 @@ export async function handleActorGuardConditions(actor) {
 }
 
 export async function handleActorWoundConditions(actor) {
-    const updatedWoundTotal = actor.system.wounds.reduce((total, wound) => total += wound.value, 0);
+    const woundImmunities = getWoundImmunities(actor);
+    const updatedWoundTotal = actor.system.wounds.filter(w => !woundImmunities.includes(w.type)).reduce((total, wound) => total += wound.value, 0);
     if (actor.system.defense.resolve.value <= updatedWoundTotal) {
         await renderLostResolveCard(actor);
     }
@@ -189,11 +196,20 @@ async function handleSkillToRounds(actor) {
 async function updateTurnStartWounds(actor) {
     const lingeringWoundTypes = foundry.utils.deepClone(CONFIG.ABBREW.lingeringWoundTypes);
     const woundToLingeringWounds = foundry.utils.deepClone(CONFIG.ABBREW.woundToLingeringWounds);
-    const lingeringWoundImmunities = actor.system.traitsData.filter(t => t.feature === "wound" && t.subFeature === "lingeringWound" && t.effect === "immunity").map(t => t.data);
-    const activeLingeringWounds = actor.system.wounds.filter(w => lingeringWoundTypes.some(lw => w.type === lw)).filter(w => !lingeringWoundImmunities.includes(w.type));
+    const woundImmunities = getWoundImmunities(actor);
+    const woundSuppressions = actor.items.filter(i => i.type === "skill").filter(s => s.system.action.modifiers.wounds.self.some(w => w.operator === "suppress")).filter(s => !s.system.isActivatable || (actor.system.activeSkills.includes(s._id))).flatMap(s => s.system.action.modifiers.wounds.self.filter(w => w.operator === "suppress")).reduce((result, ws) => {
+        if (ws.type in result) {
+            result[ws.type] = result[ws.type] + ws.value;
+        } else {
+            result[ws.type] = ws.value;
+        }
+
+        return result;
+    }, {})
+    const activeLingeringWounds = actor.system.wounds.filter(w => lingeringWoundTypes.some(lw => w.type === lw)).filter(w => !woundImmunities.includes(w.type)).filter(w => w.value > 0);
     if (activeLingeringWounds.length > 0) {
         const appliedLingeringWounds = {};
-        activeLingeringWounds.flatMap(lw => woundToLingeringWounds[lw.type].map(lwt => ({ type: lwt, value: lw.value }))).reduce((appliedLingeringWounds, wound) => {
+        activeLingeringWounds.flatMap(lw => woundToLingeringWounds[lw.type].map(lwt => ({ type: lwt, value: Math.max(0, (lw.value - woundSuppressions[lw.type] ?? 0)) }))).reduce((appliedLingeringWounds, wound) => {
             if (wound.type in appliedLingeringWounds) {
                 appliedLingeringWounds[wound.type] += wound.value;
             } else {
