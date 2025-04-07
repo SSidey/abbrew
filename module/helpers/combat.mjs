@@ -1,6 +1,7 @@
 import { applyOperator } from "./operators.mjs";
 import { applySkillEffects } from "./skill.mjs";
 import { handleSkillExpiry } from "./time.mjs";
+import { getSafeJson } from "./utils.mjs";
 
 export async function handleCombatStart(actors) {
     for (const index in actors) {
@@ -43,18 +44,17 @@ export async function updateActorWounds(actor, updateWounds) {
 }
 
 export async function checkActorFatalWounds(actor) {
-    if (actor.system.defense.fatalWounds) {
-        const fatalWounds = JSON.parse(actor.system.defense.fatalWounds).map(w => w.value.toLowerCase());
-        const activeFatalWounds = actor.system.wounds.filter(w => fatalWounds.includes(w.type));
-        // PLAYTEST: This was the original, if you exceed your max resolve in a specific fatal wound, instead of sum of fatal wounds
-        // const exceededFatalWounds = activeFatalWounds.filter(w => w.value >= actor.system.defense.resolve.max);
-        // if (exceededFatalWounds && exceededFatalWounds.length > 0) {
-        //     await setActorToDead(actor);
-        // }
-        const totalActiveFatalWounds = activeFatalWounds.reduce((result, wound) => result += wound.value, 0)
-        if (totalActiveFatalWounds >= actor.system.defense.resolve.max) {
-            await setActorToDead(actor);
-        }
+    const woundImmunities = actor.items.filter(i => i.type === "skill" && getSafeJson(i.system.skillTraits, false)).map(s => JSON.parse(s.system.skillTraits)).filter(s => s.some(st => st.feature === "wound" && st.subFeature === "lingeringWound" && st.effect === "immunity")).flatMap(s => s.data);
+    const acuteWounds = CONFIG.ABBREW.acuteWounds;
+    const activeFatalWounds = actor.system.wounds.filter(w => acuteWounds.includes(w.type)).filter(w => !woundImmunities.includes(w.type));
+    // PLAYTEST: This was the original, if you exceed your max resolve in a specific fatal wound, instead of sum of fatal wounds
+    // const exceededFatalWounds = activeFatalWounds.filter(w => w.value >= actor.system.defense.resolve.max);
+    // if (exceededFatalWounds && exceededFatalWounds.length > 0) {
+    //     await setActorToDead(actor);
+    // }
+    const totalActiveFatalWounds = activeFatalWounds.reduce((result, wound) => result += wound.value, 0)
+    if (totalActiveFatalWounds >= actor.system.defense.resolve.max) {
+        await setActorToDead(actor);
     }
 }
 
@@ -203,7 +203,7 @@ async function updateTurnStartWounds(actor) {
             return appliedLingeringWounds;
         }, appliedLingeringWounds);
         const acuteWoundUpdate = Object.entries(appliedLingeringWounds).map(alw => ({ type: alw[0], value: alw[1] }));
-        const lingeringWoundUpdate = activeLingeringWounds.flatMap(lw => actor.system.wounds.filter(w => w.type === lw.type).map(w => ({ type: w.type, value: getLingeringWoundValueUpdate(w.value) }))).filter(w => w.value > 0);
+        const lingeringWoundUpdate = activeLingeringWounds.flatMap(lw => actor.system.wounds.filter(w => w.type === lw.type).map(w => ({ type: w.type, value: getLingeringWoundValueUpdate(w.value) })));
         const fullWoundUpdate = [...acuteWoundUpdate, ...lingeringWoundUpdate];
         if (fullWoundUpdate.length > 0) {
             await updateActorWounds(actor, mergeActorWounds(actor, fullWoundUpdate));
@@ -226,5 +226,6 @@ async function rechargePerRoundSkills(actor) {
 }
 
 function getLingeringWoundValueUpdate(woundValue) {
-    return woundValue > 0 ? -1 : 0;
+    // To be merged with current stacks
+    return -1;
 }

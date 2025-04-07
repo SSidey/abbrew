@@ -217,6 +217,8 @@ ABBREW.wounds = {
   }
 }
 
+ABBREW.acuteWounds = Object.entries(ABBREW.wounds).filter(w => w[1].lingeringWounds.length === 0).map(w => w[0]);
+
 ABBREW.conditions = {
   dead: {
     name: "ABBREW.EFFECT.Condition.Dead.name",
@@ -317,6 +319,17 @@ const lingeringWoundImmunities = [
   { key: "sinImmunity", value: "ABBREW.Traits.WoundImmunities.sinImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "sin" }
 ]
 
+const acuteWoundImmunities = [
+  { key: "physicalImmunity", value: "ABBREW.Traits.WoundImmunities.physicalImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "physical" },
+  { key: "vitalImmunity", value: "ABBREW.Traits.WoundImmunities.vitalImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "vital" },
+  { key: "burnImmunity", value: "ABBREW.Traits.WoundImmunities.burnImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "burn" },
+  { key: "exhaustionImmunity", value: "ABBREW.Traits.WoundImmunities.exhaustionImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "exhaustion" },
+  { key: "terrorImmunity", value: "ABBREW.Traits.WoundImmunities.terrorImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "terror" },
+  { key: "rageImmunity", value: "ABBREW.Traits.WoundImmunities.rageImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "rage" },
+  { key: "mutationImmunity", value: "ABBREW.Traits.WoundImmunities.mutationImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "mutation" },
+  { key: "corruptionImmunity", value: "ABBREW.Traits.WoundImmunities.corruptionImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "corruption" }
+]
+
 const skillTraining = [
   { key: "attackBaseTraining", value: "ABBREW.Traits.SkillTraining.attackBase", feature: "skillTraining", subFeature: "offensiveSkills", effect: "base", data: "attack" },
   { key: "finisherBaseTraining", value: "ABBREW.Traits.SkillTraining.finisherBase", feature: "skillTraining", subFeature: "offensiveSkills", effect: "base", data: "finisher" },
@@ -333,6 +346,7 @@ const skillTraining = [
 ]
 
 ABBREW.traits = [
+  ...acuteWoundImmunities,
   ...lingeringWoundImmunities,
   ...skillTraining,
 ]
