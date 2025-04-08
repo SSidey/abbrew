@@ -114,11 +114,25 @@ div.skill-card.skill-active {
     }
 }
 
+.skill-section {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    margin-bottom: 5px;
+    grid-gap: 5px;
+
+    .skill-element-2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-gap: 5px;
+    }
+}
+
 .skill-attack-profile {
     display: grid;
     grid-template-rows: repeat(3, 1fr);
     margin-bottom: 5px;
-
+    padding-bottom: 5px;
+    border-bottom: 1px solid #888;
 
     .attack-profile-row {
         display: grid;
@@ -157,12 +171,15 @@ div.skill-card.skill-active {
     .skill-damage-row {
         display: grid;
         grid-template-columns: repeat(10, 1fr);
+        padding-top: 5px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid #888;
 
         .skill-damage-profile {
             grid-column: 1 / 10;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            grid-column-gap: 5px;
+            grid-gap: 5px;
             padding-right: 10px;
 
             .damage-profile-element-2 {
@@ -174,5 +191,46 @@ div.skill-card.skill-active {
         .skill-damage-control {
             grid-column: 10 / 11;
         }
+    }
+}
+
+.resource-modifier-container {
+    list-style: none;
+    padding-left: 0px;
+}
+
+.wound-modifier-container {
+    list-style-type: none;
+    padding-left: 0px;
+
+    .wound-row {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        padding-top: 5px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid #888;
+        grid-gap: 5px;
+    }
+
+    .wound-element-2 {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        grid-gap: 5px;
+    }
+
+    .wound-element-value {
+        grid-column: 1 / 4;
+    }
+
+    .wound-element-type {
+        grid-column: 4 / 7;
+    }
+
+    .wound-element-operator {
+        grid-column: 7 / 10;
+    }
+
+    .wound-remove {
+        grid-column: 11 / 11;
     }
 }

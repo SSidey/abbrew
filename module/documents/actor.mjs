@@ -50,6 +50,10 @@ export default class AbbrewActor extends Actor {
     return { ...super.getRollData(), ...this.system.getRollData?.() ?? null };
   }
 
+  getEffectBySkillId(skillId) {
+    return this.effects.find(e => e.flags?.abbrew?.skill?.trackDuration === skillId);
+  }
+
   async takeActionUpdates(data) {
     const updates = {};
     data.targetUpdates.forEach(update => {
@@ -442,9 +446,11 @@ export default class AbbrewActor extends Actor {
     const itemId = effect?.flags?.abbrew?.skill?.trackDuration;
     if (itemId) {
       const item = this.items.find(i => i._id === itemId)
-      await item.update({ "system.action.charges.value": 0 })
-      if (item.system.skillType === "temporary") {
-        await item.delete();
+      if (item) {
+        await item.update({ "system.action.charges.value": 0 })
+        if (item.system.skillType === "temporary") {
+          await item.delete();
+        }
       }
     }
     const activeSkillsWithDuration = this.effects.toObject().filter(e => e.flags?.abbrew?.skill?.type === "standalone").map(e => e.flags.abbrew.skill.trackDuration);

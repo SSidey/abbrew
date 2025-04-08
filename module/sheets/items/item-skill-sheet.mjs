@@ -83,9 +83,9 @@ export class AbbrewSkillSheet extends ItemSheet {
                 // Necessary in v11, can be removed in v12
                 async: true,
                 // Data to fill in for inline rolls
-                rollData: this.actor.getRollData(),
+                rollData: this.item.getRollData(),
                 // Relative UUID resolution
-                relativeTo: this.actor,
+                relativeTo: this.item,
             }
         );
 

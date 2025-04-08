@@ -126,16 +126,3 @@ export function compareModifierIndices(modifier1, modifier2) {
 
     return 0;
 }
-
-export function getOrderForOperator(operator) {
-    switch (operator) {
-        case "equal":
-            return 0;
-        case "add":
-            return 1;
-        case "minus":
-            return 2;
-        default:
-            return -1;
-    }
-}

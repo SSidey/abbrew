@@ -45,8 +45,9 @@ export async function updateActorWounds(actor, updateWounds) {
     await actor.update({ "system.wounds": woundsAfterImmunity });
 }
 
-async function getWoundImmunities(actor) {
-    return actor.items.filter(i => i.type === "skill" && getSafeJson(i.system.skillTraits, false)).map(s => JSON.parse(s.system.skillTraits)).filter(s => s.some(st => st.feature === "wound" && st.effect === "immunity")).flatMap(s => s.data);
+function getWoundImmunities(actor) {
+    const woundImmunities = actor.items.filter(i => i.type === "skill" && getSafeJson(i.system.skillTraits, false)).map(s => JSON.parse(s.system.skillTraits)).filter(s => s.some(st => st.feature === "wound" && st.effect === "immunity")).flatMap(s => s.data);
+    return woundImmunities ? woundImmunities : [];
 }
 
 export async function checkActorFatalWounds(actor) {
@@ -209,7 +210,7 @@ async function updateTurnStartWounds(actor) {
     const activeLingeringWounds = actor.system.wounds.filter(w => lingeringWoundTypes.some(lw => w.type === lw)).filter(w => !woundImmunities.includes(w.type)).filter(w => w.value > 0);
     if (activeLingeringWounds.length > 0) {
         const appliedLingeringWounds = {};
-        activeLingeringWounds.flatMap(lw => woundToLingeringWounds[lw.type].map(lwt => ({ type: lwt, value: Math.max(0, (lw.value - woundSuppressions[lw.type] ?? 0)) }))).reduce((appliedLingeringWounds, wound) => {
+        activeLingeringWounds.flatMap(lw => woundToLingeringWounds[lw.type].map(lwt => ({ type: lwt, value: Math.max(0, (lw.value - (woundSuppressions[lw.type] ?? 0))) }))).reduce((appliedLingeringWounds, wound) => {
             if (wound.type in appliedLingeringWounds) {
                 appliedLingeringWounds[wound.type] += wound.value;
             } else {

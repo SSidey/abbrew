@@ -54,8 +54,7 @@ ABBREW.SkillAttributeIncrease = "ABBREW.AttributeIncrease";
 ABBREW.skillActivationType = "ABBREW.SkillActivationType";
 ABBREW.skillActivationTypes = {
   standalone: 'ABBREW.SkillActivationTypes.standalone',
-  synergy: 'ABBREW.SkillActivationTypes.synergy',
-  stackRemoval: 'ABBREW.SkillActivationTypes.stackRemoval'
+  synergy: 'ABBREW.SkillActivationTypes.synergy'
 }
 ABBREW.EquippedWeapon = "ABBREW.EquippedWeapon";
 ABBREW.Damage = "ABBREW.Damage";
@@ -64,6 +63,8 @@ ABBREW.operators = {
   equal: "ABBREW.Operators.equal",
   add: "ABBREW.Operators.add",
   minus: "ABBREW.Operators.minus",
+  upgrade: "ABBREW.Operators.upgrade",
+  downgrade: "ABBREW.Operators.downgrade"
 }
 
 ABBREW.woundOperators = {

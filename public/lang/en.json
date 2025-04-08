@@ -42,15 +42,16 @@
     "SkillActivationType": "Activation Type",
     "SkillActivationTypes": {
       "standalone": "Standalone",
-      "synergy": "Synergy",
-      "stackRemoval": "Stack Removal"
+      "synergy": "Synergy"
     },
     "Operator": "Operator",
     "Operators": {
       "equal": "Set",
       "add": "Increase",
       "minus": "Reduce",
-      "suppress": "Suppress"
+      "suppress": "Suppress",
+      "upgrade": "Upgrade",
+      "downgrade": "Downgrade"
     },
     "AttributeRankIncrease": "Attribute Rank Increase",
     "SkillType": "Skill Type",

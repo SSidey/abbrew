@@ -11,13 +11,13 @@
       "synergy": "",
       "discord": ""
     },
-    "configurable": false,
+    "configurable": true,
     "action": {
-      "activationType": "",
+      "activationType": "standalone",
       "actionCost": "",
       "actionImage": "",
       "duration": {
-        "precision": "",
+        "precision": "0",
         "value": 0
       },
       "uses": {
@@ -133,7 +133,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743073000940,
-    "modifiedTime": 1743075705390,
+    "modifiedTime": 1744057044864,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "ownership": {

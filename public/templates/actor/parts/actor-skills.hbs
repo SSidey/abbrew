@@ -26,8 +26,19 @@
           </a>
         </div>
         {{#if item.system.isActivatable}}
+        {{#if item.system.action.isActive}}
+        {{#if item.system.action.charges.hasCharges}}
+        <button class="skill-activate" type="button"><span
+            class="actions-icon action-{{item.system.action.actionImage}}">Spend Charge</span></button>
+        {{else}}
+        <button class="skill-deactivate" type="button"><span class="actions-icon action-0a">Deactivate</span></button>
+        {{/if}}
+        {{else}}
+        {{#if item.system.action.actionCost}}
         <button class="skill-activate" type="button"><span
             class="actions-icon action-{{item.system.action.actionImage}}">Activate</span></button>
+        {{/if}}
+        {{/if}}
         {{/if}}
         {{#if (eq item.system.skillType "background")}}
         <h3 class="skill-attribute-increase">{{item.system.attributeIncreaseLong}}</h4>

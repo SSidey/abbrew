@@ -83,7 +83,7 @@
         <h3>Uses</h3>
         <label class="slide-toggle roboto-upper">
             <input type="checkbox" name="system.action.uses.hasUses" {{ checked system.action.uses.hasUses }}>
-            <span>{{attribute.label}}</span>
+            <span>Has Uses?</span>
             {{#if system.action.uses.hasUses}}
             <i class="fa fa-toggle-on"></i>
             {{else}}
@@ -91,14 +91,37 @@
             {{/if}}
         </label>
         {{#if system.action.uses.hasUses}}
-        <label>Curent Uses</label>
-        <input type="text" name="system.action.uses.value" value="{{system.action.uses.value}}" data-dtype="Number" />
-        <label>Maximum Uses</label>
-        <input type="text" name="system.action.uses.max" value="{{system.action.uses.max}}" data-dtype="Number" />
-        <select name="system.action.uses.period">
-            {{selectOptions config.durationsLabels selected=system.action.uses.period blank=""
-            localize=true}}
-        </select>
+        <div class="skill-section">
+            {{#if (eq system.skillType "temporary")}}
+            <label class="slide-toggle roboto-upper">
+                <input type="checkbox" name="system.action.uses.removeWhenNoUsesRemain" {{ checked
+                    system.action.uses.removeWhenNoUsesRemain }}>
+                <span>Remove When No Uses?</span>
+                {{#if system.action.uses.removeWhenNoUsesRemain}}
+                <i class="fa-solid fa-square-check"></i>
+                {{else}}
+                <i class="fa-regular fa-square"></i>
+                {{/if}}
+            </label>
+            {{/if}}
+            <div class="skill-element-2">
+                <label>Curent Uses</label>
+                <input type="text" name="system.action.uses.value" value="{{system.action.uses.value}}"
+                    data-dtype="Number" />
+            </div>
+            <div class="skill-element-2">
+                <label>Maximum Uses</label>
+                <input type="text" name="system.action.uses.max" value="{{system.action.uses.max}}"
+                    data-dtype="Number" />
+            </div>
+            <div class="skill-element-2">
+                <label>Restored Every</label>
+                <select name="system.action.uses.period">
+                    {{selectOptions config.durationsLabels selected=system.action.uses.period blank=""
+                    localize=true}}
+                </select>
+            </div>
+        </div>
         {{/if}}
     </div>
     <div>
@@ -106,7 +129,7 @@
         <label class="slide-toggle roboto-upper">
             <input type="checkbox" name="system.action.charges.hasCharges" {{ checked system.action.charges.hasCharges
                 }}>
-            <span>{{attribute.label}}</span>
+            <span>Has Charges?</span>
             {{#if system.action.charges.hasCharges}}
             <i class="fa fa-toggle-on"></i>
             {{else}}
@@ -135,6 +158,17 @@
         {{#if (eq system.action.activationType "standalone")}}
         <div>
             <h3>Attack Profile</h3>
+            <label class="slide-toggle roboto-upper">
+                <input type="checkbox" name="system.action.attackProfile.isEnabled" {{ checked
+                    system.action.attackProfile.isEnabled }}>
+                <span>Enable Attack?</span>
+                {{#if system.action.attackProfile.isEnabled}}
+                <i class="fa fa-toggle-on"></i>
+                {{else}}
+                <i class="fa fa-toggle-off"></i>
+                {{/if}}
+            </label>
+            {{#if system.action.attackProfile.isEnabled}}
             <div class="skill-attack-profile">
                 <div class="attack-profile-row">
                     <div class="attack-profile-element-2">
@@ -203,13 +237,13 @@
                     <h4>Wounds</h4>
                     <ol class="form-list wound-modifier-container">
                         {{#each system.action.attackProfile.finisher.wounds as |wound k|}}
-                        <li class="item resource grid-3col" data-id="{{k}}">
-                            <div>
+                        <li class="item resource wound-row" data-id="{{k}}">
+                            <div class="wound-element-2 wound-element-value">
                                 <label>Value</label>
                                 <input type="text" name="system.action.attackProfile.finisher.wounds.{{k}}.value"
                                     value="{{wound.value}}" data-dtype="Number" />
                             </div>
-                            <div>
+                            <div class="wound-element-2 wound-element-type">
                                 <label>Type</label>
                                 <select name="system.action.attackProfile.finisher.wounds.{{k}}.type">
                                     {{selectOptions ../config.wounds selected=wound.type
@@ -217,13 +251,15 @@
                                     localize=true}}
                                 </select>
                             </div>
-                            <label>{{ localize "ABBREW.Operator" }}</label>
-                            <select name="system.action.attackProfile.finisher.wounds.{{k}}.operator">
-                                {{selectOptions ../config.operators selected=wound.operator
-                                blank=""
-                                localize=true}}
-                            </select>
-                            <div>
+                            <div class="wound-element-2 wound-element-operator">
+                                <label>{{ localize "ABBREW.Operator" }}</label>
+                                <select name="system.action.attackProfile.finisher.wounds.{{k}}.operator">
+                                    {{selectOptions ../config.operators selected=wound.operator
+                                    blank=""
+                                    localize=true}}
+                                </select>
+                            </div>
+                            <div class="wound-remove">
                                 <a class="skill-action-modifier-wound-control"
                                     data-action="remove-skill-action-attackProfile-wound-finisher-modifier">
                                     <i class="fa-solid fa-minus"></i>
@@ -303,6 +339,7 @@
                 </li>
             </ol>
         </div>
+        {{/if}}
         {{/if}}
         {{#if (eq system.action.activationType "synergy")}}
         <div>

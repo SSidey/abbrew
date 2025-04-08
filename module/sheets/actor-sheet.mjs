@@ -291,7 +291,9 @@ export class AbbrewActorSheet extends ActorSheet {
       skill.sheet.render(true);
     });
 
-    html.on('click', '.skill-activate', this._onSkillActivate.bind(this))
+    html.on('click', '.skill-activate', this._onSkillActivate.bind(this));
+
+    html.on('click', '.skill-deactivate', this._onSkillDeactivate.bind(this));
 
     // -------------------------------------------------------------
     // Everything below here is only needed if the sheet is editable
@@ -426,6 +428,17 @@ export class AbbrewActorSheet extends ActorSheet {
     const skill = this.actor.items.get(id);
 
     await handleSkillActivate(this.actor, skill);
+  }
+
+  async _onSkillDeactivate(event) {
+    event.preventDefault();
+    const target = event.target.closest('.skill');
+    const id = target.dataset.itemId;
+    const skill = this.actor.items.get(id);
+    const effect = this.actor.getEffectBySkillId(skill._id);
+    if (effect) {
+      await effect.delete();
+    }
   }
 
   async _onAttackDamageAction(target, attackMode) {

@@ -1,5 +1,5 @@
-import { applyOperator } from "./operators.mjs";
-import { compareModifierIndices, getObjectValueByStringPath, getOrderForOperator, getSafeJson } from "../helpers/utils.mjs"
+import { applyOperator, getOrderForOperator } from "./operators.mjs";
+import { compareModifierIndices, getObjectValueByStringPath, getSafeJson } from "../helpers/utils.mjs"
 import { mergeWoundsWithOperator } from "./combat.mjs";
 
 export async function handleSkillActivate(actor, skill, checkActions = true) {
@@ -33,11 +33,6 @@ export async function handleSkillActivate(actor, skill, checkActions = true) {
         }
     }
 
-    if (skill.system.action.activationType === "stackRemoval") {
-        removeStackFromSkill(skill);
-        return true;
-    }
-
     await rechargeSkill(actor, skill);
     return await activateSkill(actor, skill);
 }
@@ -54,18 +49,6 @@ function doesActorMeetSkillRequirements(actor, skill) {
     }
 
     return true;
-}
-
-export async function removeStackFromSkill(skill) {
-    const stacks = skill.system.action.uses.value - 1;
-    if (stacks > 0) {
-        await skill.update({ "system.action.uses.value": stacks })
-        return;
-    }
-
-    if (skill.system.skillType === "temporary" && skill.system.action.activationType !== "passive") {
-        await skill.delete();
-    }
 }
 
 async function activateSkill(actor, skill) {
@@ -173,17 +156,12 @@ export async function applySkillEffects(actor, skill) {
             const effect = actor.effects.find(e => e.flags?.abbrew?.skill?.trackDuration === skill._id);
             await effect?.delete();
         }
-        if (skill.system.skills.paired.length > 0) {
-            skill.system.skills.paired.forEach(async ps => {
-                const pairedSkill = actor.items.filter(i => i.type === "skill" && i.system.isActivatable).find(s => s.system.abbrewId.uuid === foundry.utils.parseUuid(ps.sourceId).id);
-                await handleSkillActivate(actor, pairedSkill);
-            });
-        }
+        await handlePairedSkills(skill, actor);
     }
 
     let templateData = { allSummaries: allSummaries };
     let data = {};
-    if (skill.system.action.attackProfile) {
+    if (skill.system.action.attackProfile.isEnabled) {
         const baseAttackProfile = skill.system.action.attackProfile;
         const fortune = mergeFortune(allSkills);
         const attackProfile = mergeAttackProfiles(baseAttackProfile, modifierSkills);
@@ -300,7 +278,32 @@ export async function applySkillEffects(actor, skill) {
     mergeWoundSelfModifiers(updates, allSkills, actor, postPhaseFilter);
     await actor.update(updates);
 
+    await handlePairedSkills(skill, actor);
+    await cleanTemporarySkill(skill, actor);
+
     return {};
+}
+
+async function cleanTemporarySkill(skill, actor) {
+    if (((skill.system.action.uses.hasUses && skill.system.action.uses.value === 0) && skill.system.action.charges.value === 0) || (skill.system.action.charges.hasCharges && skill.system.action.charges.value === 0)) {
+        const effect = actor.getEffectBySkillId(skill._id);
+        if (effect) {
+            await effect.delete();
+        }
+
+        if (skill.system.skillType === "temporary" && skill.system.action.uses.removeWhenNoUsesRemain) {
+            await skill.delete();
+        }
+    }
+}
+
+async function handlePairedSkills(skill, actor) {
+    if (skill.system.skills.paired.length > 0) {
+        skill.system.skills.paired.forEach(async ps => {
+            const pairedSkill = actor.items.filter(i => i.type === "skill" && i.system.isActivatable).find(s => s.system.abbrewId.uuid === foundry.utils.parseUuid(ps.sourceId).id);
+            await handleSkillActivate(actor, pairedSkill);
+        });
+    }
 }
 
 function mergeFinishers(baseAttackProfile, modifierSkills, actor) {
@@ -335,7 +338,7 @@ function mergeFinisherWounds(allAttackProfiles, actor) {
 
 function mergeWoundsForTarget(woundArrays, actor) {
     return Object.entries(woundArrays.reduce((result, woundArray) => {
-        woundArray.forEach(w => {
+        woundArray.filter(w => w.operator !== "suppress").forEach(w => {
             if (w.type in result) {
                 result[w.type] = applyOperator(result[w.type], parsePath(w.value, actor), w.operator);
             } else {
@@ -405,7 +408,7 @@ function mergeResolveTargetModifiers(updates, allSkills, actor, phaseFilter) {
 }
 
 function mergeWoundSelfModifiers(updates, allSkills, actor, phaseFilter) {
-    const woundModifiers = allSkills.filter(s => s.system.action.modifiers.wounds.self.length > 0).flatMap(s => s.system.action.modifiers.wounds.self.filter(w => w.type && w.value != null && w.operator).filter(s => phaseFilter(s.value)).map(w => ({ ...w, index: getOrderForOperator(w.operator) }))).sort(compareModifierIndices);
+    const woundModifiers = allSkills.filter(s => s.system.action.modifiers.wounds.self.length > 0).flatMap(s => s.system.action.modifiers.wounds.self.filter(w => w.type && w.value != null && w.operator).filter(w => w.operator !== "suppress").filter(s => phaseFilter(s.value)).map(w => ({ ...w, index: getOrderForOperator(w.operator) }))).sort(compareModifierIndices);
     if (woundModifiers.length > 0) {
         let updateWounds = actor.system.wounds;
         updateWounds = woundModifiers.reduce((result, w) => result = mergeWoundsWithOperator(result, [{ type: w.type, value: w.value }], w.operator), updateWounds)
@@ -822,6 +825,10 @@ export function getAttackSkillWithActions(id, name, actionCost, image, attackPro
             attributeIncrease: "",
             attributeIncreaseLong: "",
             attributeRankIncrease: "",
+            skills: {
+                granted: [],
+                paired: []
+            },
             action: {
                 activationType: "standalone",
                 actionCost: actionCost,
@@ -842,7 +849,7 @@ export function getAttackSkillWithActions(id, name, actionCost, image, attackPro
                     max: 0
                 },
                 isActive: false,
-                attackProfile: { ...attackProfile, attackMode: attackMode, handsSupplied: handsSupplied, critical: 11 - handsSupplied },
+                attackProfile: { ...attackProfile, attackMode: attackMode, handsSupplied: handsSupplied, critical: 11 - handsSupplied, isEnabled: true },
                 modifiers: {
                     fortune: 0,
                     attackProfile: {},
@@ -899,7 +906,7 @@ export function getAttackSkillWithActions(id, name, actionCost, image, attackPro
 
 export function getParrySkillWithActions(actor, actionCost) {
     const id = actor.system.proxiedSkills["parry"];
-    const skill = actor.items.filter(i => i.type === "skill").find(s => s._id === id);
+    const skill = actor.items.filter(i => i.type === "skill").find(s => s.system.abbrewId.uuid === id);
 
     return ({
         _id: id,
@@ -911,6 +918,10 @@ export function getParrySkillWithActions(actor, actionCost) {
             attributeIncrease: "",
             attributeIncreaseLong: "",
             attributeRankIncrease: "",
+            skills: {
+                granted: [],
+                paired: []
+            },
             action: {
                 activationType: "standalone",
                 actionCost: actionCost,

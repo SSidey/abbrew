@@ -43,7 +43,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
         })
         schema.action = new fields.SchemaField({
             activationType: new fields.StringField({ ...blankString }),
-            actionCost: new fields.StringField({ ...blankString }),
+            actionCost: new fields.StringField({ ...blankString, nullable: true }),
             actionImage: new fields.StringField({ ...blankString }),
             duration: new fields.SchemaField({
                 precision: new fields.StringField({ ...blankString }),
@@ -54,7 +54,8 @@ export default class AbbrewSkill extends AbbrewItemBase {
                 hasUses: new fields.BooleanField({ required: true, initial: false }),
                 value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
                 max: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-                period: new fields.StringField({ ...blankString })
+                period: new fields.StringField({ ...blankString }),
+                removeWhenNoUsesRemain: new fields.BooleanField({ required: true, initial: false })
             }),
             charges: new fields.SchemaField({
                 hasCharges: new fields.BooleanField({ required: true, initial: false }),
@@ -63,6 +64,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
             }),
             isActive: new fields.BooleanField({ required: true }),
             attackProfile: new fields.SchemaField({
+                isEnabled: new fields.BooleanField({ required: true, initial: true }),
                 name: new fields.StringField({ required: true, blank: true }),
                 attackType: new fields.StringField({ required: true, blank: true }),
                 lethal: new fields.NumberField({ ...requiredInteger, initial: 0 }),

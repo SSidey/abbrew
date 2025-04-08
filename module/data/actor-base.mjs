@@ -1,5 +1,5 @@
-import { applyOperator } from "../helpers/operators.mjs";
-import { compareModifierIndices, getOrderForOperator, getSafeJson } from "../helpers/utils.mjs";
+import { applyOperator, getOrderForOperator } from "../helpers/operators.mjs";
+import { compareModifierIndices, getSafeJson } from "../helpers/utils.mjs";
 
 export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
