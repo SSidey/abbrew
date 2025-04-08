@@ -150,6 +150,7 @@ async function setActorToOffGuard(actor) {
 async function turnEnd(actor) {
     // TODO: Conditions could modify this?
     await actor.unsetFlag("abbrew", "combat.damage.lastRoundReceived")
+    await applyActiveSkills(actor, "end");
     await handleSkillExpiry("end", actor);
     await actor.update({ "system.actions": 5 });
 }
@@ -160,11 +161,11 @@ async function turnStart(actor) {
     }
 
     await handleSkillToRounds(actor);
+    await applyActiveSkills(actor, "start");
     await handleSkillExpiry("start", actor);
     await updateTurnStartWounds(actor);
 
     await rechargePerRoundSkills(actor);
-    await applyActiveSkills(actor);
 }
 
 async function handleSkillToRounds(actor) {
@@ -228,8 +229,18 @@ async function updateTurnStartWounds(actor) {
     }
 }
 
-async function applyActiveSkills(actor) {
-    const activeSkills = actor.system.activeSkills.flatMap(s => actor.items.filter(i => i._id === s));
+async function applyActiveSkills(actor, turnPhase) {
+    if (!(turnPhase && ["start", "end"].includes(turnPhase))) {
+        return;
+    }
+
+    let activeSkills = [];
+    if (turnPhase === "start") {
+        activeSkills = actor.system.activeSkills.flatMap(s => actor.items.filter(i => i._id === s)).filter(s => s.system.applyTurnStart);
+    } else if (turnPhase === "end") {
+        activeSkills = actor.system.activeSkills.flatMap(s => actor.items.filter(i => i._id === s)).filter(s => s.system.applyTurnEnd);
+    }
+
     for (const index in activeSkills) {
         await applySkillEffects(actor, activeSkills[index]);
     }

@@ -161,6 +161,9 @@ export default class AbbrewItem extends Item {
       if (this.actor && !this.system.isActivatable && this.system.action.duration.value > 0) {
         await trackSkillDuration(this.actor, this);
       }
+      if (this.actor && this.system.isActivatable && this.system.activateOnCreate) {
+        await handleSkillActivate(this.actor, this, false);
+      }
     }
   }
 

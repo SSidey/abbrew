@@ -15,7 +15,11 @@ export default class AbbrewSkill extends AbbrewItemBase {
             discord: new fields.StringField({ ...blankString })
         });
         schema.configurable = new fields.BooleanField({ required: true });
-        schema.isActivatable = new fields.BooleanField({ required: true, label: "ABBREW.IsActivatable" });
+        schema.isActivatable = new fields.BooleanField({ required: true, initial: false, label: "ABBREW.IsActivatable" });
+        schema.activateOnCreate = new fields.BooleanField({ required: true, initial: false });
+        schema.applyTurnStart = new fields.BooleanField({ required: true, initial: false });
+        schema.applyTurnEnd = new fields.BooleanField({ required: true, initial: false });
+        schema.applyOnExpiry = new fields.BooleanField({ required: true, initial: false });
         schema.skills = new fields.SchemaField({
             granted: new fields.ArrayField(
                 new fields.SchemaField({
@@ -33,6 +37,17 @@ export default class AbbrewSkill extends AbbrewItemBase {
                     id: new fields.StringField({ required: true, blank: true }),
                     image: new fields.StringField({ required: true, blank: true }),
                     sourceId: new fields.StringField({ required: true, blank: true }),
+                })
+            ),
+            // TODO: Implement Grant on use
+            grantedOnActivation: new fields.ArrayField(
+                new fields.SchemaField({
+                    name: new fields.StringField({ required: true, blank: true }),
+                    skillType: new fields.StringField({ required: true, blank: true }),
+                    id: new fields.StringField({ required: true, blank: true }),
+                    image: new fields.StringField({ required: true, blank: true }),
+                    sourceId: new fields.StringField({ required: true, blank: true }),
+                    grantTimes: new fields.NumberField({ ...requiredInteger, initial: 0 })
                 })
             )
         });
@@ -52,6 +67,8 @@ export default class AbbrewSkill extends AbbrewItemBase {
             }),
             uses: new fields.SchemaField({
                 hasUses: new fields.BooleanField({ required: true, initial: false }),
+                // TODO: Implement AsStacks
+                asStacks: new fields.BooleanField({ required: true, initial: false }),
                 value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
                 max: new fields.NumberField({ ...requiredInteger, initial: 0 }),
                 period: new fields.StringField({ ...blankString }),
@@ -63,6 +80,46 @@ export default class AbbrewSkill extends AbbrewItemBase {
                 max: new fields.NumberField({ ...requiredInteger, initial: 0 })
             }),
             isActive: new fields.BooleanField({ required: true }),
+            // TODO: Implement skillRequest
+            skillRequest: new fields.SchemaField({
+                isContested: new fields.BooleanField({ required: true, initial: false }),
+                selfRolls: new fields.SchemaField({
+                    checkType: new fields.StringField({ ...blankString }),
+                    modifiers: new fields.ArrayField(
+                        new fields.SchemaField({
+                            // name / id etc.
+                        })
+                    ),
+                    results: new fields.SchemaField({
+                        success: new fields.SchemaField({
+                            description: new fields.StringField({ ...blankString }),
+                            grantedSkills: new fields.StringField({ ...blankString })
+                        }),
+                        failure: new fields.SchemaField({
+                            description: new fields.StringField({ ...blankString }),
+                            grantedSkills: new fields.StringField({ ...blankString })
+                        })
+                    })
+                }),
+                targetRolls: new fields.SchemaField({
+                    checkType: new fields.StringField({ ...blankString }),
+                    modifiers: new fields.ArrayField(
+                        new fields.SchemaField({
+                            // name / id etc.
+                        })
+                    ),
+                    results: new fields.SchemaField({
+                        success: new fields.SchemaField({
+                            description: new fields.StringField({ ...blankString }),
+                            grantedSkills: new fields.StringField({ ...blankString })
+                        }),
+                        failure: new fields.SchemaField({
+                            description: new fields.StringField({ ...blankString }),
+                            grantedSkills: new fields.StringField({ ...blankString })
+                        })
+                    })
+                })
+            }),
             attackProfile: new fields.SchemaField({
                 isEnabled: new fields.BooleanField({ required: true, initial: true }),
                 name: new fields.StringField({ required: true, blank: true }),

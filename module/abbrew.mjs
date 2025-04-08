@@ -182,6 +182,10 @@ Handlebars.registerHelper('getProperty', function (parent, child) {
   return parent[preparedChild];
 });
 
+Handlebars.registerHelper('hasValue', function (arg1, opts) {
+  return arg1 !== null && arg1 !== undefined ? opts.fn(this) : opts.inverse(this);
+});
+
 Handlebars.registerHelper('empty', function (collection) {
   if (!collection) {
     return false;

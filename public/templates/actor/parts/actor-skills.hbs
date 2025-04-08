@@ -31,7 +31,9 @@
         <button class="skill-activate" type="button"><span
             class="actions-icon action-{{item.system.action.actionImage}}">Spend Charge</span></button>
         {{else}}
+        {{#hasValue item.system.action.actionCost}}
         <button class="skill-deactivate" type="button"><span class="actions-icon action-0a">Deactivate</span></button>
+        {{/hasValue}}
         {{/if}}
         {{else}}
         {{#if item.system.action.actionCost}}

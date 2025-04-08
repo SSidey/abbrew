@@ -1,5 +1,5 @@
 import { mergeActorWounds } from "../helpers/combat.mjs";
-import { isSkillBlocked } from "../helpers/skill.mjs";
+import { applySkillEffects, handleSkillActivate, isSkillBlocked } from "../helpers/skill.mjs";
 import { getAttackerAdvantageGuardResult, getAttackerAdvantageRiskResult, getDefenderAdvantageGuardResult, getDefenderAdvantageRiskResult } from "../helpers/trainedSkills.mjs";
 import { getObjectValueByStringPath } from "../helpers/utils.mjs";
 import { FINISHERS } from "../static/finishers.mjs";
@@ -447,12 +447,16 @@ export default class AbbrewActor extends Actor {
     if (itemId) {
       const item = this.items.find(i => i._id === itemId)
       if (item) {
+        if (item.system.applyOnExpiry && item.isOwner) {
+          await applySkillEffects(this, item);
+        }
         await item.update({ "system.action.charges.value": 0 })
         if (item.system.skillType === "temporary") {
           await item.delete();
         }
       }
     }
+
     const activeSkillsWithDuration = this.effects.toObject().filter(e => e.flags?.abbrew?.skill?.type === "standalone").map(e => e.flags.abbrew.skill.trackDuration);
     const queuedSkillsWithDuration = this.effects.toObject().filter(e => e.flags?.abbrew?.skill?.type === "synergy").map(e => e.flags.abbrew.skill.trackDuration);
     await this.update({ "system.activeSkills": activeSkillsWithDuration, "system.queuedSkills": queuedSkillsWithDuration });

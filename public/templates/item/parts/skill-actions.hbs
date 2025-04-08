@@ -29,6 +29,43 @@
     <i class="fa fa-toggle-off"></i>
     {{/if}}
 </label>
+<label class="slide-toggle roboto-upper">
+    <input type="checkbox" class="action-activatable" name="system.activateOnCreate" {{ checked system.activateOnCreate
+        }}>
+    <span>On Create</span>
+    {{#if system.activateOnCreate}}
+    <i class="fa fa-toggle-on"></i>
+    {{else}}
+    <i class="fa fa-toggle-off"></i>
+    {{/if}}
+</label>
+<label class="slide-toggle roboto-upper">
+    <input type="checkbox" class="action-activatable" name="system.applyTurnStart" {{ checked system.applyTurnStart }}>
+    <span>Apply Start of Turn</span>
+    {{#if system.applyTurnStart}}
+    <i class="fa fa-toggle-on"></i>
+    {{else}}
+    <i class="fa fa-toggle-off"></i>
+    {{/if}}
+</label>
+<label class="slide-toggle roboto-upper">
+    <input type="checkbox" class="action-activatable" name="system.applyTurnEnd" {{ checked system.applyTurnEnd }}>
+    <span>Apply End of Turn</span>
+    {{#if system.applyTurnEnd}}
+    <i class="fa fa-toggle-on"></i>
+    {{else}}
+    <i class="fa fa-toggle-off"></i>
+    {{/if}}
+</label>
+<label class="slide-toggle roboto-upper">
+    <input type="checkbox" class="action-activatable" name="system.applyOnExpiry" {{ checked system.applyOnExpiry }}>
+    <span>Apply On Expiry</span>
+    {{#if system.applyOnExpiry}}
+    <i class="fa fa-toggle-on"></i>
+    {{else}}
+    <i class="fa fa-toggle-off"></i>
+    {{/if}}
+</label>
 <div class="skill-paired-row">
     <div class="skill-element-2">
         <label>Action Cost</label>
