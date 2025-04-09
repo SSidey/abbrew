@@ -1,0 +1,145 @@
+{
+  "folder": "CVutUV6p568BxZd4",
+  "name": "Finisher",
+  "type": "skill",
+  "img": "systems/abbrew/assets/icons/skills/finisher.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "skillTraits": "[{\"key\":\"finisherBaseTraining\",\"value\":\"Finisher Base\",\"feature\":\"skillTraining\",\"subFeature\":\"offensiveSkills\",\"effect\":\"base\",\"data\":\"finisher\"}]",
+    "skillModifiers": {
+      "synergy": "",
+      "discord": ""
+    },
+    "configurable": false,
+    "action": {
+      "activationType": "",
+      "actionCost": "",
+      "actionImage": "",
+      "duration": {
+        "precision": "",
+        "value": 0
+      },
+      "uses": {
+        "hasUses": false,
+        "value": 0,
+        "max": 0,
+        "period": ""
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "modifiers": {
+        "fortune": 0,
+        "attackProfile": {
+          "attackType": "",
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "damage": [],
+          "finisherLimit": {
+            "value": 0,
+            "operator": ""
+          },
+          "attackMode": "",
+          "handsSupplied": 0
+        },
+        "guard": {
+          "self": {
+            "value": "",
+            "operator": ""
+          },
+          "target": {
+            "value": "",
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": 0,
+            "operator": ""
+          },
+          "target": {
+            "value": 0,
+            "operator": ""
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": 0,
+            "operator": ""
+          },
+          "target": {
+            "value": 0,
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": []
+        },
+        "actionCost": {
+          "value": 0,
+          "operator": ""
+        }
+      },
+      "attackProfile": {
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": null,
+        "attackMode": "",
+        "damage": [],
+        "finisherLimit": 10
+      }
+    },
+    "skillType": "basic",
+    "path": {
+      "value": "",
+      "archetype": ""
+    },
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": "",
+    "abbrewId": {
+      "value": "abbrew.skill.finisher.abbrewFinisher00",
+      "uuid": "abbrewFinisher00"
+    },
+    "isActivatable": false,
+    "skills": []
+  },
+  "effects": [],
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743073034235,
+    "modifiedTime": 1744236233189,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "ownership": {
+    "default": 0
+  },
+  "_id": "abbrewFinisher00",
+  "sort": 50000,
+  "_key": "!items!abbrewFinisher00"
+}

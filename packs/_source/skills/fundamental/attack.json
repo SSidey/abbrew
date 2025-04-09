@@ -1,0 +1,145 @@
+{
+  "folder": "CVutUV6p568BxZd4",
+  "name": "Attack",
+  "type": "skill",
+  "img": "systems/abbrew/assets/icons/skills/attack.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "skillTraits": "[{\"key\":\"attackBaseTraining\",\"value\":\"Attack Base\",\"feature\":\"skillTraining\",\"subFeature\":\"offensiveSkills\",\"effect\":\"base\",\"data\":\"attack\"}]",
+    "skillModifiers": {
+      "synergy": "",
+      "discord": ""
+    },
+    "configurable": true,
+    "action": {
+      "activationType": "standalone",
+      "actionCost": null,
+      "actionImage": "",
+      "duration": {
+        "precision": "0",
+        "value": 0
+      },
+      "uses": {
+        "hasUses": false,
+        "value": 0,
+        "max": 0,
+        "period": ""
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "modifiers": {
+        "fortune": 0,
+        "attackProfile": {
+          "attackType": "",
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "damage": [],
+          "finisherLimit": {
+            "value": 0,
+            "operator": ""
+          },
+          "attackMode": "",
+          "handsSupplied": 0
+        },
+        "guard": {
+          "self": {
+            "value": "",
+            "operator": ""
+          },
+          "target": {
+            "value": "",
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": 0,
+            "operator": ""
+          },
+          "target": {
+            "value": 0,
+            "operator": ""
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": 0,
+            "operator": ""
+          },
+          "target": {
+            "value": 0,
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": []
+        },
+        "actionCost": {
+          "value": 0,
+          "operator": ""
+        }
+      },
+      "attackProfile": {
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": 0,
+        "attackMode": "",
+        "damage": [],
+        "finisherLimit": 10
+      }
+    },
+    "skillType": "basic",
+    "path": {
+      "value": "",
+      "archetype": ""
+    },
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": "",
+    "abbrewId": {
+      "value": "abbrew.skill.attack.abbrewAttack0000",
+      "uuid": "abbrewAttack0000"
+    },
+    "isActivatable": false,
+    "skills": []
+  },
+  "effects": [],
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743073000940,
+    "modifiedTime": 1744236228090,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "ownership": {
+    "default": 0
+  },
+  "_id": "abbrewAttack0000",
+  "sort": 100000,
+  "_key": "!items!abbrewAttack0000"
+}

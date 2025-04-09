@@ -1,5 +1,6 @@
-import { getAttackSkillWithActions, getModifiedSkillActionCost, getParrySkillWithActions, handleSkillActivate, trackSkillDuration } from '../helpers/skill.mjs';
-import { doesNestedFieldExist, arrayDifference, getNumericParts, getSafeJson } from '../helpers/utils.mjs';
+import { getModifiedSkillActionCost, handleSkillActivate, trackSkillDuration } from '../helpers/skill.mjs';
+import { doesNestedFieldExist, arrayDifference, getNumericParts } from '../helpers/utils.mjs';
+import FundamentalSkills, { getAttackSkillWithActions, getParrySkillWithActions } from '../helpers/fundamental-skills.mjs';
 /**
  * Extend the basic Item with some very simple modifications.
  * @extends {Item}
@@ -121,11 +122,6 @@ export default class AbbrewItem extends Item {
     }
 
     const actor = tokens[0].actor;
-
-    if (action === "parry" && !actor.doesActorHaveSkillTrait("skillTraining", "defensiveSkills", "base", "parry")) {
-      ui.notifications.info("Please ensure you have the parry skill.");
-      return;
-    }
 
     if (action === "parry" && actor.doesActorHaveSkillDiscord("Parry")) {
       ui.notifications.info("You are prevented from parrying.");

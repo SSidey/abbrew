@@ -30,11 +30,13 @@
         <input type="text" name="system.skillTraits" value="{{system.skillTraits}}" data-dtype="String" k
           data-dropType="skillTrait" {{#unless (isGM)}}readonly{{/unless}} />
         <label class="resource-label">Synergy</label>
-        <input type="text" name="system.skillModifiers.synergy" value="{{system.skillModifiers.synergy}}"
-          data-dtype="String" data-dropType="skill" {{#unless (isGM)}}readonly{{/unless}} />
+        <input type="text" name="system.skillModifiers.synergy" class="drop-with-fundamentals"
+          value="{{system.skillModifiers.synergy}}" data-dtype="String" data-dropType="skill" {{#unless
+          (isGM)}}readonly{{/unless}}>
         <label class="resource-label">Discord</label>
-        <input type="text" name="system.skillModifiers.discord" value="{{system.skillModifiers.discord}}"
-          data-dtype="String" data-dropType="skill" {{#unless (isGM)}}readonly{{/unless}} />
+        <input type="text" name="system.skillModifiers.discord" class="drop-with-fundamentals"
+          value="{{system.skillModifiers.discord}}" data-dtype="String" data-dropType="skill" {{#unless
+          (isGM)}}readonly{{/unless}}>
       </div>
       <div>
         <h3>Granted Skills</h3>

@@ -184,6 +184,14 @@
     },
     "Traits": {
       "WoundImmunities": {
+        "physicalImmunity": "Physical Immunity",
+        "vitalImmunity": "Vital Immunity",
+        "burnImmunity": "Burn Immunity",
+        "exhaustionImmunity": "Exhaustion Immunity",
+        "terrorImmunity": "Terror Immunity",
+        "rageImmunity": "Rage Immunity",
+        "mutationImmunity": "Mutation Immunity",
+        "corruptionImmunity": "Corruption Immunity",
         "bleedImmunity": "Bleed Immunity",
         "burningImmunity": "Burning Immunity",
         "fatigueImmunity": "Fatigue Immunity",

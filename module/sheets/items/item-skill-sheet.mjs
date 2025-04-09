@@ -269,6 +269,7 @@ export class AbbrewSkillSheet extends ItemSheet {
         // TODO: Could add the baseline skills here to make sure they exist
         // const proxiedSkills = Object.entries(this.item?.actor?.system.proxiedSkills).filter(ps => ps[1]).map(ps => ({ value: CONFIG.ABBREW.proxiedSkills[ps[0]], id: ps[1] }));
         const settings = {
+            whitelist: CONFIG.ABBREW.fundamentalSkillSummaries,
             dropdown: {
                 maxItems: 20,               // <- mixumum allowed rendered suggestions
                 classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
@@ -278,7 +279,9 @@ export class AbbrewSkillSheet extends ItemSheet {
             },
             userInput: false,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
             duplicates: false,             // <- Should duplicate tags be allowed or not
+            placeholder: "Drop or select a skill"
         };
+
         if (skillSynergy) {
             var taggedSkillSynergy = new Tagify(skillSynergy, settings);
         }

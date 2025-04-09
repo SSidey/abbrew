@@ -16,7 +16,7 @@
       "discord": ""
     },
     "configurable": false,
-    "isActivatable": true,
+    "isActivatable": false,
     "skills": [],
     "action": {
       "activationType": "standalone",
@@ -177,7 +177,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743076241070,
-    "modifiedTime": 1744061114690,
+    "modifiedTime": 1744062120186,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!r7VMjvyw8EKDplwf"
