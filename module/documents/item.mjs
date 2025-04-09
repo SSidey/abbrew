@@ -130,7 +130,7 @@ export default class AbbrewItem extends Item {
 
     if (action === "parry") {
       const actions = this.getActionCostForAccept(data, action);
-      if (actions > 0 && !await actor.canActorUseActions(getModifiedSkillActionCost(actor, getParrySkillWithActions(actor, actions)))) {
+      if (actions > 0 && !await actor.canActorUseActions(getModifiedSkillActionCost(actor, getParrySkillWithActions(actions)))) {
         return;
       }
     }
@@ -196,8 +196,6 @@ export default class AbbrewItem extends Item {
     const attackProfile = this.system.attackProfiles[attackProfileId];
     const actionCost = attackMode === "overpower" ? this.system.exertActionCost : this.system.actionCost;
 
-    const id = actor.system.proxiedSkills[attackMode];
-
     let combineForSkill = actor.items.filter(i => i.type === "skill").find(s => s._id === actor.system.combinedAttacks.combineFor);
 
     if (!combineForSkill) {
@@ -238,7 +236,7 @@ export default class AbbrewItem extends Item {
       return;
     }
 
-    const attackSkill = getAttackSkillWithActions(id, this.name, actionCost, this.img, attackProfile, attackMode, this.system.handsSupplied);
+    const attackSkill = getAttackSkillWithActions(null, this.name, actionCost, this.img, attackProfile, attackMode, this.system.handsSupplied);
 
     await handleSkillActivate(actor, attackSkill);
   }

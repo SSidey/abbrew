@@ -358,14 +358,6 @@ ABBREW.attackModes = {
   "finisher": "ABBREW.AttackModes.finisher"
 }
 
-ABBREW.proxiedSkills = {
-  "attack": "Attack",
-  "parry": "Parry",
-  "feint": "Feint",
-  "overpower": "Overpower",
-  "finisher": "Finisher"
-}
-
 ABBREW.modify = {
   "skip": "Skip",
   "all": "Modify All",
@@ -377,7 +369,8 @@ ABBREW.fundamentalAttackSkills = {
   "attack": { id: "abbrewAttack0000", name: "Attack", image: "systems/abbrew/assets/icons/skills/attack.svg" },
   "parry": { id: "abbrewParry00000", name: "Parry", image: "systems/abbrew/assets/icons/skills/parry.svg" },
   "feint": { id: "abbrewFeint00000", name: "Feint", image: "systems/abbrew/assets/icons/skills/feint.svg" },
-  "finisher": { id: "abbrewFinisher00", name: "Finisher", image: "systems/abbrew/assets/icons/skills/finisher.svg" }
+  "finisher": { id: "abbrewFinisher00", name: "Finisher", image: "systems/abbrew/assets/icons/skills/finisher.svg" },
+  "overpower": { id: "abbrewOverpower0", name: "Parry", image: "systems/abbrew/assets/icons/skills/overpower.svg" },
 }
 
 ABBREW.fundamentalAttributeSkills = {
@@ -396,6 +389,7 @@ ABBREW.fundamentalSkillSummaries = [
   { id: "abbrewParry00000", value: "Parry", sourceId: "Compendium.abbrew.skills.Item.abbrewParry00000" },
   { id: "abbrewFeint00000", value: "Feint", sourceId: "Compendium.abbrew.skills.Item.abbrewFeint00000" },
   { id: "abbrewFinisher00", value: "Finisher", sourceId: "Compendium.abbrew.skills.Item.abbrewFinisher00" },
+  { id: "abbrewOverpower0", value: "Overpower", sourceId: "Compendium.abbrew.skills.Item.abbrewOverpower0" },
   { id: "abbrewStrCheck00", value: "Strength Check", sourceId: "Compendium.abbrew.skills.Item.abbrewStrCheck00" },
   { id: "abbrewDexCheck00", value: "Dexterity Check", sourceId: "Compendium.abbrew.skills.Item.abbrewDexCheck00" },
   { id: "abbrewAgiCheck00", value: "Agility Check", sourceId: "Compendium.abbrew.skills.Item.abbrewAgiCheck00" },

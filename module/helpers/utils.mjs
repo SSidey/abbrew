@@ -96,7 +96,11 @@ export async function renderSheetForStoredItem(event, actor, inspectionClass) {
         }
     } else if (sourceId) {
         const source = await fromUuid(sourceId);
-        source.sheet.render(true);
+        if (source) {
+            source.sheet.render(true);
+        } else {
+            ui.notifications.warn("The item is not on your sheet, have you deleted it?");
+        }
     }
 }
 

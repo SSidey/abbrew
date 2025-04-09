@@ -300,7 +300,7 @@ async function cleanTemporarySkill(skill, actor) {
 async function handlePairedSkills(skill, actor) {
     if (skill.system.skills.paired.length > 0) {
         skill.system.skills.paired.forEach(async ps => {
-            const pairedSkill = actor.items.filter(i => i.type === "skill" && i.system.isActivatable).find(s => s.system.abbrewId.uuid === foundry.utils.parseUuid(ps.sourceId).id);
+            const pairedSkill = actor.items.filter(i => i.type === "skill" && i.system.isActivatable).find(s => s.system.abbrewId.uuid === ps.id);
             await handleSkillActivate(actor, pairedSkill);
         });
     }

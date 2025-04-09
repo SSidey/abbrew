@@ -139,14 +139,6 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       })
     });
 
-    schema.proxiedSkills = new fields.SchemaField({
-      attack: new fields.StringField({ ...blankString }),
-      parry: new fields.StringField({ ...blankString }),
-      feint: new fields.StringField({ ...blankString }),
-      overpower: new fields.StringField({ ...blankString }),
-      finisher: new fields.StringField({ ...blankString })
-    });
-
     schema.skillTraining = new fields.ArrayField(
       new fields.SchemaField({
         type: new fields.StringField({ ...blankString }),
@@ -272,11 +264,6 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     this._prepareDefenses();
 
     this._prepareResolve();
-
-    Object.keys(this.proxiedSkills).forEach(ps => {
-      const item = this.parent.items.find(i => i.name.toLowerCase() === ps);
-      this.proxiedSkills[ps] = item?.system.abbrewId.uuid;
-    });
 
     const skillTraining = this.parent.items.filter(i => i.type === "skill").filter(s => s.system.skillTraits).flatMap(s => getSafeJson(s.system.skillTraits, []).filter(st => st.feature === "skillTraining").map(st => st.data)).reduce((result, st) => { if (st in result) { result[st] += 1; } else { result[st] = 1; } return result; }, {});
     const mappedTraining = Object.entries(skillTraining).map(e => ({ type: e[0], value: e[1] }));

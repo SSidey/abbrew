@@ -106,6 +106,12 @@
         "critical": 10,
         "handsSupplied": null,
         "attackMode": "",
+        "finisher": {
+          "type": "",
+          "cost": null,
+          "description": "",
+          "wounds": []
+        },
         "damage": [],
         "finisherLimit": 10
       }

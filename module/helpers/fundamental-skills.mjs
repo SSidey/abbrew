@@ -1,11 +1,11 @@
 export function getAttackSkillWithActions(id, name, actionCost, image, attackProfile, attackMode, handsSupplied) {
     const skill = CONFIG.ABBREW.fundamentalAttackSkills[attackMode];
     return ({
-        _id: skill.id,
+        _id: id ?? skill.id,
         name: name,
         system: {
             abbrewId: {
-                uuid: id
+                uuid: id ?? skill.id
             },
             isActivatable: true,
             skillTraits: [],
@@ -37,7 +37,7 @@ export function getAttackSkillWithActions(id, name, actionCost, image, attackPro
                     max: 0
                 },
                 isActive: false,
-                attackProfile: { ...attackProfile, attackMode: attackMode, handsSupplied: handsSupplied, critical: 11 - handsSupplied, isEnabled: true },
+                attackProfile: { ...attackProfile, attackMode: attackMode, handsSupplied: handsSupplied, critical: 11 - handsSupplied, isEnabled: true, finisher: { cost: 0, wounds: [] } },
                 modifiers: {
                     fortune: 0,
                     attackProfile: {},
@@ -111,7 +111,7 @@ export function getParrySkillWithActions(actionCost) {
             },
             action: {
                 activationType: "standalone",
-                actionCost: actionCost,
+                actionCost: Math.max(1, actionCost),
                 actionImage: skill.image,
                 duration: {
                     precision: "0",

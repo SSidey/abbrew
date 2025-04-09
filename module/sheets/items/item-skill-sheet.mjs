@@ -160,7 +160,7 @@ export class AbbrewSkillSheet extends ItemSheet {
                 const item = await fromUuid(eventJson.uuid);
                 if (item.type === "skill") {
                     const storedSkills = getObjectValueByStringPath(this.item, `system.skills.${collection}`);
-                    const updateSkills = [...storedSkills, { name: item.name, id: item._id, image: item.img, sourceId: item.uuid }];
+                    const updateSkills = [...storedSkills, { name: item.name, id: item.system.abbrewId.uuid, image: item.img, sourceId: item.uuid }];
                     const updateKey = `system.skills.${collection}`
                     const update = {};
                     update[updateKey] = updateSkills;
@@ -266,8 +266,6 @@ export class AbbrewSkillSheet extends ItemSheet {
     _activateSkillModifiers(html) {
         const skillSynergy = html[0].querySelector('input[name="system.skillModifiers.synergy"]');
         const skillDiscord = html[0].querySelector('input[name="system.skillModifiers.discord"]');
-        // TODO: Could add the baseline skills here to make sure they exist
-        // const proxiedSkills = Object.entries(this.item?.actor?.system.proxiedSkills).filter(ps => ps[1]).map(ps => ({ value: CONFIG.ABBREW.proxiedSkills[ps[0]], id: ps[1] }));
         const settings = {
             whitelist: CONFIG.ABBREW.fundamentalSkillSummaries,
             dropdown: {

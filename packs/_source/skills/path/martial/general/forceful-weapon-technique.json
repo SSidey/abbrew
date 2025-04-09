@@ -11,7 +11,7 @@
       "value": "abbrew.skill.forcefulweapontechnique.bAGeebFps0nxhDtE",
       "uuid": "bAGeebFps0nxhDtE"
     },
-    "skillTraits": "[{\"key\":\"overpowerTraining\",\"value\":\"Overpower Training\",\"feature\":\"skillTraining\",\"subFeature\":\"offensiveSkills\",\"effect\":\"increase\",\"data\":\"overpower\"}]",
+    "skillTraits": "[{\"key\":\"overpowerBaseTraining\",\"value\":\"Overpower Base\",\"feature\":\"skillTraining\",\"subFeature\":\"offensiveSkills\",\"effect\":\"base\",\"data\":\"overpower\"}]",
     "skillModifiers": {
       "synergy": "",
       "discord": ""
@@ -149,7 +149,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743457627370,
-    "modifiedTime": 1744134274209,
+    "modifiedTime": 1744239865044,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!bAGeebFps0nxhDtE"
