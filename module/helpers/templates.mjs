@@ -24,6 +24,7 @@ export const preloadHandlebarsTemplates = async function () {
     'systems/abbrew/templates/item/parts/skill-type.hbs',
     'systems/abbrew/templates/item/parts/skill-actions.hbs',
     'systems/abbrew/templates/item/parts/skill-damage.hbs',
+    'systems/abbrew/templates/item/parts/modifier-builder-field.hbs',
     // Chat Cards.
     'systems/abbrew/templates/chat/skill-card.hbs',
     'systems/abbrew/templates/chat/finisher-card.hbs',

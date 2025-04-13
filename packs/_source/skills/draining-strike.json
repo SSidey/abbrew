@@ -1,0 +1,217 @@
+{
+  "name": "Draining Strike",
+  "type": "skill",
+  "_id": "DKO4k6RIfayVJR7A",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "abbrew.skill.drainingstrike.DKO4k6RIfayVJR7A",
+      "uuid": "DKO4k6RIfayVJR7A"
+    },
+    "skillTraits": "",
+    "skillModifiers": {
+      "synergy": "[{\"id\":\"abbrewAttack0000\",\"value\":\"Attack\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewAttack0000\"}]",
+      "discord": ""
+    },
+    "configurable": true,
+    "isActivatable": true,
+    "activateOnCreate": false,
+    "applyTurnStart": false,
+    "applyTurnEnd": false,
+    "applyOnExpiry": false,
+    "skills": {
+      "granted": [],
+      "paired": [],
+      "grantedOnActivation": [],
+      "grantedOnAccept": [
+        {
+          "name": "Draining Strike - Heal",
+          "id": "OE3lzNqUJhEGzN0N",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.OE3lzNqUJhEGzN0N",
+          "skillType": "",
+          "grantTimes": 0
+        }
+      ]
+    },
+    "resource": {
+      "capacity": 0,
+      "operator": "",
+      "relatedResource": null
+    },
+    "action": {
+      "activationType": "synergy",
+      "actionCost": "1",
+      "actionImage": "",
+      "duration": {
+        "precision": "0",
+        "value": 0,
+        "expireOnStartOfTurn": true
+      },
+      "uses": {
+        "hasUses": false,
+        "asStacks": false,
+        "value": 0,
+        "max": 0,
+        "period": "",
+        "removeWhenNoUsesRemain": false
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "skillRequest": {
+        "isContested": false,
+        "selfRolls": {
+          "checkType": "",
+          "modifiers": [],
+          "results": {
+            "success": {
+              "description": "",
+              "grantedSkills": ""
+            },
+            "failure": {
+              "description": "",
+              "grantedSkills": ""
+            }
+          }
+        },
+        "targetRolls": {
+          "checkType": "",
+          "modifiers": [],
+          "results": {
+            "success": {
+              "description": "",
+              "grantedSkills": ""
+            },
+            "failure": {
+              "description": "",
+              "grantedSkills": ""
+            }
+          }
+        }
+      },
+      "attackProfile": {
+        "isEnabled": true,
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": 0,
+        "attackMode": "",
+        "finisher": {
+          "type": "",
+          "cost": null,
+          "description": "",
+          "wounds": []
+        },
+        "damage": [],
+        "finisherLimit": 10
+      },
+      "modifiers": {
+        "fortune": 0,
+        "actionCost": {
+          "value": 0,
+          "operator": ""
+        },
+        "attackProfile": {
+          "combineAttacks": {
+            "isEnabled": false,
+            "value": null
+          },
+          "attackType": "",
+          "attackMode": "",
+          "handsSupplied": 0,
+          "finisherLimit": {
+            "value": 10,
+            "operator": ""
+          },
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "finisher": {
+            "cost": null,
+            "wounds": []
+          },
+          "damage": []
+        },
+        "guard": {
+          "self": {
+            "value": "",
+            "operator": ""
+          },
+          "target": {
+            "value": "",
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": 0,
+            "operator": ""
+          },
+          "target": {
+            "value": 0,
+            "operator": ""
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": 0,
+            "operator": ""
+          },
+          "target": {
+            "value": 0,
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": []
+        }
+      }
+    },
+    "skillType": "path",
+    "path": {
+      "value": "",
+      "archetype": ""
+    },
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": ""
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1744319408339,
+    "modifiedTime": 1744319972718,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!DKO4k6RIfayVJR7A"
+}

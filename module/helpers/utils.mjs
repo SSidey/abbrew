@@ -35,6 +35,10 @@ export function arrayDifference(a, b) {
 /* -------------------------------------------- */
 
 export function getObjectValueByStringPath(entity, path) {
+    if (!entity || !path) {
+        return 0;
+    }
+
     return path.split('.').reduce(function (o, k) {
         return o && o[k];
     }, entity);

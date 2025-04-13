@@ -20,6 +20,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
         schema.applyTurnStart = new fields.BooleanField({ required: true, initial: false });
         schema.applyTurnEnd = new fields.BooleanField({ required: true, initial: false });
         schema.applyOnExpiry = new fields.BooleanField({ required: true, initial: false });
+        schema.activateOnDamageAccept = new fields.BooleanField({ required: true, initial: false });
         schema.skills = new fields.SchemaField({
             granted: new fields.ArrayField(
                 new fields.SchemaField({
@@ -39,8 +40,17 @@ export default class AbbrewSkill extends AbbrewItemBase {
                     sourceId: new fields.StringField({ required: true, blank: true }),
                 })
             ),
-            // TODO: Implement Grant on use
             grantedOnActivation: new fields.ArrayField(
+                new fields.SchemaField({
+                    name: new fields.StringField({ required: true, blank: true }),
+                    skillType: new fields.StringField({ required: true, blank: true }),
+                    id: new fields.StringField({ required: true, blank: true }),
+                    image: new fields.StringField({ required: true, blank: true }),
+                    sourceId: new fields.StringField({ required: true, blank: true }),
+                    grantTimes: new fields.NumberField({ ...requiredInteger, initial: 0 })
+                })
+            ),
+            grantedOnAccept: new fields.ArrayField(
                 new fields.SchemaField({
                     name: new fields.StringField({ required: true, blank: true }),
                     skillType: new fields.StringField({ required: true, blank: true }),
@@ -51,10 +61,12 @@ export default class AbbrewSkill extends AbbrewItemBase {
                 })
             )
         });
+        // TODO: Fill on create?
         schema.resource = new fields.SchemaField({
             capacity: new fields.NumberField({ ...requiredInteger, initial: 0 }),
             operator: new fields.StringField({ required: true, blank: true }),
-            relatedResource: new fields.StringField({ nullable: true, initial: null })
+            relatedResource: new fields.StringField({ nullable: true, initial: null }),
+            fillCapacityOnCreate: new fields.BooleanField({ required: true, initial: false })
         })
         schema.action = new fields.SchemaField({
             activationType: new fields.StringField({ ...blankString }),
@@ -203,63 +215,63 @@ export default class AbbrewSkill extends AbbrewItemBase {
                 }),
                 guard: new fields.SchemaField({
                     self: new fields.SchemaField({
-                        value: new fields.StringField({ ...blankString }),
+                        value: this.getModifierBuilderField(),
                         operator: new fields.StringField({ ...blankString })
                     }),
                     target: new fields.SchemaField({
-                        value: new fields.StringField({ ...blankString }),
+                        value: this.getModifierBuilderField(true),
                         operator: new fields.StringField({ ...blankString })
                     })
                 }),
                 risk: new fields.SchemaField({
                     self: new fields.SchemaField({
-                        value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                        value: this.getModifierBuilderField(),
                         operator: new fields.StringField({ ...blankString })
                     }),
                     target: new fields.SchemaField({
-                        value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-                        operator: new fields.StringField({ ...blankString })
+                        value: this.getModifierBuilderField(true),
+                        operator: new fields.StringField({ ...blankString }),
+                        lateParse: new fields.BooleanField({ required: true, initial: false })
                     })
                 }),
                 wounds: new fields.SchemaField({
                     self: new fields.ArrayField(
                         new fields.SchemaField({
                             type: new fields.StringField({ ...blankString }),
-                            value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-                            // TODO: Should be Increase/Suppress/Reduce
+                            value: this.getModifierBuilderField(),
                             operator: new fields.StringField({ ...blankString })
                         })
                     ),
                     target: new fields.ArrayField(
                         new fields.SchemaField({
                             type: new fields.StringField({ ...blankString }),
-                            value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                            value: this.getModifierBuilderField(true),
                             operator: new fields.StringField({ ...blankString })
                         })
                     )
                 }),
                 resolve: new fields.SchemaField({
                     self: new fields.SchemaField({
-                        value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                        value: this.getModifierBuilderField(),
                         operator: new fields.StringField({ ...blankString })
                     }),
                     target: new fields.SchemaField({
-                        value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-                        operator: new fields.StringField({ ...blankString })
+                        value: this.getModifierBuilderField(true),
+                        operator: new fields.StringField({ ...blankString }),
                     })
                 }),
                 resources: new fields.SchemaField({
                     self: new fields.ArrayField(
                         new fields.SchemaField({
                             summary: new fields.StringField({ required: true, blank: true }),
-                            value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                            value: this.getModifierBuilderField(false),
                             operator: new fields.StringField({ ...blankString }),
                         })
                     ),
                     target: new fields.ArrayField(
                         new fields.SchemaField({
                             summary: new fields.StringField({ required: true, blank: true }),
-                            value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                            value: this.getModifierBuilderField(true),
                             operator: new fields.StringField({ ...blankString }),
                         })
                     ),
@@ -294,6 +306,21 @@ export default class AbbrewSkill extends AbbrewItemBase {
         schema.attributeRankIncrease = new fields.StringField({ ...blankString });
 
         return schema;
+    }
+
+    static getModifierBuilderField(lateParseInitial = false) {
+        const fields = foundry.data.fields;
+        const blankString = { required: true, blank: true }
+        const requiredNumber = { required: true, nullable: false };
+        return new fields.ArrayField(
+            new fields.SchemaField({
+                operator: new fields.StringField({ ...blankString }),
+                type: new fields.StringField({ ...blankString }),
+                path: new fields.StringField({ ...blankString }),
+                multiplier: new fields.NumberField({ ...requiredNumber, initial: 1 }),
+                lateParse: new fields.BooleanField({ required: true, initial: lateParseInitial })
+            })
+        );
     }
 
     prepareBaseData() {

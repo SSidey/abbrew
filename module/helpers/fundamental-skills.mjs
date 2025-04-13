@@ -15,7 +15,9 @@ export function getAttackSkillWithActions(id, name, actionCost, image, attackPro
             attributeRankIncrease: "",
             skills: {
                 granted: [],
-                paired: []
+                paired: [],
+                grantedOnActivation: [],
+                grantedOnAccept: [],
             },
             action: {
                 activationType: "standalone",

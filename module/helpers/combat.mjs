@@ -199,19 +199,12 @@ async function updateTurnStartWounds(actor) {
     const lingeringWoundTypes = foundry.utils.deepClone(CONFIG.ABBREW.lingeringWoundTypes);
     const woundToLingeringWounds = foundry.utils.deepClone(CONFIG.ABBREW.woundToLingeringWounds);
     const woundImmunities = getWoundImmunities(actor);
-    const woundSuppressions = actor.items.filter(i => i.type === "skill").filter(s => s.system.action.modifiers.wounds.self.some(w => w.operator === "suppress")).filter(s => !s.system.isActivatable || (actor.system.activeSkills.includes(s._id))).flatMap(s => s.system.action.modifiers.wounds.self.filter(w => w.operator === "suppress")).reduce((result, ws) => {
-        if (ws.type in result) {
-            result[ws.type] = result[ws.type] + ws.value;
-        } else {
-            result[ws.type] = ws.value;
-        }
-
-        return result;
-    }, {})
+    const woundSuppressors = getWoundsWithOperator(actor, "suppress");
+    const woundIntensifiers = getWoundsWithOperator(actor, "intensify");
     const activeLingeringWounds = actor.system.wounds.filter(w => lingeringWoundTypes.some(lw => w.type === lw)).filter(w => !woundImmunities.includes(w.type)).filter(w => w.value > 0);
     if (activeLingeringWounds.length > 0) {
         const appliedLingeringWounds = {};
-        activeLingeringWounds.flatMap(lw => woundToLingeringWounds[lw.type].map(lwt => ({ type: lwt, value: Math.max(0, (lw.value - (woundSuppressions[lw.type] ?? 0))) }))).reduce((appliedLingeringWounds, wound) => {
+        activeLingeringWounds.flatMap(lw => woundToLingeringWounds[lw.type].map(lwt => ({ type: lwt, value: Math.max(0, (lw.value - (woundSuppressors[lw.type] ?? 0) + (woundIntensifiers[lw.type] ?? 0))) }))).reduce((appliedLingeringWounds, wound) => {
             if (wound.type in appliedLingeringWounds) {
                 appliedLingeringWounds[wound.type] += wound.value;
             } else {
@@ -227,6 +220,18 @@ async function updateTurnStartWounds(actor) {
             await updateActorWounds(actor, mergeActorWounds(actor, fullWoundUpdate));
         }
     }
+}
+
+function getWoundsWithOperator(actor, operator) {
+    return actor.items.filter(i => i.type === "skill").filter(s => s.system.action.modifiers.wounds.self.some(w => w.operator === operator)).filter(s => !s.system.isActivatable || (actor.system.activeSkills.includes(s._id))).flatMap(s => s.system.action.modifiers.wounds.self.filter(w => w.operator === operator)).reduce((result, ws) => {
+        if (ws.type in result) {
+            result[ws.type] = result[ws.type] + ws.value;
+        } else {
+            result[ws.type] = ws.value;
+        }
+
+        return result;
+    }, {})
 }
 
 async function applyActiveSkills(actor, turnPhase) {

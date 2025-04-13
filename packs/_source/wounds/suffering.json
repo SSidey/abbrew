@@ -1,0 +1,35 @@
+{
+  "name": "Suffering",
+  "type": "wound",
+  "_id": "9DAggRUYSbG1lSlR",
+  "img": "systems/abbrew/assets/icons/wounds/suffering.webp",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "wound": {
+      "type": "suffering",
+      "value": 1
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1744324315582,
+    "modifiedTime": 1744324438095,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!9DAggRUYSbG1lSlR"
+}

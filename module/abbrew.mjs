@@ -210,6 +210,16 @@ Handlebars.registerHelper('isGM', function () {
   return game.user.isGM;
 })
 
+Handlebars.registerHelper("eagerEvaluation", function (value, ...replacements) {
+  const regex = /{{[^{}]*}}/g;
+
+  for (let i = 0; i < replacements.length - 1; i++) {
+    value = value.replace(regex, replacements[i]);
+  }
+
+  return value;
+})
+
 /* -------------------------------------------- */
 /*  Ready Hook                                  */
 /* -------------------------------------------- */

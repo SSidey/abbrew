@@ -144,6 +144,11 @@ export class AbbrewSkillSheet extends ItemSheet {
             await renderSheetForTaggedData(event, this.actor);
         })
 
+        html.find(".modifier-control").click(event => {
+            const t = event.currentTarget;
+            if (t.dataset.action) this._onModifierControlAction(t, t.dataset.action);
+        });
+
         html.on('dragover', (event) => {
             event.preventDefault();
         });
@@ -309,6 +314,63 @@ export class AbbrewSkillSheet extends ItemSheet {
                 taggedResourceDrops.push(taggedResourceDrop);
             });
         }
+    }
+
+    _onModifierControlAction(target, action) {
+        if (this.item.system.configurable) {
+            switch (action) {
+                case "add-modifier":
+                    return this.addModifier(target);
+                case "remove-modifier":
+                    return this.removeModifier(target);
+            }
+        }
+    }
+
+    addModifier(target) {
+        const dataset = target.closest("li").dataset;
+        const parent = target.closest(".modifier-field-parent");
+        if (parent) {
+            const parentDataset = parent.dataset;
+            const parentId = parentDataset.id;
+            const parentPath = parentDataset.path;
+            const parentField = foundry.utils.deepClone(getObjectValueByStringPath(this.item, parentPath));
+            parentField[parentId].value = [...parentField[parentId].value, {}];
+            const update = {};
+            update[parentPath] = parentField;
+            return this.item.update(update);
+        } else {
+            const path = dataset.path;
+            const modifierBuilderField = foundry.utils.deepClone(getObjectValueByStringPath(this.item, path));
+            const updatedField = [...modifierBuilderField, {}];
+            const update = {};
+            update[path] = updatedField;
+            return this.item.update(update);
+        }
+    }
+
+    removeModifier(target) {
+        const dataset = target.closest("li").dataset;
+        const parent = target.closest(".modifier-field-parent");
+        const id = dataset.id;
+        if (parent) {
+            const parentDataset = parent.dataset;
+            const parentId = parentDataset.id;
+            const parentPath = parentDataset.path;
+            const parentField = foundry.utils.deepClone(getObjectValueByStringPath(this.item, parentPath));
+            parentField[parentId].value.splice(Number(id), 1);
+            const update = {};
+            update[parentPath] = parentField;
+            return this.item.update(update);
+        } else {
+            const path = dataset.path;
+            const modifierBuilderField = foundry.utils.deepClone(getObjectValueByStringPath(this.item, path));
+            modifierBuilderField.splice(Number(id), 1);
+            const update = {};
+            update[path] = modifierBuilderField;
+            return this.item.update(update);
+        }
+
     }
 
     /**

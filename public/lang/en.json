@@ -50,6 +50,7 @@
       "add": "Increase",
       "minus": "Reduce",
       "suppress": "Suppress",
+      "intensify": "Intensify",
       "upgrade": "Upgrade",
       "downgrade": "Downgrade"
     },
@@ -138,7 +139,11 @@
       "instability": "Instability",
       "mutation": "Mutation",
       "sin": "Sin",
-      "corruption": "Corruption"
+      "corruption": "Corruption",
+      "suffering": "Suffering",
+      "pain": "Pain",
+      "torment": "Torment",
+      "anguish": "Anguish"
     },
     "EFFECT": {
       "Status": {
@@ -224,14 +229,21 @@
       "hour": "Hour",
       "day": "Day",
       "permanent": "Permanent"
+    },
+    "ModifierPrefixes": {
+      "numeric": "Numeric",
+      "actor": "Actor",
+      "item": "Item",
+      "resource": "Resource",
+      "damageLastDealt": "Last Damage Dealt",
+      "damageLastReceived": "Last Damage Taken",
+      "damageRoundReceived": "Round Damage Taken"
     }
   },
-
   "Speeds": {
     "walk": "Walk",
     "dash": "Dash"
   },
-
   "TYPES": {
     "Actor": {
       "character": "Character",
@@ -251,7 +263,6 @@
       "skillDeck": "Skill Deck"
     }
   },
-
   "SETTINGS.AnnounceTurnStart.Name": "Announce Turn Start",
   "SETTINGS.AnnounceTurnStart.Hint": "Announce turn start to chat."
 }

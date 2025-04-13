@@ -66,6 +66,16 @@
     <i class="fa fa-toggle-off"></i>
     {{/if}}
 </label>
+<label class="slide-toggle roboto-upper">
+    <input type="checkbox" class="action-activatable" name="system.activateOnDamageAccept" {{ checked
+        system.activateOnDamageAccept }}>
+    <span>Activate On Damage Accept</span>
+    {{#if system.activateOnDamageAccept}}
+    <i class="fa fa-toggle-on"></i>
+    {{else}}
+    <i class="fa fa-toggle-off"></i>
+    {{/if}}
+</label>
 <div class="skill-paired-row">
     <div class="skill-element-2">
         <label>Action Cost</label>
@@ -147,16 +157,16 @@
                     data-dtype="Number" />
             </div>
             <div class="skill-element-2">
-                <label>Maximum Uses</label>
-                <input type="text" name="system.action.uses.max" value="{{system.action.uses.max}}"
-                    data-dtype="Number" />
-            </div>
-            <div class="skill-element-2">
                 <label>Restored Every</label>
                 <select name="system.action.uses.period">
                     {{selectOptions config.durationsLabels selected=system.action.uses.period blank=""
                     localize=true}}
                 </select>
+            </div>
+            <div class="skill-element-2">
+                <label>Maximum Uses</label>
+                <input type="text" name="system.action.uses.max" value="{{system.action.uses.max}}"
+                    data-dtype="Number" />
             </div>
         </div>
         {{/if}}
@@ -594,69 +604,75 @@
             <h3>Guard</h3>
             <div>
                 <label>Self</label>
-                <input type="text" name="system.action.modifiers.guard.self.value"
-                    value="{{system.action.modifiers.guard.self.value}}" data-dtype="String" />
                 <label>{{ localize "ABBREW.Operator" }}</label>
                 <select name="system.action.modifiers.guard.self.operator">
                     {{selectOptions config.operators selected=system.action.modifiers.guard.self.operator blank=""
                     localize=true}}
                 </select>
+                {{> "systems/abbrew/templates/item/parts/modifier-builder-field.hbs"
+                modifierList=system.action.modifiers.guard.self.value
+                modifierListName="system.action.modifiers.guard.self.value" config=config}}
             </div>
             <div>
                 <label>Target</label>
-                <input type="text" name="system.action.modifiers.guard.target.value"
-                    value="{{system.action.modifiers.guard.target.value}}" data-dtype="String" />
                 <label>{{ localize "ABBREW.Operator" }}</label>
                 <select name="system.action.modifiers.guard.target.operator">
                     {{selectOptions config.operators selected=system.action.modifiers.guard.target.operator blank=""
                     localize=true}}
                 </select>
+                {{> "systems/abbrew/templates/item/parts/modifier-builder-field.hbs"
+                modifierList=system.action.modifiers.guard.target.value
+                modifierListName="system.action.modifiers.guard.target.value" allowLateParse=true config=config}}
             </div>
         </div>
         <div>
             <h3>Risk</h3>
             <div>
                 <label>Self</label>
-                <input type="text" name="system.action.modifiers.risk.self.value"
-                    value="{{system.action.modifiers.risk.self.value}}" data-dtype="String" />
                 <label>{{ localize "ABBREW.Operator" }}</label>
                 <select name="system.action.modifiers.risk.self.operator">
                     {{selectOptions config.operators selected=system.action.modifiers.risk.self.operator blank=""
                     localize=true}}
                 </select>
+                {{> "systems/abbrew/templates/item/parts/modifier-builder-field.hbs"
+                modifierList=system.action.modifiers.risk.self.value
+                modifierListName="system.action.modifiers.risk.self.value" config=config}}
             </div>
             <div>
                 <label>Target</label>
-                <input type="text" name="system.action.modifiers.risk.target.value"
-                    value="{{system.action.modifiers.risk.target.value}}" data-dtype="String" />
                 <label>{{ localize "ABBREW.Operator" }}</label>
                 <select name="system.action.modifiers.risk.target.operator">
                     {{selectOptions config.operators selected=system.action.modifiers.risk.target.operator blank=""
                     localize=true}}
                 </select>
+                {{> "systems/abbrew/templates/item/parts/modifier-builder-field.hbs"
+                modifierList=system.action.modifiers.risk.target.value
+                modifierListName="system.action.modifiers.risk.target.value" allowLateParse=true config=config}}
             </div>
         </div>
         <div>
             <h3>Resolve</h3>
             <div>
                 <label>Self</label>
-                <input type="text" name="system.action.modifiers.resolve.self.value"
-                    value="{{system.action.modifiers.resolve.self.value}}" data-dtype="String" />
                 <label>{{ localize "ABBREW.Operator" }}</label>
                 <select name="system.action.modifiers.resolve.self.operator">
                     {{selectOptions config.operators selected=system.action.modifiers.resolve.self.operator blank=""
                     localize=true}}
                 </select>
+                {{> "systems/abbrew/templates/item/parts/modifier-builder-field.hbs"
+                modifierList=system.action.modifiers.resolve.self.value
+                modifierListName="system.action.modifiers.resolve.self.value" config=config}}
             </div>
             <div>
                 <label>Target</label>
-                <input type="text" name="system.action.modifiers.resolve.target.value"
-                    value="{{system.action.modifiers.resolve.target.value}}" data-dtype="String" />
                 <label>{{ localize "ABBREW.Operator" }}</label>
                 <select name="system.action.modifiers.resolve.target.operator">
                     {{selectOptions config.operators selected=system.action.modifiers.resolve.target.operator blank=""
                     localize=true}}
                 </select>
+                {{> "systems/abbrew/templates/item/parts/modifier-builder-field.hbs"
+                modifierList=system.action.modifiers.resolve.target.value
+                modifierListName="system.action.modifiers.resolve.target.value" allowLateParse=true config=config}}
             </div>
         </div>
         <div>
@@ -665,13 +681,9 @@
                 <h4>Self</h4>
                 <ol class="form-list wound-modifier-container">
                     {{#each system.action.modifiers.wounds.self as |wound k|}}
-                    <li class="item resource grid-3col" data-id="{{k}}">
-                        <div>
-                            <label>Value</label>
-                            <input type="text" name="system.action.modifiers.wounds.self.{{k}}.value"
-                                value="{{wound.value}}" data-dtype="Number" />
-                        </div>
-                        <div>
+                    <li class="item resource skill-wound-modifier modifier-field-parent wound-modifier" data-id="{{k}}"
+                        data-path="system.action.modifiers.wounds.self">
+                        <div class="wound-modifier-type">
                             <label>Type</label>
                             <select name="system.action.modifiers.wounds.self.{{k}}.type">
                                 {{selectOptions ../config.wounds selected=wound.type
@@ -679,22 +691,31 @@
                                 localize=true}}
                             </select>
                         </div>
-                        <label>{{ localize "ABBREW.Operator" }}</label>
-                        <select name="system.action.modifiers.wounds.self.{{k}}.operator">
-                            {{selectOptions ../config.woundOperators selected=wound.operator
-                            blank=""
-                            localize=true}}
-                        </select>
-                        <div>
+                        <div class="wound-modifier-operator">
+                            <label>{{ localize "ABBREW.Operator" }}</label>
+                            <select name="system.action.modifiers.wounds.self.{{k}}.operator">
+                                {{selectOptions ../config.woundOperators selected=wound.operator
+                                blank=""
+                                localize=true}}
+                            </select>
+                        </div>
+                        <div class="wound-remove">
                             <a class="skill-action-modifier-wound-control"
                                 data-action="remove-skill-action-modifier-wound-self">
                                 <i class="fa-solid fa-minus"></i>
                             </a>
                         </div>
+                        <div class="wound-modifier-value">
+                            <label>Value</label>
+                            {{> "systems/abbrew/templates/item/parts/modifier-builder-field.hbs"
+                            modifierList=wound.value
+                            modifierListName=(eagerEvaluation "system.action.modifiers.wounds.self.{{k}}.value" k)
+                            config=../config}}
+                        </div>
                     </li>
                     {{/each}}
                     <li class="skillModifierWound add">
-                        <div class="form-group">
+                        <div class="form-group wound-add">
                             <label>
                                 <a class="skill-action-modifier-wound-control"
                                     data-action="add-skill-action-modifier-wound-self">
@@ -706,17 +727,14 @@
                     </li>
                 </ol>
             </div>
+            <br />
             <div>
                 <h4>Target</h4>
                 <ol class="form-list wound-modifier-container">
                     {{#each system.action.modifiers.wounds.target as |wound k|}}
-                    <li class="item resource grid-3col" data-id="{{k}}">
-                        <div>
-                            <label>Value</label>
-                            <input type="text" name="system.action.modifiers.wounds.target.{{k}}.value"
-                                value="{{wound.value}}" data-dtype="Number" />
-                        </div>
-                        <div>
+                    <li class="item resource grid-3col modifier-field-parent wound-modifier" data-id="{{k}}"
+                        data-path="system.action.modifiers.wounds.target">
+                        <div class="wound-modifier-type">
                             <label>Type</label>
                             <select name="system.action.modifiers.wounds.target.{{k}}.type">
                                 {{selectOptions ../config.wounds selected=wound.type
@@ -724,21 +742,31 @@
                                 localize=true}}
                             </select>
                         </div>
-                        <label>{{ localize "ABBREW.Operator" }}</label>
-                        <select name="system.action.modifiers.wounds.target.{{k}}.operator">
-                            {{selectOptions ../config.operators selected=wound.operator
-                            blank=""
-                            localize=true}}
-                        </select>
-                        <div>
+                        <div class="wound-modifier-operator">
+                            <label>{{ localize "ABBREW.Operator" }}</label>
+                            <select name="system.action.modifiers.wounds.target.{{k}}.operator">
+                                {{selectOptions ../config.operators selected=wound.operator
+                                blank=""
+                                localize=true}}
+                            </select>
+                        </div>
+                        <div class="wound-remove">
                             <a class="skill-action-modifier-wound-control"
                                 data-action="remove-skill-action-modifier-wound-target">
                                 <i class="fa-solid fa-minus"></i>
                             </a>
                         </div>
+                        <div class="wound-modifier-value">
+                            <label>Value</label>
+                            {{> "systems/abbrew/templates/item/parts/modifier-builder-field.hbs"
+                            modifierList=wound.value
+                            modifierListName=(eagerEvaluation "system.action.modifiers.wounds.target.{{k}}.value" k)
+                            allowLateParse=true
+                            config=../config}}
+                        </div>
                     </li>
                     {{/each}}
-                    <li class="skillModifierWound add">
+                    <li class="skillModifierWound add wound-add">
                         <div class="form-group">
                             <label>
                                 <a class="skill-action-modifier-wound-control"
@@ -758,35 +786,41 @@
                 <h4>Self</h4>
                 <ol class="form-list resource-modifier-container">
                     {{#each system.action.modifiers.resources.self as |resource k|}}
-                    <li class="item resource grid-3col" data-id="{{k}}">
-                        <div>
+                    <li class="item resource modifier-field-parent resource-modifier" data-id="{{k}}"
+                        data-path="system.action.modifiers.resources.self">
+                        <div class="resource-modifier-type">
                             <label class="resource-label">Type</label>
                             <input type="text" name="system.action.modifiers.resources.self.{{k}}.summary"
                                 class="resource-drop" value="{{resource.summary}}" data-dtype="String"
                                 data-dropType="skill" data-dropSkillType="resource" data-dropTarget="self" {{#unless
                                 (isGM)}}readonly{{/unless}} />
                         </div>
-                        <div>
-                            <label>Value</label>
-                            <input type="text" name="system.action.modifiers.resources.self.{{k}}.value"
-                                value="{{resource.value}}" data-dtype="Number" />
+                        <div class="resource-modifier-operator">
+                            <label>{{ localize "ABBREW.Operator" }}</label>
+                            <select name="system.action.modifiers.resources.self.{{k}}.operator">
+                                {{selectOptions ../config.operators selected=resource.operator
+                                blank=""
+                                localize=true}}
+                            </select>
                         </div>
-                        <label>{{ localize "ABBREW.Operator" }}</label>
-                        <select name="system.action.modifiers.resources.self.{{k}}.operator">
-                            {{selectOptions ../config.operators selected=resource.operator
-                            blank=""
-                            localize=true}}
-                        </select>
-                        <div>
+                        <div class="resource-remove">
                             <a class="skill-action-modifier-resource-control"
                                 data-action="remove-skill-action-modifier-resource-self">
                                 <i class="fa-solid fa-minus"></i>
                             </a>
                         </div>
+                        <div class="resource-modifier-value">
+                            <label>Value</label>
+                            {{> "systems/abbrew/templates/item/parts/modifier-builder-field.hbs"
+                            modifierList=resource.value
+                            modifierListName=(eagerEvaluation "system.action.modifiers.resources.self.{{k}}.value" k)
+                            allowLateParse=false
+                            config=../config}}
+                        </div>
                     </li>
                     {{/each}}
                     <li class="skillModifierResource add">
-                        <div class="form-group">
+                        <div class="form-group resource-add">
                             <label>
                                 <a class="skill-action-modifier-resource-control"
                                     data-action="add-skill-action-modifier-resource-self">
@@ -802,35 +836,41 @@
                 <h4>Target</h4>
                 <ol class="form-list resource-modifier-container">
                     {{#each system.action.modifiers.resources.target as |resource k|}}
-                    <li class="item resource grid-3col" data-id="{{k}}">
-                        <div>
+                    <li class="item resource modifier-field-parent resource-modifier" data-id="{{k}}"
+                        data-path="system.action.modifiers.resources.target">
+                        <div class="resource-modifier-type">
                             <label class="resource-label">Type</label>
                             <input type="text" name="system.action.modifiers.resources.target.{{k}}.summary"
                                 class="resource-drop" value="{{resource.summary}}" data-dtype="String"
                                 data-dropType="skill" data-dropSkillType="resource" data-dropTarget="target" {{#unless
                                 (isGM)}}readonly{{/unless}} />
                         </div>
-                        <div>
-                            <label>Value</label>
-                            <input type="text" name="system.action.modifiers.resources.target.{{k}}.value"
-                                value="{{resource.value}}" data-dtype="Number" />
+                        <div class="resource-modifier-operator">
+                            <label>{{ localize "ABBREW.Operator" }}</label>
+                            <select name="system.action.modifiers.resources.target.{{k}}.operator">
+                                {{selectOptions ../config.operators selected=resource.operator
+                                blank=""
+                                localize=true}}
+                            </select>
                         </div>
-                        <label>{{ localize "ABBREW.Operator" }}</label>
-                        <select name="system.action.modifiers.resources.target.{{k}}.operator">
-                            {{selectOptions ../config.operators selected=resource.operator
-                            blank=""
-                            localize=true}}
-                        </select>
-                        <div>
+                        <div class="resource-remove">
                             <a class="skill-action-modifier-resource-control"
                                 data-action="remove-skill-action-modifier-resource-target">
                                 <i class="fa-solid fa-minus"></i>
                             </a>
                         </div>
+                        <div class="resource-modifier-value">
+                            <label>Value</label>
+                            {{> "systems/abbrew/templates/item/parts/modifier-builder-field.hbs"
+                            modifierList=resource.value
+                            modifierListName=(eagerEvaluation "system.action.modifiers.resources.target.{{k}}.value" k)
+                            allowLateParse=true
+                            config=../config}}
+                        </div>
                     </li>
                     {{/each}}
                     <li class="skillModifierResource add">
-                        <div class="form-group">
+                        <div class="form-group resource-add">
                             <label>
                                 <a class="skill-action-modifier-resource-control"
                                     data-action="add-skill-action-modifier-resource-target">

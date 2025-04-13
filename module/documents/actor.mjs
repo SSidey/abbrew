@@ -1,7 +1,8 @@
 import { mergeActorWounds } from "../helpers/combat.mjs";
-import { applySkillEffects, handleSkillActivate, isSkillBlocked } from "../helpers/skill.mjs";
+import { applyOperator, getOrderForOperator } from "../helpers/operators.mjs";
+import { applySkillEffects, handleSkillActivate, isSkillBlocked, mergeModifiers, parseModifierFieldValue, reduceParsedModifiers } from "../helpers/skill.mjs";
 import { getAttackerAdvantageGuardResult, getAttackerAdvantageRiskResult, getDefenderAdvantageGuardResult, getDefenderAdvantageRiskResult } from "../helpers/trainedSkills.mjs";
-import { getObjectValueByStringPath } from "../helpers/utils.mjs";
+import { compareModifierIndices, getObjectValueByStringPath } from "../helpers/utils.mjs";
 import { FINISHERS } from "../static/finishers.mjs";
 
 /**
@@ -57,25 +58,32 @@ export default class AbbrewActor extends Actor {
   async takeActionUpdates(data) {
     const updates = {};
     data.targetUpdates.forEach(update => {
-      const current = getObjectValueByStringPath(this, update.path)
-      updates[update.path] = current + update.value;
+      const current = getObjectValueByStringPath(this, update.path);
+      let updatedValue = current;
+      if (update && update.update.length > 0) {
+        updatedValue = mergeModifiers(update.update.map(u => ({ value: reduceParsedModifiers(parseModifierFieldValue(u.values, this)), operator: u.operator })).flat(), current);
+        updates[update.path] = updatedValue;
+      }
     });
-    await this.update(updates);
+
+    if (Object.keys(updates).length > 0) {
+      await this.update(updates);
+    }
+
+    // TODO: Report on the result?
+    return updates;
   }
 
   async takeActionWounds(data) {
     if (data.targetWounds) {
       const currentWounds = this.system.wounds;
-      const updateWounds = Object.entries(data.targetWounds.reduce((result, wound) => {
-        if (currentWounds.some(w => w.type === wound.type)) {
-          result[wound.type] = currentWounds.find(w => w.type === wound.type).value + wound.value;
-        } else {
-          result[wound.type] = wound.value;
-        }
+      const updateWounds = Object.entries(
+        data.targetWounds.map(w => ({ ...w, value: reduceParsedModifiers(parseModifierFieldValue(w.value, this)), index: getOrderForOperator(w.operator) })).sort(getOrderForOperator)
+          .reduce((result, wound) => {
+            result[wound.type] = applyOperator((result[wound.type] ?? 0), wound.value, wound.operator);
 
-        return result;
-      }, currentWounds)).map(e => ({ type: e[0], value: e[1] })).filter(w => w.value > 0);
-      // TODO: Check this output, seems funky for the resources
+            return result;
+          }, currentWounds)).map(e => ({ type: e[0], value: e[1] })).filter(w => w.value > 0);
       await this.update({ "system.wounds": updateWounds });
     }
   }
@@ -83,7 +91,8 @@ export default class AbbrewActor extends Actor {
   async takeActionResources(data) {
     if (data.targetResources) {
       const baseResources = this.system.resources.values.reduce((result, resource) => { result[resource.id] = resource.value; return result; }, {});
-      const updateResources = Object.entries(data.targetResources.reduce((result, resource) => {
+      const resourceModifiers = data.targetResources.map(r => ({ id: r.id, operator: r.operator, value: reduceParsedModifiers(parseModifierFieldValue(r.value)) }));
+      const updateResources = Object.entries(resourceModifiers.reduce((result, resource) => {
         const id = resource.id;
         if (id in baseResources) {
           result[id] = Math.max(0, Math.min(baseResources[id] + resource.value, this.system.resources.owned.find(r => r.id === id).max));
@@ -116,13 +125,24 @@ export default class AbbrewActor extends Actor {
     const updates = { "system.defense.guard.value": await this.calculateGuard(damage + overFlow, guard, data.isFeint, data.isStrongAttack, action, attackingActorParryCounter, attackingActorFeint), "system.defense.risk.raw": updateRisk };
     await this.update(updates);
     await this.renderAttackResultCard(data, action);
-    await this.activateDamageTakenSkill(data.damage);
+    await this.activateDamageTakenSkill();
+    await this.handleSkillsGrantedOnAccept(data);
     return this;
   }
 
+  async handleSkillsGrantedOnAccept(data) {
+    data.skillsGrantedOnAccept.forEach(async s => {
+      const skill = await fromUuid(s.sourceId);
+      if (skill) {
+        await Item.create(skill, { parent: this });
+      }
+    });
+  }
+
   async activateDamageTakenSkill(damage) {
-    // TODO: Add skill, handle activation, should trigger any synergies, may need another activate function to allow for lastdamagetaken
-    // TODO: Proxied skills that are expected to be owned should have an id set by default, add that as whitelist to tagify, still allowing for drag/drop otherwise
+    this.items.filter(i => i.type === "skill").filter(s => s.system.activateOnDamageAccept).forEach(async s => {
+      await handleSkillActivate(this, s, false);
+    })
   }
 
   async takeAttack(data, rolls, action) {
@@ -147,8 +167,8 @@ export default class AbbrewActor extends Actor {
     const totalRisk = this.applyModifiersToRisk(rolls, data);
     let finisherCost = 0;
     let finisher = null;
-    const uniqueFinisher = Object.values(data.finisher)[0];
-    if (uniqueFinisher.type && uniqueFinisher.text) {
+    const uniqueFinisher = data.finisher ? Object.values(data.finisher)[0] : null;
+    if (uniqueFinisher?.type && uniqueFinisher?.text) {
       finisherCost = Object.keys(data.finisher)[0];
       const finisherConstruct = data.finisher;
       this.getFinisherCost(finisherConstruct, totalRisk, data.attackProfile);
@@ -195,7 +215,9 @@ export default class AbbrewActor extends Actor {
 
   getAvailableFinishersForDamageType(data) {
     // TODO: Only looking at main damage type?
-    return data.damage[0].damageType in FINISHERS ? FINISHERS[data.damage[0].damageType] : FINISHERS['physical'];
+    if (data.damage[0]) {
+      return data.damage[0].damageType in FINISHERS ? FINISHERS[data.damage[0].damageType] : FINISHERS['physical'];
+    }
   }
 
   getFinisherCost(availableFinishers, risk, attackProfile) {

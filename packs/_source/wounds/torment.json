@@ -1,0 +1,35 @@
+{
+  "name": "Torment",
+  "type": "wound",
+  "_id": "fDV4UllAliLgQBr0",
+  "img": "systems/abbrew/assets/icons/wounds/torment.webp",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "wound": {
+      "type": "torment",
+      "value": 1
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1744324393736,
+    "modifiedTime": 1744324466693,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!fDV4UllAliLgQBr0"
+}

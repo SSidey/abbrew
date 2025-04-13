@@ -58,17 +58,28 @@ ABBREW.skillActivationTypes = {
 ABBREW.EquippedWeapon = "ABBREW.EquippedWeapon";
 ABBREW.Damage = "ABBREW.Damage";
 ABBREW.operator = "ABBREW.Operator"
-ABBREW.operators = {
-  equal: "ABBREW.Operators.equal",
+
+ABBREW.simpleNumericOperators = {
+  add: "+",
+  minus: "-",
+}
+
+ABBREW.simpleOperators = {
   add: "ABBREW.Operators.add",
   minus: "ABBREW.Operators.minus",
+}
+
+ABBREW.operators = {
+  equal: "ABBREW.Operators.equal",
+  ...ABBREW.simpleOperators,
   upgrade: "ABBREW.Operators.upgrade",
   downgrade: "ABBREW.Operators.downgrade"
 }
 
 ABBREW.woundOperators = {
   ...ABBREW.operators,
-  suppress: "ABBREW.Operators.suppress"
+  suppress: "ABBREW.Operators.suppress",
+  intensify: "ABBREW.Operators.intensify"
 }
 
 ABBREW.Defense = {
@@ -214,7 +225,27 @@ ABBREW.wounds = {
     name: "ABBREW.Wounds.corruption",
     lingeringWounds: [],
     concepts: ["corruption"]
-  }
+  },
+  suffering: {
+    name: "ABBREW.Wounds.suffering",
+    lingeringWounds: ["pain"],
+    concepts: ["pain"]
+  },
+  pain: {
+    name: "ABBREW.Wounds.pain",
+    lingeringWounds: [],
+    concepts: ["pain"]
+  },
+  torment: {
+    name: "ABBREW.Wounds.torment",
+    lingeringWounds: ["anguish"],
+    concepts: ["mind"]
+  },
+  anguish: {
+    name: "ABBREW.Wounds.anguish",
+    lingeringWounds: [],
+    concepts: ["mind"]
+  },
 }
 
 ABBREW.acuteWounds = Object.entries(ABBREW.wounds).filter(w => w[1].lingeringWounds.length === 0).map(w => w[0]);
@@ -399,3 +430,13 @@ ABBREW.fundamentalSkillSummaries = [
   { id: "abbrewVisCheck00", value: "Visualisation Check", sourceId: "Compendium.abbrew.skills.Item.abbrewVisCheck00" },
   { id: "abbrewWilCheck00", value: "Will Check", sourceId: "Compendium.abbrew.skills.Item.abbrewWilCheck00" },
 ]
+
+ABBREW.modifierPrefixes = {
+  "numeric": "ABBREW.ModifierPrefixes.numeric",
+  "actor": "ABBREW.ModifierPrefixes.actor",
+  "item": "ABBREW.ModifierPrefixes.item",
+  "resource": "ABBREW.ModifierPrefixes.resource",
+  "damagelastDealt": "ABBREW.ModifierPrefixes.damageLastDealt",
+  "damagelastReceived": "ABBREW.ModifierPrefixes.damageLastReceived",
+  "damageroundReceived": "ABBREW.ModifierPrefixes.damageRoundReceived",
+}

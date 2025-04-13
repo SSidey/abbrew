@@ -1,0 +1,35 @@
+{
+  "name": "Anguish",
+  "type": "wound",
+  "_id": "vEQonNCO6QLsxMFY",
+  "img": "systems/abbrew/assets/icons/wounds/anguish.webp",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "wound": {
+      "type": "anguish",
+      "value": 1
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1744324338197,
+    "modifiedTime": 1744324419787,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!vEQonNCO6QLsxMFY"
+}

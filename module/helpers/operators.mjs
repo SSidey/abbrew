@@ -26,10 +26,14 @@ export function getOrderForOperator(operator) {
     switch (operator) {
         case "equal":
             return 0;
-        case "add":
+        case "downgrade":
             return 1;
-        case "minus":
+        case "upgrade":
             return 2;
+        case "add":
+            return 3;
+        case "minus":
+            return 4;
         default:
             return -1;
     }
