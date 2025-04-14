@@ -17,6 +17,16 @@
             value="{{system.resource.relatedResource}}" data-dtype="String" data-dropType="skill"
             data-dropSkillType="resource" data-dropTarget="relatedResource" {{#unless (isGM)}}readonly{{/unless}} />
     </div>
+    <label class="slide-toggle roboto-upper">
+        <input type="checkbox" class="action-activatable" name="system.resource.fillCapacityOnCreate" {{ checked
+            system.resource.fillCapacityOnCreate }}>
+        <span>Fill on Create</span>
+        {{#if system.resource.fillCapacityOnCreate}}
+        <i class="fa fa-toggle-on"></i>
+        {{else}}
+        <i class="fa fa-toggle-off"></i>
+        {{/if}}
+    </label>
 </div>
 {{/if}}
 {{#unless (eq system.skillType "resource")}}
@@ -139,6 +149,16 @@
         </label>
         {{#if system.action.uses.hasUses}}
         <div class="skill-section">
+            <label class="slide-toggle roboto-upper">
+                <input type="checkbox" class="action-activatable" name="system.action.uses.asStacks" {{ checked
+                    system.action.uses.asStacks }}>
+                <span>Display as Stacks</span>
+                {{#if system.action.uses.asStacks}}
+                <i class="fa fa-toggle-on"></i>
+                {{else}}
+                <i class="fa fa-toggle-off"></i>
+                {{/if}}
+            </label>
             {{#if (eq system.skillType "temporary")}}
             <label class="slide-toggle roboto-upper">
                 <input type="checkbox" name="system.action.uses.removeWhenNoUsesRemain" {{ checked

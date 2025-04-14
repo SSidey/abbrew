@@ -252,7 +252,7 @@ async function applyActiveSkills(actor, turnPhase) {
 }
 
 async function rechargePerRoundSkills(actor) {
-    const roundUseSkills = actor.items.filter(i => i.type === "skill" && i.system.action.uses.hasUses && ["turn", "round"].includes(i.system.action.uses.period))
+    const roundUseSkills = actor.items.filter(i => i.type === "skill" && !i.system.action.uses.asStacks && i.system.action.uses.hasUses && ["turn", "round"].includes(i.system.action.uses.period))
     for (const index in roundUseSkills) {
         await roundUseSkills[index].update({ "system.action.uses.value": roundUseSkills[index].system.action.uses.max });
     }

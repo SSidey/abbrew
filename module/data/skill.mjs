@@ -61,10 +61,11 @@ export default class AbbrewSkill extends AbbrewItemBase {
                 })
             )
         });
-        // TODO: Fill on create?
         schema.resource = new fields.SchemaField({
             capacity: new fields.NumberField({ ...requiredInteger, initial: 0 }),
             operator: new fields.StringField({ required: true, blank: true }),
+            // Used to modify other resource capacities.
+            // This should be null for base resources.
             relatedResource: new fields.StringField({ nullable: true, initial: null }),
             fillCapacityOnCreate: new fields.BooleanField({ required: true, initial: false })
         })

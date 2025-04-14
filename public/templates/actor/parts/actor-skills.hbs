@@ -9,6 +9,15 @@
   <li class='item flexrow items-header skill-header' data-skill-section="{{localize (skillType)}}">
     <div class='item-name'>{{localize (skillType)}}</div>
     <div class='item-controls'>
+      <label class="slide-toggle roboto-upper">
+        <input type="checkbox" name="system.action.uses.hasUses" {{ checked system.action.uses.hasUses }}>
+        <span>Has Uses?</span>
+        {{#if system.action.uses.hasUses}}
+        <i class="fa fa-toggle-on"></i>
+        {{else}}
+        <i class="fa fa-toggle-off"></i>
+        {{/if}}
+      </label>
       <a class='item-control item-create' title='Create item' data-type='skill' data-skill-type={{skillType}}>
         <i class='fas fa-plus'></i>
         {{localize 'DOCUMENT.New' type='skill'}}
