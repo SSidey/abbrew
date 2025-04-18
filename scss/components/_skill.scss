@@ -158,9 +158,19 @@ div.skill-card.skill-active {
             grid-column: 1 / 3;
 
             .editor.prosemirror {
-                height: 200px;
+                height: 300px;
             }
         }
+    }
+}
+
+.skill-check-result {
+    .editor-content {
+        height: 30px;
+    }
+
+    .editor.prosemirror {
+        height: 300px;
     }
 }
 
@@ -324,4 +334,10 @@ div.skill-card.skill-active {
     .wound-add {
         grid-column: 1 / 21;
     }
+}
+
+.attribute-check:hover, .attribute-check:focus {
+    color: #000;
+    text-shadow: 0 0 10px red;
+    cursor: pointer;
 }

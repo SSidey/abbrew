@@ -61,7 +61,7 @@ export default class AbbrewActor extends Actor {
       const current = getObjectValueByStringPath(this, update.path);
       let updatedValue = current;
       if (update && update.update.length > 0) {
-        updatedValue = mergeModifiers(update.update.map(u => ({ value: reduceParsedModifiers(parseModifierFieldValue(u.values, this)), operator: u.operator })).flat(), current);
+        updatedValue = mergeModifiers(update.update.map(u => ({ value: reduceParsedModifiers(parseModifierFieldValue(u.values, this, this)), operator: u.operator })).flat(), current);
         updates[update.path] = updatedValue;
       }
     });
@@ -78,7 +78,7 @@ export default class AbbrewActor extends Actor {
     if (data.targetWounds) {
       const currentWounds = this.system.wounds;
       const updateWounds = Object.entries(
-        data.targetWounds.map(w => ({ ...w, value: reduceParsedModifiers(parseModifierFieldValue(w.value, this)), index: getOrderForOperator(w.operator) })).sort(getOrderForOperator)
+        data.targetWounds.map(w => ({ ...w, value: reduceParsedModifiers(parseModifierFieldValue(w.value, this, this)), index: getOrderForOperator(w.operator) })).sort(getOrderForOperator)
           .reduce((result, wound) => {
             result[wound.type] = applyOperator((result[wound.type] ?? 0), wound.value, wound.operator);
 
@@ -91,7 +91,7 @@ export default class AbbrewActor extends Actor {
   async takeActionResources(data) {
     if (data.targetResources) {
       const baseResources = this.system.resources.values.reduce((result, resource) => { result[resource.id] = resource.value; return result; }, {});
-      const resourceModifiers = data.targetResources.map(r => ({ id: r.id, operator: r.operator, value: reduceParsedModifiers(parseModifierFieldValue(r.value)) }));
+      const resourceModifiers = data.targetResources.map(r => ({ id: r.id, operator: r.operator, value: reduceParsedModifiers(parseModifierFieldValue(r.value, this, this)) }));
       const updateResources = Object.entries(resourceModifiers.reduce((result, resource) => {
         const id = resource.id;
         if (id in baseResources) {

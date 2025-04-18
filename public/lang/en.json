@@ -18,6 +18,10 @@
       "Anatomy": "Anatomy",
       "Skill": "Skill"
     },
+    "CheckTypes": {
+      "successes": "Successes",
+      "result": "Result"
+    },
     "Item": {
       "Spell": {
         "SpellLVL": "Level {level} Spells",
@@ -234,6 +238,7 @@
       "numeric": "Numeric",
       "actor": "Actor",
       "item": "Item",
+      "this": "This",
       "resource": "Resource",
       "damageLastDealt": "Last Damage Dealt",
       "damageLastReceived": "Last Damage Taken",

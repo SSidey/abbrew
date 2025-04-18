@@ -1,6 +1,7 @@
-import { getModifiedSkillActionCost, handleSkillActivate, trackSkillDuration } from '../helpers/skill.mjs';
+import { acceptSkillCheck, getModifiedSkillActionCost, handleSkillActivate, trackSkillDuration } from '../helpers/skill.mjs';
 import { doesNestedFieldExist, arrayDifference, getNumericParts } from '../helpers/utils.mjs';
 import { getAttackSkillWithActions, getParrySkillWithActions } from '../helpers/fundamental-skills.mjs';
+import { updateMessageForCheck } from '../socket.mjs';
 /**
  * Extend the basic Item with some very simple modifications.
  * @extends {Item}
@@ -107,11 +108,35 @@ export default class AbbrewItem extends Item {
     const action = button.dataset.action;
 
     switch (action) {
+      case 'check': await this._onAcceptCheckAction(message.rolls, message.flags.data, messageId); break;
       case 'damage': await this._onAcceptDamageAction(message.rolls, message.flags.data, action); break;
       case 'overpower': await this._onAcceptDamageAction(message.rolls, message.flags.data, action); break;
       case 'parry': await this._onAcceptDamageAction(message.rolls, message.flags.data, action); break;
       case 'finisher': await this._onAcceptFinisherAction(message.rolls, message.flags.data, action); break;
     }
+  }
+
+  static async _onAcceptCheckAction(rolls, data, messageId) {
+    const message = game.messages.get(messageId);
+    const tokens = canvas.tokens.controlled.filter((token) => token.actor);
+    if (tokens.length === 0) {
+      ui.notifications.info("Please select a token to accept the effect.");
+      return;
+    }
+
+    const actor = tokens[0].actor;
+
+    const result = await acceptSkillCheck(actor, data.skillCheckRequest);
+
+    const parsedResult = ({ name: result.actor.name, result: result.result, totalValue: result.totalValue, requiredValue: result.requiredValue, totalSuccesses: result.totalSuccesses, requiredSuccesses: result.requiredSuccesses, skillResult: result.skillResult, contestedResult: result.contestedResult })
+
+    let templateData = message.flags.abbrew.messasgeData.templateData;
+
+    templateData.skillCheck = templateData.skillCheck ? templateData.skillCheck : ({ attempts: [] });
+    templateData.skillCheck.attempts = [...templateData.skillCheck.attempts, parsedResult];
+
+    const html = await renderTemplate("systems/abbrew/templates/chat/skill-card.hbs", templateData);
+    await updateMessageForCheck(messageId, html, templateData);
   }
 
   static async _onAcceptDamageAction(rolls, data, action) {
@@ -149,6 +174,21 @@ export default class AbbrewItem extends Item {
     }
 
     await tokens[0].actor.takeFinisher(rolls, data);
+  }
+
+  async _preCreate(data, options, user) {
+    if (data.type === "skill") {
+      if (this.actor) {
+        const duplicateItem = this.actor.items.find(i => i.system.abbrewId.uuid === data.system.abbrewId.uuid);
+        if (duplicateItem) {
+          const uses = duplicateItem.system.action.uses;
+          if (uses.hasUses && uses.asStacks) {
+            await duplicateItem.update({ "system.action.uses.value": uses.value + data.system.action.uses.value });
+            return false;
+          }
+        }
+      }
+    }
   }
 
   async _onCreate(data, options, userId) {

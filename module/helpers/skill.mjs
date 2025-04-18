@@ -1,6 +1,7 @@
 import { applyOperator, getOrderForOperator } from "./operators.mjs";
 import { compareModifierIndices, getObjectValueByStringPath, getSafeJson } from "../helpers/utils.mjs"
 import { mergeWoundsWithOperator } from "./combat.mjs";
+import { getFundamentalAttributeSkill } from "./fundamental-skills.mjs";
 
 export async function handleSkillActivate(actor, skill, checkActions = true) {
     if (!skill.system.isActivatable) {
@@ -83,9 +84,9 @@ async function activateSkill(actor, skill) {
     if (await trackSkillDuration(actor, skill)) {
         await addSkillToActiveSkills(actor, skill);
     }
-    await applySkillEffects(actor, skill);
+    const skillResult = await applySkillEffects(actor, skill);
     await handleGrantOnUse(skill, actor);
-    return true;
+    return skillResult;
 }
 
 export function getModifiedSkillActionCost(actor, skill) {
@@ -112,6 +113,84 @@ function skillHasUsesRemaining(skill) {
     return (!skill.system.action.uses.hasUses && !skill.system.action.charges.hasCharges) || (skill.system.action.uses.hasUses && skill.system.action.uses.value > 0) || (skill.system.action.charges.hasCharges && skill.system.action.charges.value > 0);
 }
 
+export async function acceptSkillCheck(actor, requirements) {
+    const skill = getSkillById(actor, requirements.modifierIds);
+    if (skill && skill.system.action.skillCheck) {
+        const skillResult = await handleSkillActivate(actor, skill);
+        if (requirements.isContested) {
+            if (requirements.checkType === "successes") {
+                const requiredValues = requirements.contestedResult.dice.slice(0, requirements.contestedResult.baseDicePool).map(d => d.result + requirements.contestedResult.modifier).sort((a, b) => b - a);
+                const resultValues = skillResult.dice.slice(0, skillResult.baseDicePool).map(d => d.result + requirements.contestedResult.modifier).sort((a, b) => b - a);
+                const dicePoolDiff = requirements.contestedResult.dice.length - skillResult.dice.length;
+                const diceToCheck = Math.min(requirements.contestedResult.baseDicePool, skillResult.baseDicePool);
+                let requiredSuccesses = 0;
+                let providedSuccesses = 0;
+                if (dicePoolDiff > 0) {
+                    requiredSuccesses += dicePoolDiff;
+                } else if (dicePoolDiff < 0) {
+                    providedSuccesses += Math.abs(dicePoolDiff);
+                }
+
+                for (let i = 0; i < diceToCheck; i++) {
+                    if (requiredValues[i] >= resultValues[i]) {
+                        requiredSuccesses += 1;
+                    } else {
+                        providedSuccesses += 1;
+                    }
+                }
+
+                return ({ actor: actor, result: providedSuccesses > requiredSuccesses, totalSuccesses: providedSuccesses, requiredSuccesses: requiredSuccesses, skillResult: skillResult, contestedResult: requirements.contestedResult });
+            } else if (requirements.checkType === "result") {
+                const requiredValue = Math.max(...requirements.contestedResult.dice.map(d => d.result)) + requirements.contestedResult.modifier;
+                const totalValue = Math.max(...skillResult.dice.map(d => d.result)) + skillResult.modifier;
+                return ({ actor: actor, result: totalValue > requiredValue, totalValue: totalValue, requiredValue: requiredValue, skillResult: skillResult, contestedResult: requirements.contestedResult });
+            }
+        } else {
+            if (requirements.checkType === "successes") {
+                const diceResults = skillResult.dice.map(d => d.result + skillResult.modifier).reduce((result, value) => {
+                    if (value >= requirements.successes.requiredValue) {
+                        result += 1;
+                    }
+
+                    return result;
+                }, 0);
+                const critSuccesses = skillResult.dice.reduce((result, die) => {
+                    if (die.result === 10) {
+                        result += 1;
+                    }
+
+                    return result;
+                }, 0);
+                const totalSuccesses = diceResults + critSuccesses;
+                return ({ actor: actor, result: totalSuccesses >= requirements.successes.total, totalSuccesses: totalSuccesses, requiredSuccesses: requirements.successes.total, skillResult: skillResult });
+            } else if (requirements.checkType === "result") {
+                const requiredValue = requirements.result.requiredValue;
+                const totalValue = Math.max(...skillResult.dice.map(d => d.result)) + skillResult.modifier;
+                return ({ actor: actor, result: totalValue >= requiredValue, totalValue: totalValue, requiredValue: requiredValue, skillResult: skillResult });
+            }
+        }
+    }
+}
+
+function getSkillById(actor, skillIds) {
+    const actorSkills = actor.items.filter(i => i.type === "skill");
+    const fundamentalSkillIds = CONFIG.ABBREW.fundamentalAttributeSkillIds;
+    const fundamentalSkills = CONFIG.ABBREW.fundamentalAttributeSkills;
+
+    return skillIds.reduce((result, id) => {
+        if (!result) {
+            if (fundamentalSkillIds.includes(id)) {
+                const fundamental = fundamentalSkills[id];
+                result = getFundamentalAttributeSkill(fundamental);
+            } else {
+                result = actorSkills.find(s => s.system.abbrewId.uuid === id);
+            }
+        }
+
+        return result;
+    }, null);
+}
+
 export async function applySkillEffects(actor, skill) {
     await actor.unsetFlag("abbrew", "combat.damage.lastDealt");
     if (isSkillBlocked(actor, skill)) {
@@ -121,12 +200,13 @@ export async function applySkillEffects(actor, skill) {
 
     let updates = {};
 
-    const modifierSkills = getModifierSkills(actor, skill);
+    const mainModifierSkills = getModifierSkills(actor, skill);
+    const modifierSkills = [...mainModifierSkills, ...skill.system.siblingSkillModifiers];
     const allSkills = [...modifierSkills, skill].filter(s => !s.system.action.charges.hasCharges || (s.system.action.charges.value > 0));
     const allSummaries = allSkills.map(s => ({ name: s.name, description: s.system.description }));
     // Explicitly get any skills with charges for later use
-    const usesSkills = allSkills.filter(s => s.system.action.uses.hasUses).filter(s => s._id !== skill._id);
-    const chargedSkills = allSkills.filter(s => s.system.action.charges.hasCharges);
+    const usesSkills = [...mainModifierSkills, skill].filter(s => s.system.action.uses.hasUses).filter(s => s._id !== skill._id);
+    const chargedSkills = [...mainModifierSkills, skill].filter(s => s.system.action.charges.hasCharges);
 
     const prePhaseFilter = getPhaseFilter("pre");
     let guardSelfUpdate, riskSelfUpdate, resolveSelfUpdate;
@@ -146,35 +226,108 @@ export async function applySkillEffects(actor, skill) {
         }
         let currentUses = skill.system.action.uses.value
         const item = actor.items.find(i => i._id === skill._id);
+        if (item.system.action.uses.asStacks && !item.system.action.uses.removeStackOnUse) {
+            continue;
+        }
+
         await item.update({ "system.action.uses.value": currentUses -= 1 });
     }
+
     for (const index in chargedSkills) {
         const skill = chargedSkills[index];
         let currentCharges = skill.system.action.charges.value;
         const item = actor.items.find(i => i._id === skill._id);
         await item.update({ "system.action.charges.value": currentCharges -= 1 });
     }
-    for (const index in modifierSkills) {
-        const skill = modifierSkills[index];
+
+    for (const index in mainModifierSkills) {
+        const skill = mainModifierSkills[index];
         if (skill.system.action.duration.precision === "0") {
             const effect = actor.effects.find(e => e.flags?.abbrew?.skill?.trackDuration === skill._id);
             await effect?.delete();
         }
+        // Trigger modifier pairs early. TODO: Why?
         await handlePairedSkills(skill, actor);
     }
 
-    let templateData = { allSummaries: allSummaries };
+    const fortune = mergeFortune(allSkills);
+    const token = actor.token;
+    let templateData = { allSummaries: allSummaries, skillCheck: { attempts: [] } };
     let data = {};
+    let skillResult = { dice: [], modifier: 0, baseDicePool: 0 };
+
+    if (skill.system.action.skillCheck.length > 0) {
+        const combinedSkillModifier = allSkills
+            .flatMap(s => parseModifierFieldValue(s.system.action.skillCheck, actor, s))
+            .reduce((result, check) => {
+                result = applyOperator(result, check.path, check.operator);
+                return result;
+            }, 0);
+
+        const attributeTiers = allSkills.flatMap(s => s.system.action.skillCheck.filter(c => c.type === "actor" && c.path.includes("system.attributes") && c.path.includes("value")).map(a => getObjectValueByStringPath(actor, a.path.replace(".value", ".tier"))));
+
+        const tier = getTierFromArray(attributeTiers);
+        const critical = 10;
+        const rollFormula = getRollFormula(tier, critical, fortune);
+        const skillRoll = new Roll(rollFormula, skill.system.actor);
+        const result = await skillRoll.evaluate();
+        const resultDice = getResultDice(result);
+        skillResult.dice = resultDice;
+        skillResult.modifier = combinedSkillModifier;
+        const baseDicePool = getDiceCount(tier, fortune);
+        skillResult.baseDicePool = baseDicePool;
+        skillResult.simpleResult = baseDicePool === 0 ? combinedSkillModifier : Math.max(resultDice.slice(0, baseDicePool).map(d => d.result + combinedSkillModifier));
+        data.skillCheckResult = skillResult;
+        templateData = {
+            ...templateData,
+            showSkillResult: true,
+            skillResult: skillResult
+        };
+    }
+
+    if (skill.system.action.skillRequest.isEnabled) {
+        const skillRequest = skill.system.action.skillRequest;
+        let requirements = { modifierIds: [], checkType: skillRequest.checkType, isContested: skillRequest.isContested, successes: { total: 0, requiredValue: 0 }, result: { requiredValue: 0 }, contestedResult: { dice: [], modifier: 0 } };
+        const targetModifiers = getSafeJson(skillRequest.targetModifiers).map(m => m.id);
+        requirements.modifierIds = targetModifiers;
+        if (skillRequest.isContested) {
+            const modifierIds = getSafeJson(skillRequest.requirements.modifiers, []).map(m => m.id);
+            const skill = getSkillById(actor, modifierIds);
+            skill.system.siblingSkillModifiers.push(...modifierSkills);
+
+            if (skill) {
+                const contestResult = await handleSkillActivate(actor, skill);
+                requirements.contestedResult = contestResult;
+            }
+
+        } else {
+            requirements.isContested = false;
+            if (skillRequest.checkType === "successes") {
+                requirements.successes.total = skillRequest.requirements.successes;
+                requirements.successes.requiredValue = skillRequest.requirements.result;
+            } else if (skillRequest.checkType === "result") {
+                requirements.result.requiredValue = skillRequest.requirements.result;
+            }
+        }
+
+        if (skillRequest.selfCheck) {
+            const selfResult = await acceptSkillCheck(actor, requirements);
+        } else {
+            data.skillCheckRequest = requirements;
+            templateData = {
+                ...templateData,
+                showSkillRequest: true
+            };
+        }
+    }
+
     // TODO: Give another way to render the card and allow for an accept button
-    // TOOO: Enrich the editor for parsePath so parsed values can be manipulated
     if (skill.system.action.attackProfile.isEnabled) {
         const baseAttackProfile = skill.system.action.attackProfile;
-        const fortune = mergeFortune(allSkills);
         const attackProfile = mergeAttackProfiles(baseAttackProfile, modifierSkills);
-        const rollFormula = getRollFormula(actor.system.meta.tier.value, attackProfile, fortune);
+        const rollFormula = getRollFormula(actor.system.meta.tier.value, attackProfile.critical, fortune);
         const roll = new Roll(rollFormula, skill.system.actor);
         const result = await roll.evaluate();
-        const token = actor.token;
         const attackMode = attackProfile.attackMode;
         const attributeMultiplier = getAttributeModifier(attackMode, attackProfile);
         const damage = Object.entries(attackProfile.damage.map(d => {
@@ -182,11 +335,8 @@ export async function applySkillEffects(actor, skill) {
             if (d.attributeModifier) {
                 attributeModifier = Math.floor(attributeMultiplier * actor.system.attributes[d.attributeModifier].value);
             }
-            /* 
-                        Expects either a number value which will be returned early, or:
-                        actor.<actorId>
-             */
-            const finalDamage = Math.floor(d.overallMultiplier * (attributeModifier + (d.damageMultiplier * parsePath(d.value, actor))));
+
+            const finalDamage = Math.floor(d.overallMultiplier * (attributeModifier + (d.damageMultiplier * parsePath(d.value, actor, actor))));
 
             return { damageType: d.type, value: finalDamage };
         }).reduce((result, damage) => {
@@ -201,48 +351,19 @@ export async function applySkillEffects(actor, skill) {
 
         await actor.setFlag("abbrew", "combat.damage.lastDealt", damage);
 
-        const resultDice = result.dice[0].results.map(die => {
-            let baseClasses = "roll die d10";
-            if (die.success) {
-                baseClasses = baseClasses.concat(' ', 'success')
-            }
+        const resultDice = getResultDice(result);
 
-            if (die.exploded) {
-                baseClasses = baseClasses.concat(' ', 'exploded');
-            }
-
-            return { result: die.result, classes: baseClasses };
-        });
-
-        const totalSuccesses = result.dice[0].results.reduce((total, r) => {
-            if (r.success) {
-                total += 1;
-            }
-            return total;
-        }, 0) + attackProfile.lethal;
+        const totalSuccesses = getTotalSuccessesForResult(result);
 
 
-        const skillsGrantedOnAccept = mergeSkillsGrantedOnAccept(allSkills);
-        let targetUpdates = [];
-        let lateUpdates = [];
-        const targetPhaseFilter = getPhaseFilter("target");
-        const [, guardTargetUpdate] = mergeGuardTargetModifiers(allSkills, actor, targetPhaseFilter);
-        const [, riskTargetUpdate] = mergeRiskTargetModifiers(allSkills, actor, targetPhaseFilter);
-        const [, resolveTargetUpdate] = mergeResolveTargetModifiers(allSkills, actor, targetPhaseFilter);
-        targetUpdates = [guardTargetUpdate, riskTargetUpdate, resolveTargetUpdate];
-        const targetWounds = mergeWoundTargetModifiers(allSkills, actor, targetPhaseFilter);
-        const targetResources = mergeTargetResources(allSkills, actor, targetPhaseFilter);
         const finisher = attackMode === "finisher" ? mergeFinishers(baseAttackProfile, modifierSkills, actor) : null;
 
         const showAttack = ['attack', 'feint', 'finisher'].includes(attackMode);
         const isFeint = attackMode === 'feint';
-        // TODO: Remove
-        const showParry = true;
         const isStrongAttack = attackMode === 'overpower';
         const showFinisher = attackMode === 'finisher' || totalSuccesses > 0;
         const isFinisher = attackMode === 'finisher';
-        // TODO: Get all of the descriptions together into an array
-        // TODO: Update the chat card to display the descriptions
+
         templateData = {
             ...templateData,
             attackProfile,
@@ -255,8 +376,8 @@ export async function applySkillEffects(actor, skill) {
             showFinisher,
             isStrongAttack,
             isFinisher,
-            showParry,
-            actionCost: skill.system.action.actionCost
+            actionCost: skill.system.action.actionCost,
+            showAttackResult: true
         };
         data = {
             ...data,
@@ -268,14 +389,28 @@ export async function applySkillEffects(actor, skill) {
             attackingActor: actor,
             actionCost: skill.system.action.actionCost,
             attackerSkillTraining: actor.system.skillTraining,
-            targetUpdates: targetUpdates,
-            targetWounds: targetWounds,
             finisher: finisher,
-            targetResources: targetResources,
-            skillsGrantedOnAccept: skillsGrantedOnAccept,
-            lateUpdates: lateUpdates
         };
     }
+
+    // Target updates
+    const skillsGrantedOnAccept = mergeSkillsGrantedOnAccept(allSkills);
+    let targetUpdates = [];
+    const targetPhaseFilter = getPhaseFilter("target");
+    const [, guardTargetUpdate] = mergeGuardTargetModifiers(allSkills, actor, targetPhaseFilter);
+    const [, riskTargetUpdate] = mergeRiskTargetModifiers(allSkills, actor, targetPhaseFilter);
+    const [, resolveTargetUpdate] = mergeResolveTargetModifiers(allSkills, actor, targetPhaseFilter);
+    targetUpdates = [guardTargetUpdate, riskTargetUpdate, resolveTargetUpdate];
+    const targetWounds = mergeWoundTargetModifiers(allSkills, actor, targetPhaseFilter);
+    const targetResources = mergeTargetResources(allSkills, actor, targetPhaseFilter);
+
+    data = {
+        ...data,
+        targetUpdates: targetUpdates,
+        targetWounds: targetWounds,
+        targetResources: targetResources,
+        skillsGrantedOnAccept: skillsGrantedOnAccept,
+    };
 
     // TODO: Move this out of item and into a weapon.mjs / skill-card.mjs
     const html = await renderTemplate("systems/abbrew/templates/chat/skill-card.hbs", templateData);
@@ -289,7 +424,7 @@ export async function applySkillEffects(actor, skill) {
         rollMode: rollMode,
         flavor: label,
         content: html,
-        flags: { data: data }
+        flags: { data: data, abbrew: { messasgeData: { speaker: speaker, rollMode: rollMode, flavor: label, templateData: templateData } } }
     });
 
     updates, guardSelfUpdate, riskSelfUpdate, resolveSelfUpdate = {};
@@ -303,14 +438,61 @@ export async function applySkillEffects(actor, skill) {
     mergeResourceSelfModifiers(updates, allSkills, actor, postPhaseFilter);
     await actor.update(updates);
 
+    // Trigger Paired Skills after completion.
     await handlePairedSkills(skill, actor);
     await cleanTemporarySkills(skill, actor);
 
-    return {};
+    return skillResult;
 }
 
-function getLateParseUpdates(path, updates) {
-    return { path: path, updates: updates };
+function getTierFromArray(array) {
+    const arrayValue = Math.min(...array);
+    return arrayValue === Number.POSITIVE_INFINITY ? 0 : arrayValue;
+}
+
+function getResultDice(result) {
+    const groupedDice = result.dice[0].results.reduce((result, die) => {
+        if (result.base.length === 0) {
+            result.base.push(die);
+            return result;
+        }
+
+        if (result.base[result.base.length - 1].exploded && (result.stack.length === 0 || result.stack[result.stack.length - 1].exploded)) {
+            result.stack.push(die);
+        } else {
+            result.base.push(die);
+            result.explosions.push(...result.stack);
+            result.stack = [];
+        }
+
+        return result;
+    }, { base: [], stack: [], explosions: [] });
+
+    const orderedDice = [...groupedDice.base, ...groupedDice.explosions, ...groupedDice.stack];
+
+    return orderedDice.map(die => {
+        let baseClasses = "roll die d10";
+        if (die.success) {
+            baseClasses = baseClasses.concat(' ', 'success')
+        }
+
+        if (die.exploded) {
+            baseClasses = baseClasses.concat(' ', 'exploded');
+        }
+
+        return { result: die.result, classes: baseClasses };
+    });
+}
+
+function getTotalSuccessesForResult(result, lethal = 0) {
+    const totalSuccesses = result.dice[0].results.reduce((total, r) => {
+        if (r.success) {
+            total += 1;
+        }
+        return total;
+    }, 0);
+
+    return totalSuccesses > 0 ? totalSuccesses + lethal : totalSuccesses;
 }
 
 function mergeSkillsGrantedOnAccept(allSkills) {
@@ -396,7 +578,7 @@ function mergeSimpleSelfModifier(allSkills, actor, phaseFilter, operatorFunction
     let update = {};
     const phaseValidSkills = allSkills.filter(s => operatorFunction(s)).filter(s => phaseFilter(valueFunction(s)));
     const anyLateParse = phaseValidSkills.flatMap(s => valueFunction(s)).some(s => s.lateParse)
-    let modifiers = phaseValidSkills.map(s => ({ values: parseModifierFieldValue(valueFunction(s), actor), operator: operatorFunction(s) }));
+    let modifiers = phaseValidSkills.map(s => ({ values: parseModifierFieldValue(valueFunction(s), actor, s), operator: operatorFunction(s) }));
     if (!anyLateParse) {
         let updateValue = target === "self" ? getObjectValueByStringPath(actor, updatePath) : 0;
         updateValue = mergeModifiers(modifiers.map(m => ({ value: mergeModifiers(m.values.map(v => ({ value: v.path, operator: v.operator })), 0), operator: m.operator })).flat(), updateValue);
@@ -465,7 +647,7 @@ function mergeWoundSelfModifiers(updates, allSkills, actor, phaseFilter) {
             .filter(w => w.type && w.value != null && w.operator)
             .filter(w => !["suppress", "intensify"].includes(w.operator))
             .filter(s => phaseFilter(s.value))
-            .map(w => ({ ...w, value: mergeModifiers(parseModifierFieldValue(w.value, actor).map(r => ({ value: r.path, operator: r.operator })), 0), index: getOrderForOperator(w.operator) })))
+            .map(w => ({ ...w, value: mergeModifiers(parseModifierFieldValue(w.value, actor, w).map(r => ({ value: r.path, operator: r.operator })), 0), index: getOrderForOperator(w.operator) })))
         .sort(compareModifierIndices);
     if (woundModifiers.length > 0) {
         let updateWounds = actor.system.wounds;
@@ -478,9 +660,9 @@ function mergeWoundsForTarget(woundArrays, actor) {
     return Object.entries(woundArrays.reduce((result, woundArray) => {
         woundArray.filter(w => !["suppress", "intensify"].includes(w.operator)).forEach(w => {
             if (w.type in result) {
-                result[w.type] = applyOperator(result[w.type], parsePath(w.value, actor), w.operator);
+                result[w.type] = applyOperator(result[w.type], parsePath(w.value, actor, actor), w.operator);
             } else {
-                result[w.type] = applyOperator(0, parsePath(w.value, actor), w.operator);
+                result[w.type] = applyOperator(0, parsePath(w.value, actor, actor), w.operator);
             }
         });
 
@@ -495,7 +677,7 @@ function mergeWoundTargetModifiers(allSkills, actor, phaseFilter) {
             .filter(w => w.type && w.value != null && w.operator)
             .filter(w => !["suppress", "intensify"].includes(w.operator))
             .filter(s => phaseFilter(s.value))
-            .map(w => ({ ...w, value: parseModifierFieldValue(w.value, actor) })))
+            .map(w => ({ ...w, value: parseModifierFieldValue(w.value, actor, w) })))
         .sort(compareModifierIndices);
 }
 
@@ -519,7 +701,7 @@ function mergeResourceSelfModifiers(updates, allSkills, actor, phaseFilter) {
         .filter(s => phaseFilter(s.value))
         .filter(r => actor.system.resources.owned.some(o => o.id === r.id))
         .sort(compareModifierIndices)
-        .map(r => ({ id: r.id, operator: r.operator, value: reduceParsedModifiers(parseModifierFieldValue(r.value)) }));
+        .map(r => ({ id: r.id, operator: r.operator, value: reduceParsedModifiers(parseModifierFieldValue(r.value, null, r)) }));
 
     if (resourceModifiers.length > 0) {
         const baseValues = actor.system.resources.values ?? [];
@@ -672,12 +854,16 @@ function getAttributeModifier(attackMode, attackProfile) {
     }
 }
 
-function getRollFormula(tier, attackProfile, fortune) {
+function getRollFormula(tier, critical, fortune) {
     // 1d10x10cs10
-    const diceCount = tier + fortune;
-    const explodesOn = attackProfile.critical;
-    const successOn = attackProfile.critical;
-    return `${diceCount}d10x${explodesOn}cs${successOn}`;
+    const diceCount = getDiceCount(tier, fortune);
+    const explodesOn = critical;
+    const successOn = critical;
+    return `${diceCount}d10x>=${explodesOn}cs>=${successOn}`;
+}
+
+function getDiceCount(tier, fortune) {
+    return tier + fortune;
 }
 
 // [{ value: Number, operator: String }, ...], value: Number
@@ -794,7 +980,7 @@ export async function rechargeSkill(actor, skill) {
 
 // [{ operator: String, type: String, path: String, multiplier: Number, lateParse: Boolean }], actor
 // [{ operator: String, type: String, path: String, multiplier: Number, lateParse: Boolean }]
-export function parseModifierFieldValue(modifierFieldValue, actor) {
+export function parseModifierFieldValue(modifierFieldValue, actor, source) {
     const values = modifierFieldValue.filter(f => f.path !== "" && f.path != null && f.path !== undefined);
     const parsedValues = [];
 
@@ -809,7 +995,7 @@ export function parseModifierFieldValue(modifierFieldValue, actor) {
         if (v.type === "numeric") {
             parsedValue = parseInt(v.path) ?? 0;
         } else {
-            parsedValue = parsePath(fullPath, actor) ?? 0;
+            parsedValue = parsePath(fullPath, actor, source) ?? 0;
         }
 
         if (!isNaN(parsedValue)) {
@@ -839,7 +1025,7 @@ export function reduceParsedModifiers(parsedValues) {
     resource.<resourceId e.g. this is the abbrewId.uuid>
     damage.<"lastDealt"/"lastReceived"/"roundReceived", damageType e.g. all damage "all" / specific "slashing">
  */
-function parsePath(rawValue, actor) {
+function parsePath(rawValue, actor, source) {
     if (typeof rawValue != "string") {
         return rawValue;
     }
@@ -863,6 +1049,8 @@ function parsePath(rawValue, actor) {
 
     const entity = (function () {
         switch (entityType) {
+            case 'this':
+                return source;
             case 'actor':
                 return actor;
             case 'item':
@@ -873,6 +1061,7 @@ function parsePath(rawValue, actor) {
 
     const path = (function () {
         switch (entityType) {
+            case 'this':
             case 'actor':
                 return rawValue.split('.').slice(1).join('.');
             case 'item':

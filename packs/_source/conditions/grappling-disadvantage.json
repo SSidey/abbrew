@@ -1,0 +1,209 @@
+{
+  "name": "Grappling Disadvantage",
+  "type": "skill",
+  "_id": "Xxtpste8muvmSWNQ",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "abbrew.skill.grapplingdisadvantage.Xxtpste8muvmSWNQ",
+      "uuid": "Xxtpste8muvmSWNQ"
+    },
+    "skillTraits": "",
+    "skillModifiers": {
+      "synergy": "[{\"value\":\"Grab\",\"id\":\"nU042uDuvcVY0Bnm\",\"sourceId\":\"Compendium.abbrew.skills.Item.nU042uDuvcVY0Bnm\"}]",
+      "discord": ""
+    },
+    "configurable": true,
+    "isActivatable": false,
+    "activateOnCreate": false,
+    "applyTurnStart": false,
+    "applyTurnEnd": false,
+    "applyOnExpiry": false,
+    "activateOnDamageAccept": false,
+    "skills": {
+      "granted": [],
+      "paired": [],
+      "grantedOnActivation": [],
+      "grantedOnAccept": []
+    },
+    "resource": {
+      "capacity": 0,
+      "operator": "",
+      "relatedResource": null,
+      "fillCapacityOnCreate": false
+    },
+    "action": {
+      "activationType": "synergy",
+      "actionCost": null,
+      "actionImage": "",
+      "duration": {
+        "precision": "-1",
+        "value": 0,
+        "expireOnStartOfTurn": true
+      },
+      "uses": {
+        "hasUses": true,
+        "asStacks": true,
+        "value": 1,
+        "max": 0,
+        "period": "",
+        "removeWhenNoUsesRemain": false
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "skillCheck": [
+        {
+          "operator": "minus",
+          "type": "numeric",
+          "path": "1",
+          "multiplier": 1,
+          "lateParse": false
+        }
+      ],
+      "skillRequest": {
+        "isEnabled": false,
+        "isContested": false,
+        "selfCheck": false,
+        "checkType": "",
+        "requirements": {
+          "modifiers": "",
+          "successes": 0,
+          "result": 0
+        },
+        "targetModifiers": "",
+        "results": {
+          "success": {
+            "description": ""
+          },
+          "failure": {
+            "description": ""
+          }
+        }
+      },
+      "attackProfile": {
+        "isEnabled": true,
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": 0,
+        "attackMode": "",
+        "finisher": {
+          "type": "",
+          "cost": null,
+          "description": "",
+          "wounds": []
+        },
+        "damage": [],
+        "finisherLimit": 10
+      },
+      "modifiers": {
+        "fortune": 0,
+        "actionCost": {
+          "value": 0,
+          "operator": ""
+        },
+        "attackProfile": {
+          "combineAttacks": {
+            "isEnabled": false,
+            "value": null
+          },
+          "attackType": "",
+          "attackMode": "",
+          "handsSupplied": 0,
+          "finisherLimit": {
+            "value": 10,
+            "operator": ""
+          },
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "finisher": {
+            "cost": null,
+            "wounds": []
+          },
+          "damage": []
+        },
+        "guard": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": "",
+            "lateParse": false
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": []
+        }
+      }
+    },
+    "skillType": "temporary",
+    "path": {
+      "value": "",
+      "archetype": ""
+    },
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": ""
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 200000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1744980411755,
+    "modifiedTime": 1744987308635,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!Xxtpste8muvmSWNQ"
+}

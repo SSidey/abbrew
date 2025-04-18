@@ -17,6 +17,47 @@
                 {{/each}}
             </ol>
         </div>
+        {{#if showSkillResult}}
+        <div class="dice-roll">
+            <div class="dice-result">
+                {{#if skillResult.baseDicePool}}
+                <div class="dice-tooltip">
+                    <section class="tooltip-part">
+                        <div class="dice">
+                            <ol class="dice-rolls">
+                                {{#each skillResult.dice as |die id|}}
+                                <li class="{{die.classes}}">
+                                    {{die.result}}
+                                </li>
+                                {{/each}}
+                            </ol>
+                        </div>
+                    </section>
+                </div>
+                {{/if}}
+                <h4 class="dice-total">
+                    {{skillResult.simpleResult}}
+                </h4>
+            </div>
+        </div>
+        {{/if}}
+        {{#if skillCheck.attempts.length}}
+        <h4>
+            <ol class="skill-check-results">
+                {{#each skillCheck.attempts as |attempt id|}}
+                <div class="skill-check-result">
+                    <label class="skill-check-actor-name">{{attempt.name}}</label>
+                    {{#if attempt.result}}
+                    <i class="fa-regular fa-circle-check" style="color: #176951;"></i>
+                    {{else}}
+                    <i class="fa-regular fa-circle-xmark" style="color: #6f0003;"></i>
+                    {{/if}}
+                </div>
+                {{/each}}
+            </ol>
+        </h4>
+        {{/if}}
+        {{#if showAttackResult}}
         <div class="dice-roll">
             <div class="dice-result">
                 <div class="dice-formula">{{totalSuccesses}}</div>
@@ -44,10 +85,13 @@
                 </h4>
             </div>
         </div>
+        {{/if}}
     </div>
 
-    {{!-- TODO: If Crit, allow damage or finisher / do damage instead if no finisher --}}
     <div class="card-buttons">
+        {{#if showSkillRequest}}
+        <button data-action="check">Attempt Check</button>
+        {{/if}}
         {{#unless isStrongAttack}}
         {{#unless isFinisher}}
         {{#if showAttack}}
@@ -62,9 +106,7 @@
         {{/unless}}
         {{#unless showFinisher}}
         {{#if showAttack}}
-        {{#if showParry}}
         <button data-action="parry"><span class="actions-icon action-{{actionCost}}a">Parry</span></button>
-        {{/if}}
         {{/if}}
         {{/unless}}
         {{#if showFinisher}}

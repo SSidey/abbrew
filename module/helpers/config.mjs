@@ -404,6 +404,28 @@ ABBREW.fundamentalAttackSkills = {
   "overpower": { id: "abbrewOverpower0", name: "Parry", image: "systems/abbrew/assets/icons/skills/overpower.svg" },
 }
 
+ABBREW.fundamentalAttributeSkillIds = [
+  "abbrewStrCheck00",
+  "abbrewDexCheck00",
+  "abbrewAgiCheck00",
+  "abbrewConCheck00",
+  "abbrewIntCheck00",
+  "abbrewWitCheck00",
+  "abbrewVisCheck00",
+  "abbrewWilCheck00"
+]
+
+ABBREW.fundamentalAttributeSkillMap = {
+  "str": { id: "abbrewStrCheck00", name: "Strength Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "str" },
+  "dex": { id: "abbrewDexCheck00", name: "Dexterity Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "dex" },
+  "agi": { id: "abbrewAgiCheck00", name: "Agility Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "agi" },
+  "con": { id: "abbrewConCheck00", name: "Constitution Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "con" },
+  "int": { id: "abbrewIntCheck00", name: "Intelligence Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "int" },
+  "wit": { id: "abbrewWitCheck00", name: "Wisdom Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "wit" },
+  "vis": { id: "abbrewVisCheck00", name: "Visualisation Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "vis" },
+  "wil": { id: "abbrewWilCheck00", name: "Will Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "wil" },
+}
+
 ABBREW.fundamentalAttributeSkills = {
   "abbrewStrCheck00": { id: "abbrewStrCheck00", name: "Strength Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "str" },
   "abbrewDexCheck00": { id: "abbrewDexCheck00", name: "Dexterity Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "dex" },
@@ -415,12 +437,7 @@ ABBREW.fundamentalAttributeSkills = {
   "abbrewWilCheck00": { id: "abbrewWilCheck00", name: "Will Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "wil" },
 }
 
-ABBREW.fundamentalSkillSummaries = [
-  { id: "abbrewAttack0000", value: "Attack", sourceId: "Compendium.abbrew.skills.Item.abbrewAttack0000" },
-  { id: "abbrewParry00000", value: "Parry", sourceId: "Compendium.abbrew.skills.Item.abbrewParry00000" },
-  { id: "abbrewFeint00000", value: "Feint", sourceId: "Compendium.abbrew.skills.Item.abbrewFeint00000" },
-  { id: "abbrewFinisher00", value: "Finisher", sourceId: "Compendium.abbrew.skills.Item.abbrewFinisher00" },
-  { id: "abbrewOverpower0", value: "Overpower", sourceId: "Compendium.abbrew.skills.Item.abbrewOverpower0" },
+ABBREW.fundamentalAttributeSkillSummaries = [
   { id: "abbrewStrCheck00", value: "Strength Check", sourceId: "Compendium.abbrew.skills.Item.abbrewStrCheck00" },
   { id: "abbrewDexCheck00", value: "Dexterity Check", sourceId: "Compendium.abbrew.skills.Item.abbrewDexCheck00" },
   { id: "abbrewAgiCheck00", value: "Agility Check", sourceId: "Compendium.abbrew.skills.Item.abbrewAgiCheck00" },
@@ -428,15 +445,34 @@ ABBREW.fundamentalSkillSummaries = [
   { id: "abbrewIntCheck00", value: "Intelligence Check", sourceId: "Compendium.abbrew.skills.Item.abbrewIntCheck00" },
   { id: "abbrewWitCheck00", value: "Wisdom Check", sourceId: "Compendium.abbrew.skills.Item.abbrewWitCheck00" },
   { id: "abbrewVisCheck00", value: "Visualisation Check", sourceId: "Compendium.abbrew.skills.Item.abbrewVisCheck00" },
-  { id: "abbrewWilCheck00", value: "Will Check", sourceId: "Compendium.abbrew.skills.Item.abbrewWilCheck00" },
+  { id: "abbrewWilCheck00", value: "Will Check", sourceId: "Compendium.abbrew.skills.Item.abbrewWilCheck00" }
+]
+
+ABBREW.fundamentalAttackSkillSummaries = [
+  { id: "abbrewAttack0000", value: "Attack", sourceId: "Compendium.abbrew.skills.Item.abbrewAttack0000" },
+  { id: "abbrewParry00000", value: "Parry", sourceId: "Compendium.abbrew.skills.Item.abbrewParry00000" },
+  { id: "abbrewFeint00000", value: "Feint", sourceId: "Compendium.abbrew.skills.Item.abbrewFeint00000" },
+  { id: "abbrewFinisher00", value: "Finisher", sourceId: "Compendium.abbrew.skills.Item.abbrewFinisher00" },
+  { id: "abbrewOverpower0", value: "Overpower", sourceId: "Compendium.abbrew.skills.Item.abbrewOverpower0" }
+]
+
+ABBREW.fundamentalSkillSummaries = [
+  ...ABBREW.fundamentalAttackSkillSummaries,
+  ...ABBREW.fundamentalAttributeSkillSummaries
 ]
 
 ABBREW.modifierPrefixes = {
   "numeric": "ABBREW.ModifierPrefixes.numeric",
   "actor": "ABBREW.ModifierPrefixes.actor",
   "item": "ABBREW.ModifierPrefixes.item",
+  "this": "ABBREW.ModifierPrefixes.this",
   "resource": "ABBREW.ModifierPrefixes.resource",
   "damagelastDealt": "ABBREW.ModifierPrefixes.damageLastDealt",
   "damagelastReceived": "ABBREW.ModifierPrefixes.damageLastReceived",
   "damageroundReceived": "ABBREW.ModifierPrefixes.damageRoundReceived",
+}
+
+ABBREW.checkTypes = {
+  "successes": "ABBREW.CheckTypes.successes",
+  "result": "ABBREW.CheckTypes.result"
 }

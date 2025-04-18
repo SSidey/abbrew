@@ -16,7 +16,7 @@
       "synergy": "",
       "discord": ""
     },
-    "configurable": false,
+    "configurable": true,
     "isActivatable": false,
     "skills": {
       "granted": [],
@@ -25,7 +25,8 @@
     "resource": {
       "capacity": 5,
       "operator": "add",
-      "relatedResource": "[{\"value\":\"Faith\",\"id\":\"kA1SK7pW64oepEjs\",\"sourceId\":\"Compendium.abbrew.skills.Item.kA1SK7pW64oepEjs\"}]"
+      "relatedResource": "[{\"value\":\"Faith\",\"id\":\"kA1SK7pW64oepEjs\",\"sourceId\":\"Compendium.abbrew.skills.Item.kA1SK7pW64oepEjs\"}]",
+      "fillCapacityOnCreate": true
     },
     "action": {
       "activationType": "standalone",
@@ -151,7 +152,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743813562788,
-    "modifiedTime": 1743814721274,
+    "modifiedTime": 1744650758401,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!GDYvHDXB4J2zFFgE"

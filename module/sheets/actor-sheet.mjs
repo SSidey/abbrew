@@ -5,6 +5,7 @@ import {
 } from '../helpers/effects.mjs';
 import Tagify from '@yaireo/tagify'
 import { handleSkillActivate } from '../helpers/skill.mjs';
+import { getFundamentalAttributeSkill } from '../helpers/fundamental-skills.mjs';
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -335,6 +336,8 @@ export class AbbrewActorSheet extends ActorSheet {
     // Rollable abilities.
     html.on('click', '.rollable', this._onRoll.bind(this));
 
+    html.on('click', '.attribute-check', this._onAttributeSkill.bind(this));
+
     html.on('click', '.attack-damage-button', async (event) => {
       const t = event.currentTarget;
       await this._onAttackDamageAction(t, 'attack');
@@ -507,5 +510,13 @@ export class AbbrewActorSheet extends ActorSheet {
       });
       return roll;
     }
+  }
+
+  async _onAttributeSkill(event) {
+    const element = event.currentTarget;
+    const dataset = element.dataset;
+    const fundamental = CONFIG.ABBREW.fundamentalAttributeSkillMap[dataset.attribute];
+    const skill = getFundamentalAttributeSkill(fundamental)
+    await handleSkillActivate(this.actor, skill);
   }
 }

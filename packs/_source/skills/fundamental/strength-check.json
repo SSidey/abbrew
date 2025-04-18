@@ -16,7 +16,7 @@
       "synergy": "",
       "discord": ""
     },
-    "configurable": false,
+    "configurable": true,
     "isActivatable": false,
     "activateOnCreate": false,
     "applyTurnStart": false,
@@ -33,11 +33,11 @@
       "relatedResource": null
     },
     "action": {
-      "activationType": "",
-      "actionCost": "",
+      "activationType": "standalone",
+      "actionCost": null,
       "actionImage": "",
       "duration": {
-        "precision": "",
+        "precision": "0",
         "value": 0,
         "expireOnStartOfTurn": true
       },
@@ -84,7 +84,8 @@
               "grantedSkills": ""
             }
           }
-        }
+        },
+        "checkType": "successes"
       },
       "attackProfile": {
         "isEnabled": true,
@@ -92,7 +93,7 @@
         "attackType": "",
         "lethal": 0,
         "critical": 10,
-        "handsSupplied": null,
+        "handsSupplied": 0,
         "attackMode": "",
         "finisher": {
           "type": "",
@@ -137,21 +138,53 @@
         },
         "guard": {
           "self": {
-            "value": "",
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "multiplier": 1,
+                "lateParse": false
+              }
+            ],
             "operator": ""
           },
           "target": {
-            "value": "",
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "multiplier": 1,
+                "lateParse": true
+              }
+            ],
             "operator": ""
           }
         },
         "risk": {
           "self": {
-            "value": 0,
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "multiplier": 1,
+                "lateParse": false
+              }
+            ],
             "operator": ""
           },
           "target": {
-            "value": 0,
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "multiplier": 1,
+                "lateParse": true
+              }
+            ],
             "operator": ""
           }
         },
@@ -161,11 +194,27 @@
         },
         "resolve": {
           "self": {
-            "value": 0,
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "multiplier": 1,
+                "lateParse": false
+              }
+            ],
             "operator": ""
           },
           "target": {
-            "value": 0,
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "multiplier": 1,
+                "lateParse": true
+              }
+            ],
             "operator": ""
           }
         },
@@ -177,7 +226,16 @@
           "self": [],
           "target": []
         }
-      }
+      },
+      "skillCheck": [
+        {
+          "operator": "add",
+          "type": "actor",
+          "path": "system.attributes.str.value",
+          "multiplier": 1,
+          "lateParse": false
+        }
+      ]
     },
     "skillType": "",
     "path": {
@@ -200,7 +258,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1744236348769,
-    "modifiedTime": 1744236348769,
+    "modifiedTime": 1744836755684,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!abbrewStrCheck00"

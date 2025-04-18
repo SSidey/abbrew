@@ -140,7 +140,7 @@
     }
   ],
   "packFolders": [],
-  "socket": false,
+  "socket": true,
   "manifest": "https://raw.githubusercontent.com/SSidey/abbrew/refs/heads/master/public/system.json",
   "download": "https://github.com/SSidey/abbrew/releases/download/0.0.2-prerelease31/0.0.2-prerelease31.zip",
   "background": "systems/abbrew/assets/anvil-impact.png",

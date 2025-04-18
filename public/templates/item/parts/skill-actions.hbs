@@ -159,6 +159,18 @@
                 <i class="fa fa-toggle-off"></i>
                 {{/if}}
             </label>
+            {{#if system.action.uses.asStacks}}
+            <label class="slide-toggle roboto-upper">
+                <input type="checkbox" class="action-activatable" name="system.action.uses.removeStackOnUse" {{ checked
+                    system.action.uses.removeStackOnUse }}>
+                <span>Remove Stack on Use?</span>
+                {{#if system.action.uses.removeStackOnUse}}
+                <i class="fa fa-toggle-on"></i>
+                {{else}}
+                <i class="fa fa-toggle-off"></i>
+                {{/if}}
+            </label>
+            {{/if}}
             {{#if (eq system.skillType "temporary")}}
             <label class="slide-toggle roboto-upper">
                 <input type="checkbox" name="system.action.uses.removeWhenNoUsesRemain" {{ checked
@@ -220,7 +232,82 @@
         <div>
             <label>Successes</label>
             <input type="text" name="system.action.modifiers.successes" value="{{system.action.modifiers.successes}}"
-                data-dtype="Number" />
+                data-dtype="string" />
+        </div>
+        <div>
+            <h3>Skill Check</h3>
+            {{> "systems/abbrew/templates/item/parts/modifier-builder-field.hbs"
+            modifierList=system.action.skillCheck
+            modifierListName="system.action.skillCheck" config=config}}
+        </div>
+        <div>
+            <h3>Request Skill Check</h3>
+            <h4>Check Requirement</h4>
+            <label class="slide-toggle roboto-upper">
+                <input type="checkbox" name="system.action.skillRequest.isEnabled" {{ checked
+                    system.action.skillRequest.isEnabled }}>
+                <span>Enable Skill Request?</span>
+                {{#if system.action.skillRequest.isEnabled}}
+                <i class="fa fa-toggle-on"></i>
+                {{else}}
+                <i class="fa fa-toggle-off"></i>
+                {{/if}}
+            </label>
+            {{#if system.action.skillRequest.isEnabled}}
+            <label class="slide-toggle roboto-upper">
+                <input type="checkbox" name="system.action.skillRequest.isContested" {{ checked
+                    system.action.skillRequest.isContested }}>
+                <span>Is Contested?</span>
+                {{#if system.action.skillRequest.isContested}}
+                <i class="fa fa-toggle-on"></i>
+                {{else}}
+                <i class="fa fa-toggle-off"></i>
+                {{/if}}
+            </label>
+            {{#unless system.action.skillRequest.isContested}}
+            <label class="slide-toggle roboto-upper">
+                <input type="checkbox" name="system.action.skillRequest.selfCheck" {{ checked
+                    system.action.skillRequest.selfCheck }}>
+                <span>Self Check?</span>
+                {{#if system.action.skillRequest.selfCheck}}
+                <i class="fa fa-toggle-on"></i>
+                {{else}}
+                <i class="fa fa-toggle-off"></i>
+                {{/if}}
+            </label>
+            {{/unless}}
+            <select name="system.action.skillRequest.checkType">
+                {{selectOptions config.checkTypes selected=system.action.skillRequest.checkType localize=true}}
+            </select>
+            {{#if system.action.skillRequest.isContested}}
+            <div>
+                <div>
+                    <label>Modifiers</label>
+                    <input type="text" name="system.action.skillRequest.requirements.modifiers"
+                        value="{{system.action.skillRequest.requirements.modifiers}}" data-dtype="String" />
+                </div>
+            </div>
+            {{else}}
+            <div>
+                <div>
+                    <label>Successes</label>
+                    <input type="text" name="system.action.skillRequest.requirements.successes"
+                        value="{{system.action.skillRequest.requirements.successes}}" data-dtype="String" />
+                </div>
+                <div>
+                    <label>Result</label>
+                    <input type="text" name="system.action.skillRequest.requirements.result"
+                        value="{{system.action.skillRequest.requirements.result}}" data-dtype="String" />
+                </div>
+            </div>
+            {{/if}}
+            <h4>Target</h4>
+            <div>
+                <label>Target Modifiers</label>
+                <input type="text" name="system.action.skillRequest.targetModifiers"
+                    value="{{system.action.skillRequest.targetModifiers}}" data-dtype="String" data-dropType="skill" />
+            </div>
+            {{/if}}
         </div>
         {{#if (eq system.action.activationType "standalone")}}
         <div>

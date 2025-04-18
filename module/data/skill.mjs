@@ -82,6 +82,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
                 hasUses: new fields.BooleanField({ required: true, initial: false }),
                 // TODO: Implement AsStacks
                 asStacks: new fields.BooleanField({ required: true, initial: false }),
+                removeStackOnUse: new fields.BooleanField({ required: true, initial: true }),
                 value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
                 max: new fields.NumberField({ ...requiredInteger, initial: 0 }),
                 period: new fields.StringField({ ...blankString }),
@@ -93,43 +94,24 @@ export default class AbbrewSkill extends AbbrewItemBase {
                 max: new fields.NumberField({ ...requiredInteger, initial: 0 })
             }),
             isActive: new fields.BooleanField({ required: true }),
-            // TODO: Implement skillRequest
+            skillCheck: this.getModifierBuilderField(),
             skillRequest: new fields.SchemaField({
+                isEnabled: new fields.BooleanField({ required: true, initial: false }),
                 isContested: new fields.BooleanField({ required: true, initial: false }),
-                selfRolls: new fields.SchemaField({
-                    checkType: new fields.StringField({ ...blankString }),
-                    modifiers: new fields.ArrayField(
-                        new fields.SchemaField({
-                            // name / id etc.
-                        })
-                    ),
-                    results: new fields.SchemaField({
-                        success: new fields.SchemaField({
-                            description: new fields.StringField({ ...blankString }),
-                            grantedSkills: new fields.StringField({ ...blankString })
-                        }),
-                        failure: new fields.SchemaField({
-                            description: new fields.StringField({ ...blankString }),
-                            grantedSkills: new fields.StringField({ ...blankString })
-                        })
-                    })
+                selfCheck: new fields.BooleanField({ required: true, initial: false }),
+                checkType: new fields.StringField({ ...blankString }),
+                requirements: new fields.SchemaField({
+                    modifiers: new fields.StringField({ ...blankString }),
+                    successes: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                    result: new fields.NumberField({ ...requiredInteger, initial: 0 })
                 }),
-                targetRolls: new fields.SchemaField({
-                    checkType: new fields.StringField({ ...blankString }),
-                    modifiers: new fields.ArrayField(
-                        new fields.SchemaField({
-                            // name / id etc.
-                        })
-                    ),
-                    results: new fields.SchemaField({
-                        success: new fields.SchemaField({
-                            description: new fields.StringField({ ...blankString }),
-                            grantedSkills: new fields.StringField({ ...blankString })
-                        }),
-                        failure: new fields.SchemaField({
-                            description: new fields.StringField({ ...blankString }),
-                            grantedSkills: new fields.StringField({ ...blankString })
-                        })
+                targetModifiers: new fields.StringField({ ...blankString }),
+                results: new fields.SchemaField({
+                    success: new fields.SchemaField({
+                        description: new fields.StringField({ ...blankString })
+                    }),
+                    failure: new fields.SchemaField({
+                        description: new fields.StringField({ ...blankString })
                     })
                 })
             }),
@@ -305,6 +287,9 @@ export default class AbbrewSkill extends AbbrewItemBase {
         schema.attributeIncrease = new fields.StringField({ ...blankString });
         schema.attributeIncreaseLong = new fields.StringField({ ...blankString });
         schema.attributeRankIncrease = new fields.StringField({ ...blankString });
+        schema.siblingSkillModifiers = new fields.ArrayField(
+            new fields.ObjectField({ nullable: false })
+        );
 
         return schema;
     }

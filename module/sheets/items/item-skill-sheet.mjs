@@ -243,6 +243,8 @@ export class AbbrewSkillSheet extends ItemSheet {
         this._activateSkillTraits(html);
         this._activateSkillModifiers(html);
         this._activateResourceDrop(html);
+        this._activateSkillCheck(html);
+        this._activateSkillCheckRequestFields(html);
     }
 
     _activateSkillTraits(html) {
@@ -264,6 +266,51 @@ export class AbbrewSkillSheet extends ItemSheet {
         };
         if (skillTraits) {
             var taggedSkillTraits = new Tagify(skillTraits, skillTraitSettings);
+        }
+    }
+
+    _activateSkillCheck(html) {
+        const skillCheck = html[0].querySelector('input[name="system.action.skillCheck"]');
+        const skillCheckSettings = {
+            dropdown: {
+                maxItems: 20,               // <- mixumum allowed rendered suggestions
+                classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
+                enabled: 0,                 // <- show suggestions on focus
+                closeOnSelect: false,       // <- do not hide the suggestions dropdown once an item has been selected
+                includeSelectedTags: false   // <- Should the suggestions list Include already-selected tags (after filtering)
+            },
+            userInput: false,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+            duplicates: false,             // <- Should duplicate tags be allowed or not
+            whitelist: [...Object.entries(CONFIG.ABBREW.attributes).map(e => ({ value: game.i18n.localize(e[1]), label: e[0] }))],
+        };
+        if (skillCheck) {
+            var taggedSkillCheck = new Tagify(skillCheck, skillCheckSettings);
+        }
+    }
+
+
+    _activateSkillCheckRequestFields(html) {
+        const requirementModifiers = html[0].querySelector('input[name="system.action.skillRequest.requirements.modifiers"]');
+        const targetModifiers = html[0].querySelector('input[name="system.action.skillRequest.targetModifiers"]');
+        const settings = {
+            whitelist: CONFIG.ABBREW.fundamentalAttributeSkillSummaries,
+            dropdown: {
+                maxItems: 20,               // <- mixumum allowed rendered suggestions
+                classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
+                enabled: 0,                 // <- show suggestions on focus
+                closeOnSelect: false,       // <- do not hide the suggestions dropdown once an item has been selected
+                includeSelectedTags: false   // <- Should the suggestions list Include already-selected tags (after filtering)
+            },
+            userInput: false,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+            duplicates: false,             // <- Should duplicate tags be allowed or not
+            placeholder: "Drop or select an attribute skill"
+        };
+
+        if (requirementModifiers) {
+            var taggedRequirementModifiers = new Tagify(requirementModifiers, settings);
+        }
+        if (targetModifiers) {
+            var taggedTargetModifiers = new Tagify(targetModifiers, settings);
         }
     }
 

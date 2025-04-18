@@ -263,6 +263,7 @@ Hooks.on("updateToken", (document, changed, options, userId) => {
 /* -------------------------------------------- */
 /*  Other Hooks                                 */
 /* -------------------------------------------- */
+
 Hooks.on("applyActiveEffect", applyCustomEffects);
 
 Hooks.on("renderChatLog", (app, html, data) => {
@@ -301,8 +302,10 @@ Hooks.on("preUpdateItem", () => { })
 
 Hooks.on("deleteActiveEffect", async (effect, options, userId) => {
   console.log("deleted");
-  const actor = effect.parent;
-  await actor.handleDeleteActiveEffect(effect);
+  const parent = effect.parent;
+  if (parent.type === "actor") {
+    await parent.handleDeleteActiveEffect(effect);
+  }
 });
 
 Hooks.on("dropCanvasData", (canvas, data) => {
@@ -334,7 +337,7 @@ Hooks.on("updateActiveEffect", (effect, update, options, user) => {
   //         await effect.update({ "duration": duration })
   //     }
   // });
-})
+});
 
 Hooks.on("preUpdateActiveEffect", (effect, update, options, user) => {
   console.log("preWoo");

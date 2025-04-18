@@ -9,15 +9,6 @@
   <li class='item flexrow items-header skill-header' data-skill-section="{{localize (skillType)}}">
     <div class='item-name'>{{localize (skillType)}}</div>
     <div class='item-controls'>
-      <label class="slide-toggle roboto-upper">
-        <input type="checkbox" name="system.action.uses.hasUses" {{ checked system.action.uses.hasUses }}>
-        <span>Has Uses?</span>
-        {{#if system.action.uses.hasUses}}
-        <i class="fa fa-toggle-on"></i>
-        {{else}}
-        <i class="fa fa-toggle-off"></i>
-        {{/if}}
-      </label>
       <a class='item-control item-create' title='Create item' data-type='skill' data-skill-type={{skillType}}>
         <i class='fas fa-plus'></i>
         {{localize 'DOCUMENT.New' type='skill'}}
@@ -57,14 +48,20 @@
           <div>
             {{#if item.system.action.uses.hasUses}}
             <div class="skill-uses">
+              {{#if system.action.uses.asStacks}}
+              <label for="system.action.uses" class="resource-label">Stacks</label>
+              {{else}}
               <label for="system.action.uses" class="resource-label">Uses</label>
+              {{/if}}
               <div class="resource-content flexrow flex-center flex-between">
                 <input type="text" name="system.action.uses.value" value="{{item.system.action.uses.value}}"
                   data-dtype="Number" />
+                {{#unless system.action.uses.asStacks}}
                 <span class="skill-per"> / </span>
                 <input type="text"
                   value="{{#if item.system.action.uses.period}}{{item.system.action.uses.period}}{{else}}{{item.system.action.uses.max}}{{/if}}"
                   data-dtype="String" readonly />
+                {{/unless}}
               </div>
             </div>
             {{/if}}
