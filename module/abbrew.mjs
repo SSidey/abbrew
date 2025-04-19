@@ -17,6 +17,7 @@ import { AbbrewAnatomySheet } from './sheets/items/item-anatomy-sheet.mjs';
 import { AbbrewSkillSheet } from './sheets/items/item-skill-sheet.mjs';
 import { handleSkillActivate } from './helpers/skill.mjs';
 import { onWorldTimeUpdate } from './helpers/time.mjs';
+import { activateSocketListener } from './socket.mjs';
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -227,6 +228,8 @@ Handlebars.registerHelper("eagerEvaluation", function (value, ...replacements) {
 Hooks.once('ready', function () {
   // Wait to register hotbar drop hook on ready so that modules could register earlier if they want to
   Hooks.on('hotbarDrop', (bar, data, slot) => { createItemMacro(data, slot); return false; });
+
+  activateSocketListener();
 });
 
 /* -------------------------------------------- */

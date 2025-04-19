@@ -1,15 +1,48 @@
-let socket;
-
-Hooks.once("socketlib.ready", () => {
-    socket = socketlib.registerSystem("abbrew");
-    socket.register("updateMessageForCheck", _updateMessageForCheck);
-});
-
-export async function updateMessageForCheck(messageId, html, templateData) {
-    await socket.executeAsGM("updateMessageForCheck", messageId, html, templateData);
+class SocketMessage {
+    // String, String, Object
+    constructor(userId, request, data) {
+        this.userId = userId;
+        this.request = request;
+        this.data = data;
+    }
 }
 
-async function _updateMessageForCheck(messageId, html, templateData) {
-    const message = game.messages.get(messageId);
-    await message.update({ "content": html, "flags.abbrew.messasgeData.templateData": templateData });
+async function emitForAll(eventName, message) {
+    game.socket.emit(eventName, message);
+    await handleMessage(message);
 }
+
+
+function activateSocketListener() {
+    game.socket.on("system.abbrew", handleMessage)
+}
+
+async function handleMessage(message) {
+    const request = message.request;
+    switch (request) {
+        case "updateMessageForCheck":
+            await executeAsGM(updateMessageForCheck, message.userId, message.data);
+            break;
+    }
+}
+
+async function executeAsGM(func, userId, data) {
+    if (game.user !== game.users.activeGM) {
+        return;
+    }
+
+    if (GMProxyFunctions.includes(func)) {
+        await func(data);
+    }
+}
+
+async function updateMessageForCheck(data) {
+    const message = game.messages.get(data.messageId);
+    await message.update({ "content": data.html, "flags.abbrew.messasgeData.templateData": data.templateData });
+}
+
+const GMProxyFunctions = [
+    updateMessageForCheck
+];
+
+export { activateSocketListener, emitForAll, SocketMessage }

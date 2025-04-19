@@ -35,9 +35,18 @@
                     </section>
                 </div>
                 {{/if}}
+                {{#if skillResult.simpleResult}}
                 <h4 class="dice-total">
                     {{skillResult.simpleResult}}
+                    {{#unless skillResult.isContested}}
+                    {{#if skillResult.result}}
+                    <i class="fa-regular fa-circle-check" style="color: #176951;"></i>
+                    {{else}}
+                    <i class="fa-regular fa-circle-xmark" style="color: #6f0003;"></i>
+                    {{/if}}
+                    {{/unless}}
                 </h4>
+                {{/if}}
             </div>
         </div>
         {{/if}}

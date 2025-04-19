@@ -1,7 +1,7 @@
 import { acceptSkillCheck, getModifiedSkillActionCost, handleSkillActivate, trackSkillDuration } from '../helpers/skill.mjs';
 import { doesNestedFieldExist, arrayDifference, getNumericParts } from '../helpers/utils.mjs';
 import { getAttackSkillWithActions, getParrySkillWithActions } from '../helpers/fundamental-skills.mjs';
-import { updateMessageForCheck } from '../socket.mjs';
+import { emitForAll, SocketMessage } from '../socket.mjs';
 /**
  * Extend the basic Item with some very simple modifications.
  * @extends {Item}
@@ -136,7 +136,8 @@ export default class AbbrewItem extends Item {
     templateData.skillCheck.attempts = [...templateData.skillCheck.attempts, parsedResult];
 
     const html = await renderTemplate("systems/abbrew/templates/chat/skill-card.hbs", templateData);
-    await updateMessageForCheck(messageId, html, templateData);
+    // await updateMessageForCheck(messageId, html, templateData);
+    emitForAll("system.abbrew", new SocketMessage(game.user.id, "updateMessageForCheck", { messageId, html, templateData }));
   }
 
   static async _onAcceptDamageAction(rolls, data, action) {
@@ -177,8 +178,12 @@ export default class AbbrewItem extends Item {
   }
 
   async _preCreate(data, options, user) {
+    if (game.user !== user) {
+      return;
+    }
+
     if (data.type === "skill") {
-      if (this.actor) {
+      if (this.actor && data.system.abbrewId) {
         const duplicateItem = this.actor.items.find(i => i.system.abbrewId.uuid === data.system.abbrewId.uuid);
         if (duplicateItem) {
           const uses = duplicateItem.system.action.uses;
@@ -192,6 +197,10 @@ export default class AbbrewItem extends Item {
   }
 
   async _onCreate(data, options, userId) {
+    if (game.user.id !== userId) {
+      return;
+    }
+
     if (data.type === "skill") {
       await this.actor?.acceptSkillDeck(data);
       if (this.actor && !this.system.isActivatable && this.system.action.duration.value > 0) {

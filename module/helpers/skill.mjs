@@ -177,7 +177,7 @@ function getSkillById(actor, skillIds) {
     const fundamentalSkillIds = CONFIG.ABBREW.fundamentalAttributeSkillIds;
     const fundamentalSkills = CONFIG.ABBREW.fundamentalAttributeSkills;
 
-    return skillIds.reduce((result, id) => {
+    const skill = skillIds.reduce((result, id) => {
         if (!result) {
             if (fundamentalSkillIds.includes(id)) {
                 const fundamental = fundamentalSkills[id];
@@ -189,9 +189,14 @@ function getSkillById(actor, skillIds) {
 
         return result;
     }, null);
+
+    skill.system.isProxied = true;
+
+    return skill;
 }
 
 export async function applySkillEffects(actor, skill) {
+    const renderChatMessage = (skill.system.isProxied === null || skill.system.isProxied === undefined) || (skill.system.isProxied != null && skill.system.isProxied === false);
     await actor.unsetFlag("abbrew", "combat.damage.lastDealt");
     if (isSkillBlocked(actor, skill)) {
         ui.notifications.info(`You are blocked from using ${skill.name}`);
@@ -254,7 +259,7 @@ export async function applySkillEffects(actor, skill) {
     const token = actor.token;
     let templateData = { allSummaries: allSummaries, skillCheck: { attempts: [] } };
     let data = {};
-    let skillResult = { dice: [], modifier: 0, baseDicePool: 0 };
+    let skillResult = { dice: [], modifier: 0, baseDicePool: 0, result: false, isContested: false };
 
     if (skill.system.action.skillCheck.length > 0) {
         const combinedSkillModifier = allSkills
@@ -298,6 +303,8 @@ export async function applySkillEffects(actor, skill) {
             if (skill) {
                 const contestResult = await handleSkillActivate(actor, skill);
                 requirements.contestedResult = contestResult;
+                skillResult = contestResult;
+                skillResult.isContested = true;
             }
 
         } else {
@@ -312,6 +319,8 @@ export async function applySkillEffects(actor, skill) {
 
         if (skillRequest.selfCheck) {
             const selfResult = await acceptSkillCheck(actor, requirements);
+            skillResult = selfResult.skillResult;
+            skillResult.result = selfResult.result;
         } else {
             data.skillCheckRequest = requirements;
             templateData = {
@@ -319,6 +328,13 @@ export async function applySkillEffects(actor, skill) {
                 showSkillRequest: true
             };
         }
+
+        data.skillCheckResult = skillResult;
+        templateData = {
+            ...templateData,
+            showSkillResult: true,
+            skillResult: skillResult
+        };
     }
 
     // TODO: Give another way to render the card and allow for an accept button
@@ -419,13 +435,15 @@ export async function applySkillEffects(actor, skill) {
     const speaker = ChatMessage.getSpeaker({ actor: actor });
     const rollMode = game.settings.get('core', 'rollMode');
     const label = `[${skill.system.skillType}] ${skill.name}`;
-    ChatMessage.create({
-        speaker: speaker,
-        rollMode: rollMode,
-        flavor: label,
-        content: html,
-        flags: { data: data, abbrew: { messasgeData: { speaker: speaker, rollMode: rollMode, flavor: label, templateData: templateData } } }
-    });
+    if (renderChatMessage) {
+        ChatMessage.create({
+            speaker: speaker,
+            rollMode: rollMode,
+            flavor: label,
+            content: html,
+            flags: { data: data, abbrew: { messasgeData: { speaker: speaker, rollMode: rollMode, flavor: label, templateData: templateData } } }
+        });
+    }
 
     updates, guardSelfUpdate, riskSelfUpdate, resolveSelfUpdate = {};
 
