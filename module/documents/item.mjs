@@ -112,7 +112,7 @@ export default class AbbrewItem extends Item {
       case 'damage': await this._onAcceptDamageAction(message.rolls, message.flags.data, action); break;
       case 'overpower': await this._onAcceptDamageAction(message.rolls, message.flags.data, action); break;
       case 'parry': await this._onAcceptDamageAction(message.rolls, message.flags.data, action); break;
-      case 'finisher': await this._onAcceptFinisherAction(message.rolls, message.flags.data, action); break;
+      case 'finisher': await this._onAcceptFinisherAction(message.rolls, message.flags.data, action, button.dataset.finisherType); break;
     }
   }
 
@@ -168,13 +168,13 @@ export default class AbbrewItem extends Item {
     return action === "parry" ? data.actionCost : 0;
   }
 
-  static async _onAcceptFinisherAction(rolls, data, action) {
+  static async _onAcceptFinisherAction(rolls, data, action, finisherType) {
     const tokens = canvas.tokens.controlled.filter((token) => token.actor);
     if (tokens.length === 0) {
       return;
     }
 
-    await tokens[0].actor.takeFinisher(rolls, data);
+    await tokens[0].actor.takeFinisher(rolls, data, finisherType);
   }
 
   async _preCreate(data, options, user) {

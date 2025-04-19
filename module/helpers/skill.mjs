@@ -354,16 +354,17 @@ export async function applySkillEffects(actor, skill) {
 
             const finalDamage = Math.floor(d.overallMultiplier * (attributeModifier + (d.damageMultiplier * parsePath(d.value, actor, actor))));
 
-            return { damageType: d.type, value: finalDamage };
+            return { damageType: d.type, value: finalDamage, penetration: d.penetration };
         }).reduce((result, damage) => {
             if (damage.damageType in result) {
-                result[damage.damageType] += damage.value;
+                result[damage.damageType].value += damage.value;
+                result[damage.penetration].penetration = Math.min(damage.penetration, result[damage.penetration]) ?? 0;
             } else {
-                result[damage.damageType] = damage.value;
+                result[damage.damageType] = ({ value: damage.value, penetration: damage.penetration });
             }
 
             return result;
-        }, {})).map(e => ({ damageType: e[0], value: e[1] }));
+        }, {})).map(e => ({ damageType: e[0], value: e[1].value, penetration: e[1].penetration }));
 
         await actor.setFlag("abbrew", "combat.damage.lastDealt", damage);
 
@@ -373,6 +374,7 @@ export async function applySkillEffects(actor, skill) {
 
 
         const finisher = attackMode === "finisher" ? mergeFinishers(baseAttackProfile, modifierSkills, actor) : null;
+        const finisherDamageTypes = finisher ? finisher.type : attackProfile.damage.map(d => d.type);
 
         const showAttack = ['attack', 'feint', 'finisher'].includes(attackMode);
         const isFeint = attackMode === 'feint';
@@ -390,6 +392,7 @@ export async function applySkillEffects(actor, skill) {
             tokenId: token?.uuid || null,
             showAttack,
             showFinisher,
+            finisherDamageTypes,
             isStrongAttack,
             isFinisher,
             actionCost: skill.system.action.actionCost,
@@ -555,9 +558,13 @@ function mergeFinishers(baseAttackProfile, modifierSkills, actor) {
 
     const allAttackProfiles = [baseAttackProfile, ...modifierAttackProfiles];
     const finisherCost = mergeFinisherCost(allAttackProfiles);
-    const finisherType = mergeFinisherType(allAttackProfiles);
+    const finisherType = mergeFinisherType(allAttackProfiles) ?? "untyped";
     const finisherDescription = mergeFinisherDescriptions(allAttackProfiles);
     const finisherWounds = mergeFinisherWounds(allAttackProfiles, actor);
+
+    if (finisherDescription.length === 0 && finisherWounds.length === 0) {
+        return null;
+    }
 
     const finisher = {};
     finisher[finisherCost] = { type: finisherType, wounds: finisherWounds, text: finisherDescription };
@@ -771,6 +778,9 @@ function mergeAttackProfile(base, attackProfile) {
     if (attackProfile.lethal.value != null && attackProfile.lethal.operator) {
         baseAttackProfile.lethal.value = applyOperator(baseAttackProfile.lethal.value, attackProfile.lethal.value, attackProfile.lethal.operator)
     }
+    if (attackProfile.penetration.value != null && attackProfile.penetration.operator) {
+        baseAttackProfile.penetration.value = applyOperator(baseAttackProfile.penetration.value, attackProfile.penetration.value, attackProfile.penetration.operator)
+    }
 
     const baseDamageList = base.damage;
     let modifyDamageList = attackProfile.damage.filter(d => d.modify);
@@ -832,13 +842,15 @@ function applyModifierToDamageProfile(baseElement, modifyElement) {
     const type = modifyElement.type.length > 0 ? modifyElement.type : baseElement.type;
     const damage = (modifyElement.value && modifyElement !== "") ? modifyElement.value : baseElement.value;
     const attribute = modifyElement.attributeModifier.length > 0 ? modifyElement.attributeModifier : baseElement.attributeModifier;
+    const penetration = baseElement.penetration + modifyElement.penetration;
     return ({
         type: type,
         value: damage,
         attributeModifier: attribute,
         attributeMultiplier: modifyElement.attributeMultiplier,
         damageMultiplier: modifyElement.damageMultiplier,
-        overallMultiplier: modifyElement.overallMultiplier
+        overallMultiplier: modifyElement.overallMultiplier,
+        penetration: penetration
     });
 }
 
@@ -856,7 +868,8 @@ function damageProfileFromModifier(modifyElement) {
         attributeModifier: modifyElement.attributeModifier,
         attributeMultiplier: modifyElement.attributeMultiplier ?? 1,
         damageMultiplier: modifyElement.damageMultiplier ?? 1,
-        overallMultiplier: modifyElement.overallMultiplier ?? 1
+        overallMultiplier: modifyElement.overallMultiplier ?? 1,
+        penetration: modifyElement.penetration ?? 0
     });
 }
 

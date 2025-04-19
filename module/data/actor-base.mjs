@@ -80,16 +80,16 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         label: new fields.StringField({ required: true, blank: true }),
 
       }),
-      protection: new fields.ArrayField(
-        new fields.SchemaField({
+      protection: new fields.SchemaField(Object.keys(CONFIG.ABBREW.damageTypes).reduce((obj, damageType) => {
+        obj[damageType] = new fields.SchemaField({
+          label: new fields.StringField({ required: true, blank: true }),
           type: new fields.StringField({ required: true, blank: true }),
-          value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
           resistance: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
           weakness: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-          immunity: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-          label: new fields.StringField({ required: true, blank: true })
-        })
-      ),
+          immunity: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 })
+        });
+        return obj;
+      }, {})),
       inflexibility: new fields.SchemaField({
         raw: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
         max: new fields.NumberField({ ...requiredInteger, initial: 10, min: 10, max: 10 }),
@@ -108,8 +108,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         base: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 20 }),
         max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 20 }),
         label: new fields.StringField({ required: true, blank: true })
-      }),
-      fatalWounds: new fields.StringField({ required: true, blank: true })
+      })
     });
     schema.resources = new fields.SchemaField({
       owned: new fields.ArrayField(
@@ -252,6 +251,11 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       this.attributes[key].tier = 1 + Math.floor(this.attributes[key].rank / 10);
     }
 
+    for (const key in this.defense.protection) {
+      this.defense.protection[key].label = game.i18n.localize(CONFIG.ABBREW.damageTypes[key].label) ?? key;
+      this.defense.protection[key].type = key;
+    }
+
     for (const key in this.defense.damageTypes) {
       // Handle damage type label localization.
       // this.defense.damageTypes[key].label = game.i18n.localize(CONFIG.ABBREW.damageTypes[key]) ?? key;
@@ -314,23 +318,12 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     const anatomyProtection = anatomy.map(a => a.system.defense.protection).flat(1);
     const protection = [...armourProtection, ...anatomyProtection];
 
-    const flatDR = protection.reduce((result, dr) => {
+    protection.filter(p => p.type !== "").forEach(dr => {
       const drType = dr.type;
-      if (Object.keys(result).includes(drType)) {
-        result[drType].value += dr.value;
-        result[drType].resistance += dr.resistance;
-        result[drType].immunity += dr.immunity;
-        result[drType].weakness += dr.weakness;
-      }
-      else {
-        result[drType] = { type: dr.type, value: dr.value, resistance: dr.resistance, immunity: dr.immunity, weakness: dr.weakness, label: dr.label };
-      }
-      return result;
-    }, {}
-    );
-
-    this.defense.protection.length = 0;
-    Object.values(flatDR).map(v => this.defense.protection.push(v));
+      this.defense.protection[drType].resistance += dr.resistance;
+      this.defense.protection[drType].immunity += dr.immunity;
+      this.defense.protection[drType].weakness += dr.weakness;
+    });
   }
 
   _prepareGuard(wornArmour, anatomy) {

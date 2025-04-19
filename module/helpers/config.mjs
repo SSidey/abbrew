@@ -476,3 +476,21 @@ ABBREW.checkTypes = {
   "successes": "ABBREW.CheckTypes.successes",
   "result": "ABBREW.CheckTypes.result"
 }
+
+ABBREW.damageTypes = {
+  crushing: { label: "ABBREW.DamageTypes.crushing", },
+  piercing: { label: "ABBREW.DamageTypes.piercing", },
+  slashing: { label: "ABBREW.DamageTypes.slashing", },
+  life: { label: "ABBREW.DamageTypes.life", },
+  death: { label: "ABBREW.DamageTypes.death", },
+  fire: { label: "ABBREW.DamageTypes.fire", },
+  cold: { label: "ABBREW.DamageTypes.cold", },
+  electric: { label: "ABBREW.DamageTypes.electric", },
+  acid: { label: "ABBREW.DamageTypes.acid", },
+  poison: { label: "ABBREW.DamageTypes.poison", },
+  dark: { label: "ABBREW.DamageTypes.dark", },
+  light: { label: "ABBREW.DamageTypes.light", },
+  pain: { label: "ABBREW.DamageTypes.pain", },
+  emotion: { label: "ABBREW.DamageTypes.emotion", },
+  psychic: { label: "ABBREW.DamageTypes.psychic" }
+}

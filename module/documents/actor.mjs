@@ -75,7 +75,7 @@ export default class AbbrewActor extends Actor {
   }
 
   async takeActionWounds(data) {
-    if (data.targetWounds) {
+    if (data.targetWounds.length > 0) {
       const currentWounds = this.system.wounds;
       const updateWounds = Object.entries(
         data.targetWounds.map(w => ({ ...w, value: reduceParsedModifiers(parseModifierFieldValue(w.value, this, this)), index: getOrderForOperator(w.operator) })).sort(getOrderForOperator)
@@ -89,7 +89,7 @@ export default class AbbrewActor extends Actor {
   }
 
   async takeActionResources(data) {
-    if (data.targetResources) {
+    if (data.targetResources.length > 0) {
       const baseResources = this.system.resources.values.reduce((result, resource) => { result[resource.id] = resource.value; return result; }, {});
       const resourceModifiers = data.targetResources.map(r => ({ id: r.id, operator: r.operator, value: reduceParsedModifiers(parseModifierFieldValue(r.value, this, this)) }));
       const updateResources = Object.entries(resourceModifiers.reduce((result, resource) => {
@@ -117,7 +117,7 @@ export default class AbbrewActor extends Actor {
     //TODO: Tidy this up
     await this.setFlag("abbrew", "combat.damage.lastReceived", data.damage);
     await this.setFlag("abbrew", "combat.damage.roundReceived", this.mergeDamageTakenForRound(data.damage));
-    let damage = this.applyModifiersToDamage(rolls, data, action);
+    let damage = this.applyModifiersToDamage(data);
     const updateRisk = this.calculateRisk(damage, guard, risk, inflexibility, data.isFeint, data.isStrongAttack, action, attackingActorParryCounter, attackingActorFeint);
     let overFlow = updateRisk > 100 ? updateRisk - 100 : 0;
 
@@ -152,7 +152,7 @@ export default class AbbrewActor extends Actor {
     await this.takeDamage(rolls, data, action);
   }
 
-  async takeFinisher(rolls, data) {
+  async takeFinisher(rolls, data, finisherType) {
     if (data.totalSuccesses < 1 && !this.statuses.has('offGuard')) {
       await this.sendFinisherToChat();
       return;
@@ -164,7 +164,7 @@ export default class AbbrewActor extends Actor {
     await this.takeDamage(rolls, data, "finisher");
 
     const risk = this.system.defense.risk.raw;
-    const totalRisk = this.applyModifiersToRisk(rolls, data);
+    const totalRisk = this.applyModifiersToRisk(rolls, data, finisherType);
     let finisherCost = 0;
     let finisher = null;
     const uniqueFinisher = data.finisher ? Object.values(data.finisher)[0] : null;
@@ -174,7 +174,7 @@ export default class AbbrewActor extends Actor {
       this.getFinisherCost(finisherConstruct, totalRisk, data.attackProfile);
       finisher = this.getFinisher(finisherConstruct, finisherCost);
     } else {
-      const availableFinishers = this.getAvailableFinishersForDamageType(data);
+      const availableFinishers = this.getAvailableFinishersForDamageType(finisherType);
       finisherCost = this.getFinisherCost(availableFinishers, totalRisk, data.attackProfile);
       finisher = this.getFinisher(availableFinishers, finisherCost);
     }
@@ -199,13 +199,17 @@ export default class AbbrewActor extends Actor {
     return totalRoundReceivedDamage;
   }
 
-  applyModifiersToRisk(rolls, data) {
+  applyModifiersToRisk(rolls, data, finisherType) {
     let successes = 0;
+    if (this.system.defense.protection[finisherType].immunity > 0) {
+      return successes;
+    }
+
     successes += data.totalSuccesses;
     successes += this.system.defense.risk.value;
     successes -= this.system.defense.inflexibility.resistance.value;
-    successes += data.damage.map(d => this.system.defense.protection.find(w => w.type === d.damageType)).reduce((result, p) => result += p?.weakness ?? 0, 0);
-    successes -= data.damage.map(d => this.system.defense.protection.find(w => w.type === d.damageType)).reduce((result, p) => result += p?.resistance ?? 0, 0);
+    successes -= Math.max(0, this.system.defense.protection[finisherType].resistance - data.damage.find(d => d.damageType === finisherType)?.penetration ?? 0);
+    successes += this.system.defense.protection[finisherType].weakness;
     // TODO: Size Diff
     // TODO: Tier Diff
     // TODO: Lethal Diff
@@ -213,11 +217,8 @@ export default class AbbrewActor extends Actor {
     return successes;
   }
 
-  getAvailableFinishersForDamageType(data) {
-    // TODO: Only looking at main damage type?
-    if (data.damage[0]) {
-      return data.damage[0].damageType in FINISHERS ? FINISHERS[data.damage[0].damageType] : FINISHERS['physical'];
-    }
+  getAvailableFinishersForDamageType(finisherType) {
+    return finisherType in FINISHERS ? FINISHERS[finisherType] : FINISHERS['untyped'];
   }
 
   getFinisherCost(availableFinishers, risk, attackProfile) {
@@ -269,11 +270,10 @@ export default class AbbrewActor extends Actor {
     return risk - (finisherCost * 10);
   }
 
-  applyModifiersToDamage(rolls, data) {
+  applyModifiersToDamage(data) {
     let rollSuccesses = data.totalSuccesses;
     return data.damage.reduce((result, d) => {
-      // TODO: Enable new DR types
-      const protection = /* this.system.defense.protection.some(dr => dr.type === d.damageType) ? this.system.defense.protection.filter(dr => dr.type === d.damageType)[0] : */ { immunity: 0, resistance: 0, weakness: 0 };
+      const protection = this.system.defense.protection[d.damageType];
       if (protection.immunity > 0) {
         return result;
       }
@@ -284,7 +284,15 @@ export default class AbbrewActor extends Actor {
         return result;
       }
 
-      const dmg = d.value;
+      let multiplierSelector = Math.max(0, protection.resistance - d.penetration) - protection.weakness;
+      let multiplier = 1;
+      if (multiplierSelector > 0) {
+        multiplier = 0.5;
+      } else if (multiplierSelector < 0) {
+        multiplier = 2;
+      }
+
+      const dmg = Math.floor(d.value * multiplier);
 
       return result += dmg;
     }, 0);

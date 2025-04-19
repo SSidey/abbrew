@@ -18,7 +18,7 @@
         <div>
             <label>{{ localize "ABBREW.Type" }}</label>
             <select name="system.defense.protection.{{i}}.type">
-                {{selectOptions ../config.concepts selected=protection.type blank="" localize=true}}
+                {{selectOptions ../config.damageTypes selected=protection.type localize=true}}
             </select>
         </div>
         <div>

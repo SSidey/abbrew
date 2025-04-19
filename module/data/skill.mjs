@@ -143,6 +143,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
                         attributeMultiplier: new fields.NumberField({ ...requiredNumber, initial: 1, min: 0 }),
                         damageMultiplier: new fields.NumberField({ ...requiredNumber, initial: 1, min: 0 }),
                         overallMultiplier: new fields.NumberField({ ...requiredNumber, initial: 1, min: 0 }),
+                        penetration: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
                     })
                 ),
                 finisherLimit: new fields.NumberField({ ...requiredInteger, initial: 10, min: 1 })
@@ -173,6 +174,10 @@ export default class AbbrewSkill extends AbbrewItemBase {
                         value: new fields.NumberField({ ...requiredInteger, initial: 10, nullable: true }),
                         operator: new fields.StringField({ required: true, blank: true })
                     }),
+                    penetration: new fields.SchemaField({
+                        value: new fields.NumberField({ ...requiredInteger, initial: 10, nullable: true }),
+                        operator: new fields.StringField({ required: true, blank: true })
+                    }),
                     finisher: new fields.SchemaField({
                         cost: new fields.NumberField({ nullable: true, min: 0, integer: true }),
                         wounds: new fields.ArrayField(
@@ -192,7 +197,8 @@ export default class AbbrewSkill extends AbbrewItemBase {
                             attributeModifier: new fields.StringField({ required: true, blank: true, nullable: true }),
                             attributeMultiplier: new fields.NumberField({ ...requiredNumber, initial: 1, min: 0 }),
                             damageMultiplier: new fields.NumberField({ ...requiredNumber, initial: 1, min: 0 }),
-                            overallMultiplier: new fields.NumberField({ ...requiredNumber, initial: 1, min: 0 })
+                            overallMultiplier: new fields.NumberField({ ...requiredNumber, initial: 1, min: 0 }),
+                            penetration: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
                         })
                     )
                 }),

@@ -119,7 +119,12 @@
         {{/if}}
         {{/unless}}
         {{#if showFinisher}}
-        <button data-action="finisher">Finisher</button>
+        <ol class="finisher-buttons">
+            {{#each finisherDamageTypes as |type|}}
+            <button data-action="finisher" data-finisher-type="{{type}}" data-key="{{type}}">Finisher
+                ({{type}})</button>
+            {{/each}}
+        </ol>
         {{/if}}
     </div>
 </div>

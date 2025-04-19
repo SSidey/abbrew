@@ -42,6 +42,24 @@
     "Defense": {
       "guard": "Guard"
     },
+    "DamageTypes": {
+      "physical": "Physical",
+      "crushing": "Crushing",
+      "piercing": "Piercing",
+      "slashing": "Slashing",
+      "life": "Life",
+      "death": "Death",
+      "fire": "Fire",
+      "cold": "Cold",
+      "electric": "Electric",
+      "acid": "Acid",
+      "poison": "Poison",
+      "dark": "Dark",
+      "light": "Light",
+      "pain": "Pain",
+      "emotion": "Emotion",
+      "psychic": "Psychic"
+    },
     "AttributeIncrease": "Attribute Increase",
     "SkillActivationType": "Activation Type",
     "SkillActivationTypes": {

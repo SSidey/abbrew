@@ -375,7 +375,7 @@
                     <div class="attack-profile-element-2">
                         <label>{{ localize "ABBREW.Type" }}</label>
                         <select name="system.action.attackProfile.finisher.type">
-                            {{selectOptions config.concepts selected=system.action.attackProfile.finisher.type
+                            {{selectOptions config.damageTypes selected=system.action.attackProfile.finisher.type
                             blank="" localize=true}}
                         </select>
                         <div></div>
@@ -453,7 +453,7 @@
                         <div class="damage-profile-element-2">
                             <label>{{ localize "ABBREW.Type" }}</label>
                             <select name="system.action.attackProfile.damage.{{j}}.type">
-                                {{selectOptions ../config.concepts selected=damage.type blank="" localize=true}}
+                                {{selectOptions ../config.damageTypes selected=damage.type blank="" localize=true}}
                             </select>
                         </div>
                         <div class="damage-profile-element-2">
@@ -644,7 +644,7 @@
                         <div class="damage-profile-element-2">
                             {{#if (or (eq damage.modify "all") (eq damage.modify "one"))}}
                             <select name="system.action.modifiers.attackProfile.damage.{{j}}.modifyType">
-                                {{selectOptions ../config.concepts selected=damage.modifyType blank="" localize=true}}
+                                {{selectOptions ../config.damageTypes selected=damage.modifyType blank="" localize=true}}
                             </select>
                             {{/if}}
                         </div>
@@ -663,7 +663,7 @@
                         <div class="damage-profile-element-2">
                             <label>{{ localize "ABBREW.Type" }}</label>
                             <select name="system.action.modifiers.attackProfile.damage.{{j}}.type">
-                                {{selectOptions ../config.concepts selected=damage.type blank="" localize=true}}
+                                {{selectOptions ../config.damageTypes selected=damage.type blank="" localize=true}}
                             </select>
                         </div>
                         <div class="damage-profile-element-2">
