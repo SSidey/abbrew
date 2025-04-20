@@ -1,7 +1,7 @@
-import { applyOperator } from "./operators.mjs";
-import { applySkillEffects } from "./skill.mjs";
+import { applyOperator, getOrderForOperator } from "./operators.mjs";
+import { applySkillEffects, parseModifierFieldValue } from "./skill.mjs";
 import { handleSkillExpiry } from "./time.mjs";
-import { getSafeJson } from "./utils.mjs";
+import { compareModifierIndices, getSafeJson } from "./utils.mjs";
 
 export async function handleCombatStart(actors) {
     for (const index in actors) {
@@ -189,8 +189,8 @@ async function updateTurnStartWounds(actor) {
     const lingeringWoundTypes = foundry.utils.deepClone(CONFIG.ABBREW.lingeringWoundTypes);
     const woundToLingeringWounds = foundry.utils.deepClone(CONFIG.ABBREW.woundToLingeringWounds);
     const woundImmunities = getWoundImmunities(actor);
-    const woundSuppressors = getWoundsWithOperator(actor, "suppress");
-    const woundIntensifiers = getWoundsWithOperator(actor, "intensify");
+    const woundSuppressors = getWoundsWithSuppression(actor);
+    const woundIntensifiers = getWoundsWithIntensify(actor);
     const activeLingeringWounds = actor.system.wounds.filter(w => lingeringWoundTypes.some(lw => w.type === lw)).filter(w => !woundImmunities.includes(w.type)).filter(w => w.value > 0);
     if (activeLingeringWounds.length > 0) {
         const appliedLingeringWounds = {};
@@ -215,13 +215,37 @@ async function updateTurnStartWounds(actor) {
 function getWoundsWithOperator(actor, operator) {
     return actor.items.filter(i => i.type === "skill").filter(s => s.system.action.modifiers.wounds.self.some(w => w.operator === operator)).filter(s => !s.system.isActivatable || (actor.system.activeSkills.includes(s._id))).flatMap(s => s.system.action.modifiers.wounds.self.filter(w => w.operator === operator)).reduce((result, ws) => {
         if (ws.type in result) {
-            result[ws.type] = result[ws.type] + ws.value;
+            result[ws.type].push({ operator: ws.operator, value: parseModifierFieldValue(ws.value, actor, ws), index: getOrderForOperator(ws.operator) });
         } else {
-            result[ws.type] = ws.value;
+            result[ws.type] = [{ operator: ws.operator, value: parseModifierFieldValue(ws.value, actor, ws), index: getOrderForOperator(ws.operator) }];
         }
 
         return result;
-    }, {})
+    }, {});
+}
+
+function getWoundsWithSuppression(actor) {
+    const wounds = getWoundsWithOperator(actor, "suppress");
+    Object.keys(wounds).forEach(key => {
+        wounds[key] = wounds[key].reduce((result, wound) => {
+            result = result + wound.value[0].path;
+
+            return result;
+        }, 0);
+    });
+    return wounds;
+}
+
+function getWoundsWithIntensify(actor) {
+    const wounds = getWoundsWithOperator(actor, "intensify");
+    Object.keys(wounds).forEach(key => {
+        wounds[key] = wounds[key].reduce((result, wound) => {
+            result = result + wound.value[0].path;
+
+            return result;
+        }, 0);
+    });
+    return wounds;
 }
 
 async function applyActiveSkills(actor, turnPhase) {

@@ -49,7 +49,8 @@
         "value": 1,
         "max": 0,
         "period": "",
-        "removeWhenNoUsesRemain": false
+        "removeWhenNoUsesRemain": false,
+        "removeStackOnUse": false
       },
       "charges": {
         "hasCharges": false,
@@ -57,15 +58,7 @@
         "max": 0
       },
       "isActive": false,
-      "skillCheck": [
-        {
-          "operator": "add",
-          "type": "numeric",
-          "path": "1",
-          "multiplier": 1,
-          "lateParse": false
-        }
-      ],
+      "skillCheck": [],
       "skillRequest": {
         "isEnabled": false,
         "isContested": false,
@@ -202,7 +195,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1744980400845,
-    "modifiedTime": 1744987308635,
+    "modifiedTime": 1745068583375,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!kzr36Ru92tr41DA2"

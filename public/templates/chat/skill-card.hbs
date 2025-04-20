@@ -79,9 +79,10 @@
         {{#if showAttackResult}}
         <div class="dice-roll">
             <h3>Damage</h3>
-            <div class="dice-result" {{#unless (showGmSection user)}}data-visibility="gm" {{/unless}}>
-                <div class="dice-formula">{{totalSuccesses}}</div>
-                <div class="dice-tooltip">
+            <div class="dice-result">
+                <div class="dice-formula" {{#unless (showGmSection user)}}data-visibility="gm" {{/unless}}>{{totalSuccesses}}</div>
+                <div class="dice-formula" {{#unless (showGmSection user)}}data-visibility="player" {{/unless}}>??</div>
+                <div class="dice-tooltip" {{#unless (showGmSection user)}}data-visibility="gm" {{/unless}}>
                     <section class="tooltip-part">
                         <div class="dice">
                             <ol class="dice-rolls">
@@ -119,6 +120,10 @@
         {{#unless isFinisher}}
         {{#if showAttack}}
         <button data-action="damage">Damage</button>
+        {{else}}
+        {{#if showAcceptButton}}
+        <button data-action="accept">Accept Effect</button>
+        {{/if}}
         {{/if}}
         {{/unless}}
         {{/unless}}

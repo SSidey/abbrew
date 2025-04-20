@@ -6,48 +6,56 @@
   "system": {
     "description": "<p>Trigger: You are targeted by an attack</p>\n<hr>\n<p>Requirement: You have more than 0 movement</p>\n<hr>\n<p>You dodge out of harms way.</p>\n<p>&nbsp;</p>\n<p>Move up to your size or speed, whichever is lower.</p>\n<p>You must increase your distance from the attacker.</p>\n<p>This movement provokes reactions.</p>\n<p>The attacker can choose to follow up to their size or speed, whichever is lower.</p>\n<p>You suffer [1 Fatigue Wound]</p>",
     "traits": "",
-    "configurable": false,
+    "configurable": true,
     "action": {
       "activationType": "standalone",
       "actionCost": "1",
       "modifiers": {
         "guard": {
           "self": {
-            "value": "0",
+            "value": [],
             "operator": ""
           },
           "target": {
-            "value": "0",
+            "value": [],
             "operator": ""
           }
         },
         "risk": {
           "self": {
-            "value": 0,
+            "value": [],
             "operator": ""
           },
           "target": {
-            "value": 0,
+            "value": [],
             "operator": ""
           }
         },
         "wounds": {
           "self": [
             {
-              "value": 1,
-              "type": "fatigue",
-              "operator": "add"
+              "type": "exhaustion",
+              "operator": "add",
+              "value": [
+                {
+                  "operator": "add",
+                  "type": "numeric",
+                  "path": "1",
+                  "multiplier": 1,
+                  "lateParse": false
+                }
+              ]
             }
           ],
           "target": []
         },
         "resolve": {
           "self": {
-            "value": 0,
+            "value": [],
             "operator": ""
           },
           "target": {
-            "value": 0,
+            "value": [],
             "operator": ""
           }
         },
@@ -102,10 +110,11 @@
         "attackType": "",
         "lethal": 0,
         "critical": 10,
-        "handsSupplied": null,
+        "handsSupplied": 0,
         "attackMode": "",
         "damage": [],
-        "finisherLimit": 10
+        "finisherLimit": 10,
+        "isEnabled": false
       }
     },
     "skillType": "basic",
@@ -136,7 +145,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743073039533,
-    "modifiedTime": 1743075706111,
+    "modifiedTime": 1745164649145,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "ownership": {

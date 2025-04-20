@@ -109,6 +109,7 @@ export default class AbbrewItem extends Item {
 
     switch (action) {
       case 'check': await this._onAcceptCheckAction(message.rolls, message.flags.data, messageId); break;
+      case 'accept': await this._onAcceptEffectAction(message.rolls, message.flags.data, action); break;
       case 'damage': await this._onAcceptDamageAction(message.rolls, message.flags.data, action); break;
       case 'overpower': await this._onAcceptDamageAction(message.rolls, message.flags.data, action); break;
       case 'parry': await this._onAcceptDamageAction(message.rolls, message.flags.data, action); break;
@@ -138,6 +139,18 @@ export default class AbbrewItem extends Item {
     const html = await renderTemplate("systems/abbrew/templates/chat/skill-card.hbs", templateData);
     // await updateMessageForCheck(messageId, html, templateData);
     emitForAll("system.abbrew", new SocketMessage(game.user.id, "updateMessageForCheck", { messageId, html, templateData }));
+  }
+
+  static async _onAcceptEffectAction(rolls, data, action) {
+    const tokens = canvas.tokens.controlled.filter((token) => token.actor);
+    if (tokens.length === 0) {
+      ui.notifications.info("Please select a token to accept the effect.");
+      return;
+    }
+
+    const actor = tokens[0].actor;
+
+    await actor.takeEffect(data, rolls, action);
   }
 
   static async _onAcceptDamageAction(rolls, data, action) {

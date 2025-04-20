@@ -255,7 +255,7 @@ Hooks.on("combatTurn", async (combat, updateData, updateOptions) => {
 })
 
 Hooks.on("combatTurnChange", async (combat, prior, current) => {
-  if (canvas.tokens.get(curent.tokenId).actor.isOwner) {
+  if (canvas.tokens.get(current.tokenId).actor.isOwner) {
     await emitForAll("system.abbrew", new SocketMessage(null, "handleCombatTurnChange", { prior, current }));
   }
 })

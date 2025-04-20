@@ -340,7 +340,6 @@ export async function applySkillEffects(actor, skill) {
         };
     }
 
-    // TODO: Give another way to render the card and allow for an accept button
     if (skill.system.action.attackProfile.isEnabled) {
         const baseAttackProfile = skill.system.action.attackProfile;
         const attackProfile = mergeAttackProfiles(baseAttackProfile, modifierSkills);
@@ -425,6 +424,13 @@ export async function applySkillEffects(actor, skill) {
     targetUpdates = [guardTargetUpdate, riskTargetUpdate, resolveTargetUpdate];
     const targetWounds = mergeWoundTargetModifiers(allSkills, actor, targetPhaseFilter);
     const targetResources = mergeTargetResources(allSkills, actor, targetPhaseFilter);
+
+    const showAcceptButton = Object.keys(targetUpdates).length > 0 || targetWounds.length > 0 || targetResources.length > 0;
+
+    templateData = {
+        ...templateData,
+        showAcceptButton: showAcceptButton
+    }
 
     data = {
         ...data,
