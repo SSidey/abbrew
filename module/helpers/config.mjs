@@ -249,6 +249,7 @@ ABBREW.wounds = {
 }
 
 ABBREW.acuteWounds = Object.entries(ABBREW.wounds).filter(w => w[1].lingeringWounds.length === 0).map(w => w[0]);
+ABBREW.lingeringWounds = Object.entries(ABBREW.wounds).filter(w => w[1].lingeringWounds.length > 0).map(w => w[0]);
 
 ABBREW.conditions = {
   dead: {

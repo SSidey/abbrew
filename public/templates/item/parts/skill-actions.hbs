@@ -473,6 +473,11 @@
                             <input type="text" name="system.action.attackProfile.damage.{{j}}.attributeMultiplier"
                                 value="{{damage.attributeMultiplier}}" data-dtype="String" />
                         </div>
+                        <div class="damage-profile-element-2">
+                            <label>Penetration</label>
+                            <input type="text" name="system.action.attackProfile.damage.{{j}}.penetration"
+                                value="{{damage.penetration}}" data-dtype="String" />
+                        </div>
                     </div>
                     <div class="skill-damage-control">
                         <a class="damage-control remove-damage" data-action="remove-damage">
@@ -684,6 +689,12 @@
                             <input type="text"
                                 name="system.action.modifiers.attackProfile.damage.{{j}}.attributeMultiplier"
                                 value="{{damage.attributeMultiplier}}" data-dtype="String" />
+                        </div>
+                        <div class="damage-profile-element-2">
+                            <label>Penetration</label>
+                            <input type="text"
+                                name="system.action.modifiers.attackProfile.damage.{{j}}.penetration"
+                                value="{{damage.penetration}}" data-dtype="String" />
                         </div>
                         {{/unless}}
                     </div>

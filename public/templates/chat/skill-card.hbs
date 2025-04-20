@@ -7,21 +7,28 @@
     <div class="message-content">
         <div>
             <ol class="skill-card-descriptions">
-                {{#each allSummaries as |summary| }}
-                <li>
+                {{#each modifierSummaries as |summary| }}
+                <li {{#unless (showGmSection ../user)}}data-visibility="gm" {{/unless}}>
                     <h3>{{summary.name}}</h3>
                     <span>
                         {{{summary.description}}}
                     </span>
                 </li>
                 {{/each}}
+                <li>
+                    <h3>{{mainSummary.name}}</h3>
+                    <span>
+                        {{{mainSummary.description}}}
+                    </span>
+                </li>
             </ol>
         </div>
         {{#if showSkillResult}}
         <div class="dice-roll">
+            <h3>Skill Check</h3>
             <div class="dice-result">
                 {{#if skillResult.baseDicePool}}
-                <div class="dice-tooltip">
+                <div class="dice-tooltip" {{#unless (showGmSection user)}}data-visibility="gm" {{/unless}}>
                     <section class="tooltip-part">
                         <div class="dice">
                             <ol class="dice-rolls">
@@ -37,14 +44,17 @@
                 {{/if}}
                 {{#if skillResult.simpleResult}}
                 <h4 class="dice-total">
-                    {{skillResult.simpleResult}}
-                    {{#unless skillResult.isContested}}
-                    {{#if skillResult.result}}
-                    <i class="fa-regular fa-circle-check" style="color: #176951;"></i>
-                    {{else}}
-                    <i class="fa-regular fa-circle-xmark" style="color: #6f0003;"></i>
-                    {{/if}}
-                    {{/unless}}
+                    <span {{#unless (showGmSection user)}}data-visibility="gm" {{/unless}}>
+                        {{skillResult.simpleResult}}
+                        {{#unless skillResult.isContested}}
+                        {{#if skillResult.result}}
+                        <i class="fa-regular fa-circle-check" style="color: #176951;"></i>
+                        {{else}}
+                        <i class="fa-regular fa-circle-xmark" style="color: #6f0003;"></i>
+                        {{/if}}
+                        {{/unless}}
+                    </span>
+                    <label {{#unless (showGmSection user)}}data-visibility="player" {{/unless}}>??</label>
                 </h4>
                 {{/if}}
             </div>
@@ -68,7 +78,8 @@
         {{/if}}
         {{#if showAttackResult}}
         <div class="dice-roll">
-            <div class="dice-result">
+            <h3>Damage</h3>
+            <div class="dice-result" {{#unless (showGmSection user)}}data-visibility="gm" {{/unless}}>
                 <div class="dice-formula">{{totalSuccesses}}</div>
                 <div class="dice-tooltip">
                     <section class="tooltip-part">
@@ -84,12 +95,15 @@
                     </section>
                 </div>
                 <h4 class="dice-total">
-                    <ol>
+                    <ol class="skill-damage">
                         {{#each damage as |dmg id|}}
-                        <div>
+                        <div {{#unless (showGmSection ../user)}}data-visibility="gm" {{/unless}}>
                             <label>{{dmg.value}} {{dmg.damageType}}</label>
                         </div>
                         {{/each}}
+                        <div {{#unless (showGmSection user)}}data-visibility="player" {{/unless}}>
+                            <label>??</label>
+                        </div>
                     </ol>
                 </h4>
             </div>

@@ -293,6 +293,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
         schema.attributeIncrease = new fields.StringField({ ...blankString });
         schema.attributeIncreaseLong = new fields.StringField({ ...blankString });
         schema.attributeRankIncrease = new fields.StringField({ ...blankString });
+        schema.isProxied = new fields.BooleanField({ required: true, initial: false });
         schema.siblingSkillModifiers = new fields.ArrayField(
             new fields.ObjectField({ nullable: false })
         );

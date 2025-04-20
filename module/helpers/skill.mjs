@@ -4,6 +4,7 @@ import { mergeWoundsWithOperator } from "./combat.mjs";
 import { getFundamentalAttributeSkill } from "./fundamental-skills.mjs";
 
 export async function handleSkillActivate(actor, skill, checkActions = true) {
+    const isSkillProxied = skill.system.isProxied;
     if (!skill.system.isActivatable) {
         ui.notifications.info(`${skill.name} can not be activated`);
         return false;
@@ -35,6 +36,7 @@ export async function handleSkillActivate(actor, skill, checkActions = true) {
     }
 
     await rechargeSkill(actor, skill);
+    skill.system.isProxied = isSkillProxied;
     return await activateSkill(actor, skill);
 }
 
@@ -208,7 +210,8 @@ export async function applySkillEffects(actor, skill) {
     const mainModifierSkills = getModifierSkills(actor, skill);
     const modifierSkills = [...mainModifierSkills, ...skill.system.siblingSkillModifiers];
     const allSkills = [...modifierSkills, skill].filter(s => !s.system.action.charges.hasCharges || (s.system.action.charges.value > 0));
-    const allSummaries = allSkills.map(s => ({ name: s.name, description: s.system.description }));
+    const mainSummary = ({ name: skill.name, description: skill.system.description });
+    const modifierSummaries = modifierSkills.map(s => ({ name: s.name, description: s.system.description }));
     // Explicitly get any skills with charges for later use
     const usesSkills = [...mainModifierSkills, skill].filter(s => s.system.action.uses.hasUses).filter(s => s._id !== skill._id);
     const chargedSkills = [...mainModifierSkills, skill].filter(s => s.system.action.charges.hasCharges);
@@ -257,7 +260,7 @@ export async function applySkillEffects(actor, skill) {
 
     const fortune = mergeFortune(allSkills);
     const token = actor.token;
-    let templateData = { allSummaries: allSummaries, skillCheck: { attempts: [] } };
+    let templateData = { user: game.user, mainSummary: mainSummary, modifierSummaries: modifierSummaries, skillCheck: { attempts: [] } };
     let data = {};
     let skillResult = { dice: [], modifier: 0, baseDicePool: 0, result: false, isContested: false };
 

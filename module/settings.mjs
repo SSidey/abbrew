@@ -7,4 +7,13 @@ export function registerSystemSettings() {
         default: false,
         type: Boolean
     });
+
+    game.settings.register("abbrew", "hideGmSection", {
+        name: "SETTINGS.hideGmSection.Name",
+        hint: "SETTINGS.hideGmSection.Hint",
+        scope: "world",
+        config: true,
+        default: true,
+        type: Boolean
+    });
 }

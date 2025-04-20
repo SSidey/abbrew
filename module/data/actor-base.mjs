@@ -108,7 +108,16 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         base: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 20 }),
         max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 20 }),
         label: new fields.StringField({ required: true, blank: true })
-      })
+      }),
+      recovery: new fields.SchemaField(Object.keys(CONFIG.ABBREW.lingeringWounds).reduce((obj, wound) => {
+        const type = CONFIG.ABBREW.lingeringWounds[wound];
+        obj[type] = new fields.SchemaField({
+          label: new fields.StringField({ required: true, blank: true }),
+          type: new fields.StringField({ required: true, blank: true }),
+          value: new fields.NumberField({ ...requiredInteger, initial: 1 })
+        });
+        return obj;
+      }, {}))
     });
     schema.resources = new fields.SchemaField({
       owned: new fields.ArrayField(
@@ -256,9 +265,9 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       this.defense.protection[key].type = key;
     }
 
-    for (const key in this.defense.damageTypes) {
-      // Handle damage type label localization.
-      // this.defense.damageTypes[key].label = game.i18n.localize(CONFIG.ABBREW.damageTypes[key]) ?? key;
+    for (const key in this.defense.recovery) {
+      this.defense.recovery[key].type = key;
+      this.defense.recovery[key].label = game.i18n.localize(CONFIG.ABBREW.wounds[key].name) ?? type;
     }
 
     const anatomy = this._prepareAnatomy();

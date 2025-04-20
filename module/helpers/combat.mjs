@@ -21,16 +21,11 @@ export async function handleTurnChange(prior, current, priorActor, currentActor)
 }
 
 export function mergeActorWounds(actor, incomingWounds) {
-    // const wounds = actor.system.wounds;
-    // const result = [...wounds, ...incomingWounds].reduce((a, { type, value }) => ({ ...a, [type]: a[type] ? { type, value: a[type].value + value } : { type, value } }), {});
-    // return Object.values(result).filter(v => v.value > 0);
     return mergeActorWoundsWithOperator(actor, incomingWounds, 'add');
 }
 
 export function mergeActorWoundsWithOperator(actor, incomingWounds, operator) {
     const wounds = actor.system.wounds;
-    // const result = [...wounds, ...incomingWounds].reduce((a, { type, value }) => ({ ...a, [type]: a[type] ? { type, value: applyOperator(a[type].value, value, operator) } : { type, value } }), {});
-    // return Object.values(result).filter(v => v.value > 0);
     return mergeWoundsWithOperator(wounds, incomingWounds, operator);
 }
 
@@ -209,7 +204,7 @@ async function updateTurnStartWounds(actor) {
             return appliedLingeringWounds;
         }, appliedLingeringWounds);
         const acuteWoundUpdate = Object.entries(appliedLingeringWounds).map(alw => ({ type: alw[0], value: alw[1] }));
-        const lingeringWoundUpdate = activeLingeringWounds.flatMap(lw => actor.system.wounds.filter(w => w.type === lw.type).map(w => ({ type: w.type, value: getLingeringWoundValueUpdate(w.value) })));
+        const lingeringWoundUpdate = activeLingeringWounds.flatMap(lw => actor.system.wounds.filter(w => w.type === lw.type).map(w => ({ type: w.type, value: getLingeringWoundValueUpdate(actor, w.type) })));
         const fullWoundUpdate = [...acuteWoundUpdate, ...lingeringWoundUpdate];
         if (fullWoundUpdate.length > 0) {
             await updateActorWounds(actor, mergeActorWounds(actor, fullWoundUpdate));
@@ -253,7 +248,7 @@ async function rechargePerRoundSkills(actor) {
     }
 }
 
-function getLingeringWoundValueUpdate(woundValue) {
+function getLingeringWoundValueUpdate(actor, woundType) {
     // To be merged with current stacks
-    return -1;
+    return -1 * actor.system.defense.recovery[woundType].value;
 }

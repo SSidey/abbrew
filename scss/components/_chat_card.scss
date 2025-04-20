@@ -6,3 +6,13 @@ label.skill-check-actor-name {
     list-style: none;
     padding-left: 0px;
 }
+
+[data-visibility="gm"] {
+    background-color: rgba(240, 240, 255, 0.9);
+    outline: 1px solid rgba(0, 0, 255, 0.4);
+}
+
+.skill-damage {
+    list-style: none;
+    padding-left: 0px;
+}

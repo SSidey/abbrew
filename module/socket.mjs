@@ -1,3 +1,5 @@
+import { handleTurnChange } from "./helpers/combat.mjs";
+
 class SocketMessage {
     // String, String, Object
     constructor(userId, request, data) {
@@ -23,7 +25,25 @@ async function handleMessage(message) {
         case "updateMessageForCheck":
             await executeAsGM(updateMessageForCheck, message.userId, message.data);
             break;
+        case "handleCombatTurnChange":
+            await executeAsGM(handleCombatTurnChange, message.userId, message.data);
     }
+}
+
+const GMProxyFunctions = [
+    updateMessageForCheck,
+    handleCombatTurnChange
+];
+
+async function updateMessageForCheck(data) {
+    const message = game.messages.get(data.messageId);
+    await message.update({ "content": data.html, "flags.abbrew.messasgeData.templateData": data.templateData });
+}
+
+async function handleCombatTurnChange(data) {
+    const prior = data.prior;
+    const current = data.current;
+    await handleTurnChange(prior, current, canvas.tokens.get(prior.tokenId)?.actor, canvas.tokens.get(current.tokenId).actor);
 }
 
 async function executeAsGM(func, userId, data) {
@@ -35,14 +55,5 @@ async function executeAsGM(func, userId, data) {
         await func(data);
     }
 }
-
-async function updateMessageForCheck(data) {
-    const message = game.messages.get(data.messageId);
-    await message.update({ "content": data.html, "flags.abbrew.messasgeData.templateData": data.templateData });
-}
-
-const GMProxyFunctions = [
-    updateMessageForCheck
-];
 
 export { activateSocketListener, emitForAll, SocketMessage }

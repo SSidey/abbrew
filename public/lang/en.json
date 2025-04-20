@@ -287,5 +287,7 @@
     }
   },
   "SETTINGS.AnnounceTurnStart.Name": "Announce Turn Start",
-  "SETTINGS.AnnounceTurnStart.Hint": "Announce turn start to chat."
+  "SETTINGS.AnnounceTurnStart.Hint": "Announce turn start to chat.",
+  "SETTINGS.hideGmSection.Name": "Hide GM Section From Players",
+  "SETTINGS.hideGmSection.Hint": "Should GM Section (decriptions, checks and damage etc.) be hidden from players? (default true)"
 }

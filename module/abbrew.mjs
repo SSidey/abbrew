@@ -8,7 +8,7 @@ import { ABBREW } from './helpers/config.mjs';
 import * as models from './data/_module.mjs';
 // Import Documents Classes
 import * as documents from './documents/_module.mjs';
-import { handleTurnChange, handleActorWoundConditions, handleActorGuardConditions, handleCombatStart } from './helpers/combat.mjs';
+import { handleActorWoundConditions, handleActorGuardConditions, handleCombatStart } from './helpers/combat.mjs';
 import { staticID, doesNestedFieldExist } from './helpers/utils.mjs';
 import { registerSystemSettings } from './settings.mjs';
 import { AbbrewCreatureFormSheet } from './sheets/items/item-creature-form-sheet.mjs';
@@ -17,7 +17,7 @@ import { AbbrewAnatomySheet } from './sheets/items/item-anatomy-sheet.mjs';
 import { AbbrewSkillSheet } from './sheets/items/item-skill-sheet.mjs';
 import { handleSkillActivate } from './helpers/skill.mjs';
 import { onWorldTimeUpdate } from './helpers/time.mjs';
-import { activateSocketListener } from './socket.mjs';
+import { activateSocketListener, emitForAll, SocketMessage } from './socket.mjs';
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -211,6 +211,12 @@ Handlebars.registerHelper('isGM', function () {
   return game.user.isGM;
 })
 
+Handlebars.registerHelper('showGmSection', function (user, options) {
+  const hideGmSection = game.settings.get("abbrew", "hideGmSection");
+  const result = !hideGmSection || !game.users.get(user._id).isGM;
+  return result;
+})
+
 Handlebars.registerHelper("eagerEvaluation", function (value, ...replacements) {
   const regex = /{{[^{}]*}}/g;
 
@@ -249,8 +255,8 @@ Hooks.on("combatTurn", async (combat, updateData, updateOptions) => {
 })
 
 Hooks.on("combatTurnChange", async (combat, prior, current) => {
-  if (canvas.tokens.get(current.tokenId).actor.isOwner) {
-    await handleTurnChange(prior, current, canvas.tokens.get(prior.tokenId)?.actor, canvas.tokens.get(current.tokenId).actor);
+  if (canvas.tokens.get(curent.tokenId).actor.isOwner) {
+    await emitForAll("system.abbrew", new SocketMessage(null, "handleCombatTurnChange", { prior, current }));
   }
 })
 
@@ -271,6 +277,29 @@ Hooks.on("applyActiveEffect", applyCustomEffects);
 
 Hooks.on("renderChatLog", (app, html, data) => {
   documents.AbbrewItem.chatListeners(html);
+});
+
+Hooks.on("renderChatMessage", async function onMessageRendered(message, html, messageData) {
+  //[data-visibility="gm"]
+  if (!game.user.isGM) {
+    html.find(`[data-visibility="gm"]`).remove();
+  }
+  if (game.user.isGM) {
+    html.find(`[data-visibility="redacted"]`).remove();
+    html.find(`[data-visibility="player"]`).remove();
+  }
+
+  // visibility based on actor owner
+  let element = html.find("div [data-visibility]");
+  if (element) {
+    let actorId = element.data("visibility");
+    if (actorId) {
+      let actor = game.actors.get(actorId);
+      if (actor && !actor.isOwner) {
+        element.remove();
+      }
+    }
+  }
 });
 
 Hooks.on("updateActor", async (actor, updates, options, userId) => {
