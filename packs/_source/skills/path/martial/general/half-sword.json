@@ -13,7 +13,7 @@
     },
     "skillTraits": "",
     "skillModifiers": {
-      "synergy": "",
+      "synergy": "[{\"id\":\"abbrewAttack0000\",\"value\":\"Attack\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewAttack0000\"},{\"id\":\"abbrewOverpower0\",\"value\":\"Overpower\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewOverpower0\"},{\"id\":\"abbrewParry00000\",\"value\":\"Parry\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewParry00000\"},{\"id\":\"abbrewFinisher00\",\"value\":\"Finisher\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewFinisher00\"}]",
       "discord": ""
     },
     "configurable": true,
@@ -213,7 +213,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1745164714573,
-    "modifiedTime": 1745164777869,
+    "modifiedTime": 1745173963204,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!Z8Md424d0y5Y9GM8"

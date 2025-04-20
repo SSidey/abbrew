@@ -13,7 +13,7 @@
     },
     "skillTraits": "",
     "skillModifiers": {
-      "synergy": "[{\"value\":\"Attack\",\"id\":\"\",\"sourceId\":\"Compendium.abbrew.skills.Item.XUpBl13SyrdUvgMb\"},{\"value\":\"Overpower\",\"id\":\"\",\"sourceId\":\"Compendium.abbrew.skills.Item.rROAymZJjdomFnKc\"}]",
+      "synergy": "[{\"value\":\"Attack\",\"id\":\"\",\"sourceId\":\"Compendium.abbrew.skills.Item.XUpBl13SyrdUvgMb\"},{\"value\":\"Overpower\",\"id\":\"\",\"sourceId\":\"Compendium.abbrew.skills.Item.rROAymZJjdomFnKc\"},{\"id\":\"abbrewFeint00000\",\"value\":\"Feint\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewFeint00000\"},{\"id\":\"abbrewFinisher00\",\"value\":\"Finisher\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewFinisher00\"}]",
       "discord": ""
     },
     "configurable": true,
@@ -89,21 +89,53 @@
         },
         "guard": {
           "self": {
-            "value": "",
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "multiplier": 1,
+                "lateParse": false
+              }
+            ],
             "operator": ""
           },
           "target": {
-            "value": "",
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "multiplier": 1,
+                "lateParse": true
+              }
+            ],
             "operator": ""
           }
         },
         "risk": {
           "self": {
-            "value": 0,
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "multiplier": 1,
+                "lateParse": false
+              }
+            ],
             "operator": ""
           },
           "target": {
-            "value": 0,
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "multiplier": 1,
+                "lateParse": true
+              }
+            ],
             "operator": ""
           }
         },
@@ -113,11 +145,27 @@
         },
         "resolve": {
           "self": {
-            "value": 0,
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "multiplier": 1,
+                "lateParse": false
+              }
+            ],
             "operator": ""
           },
           "target": {
-            "value": 0,
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "multiplier": 1,
+                "lateParse": true
+              }
+            ],
             "operator": ""
           }
         },
@@ -152,7 +200,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743457541441,
-    "modifiedTime": 1743457878856,
+    "modifiedTime": 1745173979553,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!aDuQuRzigltZwBCu"
