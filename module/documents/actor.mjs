@@ -1,6 +1,6 @@
 import { mergeActorWounds } from "../helpers/combat.mjs";
 import { applyOperator, getOrderForOperator } from "../helpers/operators.mjs";
-import { applySkillEffects, handleSkillActivate, isSkillBlocked, mergeModifiers, parseModifierFieldValue, reduceParsedModifiers } from "../helpers/skill.mjs";
+import { applySkillEffects, getSkillById, handleSkillActivate, isSkillBlocked, mergeModifiers, parseModifierFieldValue, reduceParsedModifiers } from "../helpers/skill.mjs";
 import { getAttackerAdvantageGuardResult, getAttackerAdvantageRiskResult, getDefenderAdvantageGuardResult, getDefenderAdvantageRiskResult } from "../helpers/trainedSkills.mjs";
 import { compareModifierIndices, getObjectValueByStringPath } from "../helpers/utils.mjs";
 import { FINISHERS } from "../static/finishers.mjs";
@@ -57,6 +57,10 @@ export default class AbbrewActor extends Actor {
 
   async takeActionUpdates(data) {
     const updates = {};
+    if (!data.targetUpdates) {
+      return;
+    }
+
     data.targetUpdates.forEach(update => {
       const current = getObjectValueByStringPath(this, update.path);
       let updatedValue = current;
@@ -75,7 +79,7 @@ export default class AbbrewActor extends Actor {
   }
 
   async takeActionWounds(data) {
-    if (data.targetWounds.length > 0) {
+    if (data.targetWounds && data.targetWounds.length > 0) {
       const currentWounds = this.system.wounds;
       const updateWounds = Object.entries(
         data.targetWounds.map(w => ({ ...w, value: reduceParsedModifiers(parseModifierFieldValue(w.value, this, this)), index: getOrderForOperator(w.operator) })).sort(getOrderForOperator)
@@ -89,7 +93,7 @@ export default class AbbrewActor extends Actor {
   }
 
   async takeActionResources(data) {
-    if (data.targetResources.length > 0) {
+    if (data.targetResources && data.targetResources.length > 0) {
       const baseResources = this.system.resources.values.reduce((result, resource) => { result[resource.id] = resource.value; return result; }, {});
       const resourceModifiers = data.targetResources.map(r => ({ id: r.id, operator: r.operator, value: reduceParsedModifiers(parseModifierFieldValue(r.value, this, this)) }));
       const updateResources = Object.entries(resourceModifiers.reduce((result, resource) => {
@@ -105,7 +109,7 @@ export default class AbbrewActor extends Actor {
     }
   }
 
-  async takeDamage(rolls, data, action) {
+  async takeDamage(data, action) {
     Hooks.call('actorTakesDamage', this);
     let guard = this.system.defense.guard.value;
     let risk = this.system.defense.risk.raw;
@@ -151,9 +155,9 @@ export default class AbbrewActor extends Actor {
     await this.takeActionResources(data);
   }
 
-  async takeAttack(data) {
-    await this.takeEffect(data, rolls, action);
-    await this.takeDamage(rolls, data, action);
+  async takeAttack(data, action) {
+    await this.takeEffect(data);
+    await this.takeDamage(data, action);
   }
 
   async takeFinisher(rolls, data, finisherType) {
@@ -163,7 +167,7 @@ export default class AbbrewActor extends Actor {
     }
 
     await this.takeEffect(data);
-    await this.takeDamage(rolls, data, "finisher");
+    await this.takeDamage(data, "finisher");
 
     const risk = this.system.defense.risk.raw;
     const totalRisk = this.applyModifiersToRisk(rolls, data, finisherType);
@@ -494,8 +498,7 @@ export default class AbbrewActor extends Actor {
     await this.update({ "system.activeSkills": activeSkillsWithDuration, "system.queuedSkills": queuedSkillsWithDuration });
   }
 
-  doesActorHaveSkillDiscord(skillName) {
-    const skill = this.items.find(i => i.name === skillName);
+  doesActorHaveSkillDiscord(skill) {
     if (skill) {
       return isSkillBlocked(this, skill);
     }

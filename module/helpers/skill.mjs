@@ -421,7 +421,17 @@ export async function applySkillEffects(actor, skill) {
     const [, guardTargetUpdate] = mergeGuardTargetModifiers(allSkills, actor, targetPhaseFilter);
     const [, riskTargetUpdate] = mergeRiskTargetModifiers(allSkills, actor, targetPhaseFilter);
     const [, resolveTargetUpdate] = mergeResolveTargetModifiers(allSkills, actor, targetPhaseFilter);
-    targetUpdates = [guardTargetUpdate, riskTargetUpdate, resolveTargetUpdate];
+    targetUpdates = [];
+    if (Object.keys(guardTargetUpdate).length > 0) {
+        targetUpdates.push(guardTargetUpdate);
+    }
+    if (Object.keys(riskTargetUpdate).length > 0) {
+        targetUpdates.push(riskTargetUpdate);
+    }
+    if (Object.keys(resolveTargetUpdate).length > 0) {
+        targetUpdates.push(resolveTargetUpdate);
+    }
+
     const targetWounds = mergeWoundTargetModifiers(allSkills, actor, targetPhaseFilter);
     const targetResources = mergeTargetResources(allSkills, actor, targetPhaseFilter);
 
@@ -470,7 +480,7 @@ export async function applySkillEffects(actor, skill) {
 
     // Trigger Paired Skills after completion.
     await handlePairedSkills(skill, actor);
-    await cleanTemporarySkills(skill, actor);
+    await checkForTemporarySkillOutOfUses(skill, actor);
 
     return skillResult;
 }
@@ -540,14 +550,18 @@ async function handleGrantOnUse(skill, actor) {
     }
 }
 
-async function cleanTemporarySkills(skill, actor) {
+async function checkForTemporarySkillOutOfUses(skill, actor) {
     if (((skill.system.action.uses.hasUses && skill.system.action.uses.value === 0) && skill.system.action.charges.value === 0) || (skill.system.action.charges.hasCharges && skill.system.action.charges.value === 0)) {
+        await cleanTemporarySkill(skill, actor);
+    }
+}
+
+export async function cleanTemporarySkill(skill, actor) {
+    if (skill.system.skillType === "temporary" && skill.system.action.uses.removeWhenNoUsesRemain) {
         const effect = actor.getEffectBySkillId(skill._id);
         if (effect) {
             await effect.delete();
-        }
-
-        if (skill.system.skillType === "temporary" && skill.system.action.uses.removeWhenNoUsesRemain) {
+        } else {
             await skill.delete();
         }
     }
@@ -611,6 +625,9 @@ function getPhaseFilter(damagePhase) {
 function mergeSimpleSelfModifier(allSkills, actor, phaseFilter, operatorFunction, valueFunction, target, updatePath) {
     let update = {};
     const phaseValidSkills = allSkills.filter(s => operatorFunction(s)).filter(s => phaseFilter(valueFunction(s)));
+    if (phaseValidSkills.length === 0) {
+        return [{}, {}];
+    }
     const anyLateParse = phaseValidSkills.flatMap(s => valueFunction(s)).some(s => s.lateParse)
     let modifiers = phaseValidSkills.map(s => ({ values: parseModifierFieldValue(valueFunction(s), actor, s), operator: operatorFunction(s) }));
     if (!anyLateParse) {
@@ -981,6 +998,7 @@ function getSkillDuration(skill) {
 }
 
 async function createDurationActiveEffect(actor, skill, duration) {
+    const stacks = skill.system.action.uses.hasUses ? skill.system.action.uses.value : 1;
     const conditionEffectData = {
         _id: actor._id,
         name: game.i18n.localize(skill.name),
@@ -993,7 +1011,7 @@ async function createDurationActiveEffect(actor, skill, duration) {
         tint: '',
         transfer: false,
         statuses: [],
-        flags: { abbrew: { skill: { type: skill.system.action.activationType, trackDuration: skill._id, expiresOn: skill.system.action.duration.expireOnStartOfTurn ? "start" : "end" } } }
+        flags: { abbrew: { skill: { stacks: stacks, type: skill.system.action.activationType, trackDuration: skill._id, expiresOn: skill.system.action.duration.expireOnStartOfTurn ? "start" : "end" } } }
     };
 
     await actor.createEmbeddedDocuments('ActiveEffect', [conditionEffectData]);

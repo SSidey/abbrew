@@ -328,7 +328,15 @@ Hooks.on("updateWorldTime", async (worldTime, td, options, userId) => {
   await onWorldTimeUpdate(worldTime, td, options, userId);
 });
 
-Hooks.on("updateItem", (document, options, userId) => { });
+Hooks.on("updateItem", async (document, changed, options, userId) => {
+  if (doesNestedFieldExist(changed, "system.action.uses.value")) {
+    const effect = document.effects.find(e => e.flags.abbrew.skill.stacks);
+    if (effect) {
+      const stacks = changed.system.action.uses.value;
+      await effect.update({ "flags.abbrew.skill.stacks": stacks });
+    }
+  }
+});
 
 Hooks.on("preUpdateItem", () => { })
 
@@ -344,35 +352,32 @@ Hooks.on("dropCanvasData", (canvas, data) => {
   console.log("Canvas Drop")
 });
 
-Hooks.on("updateActiveEffect", (effect, update, options, user) => {
-  console.log("Woo");
-  // const effects = actor.effects;
-  // effects.entries().forEach(async e => {
-  //     const effect = e[1];
-  //     const preparedDuration = effect._prepareDuration();
-  //     if (preparedDuration.type === "seconds" && preparedDuration.remaining <= 60) {
-  //         const duration = { ...effect.duration };
-  //         const rounds = Math.floor(preparedDuration.remaining / 6);
-  //         duration["rounds"] = rounds;
-  //         duration["seconds"] = null;
-  //         duration["duration"] = rounds
-  //         // duration["startRound"] = game.combat?.round ?? 0;
-  //         // duration["startTurn"] = game.combat?.turn ?? 0;
-  //         duration["type"] = "turns";
-  //         duration["startTime"] = game.time.worldTime;
-  //         const skills = actor.items.filter(i => i.type === "skill" && i._id === effect.flags?.abbrew?.skill?.trackDuration)
-  //         if (skills.length > 0 && !skills[0].system.action.duration.expireOnStartOfTurn) {
-  //             duration["turns"] = 1;
-  //             duration["duration"] += 0.01;
-  //         }
-  //         // duration["duration"] = value;
-  //         await effect.update({ "duration": duration })
-  //     }
-  // });
+Hooks.on("preCreateActiveEffect", effect => {
+  const startingStacks = effect.flags?.abbrew?.skill?.stacks ?? effect.getFlag("statuscounter", "value") ?? 1
+  effect.updateSource({
+    "flags.statuscounter.config.dataSource": "flags.abbrew.skill.stacks",
+    "flags.statuscounter.visible": startingStacks > 1,
+    "flags.statuscounter.value": startingStacks,
+    "flags.abbrew.skill.stacks": startingStacks,
+  });
 });
 
-Hooks.on("preUpdateActiveEffect", (effect, update, options, user) => {
-  console.log("preWoo");
+Hooks.on("createActiveEffect", (document, options, userId) => {
+  console.log("Created");
+});
+
+Hooks.on("preUpdateDocument", (document, changed, options, userId) => {
+  console.log("Preupdate");
+});
+
+Hooks.on("updateActiveEffect", async (effect, update, options, user) => {
+  if (effect.parent && effect.parent.type === "skill" && doesNestedFieldExist(update, "flags.abbrew.skill.stacks")) {
+    const skill = effect.parent;
+    await skill.update({ "system.action.uses.value": update.flags.abbrew.skill.stacks });
+  }
+});
+
+Hooks.on("preUpdateActiveEffect", async (effect, update, options, user) => {
 });
 
 Hooks.on("preDeleteActiveEffect", async (effect, options, userId) => {

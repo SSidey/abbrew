@@ -16,7 +16,7 @@ export default class AbbrewItem extends Item {
     super.prepareData();
   }
 
-  _preUpdate(changed, options, userId) {
+  async _preUpdate(changed, options, userId) {
     if (doesNestedFieldExist(changed, "system.equipState") && changed.system.equipState === 'worn' && this.type === 'armour') {
       if (!this.isWornEquipStateChangePossible()) {
         ui.notifications.info("You are already wearing too many items, try stowing some");
@@ -162,7 +162,7 @@ export default class AbbrewItem extends Item {
 
     const actor = tokens[0].actor;
 
-    if (action === "parry" && actor.doesActorHaveSkillDiscord("Parry")) {
+    if (action === "parry" && actor.doesActorHaveSkillDiscord(getParrySkillWithActions(0))) {
       ui.notifications.info("You are prevented from parrying.");
       return;
     }
@@ -174,7 +174,7 @@ export default class AbbrewItem extends Item {
       }
     }
 
-    await actor.takeAttack(data, rolls, action);
+    await actor.takeAttack(data, action);
   }
 
   static getActionCostForAccept(data, action) {
@@ -207,6 +207,11 @@ export default class AbbrewItem extends Item {
         }
       }
     }
+
+    return super._preCreate(data, options, user);
+  }
+
+  async createEmbeddedDocuments(embeddedName, data = null, operation = null) {
   }
 
   async _onCreate(data, options, userId) {
@@ -226,6 +231,12 @@ export default class AbbrewItem extends Item {
         const id = this.system.resource.relatedResource ? JSON.parse(this.system.resource.relatedResource)[0].id : this._id;
         const capacity = this.system.resource.capacity ?? 0;
         await this.actor.handleResourceFill(id, capacity);
+      }
+      if (this.actor && data.effects.find(e => e.flags.abbrew.skill.stacks && data.system.action.uses.hasUses)) {
+        const effect = this.effects.find(e => e.flags.abbrew.skill.stacks)
+        const stacks = data.effects.find(e => e.flags.abbrew.skill.stacks).flags.abbrew.skill.stacks;
+        const visible = stacks > 1;
+        await effect.update({ "flags.statuscounter.visible": visible, "flags.statuscounter.value": stacks });
       }
     }
   }

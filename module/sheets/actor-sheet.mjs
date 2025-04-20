@@ -4,7 +4,7 @@ import {
   prepareActiveEffectCategories,
 } from '../helpers/effects.mjs';
 import Tagify from '@yaireo/tagify'
-import { handleSkillActivate } from '../helpers/skill.mjs';
+import { cleanTemporarySkill, handleSkillActivate } from '../helpers/skill.mjs';
 import { getFundamentalAttributeSkill } from '../helpers/fundamental-skills.mjs';
 
 /**
@@ -290,6 +290,8 @@ export class AbbrewActorSheet extends ActorSheet {
 
     html.on('click', '.skill-deactivate', this._onSkillDeactivate.bind(this));
 
+    html.on('click', '.skill-stack', this._onSkillStackRemove.bind(this));
+
     // -------------------------------------------------------------
     // Everything below here is only needed if the sheet is editable
     if (!this.isEditable) return;
@@ -434,6 +436,20 @@ export class AbbrewActorSheet extends ActorSheet {
     const effect = this.actor.getEffectBySkillId(skill._id);
     if (effect) {
       await effect.delete();
+    }
+  }
+
+  async _onSkillStackRemove(event) {
+    event.preventDefault();
+    const target = event.target.closest('.skill');
+    const id = target.dataset.itemId;
+    const skill = this.actor.items.get(id);
+    if (skill) {
+      const stackUpdate = skill.system.action.uses.value - 1;
+      await skill.update({ "system.action.uses.value": stackUpdate });
+      if (stackUpdate === 0) {
+        await cleanTemporarySkill(skill, this.actor);
+      }
     }
   }
 

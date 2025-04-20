@@ -86,6 +86,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
                 value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
                 max: new fields.NumberField({ ...requiredInteger, initial: 0 }),
                 period: new fields.StringField({ ...blankString }),
+                stackRemovalActivation: new fields.BooleanField({ required: true, initial: false }),
                 removeWhenNoUsesRemain: new fields.BooleanField({ required: true, initial: false })
             }),
             charges: new fields.SchemaField({

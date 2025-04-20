@@ -171,6 +171,18 @@
                 {{/if}}
             </label>
             {{/if}}
+            {{#unless system.isActivatable}}
+            <label class="slide-toggle roboto-upper">
+                <input type="checkbox" name="system.action.uses.stackRemovalActivation" {{ checked
+                    system.action.uses.stackRemovalActivation }}>
+                <span>Remove Stacks on Activation?</span>
+                {{#if system.action.uses.stackRemovalActivation}}
+                <i class="fa fa-toggle-on"></i>
+                {{else}}
+                <i class="fa fa-toggle-off"></i>
+                {{/if}}
+            </label>
+            {{/unless}}
             {{#if (eq system.skillType "temporary")}}
             <label class="slide-toggle roboto-upper">
                 <input type="checkbox" name="system.action.uses.removeWhenNoUsesRemain" {{ checked
@@ -649,7 +661,8 @@
                         <div class="damage-profile-element-2">
                             {{#if (or (eq damage.modify "all") (eq damage.modify "one"))}}
                             <select name="system.action.modifiers.attackProfile.damage.{{j}}.modifyType">
-                                {{selectOptions ../config.damageTypes selected=damage.modifyType blank="" localize=true}}
+                                {{selectOptions ../config.damageTypes selected=damage.modifyType blank=""
+                                localize=true}}
                             </select>
                             {{/if}}
                         </div>
@@ -692,8 +705,7 @@
                         </div>
                         <div class="damage-profile-element-2">
                             <label>Penetration</label>
-                            <input type="text"
-                                name="system.action.modifiers.attackProfile.damage.{{j}}.penetration"
+                            <input type="text" name="system.action.modifiers.attackProfile.damage.{{j}}.penetration"
                                 value="{{damage.penetration}}" data-dtype="String" />
                         </div>
                         {{/unless}}

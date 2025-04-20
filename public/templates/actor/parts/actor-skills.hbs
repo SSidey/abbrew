@@ -42,6 +42,12 @@
         {{/if}}
         {{/if}}
         {{/if}}
+        {{#unless item.system.isActivatable}}
+        {{#if item.system.action.uses.stackRemovalActivation}}
+        <button class="skill-stack" type="button"><span
+            class="actions-icon action-{{item.system.action.actionImage}}">Remove Stack</span></button>
+        {{/if}}
+        {{/unless}}
         {{#if (eq item.system.skillType "background")}}
         <h3 class="skill-attribute-increase">{{item.system.attributeIncreaseLong}}</h4>
           {{/if}}
