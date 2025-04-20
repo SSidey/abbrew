@@ -145,13 +145,13 @@ export default class AbbrewActor extends Actor {
     })
   }
 
-  async takeEffect(data, rolls, action) {
+  async takeEffect(data) {
     await this.takeActionUpdates(data);
     await this.takeActionWounds(data);
     await this.takeActionResources(data);
   }
 
-  async takeAttack(data, rolls, action) {
+  async takeAttack(data) {
     await this.takeEffect(data, rolls, action);
     await this.takeDamage(rolls, data, action);
   }
@@ -162,7 +162,7 @@ export default class AbbrewActor extends Actor {
       return;
     }
 
-    await this.takeEffect(data, rolls, action);
+    await this.takeEffect(data);
     await this.takeDamage(rolls, data, "finisher");
 
     const risk = this.system.defense.risk.raw;
