@@ -1,8 +1,8 @@
 import { mergeActorWounds } from "../helpers/combat.mjs";
 import { applyOperator, getOrderForOperator } from "../helpers/operators.mjs";
-import { applySkillEffects, getSkillById, handleSkillActivate, isSkillBlocked, mergeModifiers, parseModifierFieldValue, reduceParsedModifiers } from "../helpers/skill.mjs";
+import { applySkillEffects, handleSkillActivate, isSkillBlocked, parseModifierFieldValue, reduceParsedModifiers } from "../helpers/skill.mjs";
 import { getAttackerAdvantageGuardResult, getAttackerAdvantageRiskResult, getDefenderAdvantageGuardResult, getDefenderAdvantageRiskResult } from "../helpers/trainedSkills.mjs";
-import { compareModifierIndices, getObjectValueByStringPath } from "../helpers/utils.mjs";
+import { getObjectValueByStringPath } from "../helpers/utils.mjs";
 import { FINISHERS } from "../static/finishers.mjs";
 
 /**
@@ -56,25 +56,29 @@ export default class AbbrewActor extends Actor {
   }
 
   async takeActionUpdates(data) {
+    console.log("1");
     const updates = {};
+    console.log("2");
     if (!data.targetUpdates) {
       return;
     }
 
+    console.log("3");
+
     data.targetUpdates.forEach(update => {
       const current = getObjectValueByStringPath(this, update.path);
       let updatedValue = current;
-      if (update && update.update.length > 0) {
-        updatedValue = mergeModifiers(update.update.map(u => ({ value: reduceParsedModifiers(parseModifierFieldValue(u.values, this, this)), operator: u.operator })).flat(), current);
-        updates[update.path] = updatedValue;
-      }
+      // if (update.lateModifiers && update.lateModifiers.length > 0) {
+      //   updatedValue = mergeModifiers(update.update.map(u => ({ value: reduceParsedModifiers(parseModifierFieldValue(u.values, this, this)), operator: u.operator })).flat(), current);
+      //   updates[update.path] = updatedValue;
+      // }
+
+      updates[update.path] = reduceParsedModifiers(update.update, current);
     });
 
-    if (Object.keys(updates).length > 0) {
-      await this.update(updates);
-    }
 
-    // TODO: Report on the result?
+    console.log("4");
+    await this.update(updates);
     return updates;
   }
 
