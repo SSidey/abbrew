@@ -216,14 +216,12 @@ export async function applySkillEffects(actor, skill) {
     const usesSkills = [...mainModifierSkills, skill].filter(s => s.system.action.uses.hasUses).filter(s => s._id !== skill._id);
     const chargedSkills = [...mainModifierSkills, skill].filter(s => s.system.action.charges.hasCharges);
 
-    const prePhaseFilter = getPhaseFilter("pre");
-    let guardSelfUpdate, riskSelfUpdate, resolveSelfUpdate;
-    [guardSelfUpdate, /* Ignore Late Evaluated Modifiers */] = mergeGuardSelfModifiers(allSkills, actor, prePhaseFilter);
-    [riskSelfUpdate, /* Ignore Late Evaluated Modifiers */] = mergeRiskSelfModifiers(allSkills, actor, prePhaseFilter);
-    [resolveSelfUpdate, /* Ignore Late Evaluated Modifiers */] = mergeResolveSelfModifiers(allSkills, actor, prePhaseFilter);
+    const [guardSelfUpdate, lateGuardSelfUpdate] = mergeGuardSelfModifiers(allSkills, actor);
+    const [riskSelfUpdate, lateRiskSelfUpdate] = mergeRiskSelfModifiers(allSkills, actor);
+    const [resolveSelfUpdate, lateResolveSelfUpdate] = mergeResolveSelfModifiers(allSkills, actor);
     updates = { ...updates, ...guardSelfUpdate, ...riskSelfUpdate, ...resolveSelfUpdate };
-    mergeWoundSelfModifiers(updates, allSkills, actor, prePhaseFilter);
-    mergeResourceSelfModifiers(updates, allSkills, actor, prePhaseFilter);
+    // mergeWoundSelfModifiers(updates, allSkills, actor);
+    // mergeResourceSelfModifiers(updates, allSkills, actor);
     await actor.update(updates);
 
     for (const index in usesSkills) {
@@ -416,39 +414,38 @@ export async function applySkillEffects(actor, skill) {
 
     // Target updates
     const skillsGrantedOnAccept = mergeSkillsGrantedOnAccept(allSkills);
-    let targetUpdates = [];
-    const targetPhaseFilter = getPhaseFilter("target");
-    const [, guardTargetUpdate] = mergeGuardTargetModifiers(allSkills, actor, targetPhaseFilter);
-    const [, riskTargetUpdate] = mergeRiskTargetModifiers(allSkills, actor, targetPhaseFilter);
-    const [, resolveTargetUpdate] = mergeResolveTargetModifiers(allSkills, actor, targetPhaseFilter);
-    targetUpdates = [];
-    if (Object.keys(guardTargetUpdate).length > 0) {
-        targetUpdates.push(guardTargetUpdate);
-    }
-    if (Object.keys(riskTargetUpdate).length > 0) {
-        targetUpdates.push(riskTargetUpdate);
-    }
-    if (Object.keys(resolveTargetUpdate).length > 0) {
-        targetUpdates.push(resolveTargetUpdate);
-    }
+    // let targetUpdates = [];
+    // const [guardTargetUpdate, lateguardTargetUpdate] = mergeGuardTargetModifiers(allSkills, actor);
+    // const [riskTargetUpdate, lateriskTargetUpdate] = mergeRiskTargetModifiers(allSkills, actor);
+    // const [resolveTargetUpdate, lateresolveTargetUpdate] = mergeResolveTargetModifiers(allSkills, actor);
+    // targetUpdates = [];
+    // if (Object.keys(guardTargetUpdate).length > 0) {
+    //     targetUpdates.push(guardTargetUpdate);
+    // }
+    // if (Object.keys(riskTargetUpdate).length > 0) {
+    //     targetUpdates.push(riskTargetUpdate);
+    // }
+    // if (Object.keys(resolveTargetUpdate).length > 0) {
+    //     targetUpdates.push(resolveTargetUpdate);
+    // }
 
-    const targetWounds = mergeWoundTargetModifiers(allSkills, actor, targetPhaseFilter);
-    const targetResources = mergeTargetResources(allSkills, actor, targetPhaseFilter);
+    // const targetWounds = mergeWoundTargetModifiers(allSkills, actor);
+    // const targetResources = mergeTargetResources(allSkills, actor);
 
-    const showAcceptButton = Object.keys(targetUpdates).length > 0 || targetWounds.length > 0 || targetResources.length > 0;
+    // const showAcceptButton = Object.keys(targetUpdates).length > 0 || targetWounds.length > 0 || targetResources.length > 0;
 
-    templateData = {
-        ...templateData,
-        showAcceptButton: showAcceptButton
-    }
+    // templateData = {
+    //     ...templateData,
+    //     showAcceptButton: showAcceptButton
+    // }
 
-    data = {
-        ...data,
-        targetUpdates: targetUpdates,
-        targetWounds: targetWounds,
-        targetResources: targetResources,
-        skillsGrantedOnAccept: skillsGrantedOnAccept,
-    };
+    // data = {
+    //     ...data,
+    //     targetUpdates: targetUpdates,
+    //     targetWounds: targetWounds,
+    //     targetResources: targetResources,
+    //     skillsGrantedOnAccept: skillsGrantedOnAccept,
+    // };
 
     // TODO: Move this out of item and into a weapon.mjs / skill-card.mjs
     const html = await renderTemplate("systems/abbrew/templates/chat/skill-card.hbs", templateData);
@@ -467,15 +464,21 @@ export async function applySkillEffects(actor, skill) {
         });
     }
 
-    updates, guardSelfUpdate, riskSelfUpdate, resolveSelfUpdate = {};
+    updates = {};
+    let parsedLateGuardSelfUpdate, parsedLateRiskSelfUpdate, parsedLateResolveSelfUpdate = {};
 
-    const postPhaseFilter = getPhaseFilter("post");
-    [guardSelfUpdate, /* Ignore Late Evaluated Modifiers */] = mergeGuardSelfModifiers(allSkills, actor, postPhaseFilter);
-    [riskSelfUpdate, /* Ignore Late Evaluated Modifiers */] = mergeRiskSelfModifiers(allSkills, actor, postPhaseFilter);
-    [resolveSelfUpdate, /* Ignore Late Evaluated Modifiers */] = mergeResolveSelfModifiers(allSkills, actor, postPhaseFilter);
-    updates = { ...updates, ...guardSelfUpdate, ...riskSelfUpdate, ...resolveSelfUpdate };
-    mergeWoundSelfModifiers(updates, allSkills, actor, postPhaseFilter);
-    mergeResourceSelfModifiers(updates, allSkills, actor, postPhaseFilter);
+    if (lateGuardSelfUpdate.length > 0) {
+        [parsedLateGuardSelfUpdate, /* Ignore Late Parse Values, Should be [] */] = mergeGuardSelfLateModifiers(lateGuardSelfUpdate, actor);
+    }
+    if (lateRiskSelfUpdate.length > 0) {
+        [parsedLateRiskSelfUpdate, /* Ignore Late Parse Values, Should be [] */] = mergeRiskSelfLateModifiers(lateRiskSelfUpdate, actor);
+    }
+    if (lateResolveSelfUpdate.length > 0) {
+        [parsedLateResolveSelfUpdate, /* Ignore Late Parse Values, Should be [] */] = mergeResolveSelfLateModifiers(lateResolveSelfUpdate, actor);
+    }
+    updates = { ...updates, ...parsedLateGuardSelfUpdate, ...parsedLateRiskSelfUpdate, ...parsedLateResolveSelfUpdate };
+    // mergeWoundSelfModifiers(updates, allSkills, actor);
+    // mergeResourceSelfModifiers(updates, allSkills, actor);
     await actor.update(updates);
 
     // Trigger Paired Skills after completion.
@@ -610,94 +613,109 @@ function mergeFinisherWounds(allAttackProfiles, actor) {
     return mergeWoundsForTarget(allAttackProfiles.map(a => a.finisher.wounds), actor);
 }
 
-function getPhaseFilter(damagePhase) {
-    switch (damagePhase) {
-        case "target":
-            return (v) => true;
-        case "post":
-            return (v) => ["damage.lastDealt", "damage.lastReceived", "damage.roundReceived"].includes(v.type);
-        case "pre":
-        default:
-            return (v) => !["damage.lastDealt", "damage.lastReceived", "damage.roundReceived"].includes(v.type);
+function mergeSimpleSelfModifier(allSkills, actor, operatorFunction, valueFunction, target, updatePath) {
+    let update = undefined;
+    const parsedSkills = allSkills.filter(s => operatorFunction(s)).map(s => {
+        const operator = operatorFunction(s);
+        return ({ ...parseModifierFieldValue(valueFunction(s), actor, s), operator: operator, index: getOrderForOperator(operator) });
+    }).sort(compareModifierIndices);
+
+    const fullyParsed = parsedSkills.filter(s => s.fullyParsed);
+    const toParse = parsedSkills.filter(s => !s.fullyParsed);
+
+    if (fullyParsed.length > 0) {
+        const startingValue = target === "self" ? getObjectValueByStringPath(actor, updatePath) : 0;
+        update = {};
+        update[updatePath] = applyFullyParsedModifiers(fullyParsed, startingValue);
     }
+
+    return [update, toParse];
 }
 
-function mergeSimpleSelfModifier(allSkills, actor, phaseFilter, operatorFunction, valueFunction, target, updatePath) {
-    let update = {};
-    const phaseValidSkills = allSkills.filter(s => operatorFunction(s)).filter(s => phaseFilter(valueFunction(s)));
-    if (phaseValidSkills.length === 0) {
-        return [{}, {}];
-    }
-    const anyLateParse = phaseValidSkills.flatMap(s => valueFunction(s)).some(s => s.lateParse)
-    let modifiers = phaseValidSkills.map(s => ({ values: parseModifierFieldValue(valueFunction(s), actor, s), operator: operatorFunction(s) }));
-    if (!anyLateParse) {
-        let updateValue = target === "self" ? getObjectValueByStringPath(actor, updatePath) : 0;
-        updateValue = mergeModifiers(modifiers.map(m => ({ value: mergeModifiers(m.values.map(v => ({ value: v.path, operator: v.operator })), 0), operator: m.operator })).flat(), updateValue);
-        update[updatePath] = updateValue;
-        modifiers = [];
-    }
-
-    return [update, { path: updatePath, update: modifiers }];
+function applyFullyParsedModifiers(parsedModifiers, startingValue) {
+    return parsedModifiers.reduce((result, modifier) => {
+        const modifierValue = reduceParsedModifiers(modifier.values, 0);
+        result = applyOperator(result, modifierValue, modifier.operator);
+        return result;
+    }, startingValue);
 }
 
-function mergeGuardSelfModifiers(allSkills, actor, phaseFilter) {
+function mergeGuardSelfModifiers(allSkills, actor) {
     const target = "self";
-    return mergeGuardModifiers(allSkills, actor, phaseFilter, target);
+    return mergeGuardModifiers(allSkills, actor, target);
 }
 
-function mergeGuardTargetModifiers(allSkills, actor, phaseFilter) {
+function mergeGuardSelfLateModifiers(modifiers, actor) {
+    return mergeSelfLateModifiers(modifiers, actor, "system.defense.guard.value");
+}
+
+function mergeRiskSelfLateModifiers(modifiers, actor) {
+    return mergeSelfLateModifiers(modifiers, actor, "system.defense.risk.raw");
+}
+
+function mergeResolveSelfLateModifiers(modifiers, actor) {
+    return mergeSelfLateModifiers(modifiers, actor, "system.defense.resolve.value");
+}
+
+function mergeSelfLateModifiers(modifiers, actor, updatePath) {
+    const target = "self";
+    const valueFunction = m => m.values;
+    const operatorFunction = m => m.operator;
+    return mergeSimpleSelfModifier(modifiers, actor, operatorFunction, valueFunction, target, updatePath);
+}
+
+function mergeGuardTargetModifiers(allSkills, actor) {
     const target = "target";
-    return mergeGuardModifiers(allSkills, actor, phaseFilter, target);
+    return mergeGuardModifiers(allSkills, actor, target);
 }
 
-function mergeGuardModifiers(allSkills, actor, phaseFilter, target) {
+function mergeGuardModifiers(allSkills, actor, target) {
     const operatorFunction = s => s.system.action.modifiers.guard[target].operator,
         valueFunction = s => s.system.action.modifiers.guard[target].value,
         updatePath = "system.defense.guard.value";
-    return mergeSimpleSelfModifier(allSkills, actor, phaseFilter, operatorFunction, valueFunction, target, updatePath);
+    return mergeSimpleSelfModifier(allSkills, actor, operatorFunction, valueFunction, target, updatePath);
 }
 
-function mergeRiskSelfModifiers(allSkills, actor, phaseFilter) {
+function mergeRiskSelfModifiers(allSkills, actor) {
     const target = "self";
-    return mergeRiskModifiers(allSkills, actor, phaseFilter, target);
+    return mergeRiskModifiers(allSkills, actor, target);
 }
 
-function mergeRiskTargetModifiers(allSkills, actor, phaseFilter) {
+function mergeRiskTargetModifiers(allSkills, actor) {
     const target = "target";
-    return mergeRiskModifiers(allSkills, actor, phaseFilter, target);
+    return mergeRiskModifiers(allSkills, actor, target);
 }
 
-function mergeRiskModifiers(allSkills, actor, phaseFilter, target) {
+function mergeRiskModifiers(allSkills, actor, target) {
     const operatorFunction = s => s.system.action.modifiers.risk[target].operator,
         valueFunction = s => s.system.action.modifiers.risk[target].value,
         updatePath = "system.defense.risk.raw";
-    return mergeSimpleSelfModifier(allSkills, actor, phaseFilter, operatorFunction, valueFunction, target, updatePath);
+    return mergeSimpleSelfModifier(allSkills, actor, operatorFunction, valueFunction, target, updatePath);
 }
 
-function mergeResolveSelfModifiers(allSkills, actor, phaseFilter) {
+function mergeResolveSelfModifiers(allSkills, actor) {
     const target = "self";
-    return mergeResolveModifiers(allSkills, actor, phaseFilter, target);
+    return mergeResolveModifiers(allSkills, actor, target);
 }
 
-function mergeResolveTargetModifiers(allSkills, actor, phaseFilter) {
+function mergeResolveTargetModifiers(allSkills, actor) {
     const target = "target";
-    return mergeResolveModifiers(allSkills, actor, phaseFilter, target);
+    return mergeResolveModifiers(allSkills, actor, target);
 }
 
-function mergeResolveModifiers(allSkills, actor, phaseFilter, target) {
+function mergeResolveModifiers(allSkills, actor, target) {
     const operatorFunction = s => s.system.action.modifiers.resolve[target].operator,
         valueFunction = s => s.system.action.modifiers.resolve[target].value,
         updatePath = "system.defense.resolve.value";
-    return mergeSimpleSelfModifier(allSkills, actor, phaseFilter, operatorFunction, valueFunction, target, updatePath);
+    return mergeSimpleSelfModifier(allSkills, actor, operatorFunction, valueFunction, target, updatePath);
 }
 
-function mergeWoundSelfModifiers(updates, allSkills, actor, phaseFilter) {
+function mergeWoundSelfModifiers(updates, allSkills, actor) {
     const woundModifiers = allSkills
         .filter(s => s.system.action.modifiers.wounds.self.length > 0)
         .flatMap(s => s.system.action.modifiers.wounds.self
             .filter(w => w.type && w.value != null && w.operator)
             .filter(w => !["suppress", "intensify"].includes(w.operator))
-            .filter(s => phaseFilter(s.value))
             .map(w => ({ ...w, value: mergeModifiers(parseModifierFieldValue(w.value, actor, w).map(r => ({ value: r.path, operator: r.operator })), 0), index: getOrderForOperator(w.operator) })))
         .sort(compareModifierIndices);
     if (woundModifiers.length > 0) {
@@ -721,35 +739,32 @@ function mergeWoundsForTarget(woundArrays, actor) {
     }, {})).map(e => ({ type: e[0], value: e[1] }));
 }
 
-function mergeWoundTargetModifiers(allSkills, actor, phaseFilter) {
+function mergeWoundTargetModifiers(allSkills, actor) {
     return allSkills
         .filter(s => s.system.action.modifiers.wounds.target.length > 0)
         .flatMap(s => s.system.action.modifiers.wounds.target
             .filter(w => w.type && w.value != null && w.operator)
             .filter(w => !["suppress", "intensify"].includes(w.operator))
-            .filter(s => phaseFilter(s.value))
             .map(w => ({ ...w, value: parseModifierFieldValue(w.value, actor, w) })))
         .sort(compareModifierIndices);
 }
 
-function mergeTargetResources(allSkills, actor, phaseFilter) {
+function mergeTargetResources(allSkills, actor) {
     return allSkills
         .filter(s => s.system.action.modifiers.resources.target.length > 0)
         .flatMap(r => r.system.action.modifiers.resources.target)
         .filter(r => r.summary)
         .map(r => ({ id: JSON.parse(r.summary)[0].id, value: r.value, operator: r.operator, index: getOrderForOperator(r.operator) }))
-        .filter(s => phaseFilter(s.value))
         .filter(r => actor.system.resources.owned.some(o => o.id === r.id))
         .sort(compareModifierIndices)
 }
 
-function mergeResourceSelfModifiers(updates, allSkills, actor, phaseFilter) {
+function mergeResourceSelfModifiers(updates, allSkills, actor) {
     const resourceModifiers = allSkills
         .filter(s => s.system.action.modifiers.resources.self.length > 0)
         .flatMap(r => r.system.action.modifiers.resources.self)
         .filter(r => r.summary)
         .map(r => ({ id: JSON.parse(r.summary)[0].id, value: r.value, operator: r.operator, index: getOrderForOperator(r.operator) }))
-        .filter(s => phaseFilter(s.value))
         .filter(r => actor.system.resources.owned.some(o => o.id === r.id))
         .sort(compareModifierIndices)
         .map(r => ({ id: r.id, operator: r.operator, value: reduceParsedModifiers(parseModifierFieldValue(r.value, null, r)) }));
@@ -1041,10 +1056,12 @@ export async function rechargeSkill(actor, skill) {
 export function parseModifierFieldValue(modifierFieldValue, actor, source) {
     const values = modifierFieldValue.filter(f => f.path !== "" && f.path != null && f.path !== undefined);
     const parsedValues = [];
+    let fullyParsed = true;
 
     values.forEach(v => {
         if (v.lateParse) {
             parsedValues.push({ ...v, lateParse: false });
+            fullyParsed = false;
             return;
         }
 
@@ -1063,14 +1080,14 @@ export function parseModifierFieldValue(modifierFieldValue, actor, source) {
         }
     });
 
-    return parsedValues;
+    return ({ values: parsedValues, fullyParsed: fullyParsed });
 }
 
-export function reduceParsedModifiers(parsedValues) {
+export function reduceParsedModifiers(parsedValues, startingValue = 0) {
     return parsedValues.reduce((result, value) => {
         result = applyOperator(result, value.path, value.operator);
         return result;
-    }, 0)
+    }, startingValue);
 }
 
 
