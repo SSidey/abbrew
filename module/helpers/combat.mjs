@@ -1,7 +1,8 @@
+import { parseModifierFieldValue } from "./modifierBuilderFieldHelpers.mjs";
 import { applyOperator, getOrderForOperator } from "./operators.mjs";
-import { applySkillEffects, parseModifierFieldValue } from "./skill.mjs";
+import { applySkillEffects } from "./skill.mjs";
 import { handleSkillExpiry } from "./time.mjs";
-import { compareModifierIndices, getSafeJson } from "./utils.mjs";
+import { getSafeJson } from "./utils.mjs";
 
 export async function handleCombatStart(actors) {
     for (const index in actors) {
