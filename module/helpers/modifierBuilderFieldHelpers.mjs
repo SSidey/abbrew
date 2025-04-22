@@ -91,10 +91,13 @@ export function applyFullyParsedComplexModifiers(parsedComplexFields, actor, upd
     const update = {};
     update[updatePath] = [];
     parsedComplexFields.forEach(f => {
-        update[updatePath].push(applyFullyParsedModifiers(f.update, actor, updatePath, key, f.type)[updatePath]);
+        const value = applyFullyParsedModifiers(f.update, actor, updatePath, key, f.type)[updatePath];
+        if (value) {
+            update[updatePath].push(value);
+        }
     });
 
-    return update;
+    return update[updatePath].length > 0 ? update : {};
 }
 
 export function getStartingValue(actor, updatePath, key, keyValue) {
@@ -135,7 +138,7 @@ export function reduceParsedModifiers(parsedValues, startingValue = 0) {
     resource.<resourceId e.g. this is the abbrewId.uuid>
     damage.<"lastDealt"/"lastReceived"/"roundReceived", damageType e.g. all damage "all" / specific "slashing">
  */
-function parsePath(rawValue, actor, source) {
+export function parsePath(rawValue, actor, source) {
     if (typeof rawValue != "string") {
         return rawValue;
     }
@@ -205,4 +208,36 @@ function getLastDamageValue(actor, instance, damageType) {
     }
 
     return 0;
+}
+
+export function mergeLateComplexModifiers(modifiers, actor, path, key) {
+    if (!modifiers || modifiers.length === 0) {
+        return;
+    }
+
+    let updates = {};
+    let updateValues = [];
+
+    modifiers.forEach(w => {
+        const parsedUpdates = w.update;
+        const lateModifiers = w.lateModifiers;
+        const [lateUpdates,] = mergeModifierFields(lateModifiers, actor);
+        const fullUpdates = [...parsedUpdates, ...lateUpdates].sort(compareModifierIndices);
+        const updateValue = applyFullyParsedModifiers(fullUpdates, actor, path, key, w.type);
+
+        updateValues = [...updateValues, updateValue[path]];
+    });
+
+    const fieldValue = getObjectValueByStringPath(actor, path);
+
+    let fullValue = [...updateValues, ...fieldValue].reduce((result, value) => {
+        if (!result.find(r => r[key] === value[key])) {
+            result.push(value);
+        }
+
+        return result;
+    }, []);
+
+    updates[path] = fullValue;
+    return updates;
 }

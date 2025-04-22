@@ -1,7 +1,7 @@
 import { applyOperator, getOrderForOperator } from "./operators.mjs";
 import { compareModifierIndices, getObjectValueByStringPath, getSafeJson } from "../helpers/utils.mjs"
 import { getFundamentalAttributeSkill } from "./fundamental-skills.mjs";
-import { applyFullyParsedComplexModifiers, applyFullyParsedModifiers, mergeComplexModifierFields, mergeModifierFields, parseModifierFieldValue, reduceParsedModifiers } from "./modifierBuilderFieldHelpers.mjs";
+import { applyFullyParsedComplexModifiers, applyFullyParsedModifiers, mergeComplexModifierFields, mergeLateComplexModifiers, mergeModifierFields, parseModifierFieldValue, parsePath, reduceParsedModifiers } from "./modifierBuilderFieldHelpers.mjs";
 // import { mergeSimpleSelfModifier } from "./modifierBuilderFieldHelpers.mjs";
 
 export async function handleSkillActivate(actor, skill, checkActions = true) {
@@ -275,7 +275,7 @@ export async function applySkillEffects(actor, skill) {
         const combinedSkillModifier = allSkills
             .flatMap(s => parseModifierFieldValue(s.system.action.skillCheck, actor, s))
             .reduce((result, check) => {
-                result = applyOperator(result, check.path, check.operator);
+                result = applyOperator(result, check.value[0].path, check.value[0].operator);
                 return result;
             }, 0);
 
@@ -477,15 +477,17 @@ export async function applySkillEffects(actor, skill) {
     if (lateResolveSelfUpdate.length > 0) {
         [parsedLateResolveSelfUpdate, /* Ignore Late Parse Values, Should be [] */] = mergeSelfLateModifiers(lateResolveSelfUpdate, actor);
     }
-    
-    // const lateSelfWoundUpdate = mergeWoundSelfModifiers(allSkills, actor);
-    // const lateSelfResourceUpdate = mergeResourceSelfModifiers(allSkills, actor);
+
+    const lateSelfWoundUpdate = mergeLateComplexModifiers(mergedSelfWounds.filter(m => m.lateModifiers.length > 0), actor, "system.wounds", "type");
+    const lateSelfResourceUpdate = mergeLateComplexModifiers(mergedSelfResources.filter(m => m.lateModifiers.length > 0), actor, "system.resources.values", "id");
 
     updates = {
         ...updates,
         ...applyFullyParsedModifiers(parsedLateGuardSelfUpdate, actor, "system.defense.guard.value"),
         ...applyFullyParsedModifiers(parsedLateRiskSelfUpdate, actor, "system.defense.risk.raw"),
-        ...applyFullyParsedModifiers(parsedLateResolveSelfUpdate, actor, "system.defense.resolve.value")
+        ...applyFullyParsedModifiers(parsedLateResolveSelfUpdate, actor, "system.defense.resolve.value"),
+        ...lateSelfWoundUpdate,
+        ...lateSelfResourceUpdate
     };
     await actor.update(updates);
 
@@ -621,6 +623,20 @@ function mergeFinisherWounds(allAttackProfiles, actor) {
     return mergeWoundsForTarget(allAttackProfiles.map(a => a.finisher.wounds), actor);
 }
 
+function mergeWoundsForTarget(woundArrays, actor) {
+    return Object.entries(woundArrays.reduce((result, woundArray) => {
+        woundArray.filter(w => !["suppress", "intensify"].includes(w.operator)).forEach(w => {
+            if (w.type in result) {
+                result[w.type] = applyOperator(result[w.type], parsePath(w.value, actor, actor), w.operator);
+            } else {
+                result[w.type] = applyOperator(0, parsePath(w.value, actor, actor), w.operator);
+            }
+        });
+
+        return result;
+    }, {})).map(e => ({ type: e[0], value: e[1] }));
+}
+
 function mergeGuardSelfModifiers(allSkills, actor) {
     const target = "self";
     return mergeGuardModifiers(allSkills, actor, target);
@@ -721,16 +737,13 @@ function mergeAttackProfile(base, attackProfile) {
     }
 
     if (attackProfile.finisherLimit.value != null && attackProfile.finisherLimit.operator) {
-        baseAttackProfile.finisherLimit.value = applyOperator(baseAttackProfile.finisherLimit.value, attackProfile.finisherLimit.value, attackProfile.finisherLimit.operator)
+        baseAttackProfile.finisherLimit = applyOperator(baseAttackProfile.finisherLimit.value ?? 0, attackProfile.finisherLimit.value, attackProfile.finisherLimit.operator)
     }
     if (attackProfile.critical.value != null && attackProfile.critical.operator) {
-        baseAttackProfile.critical.value = applyOperator(baseAttackProfile.critical.value, attackProfile.critical.value, attackProfile.critical.operator)
+        baseAttackProfile.critical = applyOperator(baseAttackProfile.critical.value ?? 10, attackProfile.critical.value, attackProfile.critical.operator)
     }
     if (attackProfile.lethal.value != null && attackProfile.lethal.operator) {
-        baseAttackProfile.lethal.value = applyOperator(baseAttackProfile.lethal.value, attackProfile.lethal.value, attackProfile.lethal.operator)
-    }
-    if (attackProfile.penetration.value != null && attackProfile.penetration.operator) {
-        baseAttackProfile.penetration.value = applyOperator(baseAttackProfile.penetration.value, attackProfile.penetration.value, attackProfile.penetration.operator)
+        baseAttackProfile.lethal = applyOperator(baseAttackProfile.lethal.value ?? 0, attackProfile.lethal.value, attackProfile.lethal.operator)
     }
 
     const baseDamageList = base.damage;

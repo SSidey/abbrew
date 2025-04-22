@@ -3,7 +3,7 @@ import { applyFullyParsedModifiers, mergeModifierFields, reduceParsedModifiers }
 import { applyOperator, getOrderForOperator } from "../helpers/operators.mjs";
 import { applySkillEffects, handleSkillActivate, isSkillBlocked } from "../helpers/skill.mjs";
 import { getAttackerAdvantageGuardResult, getAttackerAdvantageRiskResult, getDefenderAdvantageGuardResult, getDefenderAdvantageRiskResult } from "../helpers/trainedSkills.mjs";
-import { compareModifierIndices } from "../helpers/utils.mjs";
+import { compareModifierIndices, getObjectValueByStringPath } from "../helpers/utils.mjs";
 import { FINISHERS } from "../static/finishers.mjs";
 
 /**
@@ -96,7 +96,17 @@ export default class AbbrewActor extends Actor {
       updateValues = [...updateValues, updateValue[path]];
     });
 
-    updates[path] = updateValues;
+    const fieldValue = getObjectValueByStringPath(this, path);
+
+    let fullValue = [...updateValues, ...fieldValue].reduce((result, wound) => {
+      if (!result.find(r => r.type === wound.type)) {
+        result.push(wound);
+      }
+
+      return result;
+    }, []);
+
+    updates[path] = fullValue;
     await this.update(updates);
     return updates;
   }
@@ -120,7 +130,17 @@ export default class AbbrewActor extends Actor {
       updateValues = [...updateValues, updateValue[path]];
     });
 
-    updates[path] = updateValues;
+    const fieldValue = getObjectValueByStringPath(this, path);
+
+    let fullValue = [...updateValues, ...fieldValue].reduce((result, resource) => {
+      if (!result.find(r => r.id === resource.id)) {
+        result.push(resource);
+      }
+
+      return result;
+    }, []);
+
+    updates[path] = fullValue;
     await this.update(updates);
     return updates;
   }
@@ -146,7 +166,6 @@ export default class AbbrewActor extends Actor {
     await this.update(updates);
     await this.renderAttackResultCard(data, action);
     await this.activateDamageTakenSkill();
-    await this.handleSkillsGrantedOnAccept(data);
     return this;
   }
 
@@ -169,6 +188,8 @@ export default class AbbrewActor extends Actor {
     await this.takeActionUpdates(data);
     await this.takeActionWounds(data);
     await this.takeActionResources(data);
+    
+    await this.handleSkillsGrantedOnAccept(data);
   }
 
   async takeAttack(data, action) {
