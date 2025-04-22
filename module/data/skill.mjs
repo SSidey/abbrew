@@ -1,3 +1,4 @@
+import { getSafeJson } from "../helpers/utils.mjs";
 import AbbrewItemBase from "./item-base.mjs";
 
 export default class AbbrewSkill extends AbbrewItemBase {
@@ -254,6 +255,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
                     self: new fields.ArrayField(
                         new fields.SchemaField({
                             summary: new fields.StringField({ required: true, blank: true }),
+                            type: new fields.StringField({ ...blankString }),
                             value: this.getModifierBuilderField(false),
                             operator: new fields.StringField({ ...blankString }),
                         })
@@ -261,6 +263,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
                     target: new fields.ArrayField(
                         new fields.SchemaField({
                             summary: new fields.StringField({ required: true, blank: true }),
+                            type: new fields.StringField({ ...blankString }),
                             value: this.getModifierBuilderField(true),
                             operator: new fields.StringField({ ...blankString }),
                         })
@@ -322,6 +325,18 @@ export default class AbbrewSkill extends AbbrewItemBase {
         if (this.isActivatable) {
             this.action.actionCostOperator = "";
         }
+
+        for (const index in this.action.modifiers.resources.self) {
+            const resourceField = this.action.modifiers.resources.self[index];
+            const typeId = getSafeJson(resourceField.summary, [{ id: "" }])[0].id;
+            this.action.modifiers.resources.self[index].type = typeId;
+        };
+
+        for (const index in this.action.modifiers.resources.target) {
+            const resourceField = this.action.modifiers.resources.target[index];
+            const typeId = getSafeJson(resourceField.summary, [{ id: "" }])[0].id;
+            this.action.modifiers.resources.target[index].type = typeId;
+        };
     }
 
     // Post Active Effects

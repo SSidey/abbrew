@@ -45,18 +45,78 @@ export function mergeModifierFields(modifierFields, actor) {
     return [fullyParsed, toParse];
 }
 
-export function applyFullyParsedModifiers(parsedModifiers, actor, updatePath) {
-    const update = {};
+export function applyFullyParsedModifiers(parsedModifiers, actor, updatePath, key = null, keyValue = null) {
+    const update = key && keyValue ? [] : {};
     if (parsedModifiers && parsedModifiers.length > 0) {
-        const startingValue = getObjectValueByStringPath(actor, updatePath) ?? 0;
-        update[updatePath] = parsedModifiers.reduce((result, modifier) => {
+        const startingValue = getStartingValue(actor, updatePath, key, keyValue);
+        const updateValue = parsedModifiers.reduce((result, modifier) => {
             const modifierValue = reduceParsedModifiers(modifier.value, 0);
             result = applyOperator(result, modifierValue, modifier.operator);
             return result;
+
+
         }, startingValue);
+
+        update[updatePath] = getUpdatePayload(updateValue, key, keyValue, update);
     }
 
     return update;
+}
+
+export function mergeComplexModifierFields(modifierFields, actor, typeSpecificFiltering) {
+    const groupedModifiers = modifierFields
+        .filter(m => m.length > 0)
+        .flatMap(m => typeSpecificFiltering(m.filter(v => v.type && v.value != null && v.operator)))
+        .reduce((result, woundModifier) => {
+            if (woundModifier.type in result) {
+                result[woundModifier.type].push({ ...woundModifier, index: getOrderForOperator(woundModifier.operator) })
+                result[woundModifier.type].sort(compareModifierIndices);
+            } else {
+                result[woundModifier.type] = [{ ...woundModifier, index: getOrderForOperator(woundModifier.operator) }]
+            }
+
+            return result;
+        }, {});
+
+    const parsedModifiers = Object.entries(groupedModifiers)
+        .map(([k, v], i) => {
+            const [update, lateModifiers] = mergeModifierFields(v, actor);
+            return ({ type: k, update: update, lateModifiers: lateModifiers });
+        });
+
+    return parsedModifiers;
+}
+
+export function applyFullyParsedComplexModifiers(parsedComplexFields, actor, updatePath, key) {
+    const update = {};
+    update[updatePath] = [];
+    parsedComplexFields.forEach(f => {
+        update[updatePath].push(applyFullyParsedModifiers(f.update, actor, updatePath, key, f.type)[updatePath]);
+    });
+
+    return update;
+}
+
+export function getStartingValue(actor, updatePath, key, keyValue) {
+    let startingValue;
+    if (key && keyValue) {
+        startingValue = getObjectValueByStringPath(actor, updatePath).find(v => v[key] === keyValue)?.value ?? 0;
+    } else {
+        startingValue = getObjectValueByStringPath(actor, updatePath) ?? 0;
+    }
+
+    return startingValue;
+}
+
+function getUpdatePayload(updateValue, key, keyValue) {
+    if (key) {
+        const update = {};
+        update[key] = keyValue;
+        update["value"] = updateValue;
+        return update;
+    } else {
+        return updateValue;
+    }
 }
 
 export function reduceParsedModifiers(parsedValues, startingValue = 0) {

@@ -78,34 +78,51 @@ export default class AbbrewActor extends Actor {
   }
 
   async takeActionWounds(data) {
-    if (data.targetWounds && data.targetWounds.length > 0) {
-      const currentWounds = this.system.wounds;
-      const updateWounds = Object.entries(
-        data.targetWounds.map(w => ({ ...w, value: reduceParsedModifiers(parseModifierFieldValue(w.value, this, this)), index: getOrderForOperator(w.operator) })).sort(getOrderForOperator)
-          .reduce((result, wound) => {
-            result[wound.type] = applyOperator((result[wound.type] ?? 0), wound.value, wound.operator);
-
-            return result;
-          }, currentWounds)).map(e => ({ type: e[0], value: e[1] })).filter(w => w.value > 0);
-      await this.update({ "system.wounds": updateWounds });
+    if (!data.targetWounds || data.targetWounds.length === 0) {
+      return;
     }
+
+    const path = "system.wounds";
+    let updates = {};
+    let updateValues = [];
+
+    data.targetWounds.forEach(w => {
+      const parsedUpdates = w.update;
+      const lateModifiers = w.lateModifiers;
+      const [lateUpdates,] = mergeModifierFields(lateModifiers, this);
+      const fullUpdates = [...parsedUpdates, ...lateUpdates].sort(compareModifierIndices);
+      const updateValue = applyFullyParsedModifiers(fullUpdates, this, path, "type", w.type);
+
+      updateValues = [...updateValues, updateValue[path]];
+    });
+
+    updates[path] = updateValues;
+    await this.update(updates);
+    return updates;
   }
 
   async takeActionResources(data) {
-    if (data.targetResources && data.targetResources.length > 0) {
-      const baseResources = this.system.resources.values.reduce((result, resource) => { result[resource.id] = resource.value; return result; }, {});
-      const resourceModifiers = data.targetResources.map(r => ({ id: r.id, operator: r.operator, value: reduceParsedModifiers(parseModifierFieldValue(r.value, this, this)) }));
-      const updateResources = Object.entries(resourceModifiers.reduce((result, resource) => {
-        const id = resource.id;
-        if (id in baseResources) {
-          result[id] = Math.max(0, Math.min(baseResources[id] + resource.value, this.system.resources.owned.find(r => r.id === id).max));
-        }
-
-        return result;
-      }, baseResources)).map(e => ({ id: e[0], value: e[1] }));
-
-      await this.update({ "system.resources.values": updateResources });
+    if (!data.targetResources || data.targetResources.length === 0) {
+      return;
     }
+
+    const path = "system.resources.values";
+    let updates = {};
+    let updateValues = [];
+
+    data.targetResources.forEach(r => {
+      const parsedUpdates = r.update;
+      const lateModifiers = r.lateModifiers;
+      const [lateUpdates,] = mergeModifierFields(lateModifiers, this);
+      const fullUpdates = [...parsedUpdates, ...lateUpdates].sort(compareModifierIndices);
+      const updateValue = applyFullyParsedModifiers(fullUpdates, this, path, "id", r.type);
+
+      updateValues = [...updateValues, updateValue[path]];
+    });
+
+    updates[path] = updateValues;
+    await this.update(updates);
+    return updates;
   }
 
   async takeDamage(data, action) {

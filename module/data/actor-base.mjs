@@ -230,8 +230,10 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       const id = ownedResource.id;
       const max = ownedResource.max;
       const valueIndex = this.resources.values.findIndex(r => r.id === id);
-      const valueResource = this.resources.values[valueIndex];
-      this.resources.values[valueIndex] = ({ id: valueResource.id, value: Math.min(max, valueResource.value) });
+      if (valueIndex && valueIndex > -1) {
+        const valueResource = this.resources.values[valueIndex];
+        this.resources.values[valueIndex] = ({ id: valueResource.id, value: Math.min(max, valueResource.value) });
+      }
     }
   }
 
