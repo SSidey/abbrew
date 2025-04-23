@@ -54,13 +54,14 @@ export class AbbrewActorSheet extends ActorSheet {
     if (actorData.type == 'character') {
       this._prepareItems(context);
       this._prepareDefenses(actorData, context);
-      this._prepareCharacterData(context);
+      this._prepareCharacterData(actorData, context);
     }
 
     // Prepare NPC data and items.
     if (actorData.type == 'npc') {
       this._prepareItems(context);
       this._prepareDefenses(actorData, context);
+      this._prepareCharacterData(actorData, context);
     }
 
     // Enrich biography info for display
@@ -98,11 +99,9 @@ export class AbbrewActorSheet extends ActorSheet {
    *
    * @return {undefined}
    */
-  _prepareCharacterData(context) {
-    // Handle attribute scores.
-    // for (let [k, v] of Object.entries(context.system.abilities)) {
-    //   v.label = game.i18n.localize(CONFIG.ABBREW.abilities[k]) ?? k;
-    // }
+  _prepareCharacterData(actorData, context) {
+    const resources = actorData.system.resources.owned.map(r => ({ id: r.id, name: r.name, value: actorData.system.resources.values.find(v => v.id === r.id)?.value ?? 0, max: r.max }));
+    context.resources = resources;
   }
 
   /**

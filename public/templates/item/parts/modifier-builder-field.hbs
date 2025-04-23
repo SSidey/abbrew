@@ -18,9 +18,9 @@
                 <input type="text" name="{{../modifierListName}}.{{i}}.path" value="{{modifier.path}}"
                     data-dtype="string" />
             </div>
-            <label class="slide-toggle roboto-upper">
-                <input type="checkbox" class="action-activatable" name="{{../modifierListName}}.{{i}}.lateParse" {{ checked
-                    modifier.lateParse }}>
+            <label class="slide-toggle roboto-upper modifier-parse">
+                <input type="checkbox" class="action-activatable" name="{{../modifierListName}}.{{i}}.lateParse" {{
+                    checked modifier.lateParse }}>
                 {{#if modifier.lateParse}}
                 <i class="fa fa-toggle-on"></i>
                 {{else}}

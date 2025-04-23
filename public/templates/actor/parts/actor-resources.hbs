@@ -1,0 +1,13 @@
+<div>
+    <h3>Resources</h3>
+    <ol class="resource-list">
+        {{#each resources as |resource id|}}
+        <li class="resource">
+            <span class="resource-name">{{resource.name}} </span>
+            <input type="text" value="{{resource.value}}" data-dtype="string" readonly />
+            <span class="resource-divider">/</span>
+            <input type="text" value="{{resource.max}}" data-dtype="string" readonly />
+        </li>
+        {{/each}}
+    </ol>
+</div>

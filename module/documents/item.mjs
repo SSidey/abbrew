@@ -1,5 +1,5 @@
 import { acceptSkillCheck, getModifiedSkillActionCost, handleSkillActivate, trackSkillDuration } from '../helpers/skill.mjs';
-import { doesNestedFieldExist, arrayDifference, getNumericParts } from '../helpers/utils.mjs';
+import { doesNestedFieldExist, arrayDifference, getNumericParts, getSafeJson } from '../helpers/utils.mjs';
 import { getAttackSkillWithActions, getParrySkillWithActions } from '../helpers/fundamental-skills.mjs';
 import { emitForAll, SocketMessage } from '../socket.mjs';
 import { applyOperator } from '../helpers/operators.mjs';
@@ -26,12 +26,33 @@ export default class AbbrewItem extends Item {
       }
     }
 
-
     if (doesNestedFieldExist(changed, "system.equipState") && changed.system.equipState.startsWith('held')) {
       if (!this.isHeldEquipStateChangePossible(changed.system.equipState)) {
         ui.notifications.info("You are already holding too many items, try stowing some");
         this.actor.sheet.render();
         return false;
+      }
+    }
+
+    if (doesNestedFieldExist(changed, "system.action.modifiers.resources.self")) {
+      const resourceUpdate = changed.system.action.modifiers.resources.self;
+      if (Array.isArray(resourceUpdate)) {
+        resourceUpdate.forEach(r => {
+          if ("type" in r) {
+            r.type = getSafeJson(r.summary, [{ id: "" }])[0].id;
+          }
+        });
+      }
+    }
+
+    if (doesNestedFieldExist(changed, "system.action.modifiers.resources.target")) {
+      const resourceUpdate = changed.system.action.modifiers.resources.target;
+      if (Array.isArray(resourceUpdate)) {
+        changed.system.action.modifiers.resources.target.forEach(r => {
+          if ("type" in r) {
+            r.type = getSafeJson(r.summary, [{ id: "" }])[0].id;
+          }
+        });
       }
     }
 

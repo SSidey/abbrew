@@ -230,7 +230,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       const id = ownedResource.id;
       const max = ownedResource.max;
       const valueIndex = this.resources.values.findIndex(r => r.id === id);
-      if (valueIndex && valueIndex > -1) {
+      if (valueIndex != null && valueIndex > -1) {
         const valueResource = this.resources.values[valueIndex];
         this.resources.values[valueIndex] = ({ id: valueResource.id, value: Math.min(max, valueResource.value) });
       }
@@ -284,6 +284,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     const mappedTraining = Object.entries(skillTraining).map(e => ({ type: e[0], value: e[1] }));
     this.skillTraining = foundry.utils.mergeObject(this.skillTraining, mappedTraining);
 
+    this._limitResourceValues();
   }
 
   _prepareAnatomy() {

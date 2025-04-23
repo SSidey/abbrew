@@ -169,9 +169,7 @@ async function handleSkillToRounds(actor) {
             const rounds = Math.floor(preparedDuration.remaining / 6);
             duration["rounds"] = rounds;
             duration["seconds"] = null;
-            duration["duration"] = rounds
-            // duration["startRound"] = game.combat?.round ?? 0;
-            // duration["startTurn"] = game.combat?.turn ?? 0;
+            duration["duration"] = rounds;
             duration["type"] = "turns";
             duration["startTime"] = game.time.worldTime;
             duration["startRound"] = game.combat.current.round;
@@ -180,7 +178,7 @@ async function handleSkillToRounds(actor) {
                 duration["turns"] = 1;
                 duration["duration"] += 0.01;
             }
-            // duration["duration"] = value;
+            
             await effect.update({ "duration": duration })
         }
     });
@@ -214,7 +212,7 @@ async function updateTurnStartWounds(actor) {
 }
 
 function getWoundsWithOperator(actor, operator) {
-    return actor.items.filter(i => i.type === "skill").filter(s => s.system.action.modifiers.wounds.self.some(w => w.operator === operator)).filter(s => !s.system.isActivatable || (actor.system.activeSkills.includes(s._id))).flatMap(s => s.system.action.modifiers.wounds.self.filter(w => w.operator === operator)).reduce((result, ws) => {
+    return actor.items.filter(i => i.type === "skill").filter(s => s.system.action.modifiers.wounds.self.some(w => w.operator === operator)).filter(s => (!s.system.isActivatable && s.system.skillType === "standalone") || (actor.system.activeSkills.includes(s._id))).flatMap(s => s.system.action.modifiers.wounds.self.filter(w => w.operator === operator)).reduce((result, ws) => {
         if (ws.type in result) {
             result[ws.type].push({ operator: ws.operator, ...parseModifierFieldValue(ws.value, actor, ws), index: getOrderForOperator(ws.operator) });
         } else {

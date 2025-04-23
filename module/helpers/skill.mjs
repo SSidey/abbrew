@@ -694,22 +694,28 @@ function mergeResolveModifiers(allSkills, actor, target) {
 }
 
 function mergeWoundSelfModifiers(allSkills, actor) {
-    const modifierFields = allSkills.map(s => s.system.action.modifiers.wounds.self);
+    const modifierFields = allSkills.map(s => s.system.action.modifiers.wounds.self).filter(s => s.length > 0);
     return mergeComplexModifierFields(modifierFields, actor, getApplicableWounds);
 }
 
 function mergeResourceSelfModifiers(allSkills, actor) {
-    const modifierFields = allSkills.map(s => s.system.action.modifiers.resources.self);
+    const modifierFields = allSkills.map(s => s.system.action.modifiers.resources.self).filter(s => s.length > 0);
+    modifierFields.forEach(f => f.forEach(a => {
+        a.type = getSafeJson(a.summary, [{ id: "" }])[0].id;
+    }));
     return mergeComplexModifierFields(modifierFields, actor, noopFilter);
 }
 
 function mergeWoundTargetModifiers(allSkills, actor) {
-    const modifierFields = allSkills.map(s => s.system.action.modifiers.wounds.target);
+    const modifierFields = allSkills.map(s => s.system.action.modifiers.wounds.target).filter(s => s.length > 0);
     return mergeComplexModifierFields(modifierFields, actor, getApplicableWounds);
 }
 
 function mergeResourceTargetModifiers(allSkills, actor) {
-    const modifierFields = allSkills.map(s => s.system.action.modifiers.resources.target);
+    const modifierFields = allSkills.map(s => s.system.action.modifiers.resources.target).filter(s => s.length > 0);
+    modifierFields.forEach(f => f.forEach(a => {
+        a.type = getSafeJson(a.summary, [{ id: "" }])[0].id;
+    }));
     return mergeComplexModifierFields(modifierFields, actor, noopFilter);
 }
 
