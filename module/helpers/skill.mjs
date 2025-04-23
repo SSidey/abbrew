@@ -2,7 +2,6 @@ import { applyOperator, getOrderForOperator } from "./operators.mjs";
 import { compareModifierIndices, getObjectValueByStringPath, getSafeJson } from "../helpers/utils.mjs"
 import { getFundamentalAttributeSkill } from "./fundamental-skills.mjs";
 import { applyFullyParsedComplexModifiers, applyFullyParsedModifiers, mergeComplexModifierFields, mergeLateComplexModifiers, mergeModifierFields, parseModifierFieldValue, parsePath, reduceParsedModifiers } from "./modifierBuilderFieldHelpers.mjs";
-// import { mergeSimpleSelfModifier } from "./modifierBuilderFieldHelpers.mjs";
 
 export async function handleSkillActivate(actor, skill, checkActions = true) {
     const isSkillProxied = skill.system.isProxied;
