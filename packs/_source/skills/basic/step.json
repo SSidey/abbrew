@@ -13,21 +13,53 @@
       "modifiers": {
         "guard": {
           "self": {
-            "value": "",
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": false,
+                "multiplier": 1
+              }
+            ],
             "operator": ""
           },
           "target": {
-            "value": "",
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": true,
+                "multiplier": 1
+              }
+            ],
             "operator": ""
           }
         },
         "risk": {
           "self": {
-            "value": 0,
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": false,
+                "multiplier": 1
+              }
+            ],
             "operator": ""
           },
           "target": {
-            "value": 0,
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": true,
+                "multiplier": 1
+              }
+            ],
             "operator": ""
           }
         },
@@ -37,11 +69,27 @@
         },
         "resolve": {
           "self": {
-            "value": 0,
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": false,
+                "multiplier": 1
+              }
+            ],
             "operator": ""
           },
           "target": {
-            "value": 0,
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": true,
+                "multiplier": 1
+              }
+            ],
             "operator": ""
           }
         },
@@ -96,7 +144,7 @@
         "attackType": "",
         "lethal": 0,
         "critical": 10,
-        "handsSupplied": null,
+        "handsSupplied": 0,
         "attackMode": "",
         "damage": [],
         "finisherLimit": 10
@@ -130,7 +178,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743073136357,
-    "modifiedTime": 1743075708712,
+    "modifiedTime": 1745432759778,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "ownership": {

@@ -13,7 +13,7 @@
     },
     "skillTraits": "",
     "skillModifiers": {
-      "synergy": "[{\"value\":\"Attack\",\"id\":\"\",\"sourceId\":\"Compendium.abbrew.skills.Item.XUpBl13SyrdUvgMb\"},{\"value\":\"Overpower\",\"id\":\"\",\"sourceId\":\"Compendium.abbrew.skills.Item.rROAymZJjdomFnKc\"},{\"id\":\"abbrewFeint00000\",\"value\":\"Feint\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewFeint00000\"},{\"id\":\"abbrewFinisher00\",\"value\":\"Finisher\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewFinisher00\"}]",
+      "synergy": "[{\"id\":\"abbrewAttack0000\",\"value\":\"Attack\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewAttack0000\"},{\"id\":\"abbrewFeint00000\",\"value\":\"Feint\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewFeint00000\"},{\"id\":\"abbrewOverpower0\",\"value\":\"Overpower\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewOverpower0\"},{\"id\":\"abbrewFinisher00\",\"value\":\"Finisher\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewFinisher00\"}]",
       "discord": ""
     },
     "configurable": true,
@@ -200,7 +200,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743457541441,
-    "modifiedTime": 1745173979553,
+    "modifiedTime": 1745360737713,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!aDuQuRzigltZwBCu"

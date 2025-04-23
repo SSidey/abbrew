@@ -1,4 +1,4 @@
-import { parseModifierFieldValue } from "./modifierBuilderFieldHelpers.mjs";
+import { mergeModifierFields, parseModifierFieldValue } from "./modifierBuilderFieldHelpers.mjs";
 import { applyOperator, getOrderForOperator } from "./operators.mjs";
 import { applySkillEffects } from "./skill.mjs";
 import { handleSkillExpiry } from "./time.mjs";
@@ -216,9 +216,9 @@ async function updateTurnStartWounds(actor) {
 function getWoundsWithOperator(actor, operator) {
     return actor.items.filter(i => i.type === "skill").filter(s => s.system.action.modifiers.wounds.self.some(w => w.operator === operator)).filter(s => !s.system.isActivatable || (actor.system.activeSkills.includes(s._id))).flatMap(s => s.system.action.modifiers.wounds.self.filter(w => w.operator === operator)).reduce((result, ws) => {
         if (ws.type in result) {
-            result[ws.type].push({ operator: ws.operator, value: parseModifierFieldValue(ws.value, actor, ws), index: getOrderForOperator(ws.operator) });
+            result[ws.type].push({ operator: ws.operator, ...parseModifierFieldValue(ws.value, actor, ws), index: getOrderForOperator(ws.operator) });
         } else {
-            result[ws.type] = [{ operator: ws.operator, value: parseModifierFieldValue(ws.value, actor, ws), index: getOrderForOperator(ws.operator) }];
+            result[ws.type] = [{ operator: ws.operator, ...parseModifierFieldValue(ws.value, actor, ws), index: getOrderForOperator(ws.operator) }];
         }
 
         return result;
@@ -227,21 +227,24 @@ function getWoundsWithOperator(actor, operator) {
 
 function getWoundsWithSuppression(actor) {
     const wounds = getWoundsWithOperator(actor, "suppress");
-    Object.keys(wounds).forEach(key => {
-        wounds[key] = wounds[key].reduce((result, wound) => {
-            result = result + wound.value[0].path;
-
-            return result;
-        }, 0);
-    });
-    return wounds;
+    return fullyParseWoundModifiers(actor, wounds);
 }
 
 function getWoundsWithIntensify(actor) {
     const wounds = getWoundsWithOperator(actor, "intensify");
+    return fullyParseWoundModifiers(actor, wounds);
+}
+
+function fullyParseWoundModifiers(actor, wounds) {
     Object.keys(wounds).forEach(key => {
         wounds[key] = wounds[key].reduce((result, wound) => {
-            result = result + wound.value[0].path;
+            const [fullyParsed,] = mergeModifierFields([wound], actor);
+            const fullWound = fullyParsed[0];
+            result = result + fullWound.value.reduce((innerResult, field) => {
+                const value = Math.floor(field.path * field.multiplier);
+                innerResult = applyOperator(innerResult, value, field.operator, 0);
+                return innerResult;
+            }, 0);
 
             return result;
         }, 0);

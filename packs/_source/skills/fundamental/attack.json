@@ -54,21 +54,53 @@
         },
         "guard": {
           "self": {
-            "value": "",
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": false,
+                "multiplier": 1
+              }
+            ],
             "operator": ""
           },
           "target": {
-            "value": "",
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": true,
+                "multiplier": 1
+              }
+            ],
             "operator": ""
           }
         },
         "risk": {
           "self": {
-            "value": 0,
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": false,
+                "multiplier": 1
+              }
+            ],
             "operator": ""
           },
           "target": {
-            "value": 0,
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": true,
+                "multiplier": 1
+              }
+            ],
             "operator": ""
           }
         },
@@ -78,11 +110,27 @@
         },
         "resolve": {
           "self": {
-            "value": 0,
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": false,
+                "multiplier": 1
+              }
+            ],
             "operator": ""
           },
           "target": {
-            "value": 0,
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": true,
+                "multiplier": 1
+              }
+            ],
             "operator": ""
           }
         },
@@ -133,7 +181,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743073000940,
-    "modifiedTime": 1744236228090,
+    "modifiedTime": 1745424855784,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "ownership": {

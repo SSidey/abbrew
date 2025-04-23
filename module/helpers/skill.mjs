@@ -261,7 +261,7 @@ export async function applySkillEffects(actor, skill) {
             const effect = actor.effects.find(e => e.flags?.abbrew?.skill?.trackDuration === skill._id);
             await effect?.delete();
         }
-        // Trigger modifier pairs early. TODO: Why?
+
         await handlePairedSkills(skill, actor);
     }
 
@@ -367,7 +367,7 @@ export async function applySkillEffects(actor, skill) {
         }).reduce((result, damage) => {
             if (damage.damageType in result) {
                 result[damage.damageType].value += damage.value;
-                result[damage.penetration].penetration = Math.min(damage.penetration, result[damage.penetration]) ?? 0;
+                result[damage.damageType].penetration = Math.min(damage.penetration, result[damage.penetration]) ?? 0;
             } else {
                 result[damage.damageType] = ({ value: damage.value, penetration: damage.penetration });
             }
@@ -427,9 +427,15 @@ export async function applySkillEffects(actor, skill) {
     const [guardTargetUpdate, lateGuardTargetUpdate] = mergeGuardTargetModifiers(allSkills, actor);
     const [riskTargetUpdate, lateRiskTargetUpdate] = mergeRiskTargetModifiers(allSkills, actor);
     const [resolveTargetUpdate, lateResolveTargetUpdate] = mergeResolveTargetModifiers(allSkills, actor);
-    targetUpdates.push({ path: "system.defense.guard.value", update: guardTargetUpdate, lateModifiers: lateGuardTargetUpdate });
-    targetUpdates.push({ path: "system.defense.risk.raw", update: riskTargetUpdate, lateModifiers: lateRiskTargetUpdate });
-    targetUpdates.push({ path: "system.defense.resolve.value", update: resolveTargetUpdate, lateModifiers: lateResolveTargetUpdate });
+    if (guardTargetUpdate.length > 0 || lateGuardTargetUpdate.length > 0) {
+        targetUpdates.push({ path: "system.defense.guard.value", update: guardTargetUpdate, lateModifiers: lateGuardTargetUpdate });
+    }
+    if (riskTargetUpdate.length > 0 || lateRiskTargetUpdate.length > 0) {
+        targetUpdates.push({ path: "system.defense.risk.raw", update: riskTargetUpdate, lateModifiers: lateRiskTargetUpdate });
+    }
+    if (resolveTargetUpdate.length > 0 || lateResolveTargetUpdate.length > 0) {
+        targetUpdates.push({ path: "system.defense.resolve.value", update: resolveTargetUpdate, lateModifiers: lateResolveTargetUpdate });
+    }
     const targetWounds = mergeWoundTargetModifiers(allSkills, actor);
     const targetResources = mergeResourceTargetModifiers(allSkills, actor);
 
@@ -896,8 +902,6 @@ function getSkillDuration(skill) {
         return duration;
     }
 
-    // TODO: remove on next standalone.
-    // Return 1 Turn Duration for Instants, remove on next standalone.
     if (precision === "0") {
         duration["turns"] = 1;
         duration["startRound"] = game.combat?.round ?? 0;
@@ -907,24 +911,30 @@ function getSkillDuration(skill) {
         return duration;
     }
 
+    const expiresOnStartOfTurn = skill.system.action.duration.expireOnStartOfTurn;
     const value = Math.max(1, skill.system.action.duration.value);
+    const roundOffset = 0.01
     duration["startTime"] = game.time.worldTime;
 
     if (precision === "6") {
         duration["rounds"] = value;
+        if (expiresOnStartOfTurn) {
+            duration["turns"] = 1;
+        }
         duration["startRound"] = game.combat?.round ?? 0;
         duration["startTurn"] = game.combat?.turn ?? 0;
         duration["type"] = "turns";
-        duration["duration"] = value;
+        duration["duration"] = expiresOnStartOfTurn ? value : value + roundOffset;
         return duration;
     }
 
     if (precision === "0.01") {
-        duration["turns"] = value;
+        duration["turns"] = expiresOnStartOfTurn ? value : value + 1;
         duration["startRound"] = game.combat?.round ?? 0;
         duration["startTurn"] = game.combat?.turn ?? 0;
         duration["type"] = "turns";
-        duration["duration"] = (value / 100).toFixed(2);
+        const rawDuration = (value / 100).toFixed(2);
+        duration["duration"] = expiresOnStartOfTurn ? rawDuration : rawDuration + roundOffset;
         return duration;
     }
 

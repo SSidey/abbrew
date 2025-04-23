@@ -11,7 +11,7 @@
     },
     "skillTraits": "",
     "skillModifiers": {
-      "synergy": "",
+      "synergy": "[{\"id\":\"abbrewAttack0000\",\"value\":\"Attack\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewAttack0000\"}]",
       "discord": ""
     },
     "configurable": true,
@@ -80,21 +80,53 @@
         },
         "guard": {
           "self": {
-            "value": "",
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": false,
+                "multiplier": 1
+              }
+            ],
             "operator": ""
           },
           "target": {
-            "value": "",
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": true,
+                "multiplier": 1
+              }
+            ],
             "operator": ""
           }
         },
         "risk": {
           "self": {
-            "value": 0,
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": false,
+                "multiplier": 1
+              }
+            ],
             "operator": ""
           },
           "target": {
-            "value": 0,
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": true,
+                "multiplier": 1
+              }
+            ],
             "operator": ""
           }
         },
@@ -104,11 +136,27 @@
         },
         "resolve": {
           "self": {
-            "value": 0,
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": false,
+                "multiplier": 1
+              }
+            ],
             "operator": ""
           },
           "target": {
-            "value": 0,
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": true,
+                "multiplier": 1
+              }
+            ],
             "operator": ""
           }
         },
@@ -143,7 +191,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743711660124,
-    "modifiedTime": 1743711660124,
+    "modifiedTime": 1745426064184,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_id": "LC65Qtc9wBcWbcVc",

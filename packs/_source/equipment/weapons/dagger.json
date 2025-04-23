@@ -54,7 +54,7 @@
       "value": "",
       "uuid": ""
     },
-    "handsRequired": "none",
+    "handsRequired": "oneHand",
     "handsSupplied": 0,
     "actionCost": 0,
     "exertActionCost": 0,
@@ -75,7 +75,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075360599,
-    "modifiedTime": 1743076005600,
+    "modifiedTime": 1745358212637,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_id": "kQFrvnG9djLFUEVU",

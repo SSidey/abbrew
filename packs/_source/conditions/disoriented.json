@@ -4,7 +4,7 @@
   "_id": "r7VMjvyw8EKDplwf",
   "img": "systems/abbrew/assets/icons/statuses/disoriented.svg",
   "system": {
-    "description": "",
+    "description": "<p>You have been disoriented, you cannot restore guard nor parry while you have this condition.</p>",
     "traits": "",
     "abbrewId": {
       "value": "abbrew.skill.disoriented.r7VMjvyw8EKDplwf",
@@ -12,25 +12,29 @@
     },
     "skillTraits": "",
     "skillModifiers": {
-      "synergy": "[{\"value\":\"Parry\",\"id\":\"\",\"sourceId\":\"Compendium.abbrew.skills.Item.lTy5lovRwgSU5ERZ\"},{\"value\":\"Restore Guard\",\"id\":\"\",\"sourceId\":\"Compendium.abbrew.skills.Item.iUJqYFdrcfZyUr6S\"}]",
-      "discord": ""
+      "synergy": "",
+      "discord": "[{\"id\":\"abbrewParry00000\",\"value\":\"Parry\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewParry00000\"},{\"value\":\"Restore Guard\",\"id\":\"iUJqYFdrcfZyUr6S\",\"sourceId\":\"Compendium.abbrew.skills.Item.iUJqYFdrcfZyUr6S\"}]"
     },
-    "configurable": false,
+    "configurable": true,
     "isActivatable": false,
     "skills": [],
     "action": {
-      "activationType": "standalone",
+      "activationType": "synergy",
       "actionCost": "1",
       "actionImage": "",
       "duration": {
-        "precision": "0",
-        "value": 0
+        "precision": "-1",
+        "value": 0,
+        "expireOnStartOfTurn": true
       },
       "uses": {
         "hasUses": true,
         "value": 1,
-        "max": 1,
-        "period": ""
+        "max": 0,
+        "period": "",
+        "asStacks": true,
+        "removeWhenNoUsesRemain": true,
+        "stackRemovalActivation": true
       },
       "charges": {
         "hasCharges": false,
@@ -74,21 +78,21 @@
         },
         "guard": {
           "self": {
-            "value": "",
+            "value": [],
             "operator": ""
           },
           "target": {
-            "value": "",
+            "value": [],
             "operator": ""
           }
         },
         "risk": {
           "self": {
-            "value": 0,
+            "value": [],
             "operator": ""
           },
           "target": {
-            "value": 0,
+            "value": [],
             "operator": ""
           }
         },
@@ -98,11 +102,11 @@
         },
         "resolve": {
           "self": {
-            "value": 0,
+            "value": [],
             "operator": ""
           },
           "target": {
-            "value": 0,
+            "value": [],
             "operator": ""
           }
         },
@@ -123,7 +127,10 @@
     },
     "attributeIncrease": "",
     "attributeIncreaseLong": "",
-    "attributeRankIncrease": ""
+    "attributeRankIncrease": "",
+    "applyTurnStart": false,
+    "applyOnExpiry": false,
+    "applyTurnEnd": false
   },
   "effects": [
     {
@@ -140,29 +147,43 @@
         "startTurn": null
       },
       "disabled": false,
-      "_id": "mfqnPc0kjgyfJPeV",
+      "_id": "3mx7LChk26e1LPl0",
       "type": "base",
       "system": {},
       "changes": [],
-      "description": "",
+      "description": "<p>You have been disoriented, you cannot restore guard nor parry while you have this condition.</p>",
       "tint": "#ffffff",
       "transfer": true,
       "statuses": [
         "disoriented"
       ],
       "sort": 0,
-      "flags": {},
+      "flags": {
+        "statuscounter": {
+          "config": {
+            "dataSource": "flags.abbrew.skill.stacks",
+            "type": "default"
+          },
+          "value": 1,
+          "visible": false
+        },
+        "abbrew": {
+          "skill": {
+            "stacks": 1
+          }
+        }
+      },
       "_stats": {
         "compendiumSource": null,
         "duplicateSource": null,
         "coreVersion": "12.331",
         "systemId": "abbrew",
         "systemVersion": "0.0.2-prerelease31",
-        "createdTime": 1743076253901,
-        "modifiedTime": 1743076277489,
+        "createdTime": 1745177790062,
+        "modifiedTime": 1745358944430,
         "lastModifiedBy": "abbrewpacks00000"
       },
-      "_key": "!items.effects!r7VMjvyw8EKDplwf.mfqnPc0kjgyfJPeV"
+      "_key": "!items.effects!r7VMjvyw8EKDplwf.3mx7LChk26e1LPl0"
     }
   ],
   "folder": null,
@@ -177,7 +198,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743076241070,
-    "modifiedTime": 1744987308635,
+    "modifiedTime": 1745358944423,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!r7VMjvyw8EKDplwf"

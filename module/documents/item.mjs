@@ -2,6 +2,7 @@ import { acceptSkillCheck, getModifiedSkillActionCost, handleSkillActivate, trac
 import { doesNestedFieldExist, arrayDifference, getNumericParts } from '../helpers/utils.mjs';
 import { getAttackSkillWithActions, getParrySkillWithActions } from '../helpers/fundamental-skills.mjs';
 import { emitForAll, SocketMessage } from '../socket.mjs';
+import { applyOperator } from '../helpers/operators.mjs';
 /**
  * Extend the basic Item with some very simple modifications.
  * @extends {Item}
@@ -315,6 +316,10 @@ export default class AbbrewItem extends Item {
       let base = actor.system.combinedAttacks.base;
       base.attackProfile.damage = [...base.attackProfile.damage, ...fullCombinedDamage];
       let attackSkill = getAttackSkillWithActions(base.id, base.name, base.actionCost, base.image, base.attackProfile, base.attackMode, base.handsSupplied);
+      attackSkill.system.action.attackProfile.finisherLimit = applyOperator(attackSkill.system.action.attackProfile.finisherLimit, combineForSkill.system.action.modifiers.attackProfile.finisherLimit.value, combineForSkill.system.action.modifiers.attackProfile.finisherLimit.operator, 0);
+      attackSkill.system.action.attackProfile.critical = applyOperator(attackSkill.system.action.attackProfile.critical, combineForSkill.system.action.modifiers.attackProfile.critical.value, combineForSkill.system.action.modifiers.attackProfile.critical.operator, 5);
+      attackSkill.system.action.attackProfile.lethal = applyOperator(attackSkill.system.action.attackProfile.lethal, combineForSkill.system.action.modifiers.attackProfile.lethal.value, combineForSkill.system.action.modifiers.attackProfile.lethal.operator, 0);
+
       if (combineSkill.durationPrecision === "0") {
         const effect = actor.effects.find(e => e.flags?.abbrew?.skill?.trackDuration === combineSkill.id);
         await effect?.delete();

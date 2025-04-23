@@ -11,7 +11,7 @@
     },
     "skillTraits": "",
     "skillModifiers": {
-      "synergy": "[{\"value\":\"Attack\",\"id\":\"XUpBl13SyrdUvgMb\",\"sourceId\":\"Compendium.abbrew.skills.Item.XUpBl13SyrdUvgMb\"},{\"value\":\"Feint\",\"id\":\"K0OOr4X7XjakQ6cn\",\"sourceId\":\"Compendium.abbrew.skills.Item.K0OOr4X7XjakQ6cn\"},{\"value\":\"Move\",\"id\":\"ttDyhN1XtKKSjkXk\",\"sourceId\":\"Compendium.abbrew.skills.Item.ttDyhN1XtKKSjkXk\"},{\"value\":\"Step\",\"id\":\"jv5DDww4KxR8YbQK\",\"sourceId\":\"Compendium.abbrew.skills.Item.jv5DDww4KxR8YbQK\"},{\"value\":\"Overpower\",\"id\":\"rROAymZJjdomFnKc\",\"sourceId\":\"Compendium.abbrew.skills.Item.Nv1PxBfxFdkkF0jo\"},{\"value\":\"Finisher\",\"id\":\"CyLt3Q0Ao82N1c6o\",\"sourceId\":\"Compendium.abbrew.skills.Item.CyLt3Q0Ao82N1c6o\"},{\"value\":\"Parry\",\"id\":\"lTy5lovRwgSU5ERZ\",\"sourceId\":\"Compendium.abbrew.skills.Item.lTy5lovRwgSU5ERZ\"}]",
+      "synergy": "[{\"value\":\"Move\",\"id\":\"ttDyhN1XtKKSjkXk\",\"sourceId\":\"Compendium.abbrew.skills.Item.ttDyhN1XtKKSjkXk\"},{\"value\":\"Step\",\"id\":\"jv5DDww4KxR8YbQK\",\"sourceId\":\"Compendium.abbrew.skills.Item.jv5DDww4KxR8YbQK\"},{\"id\":\"abbrewAttack0000\",\"value\":\"Attack\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewAttack0000\"},{\"id\":\"abbrewParry00000\",\"value\":\"Parry\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewParry00000\"},{\"id\":\"abbrewFinisher00\",\"value\":\"Finisher\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewFinisher00\"},{\"id\":\"abbrewFeint00000\",\"value\":\"Feint\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewFeint00000\"},{\"id\":\"abbrewOverpower0\",\"value\":\"Overpower\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewOverpower0\"}]",
       "discord": ""
     },
     "configurable": true,
@@ -80,21 +80,53 @@
         },
         "guard": {
           "self": {
-            "value": "",
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": false,
+                "multiplier": 1
+              }
+            ],
             "operator": ""
           },
           "target": {
-            "value": "",
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": true,
+                "multiplier": 1
+              }
+            ],
             "operator": ""
           }
         },
         "risk": {
           "self": {
-            "value": 0,
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": false,
+                "multiplier": 1
+              }
+            ],
             "operator": ""
           },
           "target": {
-            "value": 0,
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": true,
+                "multiplier": 1
+              }
+            ],
             "operator": ""
           }
         },
@@ -104,11 +136,27 @@
         },
         "resolve": {
           "self": {
-            "value": 0,
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": false,
+                "multiplier": 1
+              }
+            ],
             "operator": ""
           },
           "target": {
-            "value": 0,
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": true,
+                "multiplier": 1
+              }
+            ],
             "operator": ""
           }
         },
@@ -143,7 +191,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743711622026,
-    "modifiedTime": 1743713108891,
+    "modifiedTime": 1745432774046,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_id": "gGwNbDdkafpU6rNm",
