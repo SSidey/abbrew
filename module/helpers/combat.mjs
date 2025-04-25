@@ -1,5 +1,6 @@
 import { mergeModifierFields, parseModifierFieldValue } from "./modifierBuilderFieldHelpers.mjs";
 import { applyOperator, getOrderForOperator } from "./operators.mjs";
+import { applySkillEffects } from "./skills/skill-application.mjs";
 import { handleSkillExpiry } from "./time.mjs";
 import { getSafeJson } from "./utils.mjs";
 

@@ -7,6 +7,7 @@ import Tagify from '@yaireo/tagify'
 import { getFundamentalAttributeSkill } from '../helpers/fundamental-skills.mjs';
 import { cleanTemporarySkill } from '../helpers/skills/skill-uses.mjs';
 import { handleSkillActivate } from '../helpers/skills/skill-activation.mjs';
+import { manualSkillExpiry } from '../helpers/skills/skill-expiry.mjs';
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -435,7 +436,7 @@ export class AbbrewActorSheet extends ActorSheet {
     const skill = this.actor.items.get(id);
     const effect = this.actor.getEffectBySkillId(skill._id);
     if (effect) {
-      await effect.delete();
+      await manualSkillExpiry(effect);
     }
   }
 

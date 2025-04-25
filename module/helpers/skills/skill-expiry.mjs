@@ -11,3 +11,7 @@ export async function handleInstantModifierExpiry(actor, modifierSkills) {
         await handlePairedSkills(skill, actor);
     }
 }
+
+export async function manualSkillExpiry(effect) {
+    await effect.delete();
+}
