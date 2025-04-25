@@ -147,7 +147,8 @@
         "handsSupplied": 0,
         "attackMode": "",
         "damage": [],
-        "finisherLimit": 10
+        "finisherLimit": 10,
+        "isEnabled": false
       }
     },
     "skillType": "basic",
@@ -178,7 +179,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743073136357,
-    "modifiedTime": 1745432759778,
+    "modifiedTime": 1745618148003,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "ownership": {

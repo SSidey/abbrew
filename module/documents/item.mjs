@@ -1,8 +1,10 @@
-import { acceptSkillCheck, getModifiedSkillActionCost, handleSkillActivate, trackSkillDuration } from '../helpers/skill.mjs';
 import { doesNestedFieldExist, arrayDifference, getNumericParts, getSafeJson } from '../helpers/utils.mjs';
 import { getAttackSkillWithActions, getParrySkillWithActions } from '../helpers/fundamental-skills.mjs';
 import { emitForAll, SocketMessage } from '../socket.mjs';
 import { applyOperator } from '../helpers/operators.mjs';
+import { acceptSkillCheck } from '../helpers/skills/skill-check.mjs';
+import { getModifiedSkillActionCost, handleSkillActivate } from '../helpers/skills/skill-activation.mjs';
+import { trackSkillDuration } from '../helpers/skills/skill-duration.mjs';
 /**
  * Extend the basic Item with some very simple modifications.
  * @extends {Item}
@@ -31,28 +33,6 @@ export default class AbbrewItem extends Item {
         ui.notifications.info("You are already holding too many items, try stowing some");
         this.actor.sheet.render();
         return false;
-      }
-    }
-
-    if (doesNestedFieldExist(changed, "system.action.modifiers.resources.self")) {
-      const resourceUpdate = changed.system.action.modifiers.resources.self;
-      if (Array.isArray(resourceUpdate)) {
-        resourceUpdate.forEach(r => {
-          if ("type" in r) {
-            r.type = getSafeJson(r.summary, [{ id: "" }])[0].id;
-          }
-        });
-      }
-    }
-
-    if (doesNestedFieldExist(changed, "system.action.modifiers.resources.target")) {
-      const resourceUpdate = changed.system.action.modifiers.resources.target;
-      if (Array.isArray(resourceUpdate)) {
-        changed.system.action.modifiers.resources.target.forEach(r => {
-          if ("type" in r) {
-            r.type = getSafeJson(r.summary, [{ id: "" }])[0].id;
-          }
-        });
       }
     }
 

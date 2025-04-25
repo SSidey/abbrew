@@ -1,6 +1,5 @@
 import { mergeModifierFields, parseModifierFieldValue } from "./modifierBuilderFieldHelpers.mjs";
 import { applyOperator, getOrderForOperator } from "./operators.mjs";
-import { applySkillEffects } from "./skill.mjs";
 import { handleSkillExpiry } from "./time.mjs";
 import { getSafeJson } from "./utils.mjs";
 
@@ -178,7 +177,7 @@ async function handleSkillToRounds(actor) {
                 duration["turns"] = 1;
                 duration["duration"] += 0.01;
             }
-            
+
             await effect.update({ "duration": duration })
         }
     });

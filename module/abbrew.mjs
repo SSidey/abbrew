@@ -9,15 +9,15 @@ import * as models from './data/_module.mjs';
 // Import Documents Classes
 import * as documents from './documents/_module.mjs';
 import { handleActorWoundConditions, handleActorGuardConditions, handleCombatStart } from './helpers/combat.mjs';
-import { staticID, doesNestedFieldExist } from './helpers/utils.mjs';
+import { staticID, doesNestedFieldExist, getSafeJson } from './helpers/utils.mjs';
 import { registerSystemSettings } from './settings.mjs';
 import { AbbrewCreatureFormSheet } from './sheets/items/item-creature-form-sheet.mjs';
 import { AbbrewSkillDeckSheet } from './sheets/items/item-skill-deck-sheet.mjs';
 import { AbbrewAnatomySheet } from './sheets/items/item-anatomy-sheet.mjs';
 import { AbbrewSkillSheet } from './sheets/items/item-skill-sheet.mjs';
-import { handleSkillActivate } from './helpers/skill.mjs';
 import { onWorldTimeUpdate } from './helpers/time.mjs';
 import { activateSocketListener, emitForAll, SocketMessage } from './socket.mjs';
+import { handleSkillActivate } from './helpers/skills/skill-activation.mjs';
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -267,6 +267,36 @@ Hooks.on("updateToken", (document, changed, options, userId) => {
   // stepping is 1 action, less than or equal to speed is 2 actions, over that is 4, then should show red or no ruler?
   // Once another action has been taken, reset for next movement?
   // console.log("Somewhere to hit");
+});
+
+Hooks.on("preUpdateItem", async (document, changed, options, userId) => {
+  if (document.type === "skill") {
+    if (doesNestedFieldExist(changed, "system.action.modifiers.resources.self")) {
+      const resourceUpdate = changed.system.action.modifiers.resources.self;
+      if (Array.isArray(resourceUpdate)) {
+        resourceUpdate.forEach(r => {
+          if ("type" in r) {
+            r.type = getSafeJson(r.summary, [{ id: "" }])[0].id;
+          }
+        });
+      }
+    }
+
+    if (doesNestedFieldExist(changed, "system.action.modifiers.resources.target")) {
+      const resourceUpdate = changed.system.action.modifiers.resources.target;
+      if (Array.isArray(resourceUpdate)) {
+        changed.system.action.modifiers.resources.target.forEach(r => {
+          if ("type" in r) {
+            r.type = getSafeJson(r.summary, [{ id: "" }])[0].id;
+          }
+        });
+      }
+    }
+  }
+});
+
+Hooks.on("updateItem", async (document, changed, options, userId) => {
+  console.log(changed);
 });
 
 /* -------------------------------------------- */

@@ -4,8 +4,9 @@ import {
   prepareActiveEffectCategories,
 } from '../helpers/effects.mjs';
 import Tagify from '@yaireo/tagify'
-import { cleanTemporarySkill, handleSkillActivate } from '../helpers/skill.mjs';
 import { getFundamentalAttributeSkill } from '../helpers/fundamental-skills.mjs';
+import { cleanTemporarySkill } from '../helpers/skills/skill-uses.mjs';
+import { handleSkillActivate } from '../helpers/skills/skill-activation.mjs';
 
 /**
  * Extend the basic ActorSheet with some very simple modifications

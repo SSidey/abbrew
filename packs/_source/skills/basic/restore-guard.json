@@ -6,28 +6,36 @@
   "system": {
     "description": "",
     "traits": "",
-    "configurable": false,
+    "configurable": true,
     "action": {
       "activationType": "standalone",
       "actionCost": "0",
       "modifiers": {
         "guard": {
           "self": {
-            "value": "10",
+            "value": [
+              {
+                "operator": "add",
+                "type": "actor",
+                "path": "system.defense.resolve.max",
+                "lateParse": false,
+                "multiplier": 1
+              }
+            ],
             "operator": "add"
           },
           "target": {
-            "value": "0",
+            "value": [],
             "operator": ""
           }
         },
         "risk": {
           "self": {
-            "value": 0,
+            "value": [],
             "operator": ""
           },
           "target": {
-            "value": 0,
+            "value": [],
             "operator": ""
           }
         },
@@ -37,11 +45,11 @@
         },
         "resolve": {
           "self": {
-            "value": 0,
+            "value": [],
             "operator": ""
           },
           "target": {
-            "value": 0,
+            "value": [],
             "operator": ""
           }
         },
@@ -96,10 +104,11 @@
         "attackType": "",
         "lethal": 0,
         "critical": 10,
-        "handsSupplied": null,
+        "handsSupplied": 0,
         "attackMode": "",
         "damage": [],
-        "finisherLimit": 10
+        "finisherLimit": 10,
+        "isEnabled": false
       }
     },
     "skillType": "basic",
@@ -130,7 +139,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743073036669,
-    "modifiedTime": 1743075708311,
+    "modifiedTime": 1745618177181,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "ownership": {

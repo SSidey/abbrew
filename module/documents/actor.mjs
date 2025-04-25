@@ -1,7 +1,7 @@
 import { mergeActorWounds } from "../helpers/combat.mjs";
 import { applyFullyParsedModifiers, mergeModifierFields, reduceParsedModifiers } from "../helpers/modifierBuilderFieldHelpers.mjs";
-import { applyOperator, getOrderForOperator } from "../helpers/operators.mjs";
-import { applySkillEffects, handleSkillActivate, isSkillBlocked } from "../helpers/skill.mjs";
+import { handleSkillActivate, isSkillBlocked } from "../helpers/skills/skill-activation.mjs";
+import { applySkillEffects } from "../helpers/skills/skill-application.mjs";
 import { getAttackerAdvantageGuardResult, getAttackerAdvantageRiskResult, getDefenderAdvantageGuardResult, getDefenderAdvantageRiskResult } from "../helpers/trainedSkills.mjs";
 import { compareModifierIndices, getObjectValueByStringPath } from "../helpers/utils.mjs";
 import { FINISHERS } from "../static/finishers.mjs";
@@ -188,7 +188,7 @@ export default class AbbrewActor extends Actor {
     await this.takeActionUpdates(data);
     await this.takeActionWounds(data);
     await this.takeActionResources(data);
-    
+
     await this.handleSkillsGrantedOnAccept(data);
   }
 
