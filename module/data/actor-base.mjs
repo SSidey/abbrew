@@ -149,7 +149,8 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       tier: new fields.SchemaField({
         value: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0, max: 10 })
       }),
-      size: new fields.NumberField({ ...requiredInteger, initial: 0 })
+      size: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+      actionRecovery: new fields.NumberField({ ...requiredInteger, initial: 5, min: 0, max: 5 })
     });
 
     schema.skillTraining = new fields.ArrayField(

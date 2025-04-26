@@ -216,9 +216,6 @@ export default class AbbrewItem extends Item {
     return super._preCreate(data, options, user);
   }
 
-  async createEmbeddedDocuments(embeddedName, data = null, operation = null) {
-  }
-
   async _onCreate(data, options, userId) {
     if (game.user.id !== userId) {
       return;

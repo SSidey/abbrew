@@ -143,7 +143,7 @@ async function turnEnd(actor) {
     await actor.unsetFlag("abbrew", "combat.damage.lastRoundReceived")
     await applyActiveSkills(actor, "end");
     await handleSkillExpiry("end", actor);
-    await actor.update({ "system.actions": 5 });
+    await actor.update({ "system.actions": actor.system.meta.actionRecovery });
 }
 
 async function turnStart(actor) {

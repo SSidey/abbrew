@@ -23,15 +23,15 @@ ABBREW.durationsLabels = {
 }
 
 ABBREW.size = {
-  fine: { label: "ABBREW.size.fine", value: -4 },
-  diminutive: { label: "ABBREW.size.diminutive", value: -3 },
-  tiny: { label: "ABBREW.size.tiny", value: -2 },
-  small: { label: "ABBREW.size.small", value: -1 },
-  standard: { label: "ABBREW.size.standard", value: 0 },
-  large: { label: "ABBREW.size.large", value: 1 },
-  huge: { label: "ABBREW.size.huge", value: 2 },
-  gargantuan: { label: "ABBREW.size.gargantuan", value: 3 },
-  colossal: { label: "ABBREW.size.colossal", value: 4 }
+  fine: { label: "ABBREW.size.fine", value: -4, dimension: 0.5 },
+  diminutive: { label: "ABBREW.size.diminutive", value: -3, dimension: 0.5 },
+  tiny: { label: "ABBREW.size.tiny", value: -2, dimension: 0.5 },
+  small: { label: "ABBREW.size.small", value: -1, dimension: 0.5 },
+  standard: { label: "ABBREW.size.standard", value: 0, dimension: 1 },
+  large: { label: "ABBREW.size.large", value: 1, dimension: 2 },
+  huge: { label: "ABBREW.size.huge", value: 2, dimension: 3 },
+  gargantuan: { label: "ABBREW.size.gargantuan", value: 3, dimension: 4 },
+  colossal: { label: "ABBREW.size.colossal", value: 4, dimension: 5 }
 }
 
 /**
