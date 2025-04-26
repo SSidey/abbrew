@@ -5,6 +5,7 @@ import { applyOperator } from '../helpers/operators.mjs';
 import { acceptSkillCheck } from '../helpers/skills/skill-check.mjs';
 import { getModifiedSkillActionCost, handleSkillActivate } from '../helpers/skills/skill-activation.mjs';
 import { trackSkillDuration } from '../helpers/skills/skill-duration.mjs';
+import { manualSkillExpiry } from '../helpers/skills/skill-expiry.mjs';
 /**
  * Extend the basic Item with some very simple modifications.
  * @extends {Item}
@@ -36,14 +37,16 @@ export default class AbbrewItem extends Item {
       }
     }
 
-    super._preUpdate(changed, options, userId);
+    if (doesNestedFieldExist(changed, "system.isDismembered") && changed.system.isDismembered === true) {
+      foundry.utils.setProperty(changed, `system.equipState`, "dropped");
+    }
   }
 
   // TODO: Drop items when not enough hands
   isWornEquipStateChangePossible() {
     const armourPoints = JSON.parse(this.system.armourPoints).map(ap => ap.value);
     const usedArmourPoints = this.actor.getActorWornArmour().flatMap(a => JSON.parse(a.system.armourPoints).map(ap => ap.value));
-    const actorArmourPoints = this.actor.getActorAnatomy().flatMap(a => JSON.parse(a.system.parts).map(ap => ap.value));
+    const actorArmourPoints = this.actor.getActorAnatomy().parts;
     const availableArmourPoints = arrayDifference(actorArmourPoints, usedArmourPoints);
     if (!armourPoints.every(ap => availableArmourPoints.includes(ap))) {
       return false;
@@ -68,7 +71,7 @@ export default class AbbrewItem extends Item {
   }
 
   isHeldEquipStateChangePossible(equipState) {
-    const actorHands = this.actor.getActorAnatomy().reduce((result, a) => result += a.system.hands, 0);
+    const actorHands = this.actor.getActorAnatomy().hands;
     const equippedHeldItemHands = this.actor.getActorHeldItems().filter(i => i._id !== this._id).reduce((result, a) => result += getNumericParts(a.system.equipState), 0);
     const requiredHands = equippedHeldItemHands + getNumericParts(equipState);
     return actorHands >= requiredHands;
@@ -243,35 +246,6 @@ export default class AbbrewItem extends Item {
     }
   }
 
-  /**
-   * Handle clickable rolls.
-   * @param {Event} event   The originating click event
-   * @private
-   */
-  async roll() {
-    const item = this;
-
-    // Initialize chat data.
-    const speaker = ChatMessage.getSpeaker({ actor: this.actor });
-    const rollMode = game.settings.get('core', 'rollMode');
-    const label = `[${item.type}] ${item.name}`;
-
-    // If there's no roll data, send a chat message.
-    if (!this.system.formula) {
-      ChatMessage.create({
-        speaker: speaker,
-        rollMode: rollMode,
-        flavor: label,
-        content: item.system.description ?? '',
-      });
-    }
-    // Otherwise, create a roll and send a chat message from it.
-    else {
-      // TODO: Replace with old
-      console.log('general roll');
-    }
-  }
-
   async handleAttackDamageAction(actor, attackProfileId, attackMode) {
     const attackProfile = this.system.attackProfiles[attackProfileId];
     const actionCost = attackMode === "overpower" ? this.system.exertActionCost : this.system.actionCost;
@@ -323,7 +297,7 @@ export default class AbbrewItem extends Item {
 
       if (combineSkill.durationPrecision === "0") {
         const effect = actor.effects.find(e => e.flags?.abbrew?.skill?.trackDuration === combineSkill.id);
-        await effect?.delete();
+        await manualSkillExpiry(effect);
       }
       attackSkill.system.skills.grantedOnAccept = combineSkill.skillsGrantedOnAccept;
 

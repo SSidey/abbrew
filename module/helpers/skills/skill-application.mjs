@@ -1,18 +1,18 @@
 import { makeSkillCheck, makeSkillCheckRequest } from "./skill-check.mjs";
 import { handleInstantModifierExpiry } from "./skill-expiry.mjs";
-import { checkForTemporarySkillOutOfUses, handleSkillUsesAndCharges, skillHasChargesRemaining } from "./skill-uses.mjs";
+import { checkForTemporarySkillOutOfUses, handleSkillUsesAndCharges, skillHasChargesRemaining, skillHasUsesRemaining } from "./skill-uses.mjs";
 import { handlePairedSkills, isSkillBlocked } from "./skill-activation.mjs";
 import { handleEarlySelfModifiers, handleLateSelfModifiers, handleTargetUpdates } from "./skill-modifiers.mjs";
 import { applyAttackProfiles } from "./skill-attack.mjs";
 import { renderChatMessage } from "./skill-chat.mjs";
 
 export function getModifierSkills(actor, skill) {
-    // Get all queued synergy skills
+    // Get all queued synergy skills (Only include filter out those with charges but 0 remaining)
     const queuedSkills = actor.items.toObject().filter(i => actor.system.queuedSkills.includes(i._id)).filter(s => skillHasChargesRemaining(s));
     // Get all synergies that apply to the main skill
     const queuedSynergies = queuedSkills.filter(s => s.system.skillModifiers.synergy).map(s => ({ skill: s, synergy: JSON.parse(s.system.skillModifiers.synergy).flatMap(s => [s.id, foundry.utils.parseUuid(s.sourceId).id]) })).filter(s => s.synergy.includes(skill.system.abbrewId.uuid)).map(s => s.skill)
-    // Get all passives
-    const passiveSkills = actor.items.toObject().filter(i => i.type === "skill" && i.system.isActivatable === false);
+    // Get all passives (Only filter out those that have 0 uses and charges remaining)
+    const passiveSkills = actor.items.toObject().filter(i => i.type === "skill" && i.system.isActivatable === false).filter(s => skillHasUsesRemaining(s) || skillHasChargesRemaining(s));
     // Get passives that have synergy with the main skill
     const passiveSynergies = passiveSkills.filter(s => s.system.skillModifiers.synergy).map(s => ({ skill: s, synergy: JSON.parse(s.system.skillModifiers.synergy).flatMap(s => [s.id, foundry.utils.parseUuid(s.sourceId).id]) })).filter(s => s.synergy.includes(skill.system.abbrewId.uuid)).map(s => s.skill)
     // Combine all relevant skills, filtering for those that are out of charges    
@@ -44,9 +44,9 @@ export async function applySkillEffects(actor, skill) {
 
     const shouldRenderChatMessage = (skill.system.isProxied === null || skill.system.isProxied === undefined) || (skill.system.isProxied != null && skill.system.isProxied === false);
     await actor.unsetFlag("abbrew", "combat.damage.lastDealt");
-    
-    let templateData = { user: game.user, skillCheck: { attempts: [] } };
-    let data = {};
+
+    let templateData = { user: game.user, skillCheck: { attempts: [] }, actorSize: actor.system.meta.size, actorTier: actor.system.meta.tier };
+    let data = { actorSize: actor.system.meta.size, actorTier: actor.system.meta.tier.value };
 
     const [mainModifierSkills, modifierSkills, allSkills] = getGroupedModifierSkills(actor, skill);
     const [mainSummary, modifierSummaries] = getSkillSummaries(skill, modifierSkills);

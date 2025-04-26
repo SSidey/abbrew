@@ -156,7 +156,7 @@ function mergeWoundSelfModifiers(allSkills, actor) {
     return mergeComplexModifierFields(modifierFields, actor, getApplicableWounds);
 }
 
-function mergeResourceSelfModifiers(allSkills, actor) {
+export function mergeResourceSelfModifiers(allSkills, actor) {
     const modifierFields = allSkills.map(s => s.system.action.modifiers.resources.self).filter(s => s.length > 0);
     modifierFields.forEach(f => f.forEach(a => {
         a.type = getSafeJson(a.summary, [{ id: "" }])[0].id;

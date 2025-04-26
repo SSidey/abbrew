@@ -39,8 +39,7 @@ export async function applyAttackProfiles(actor, skill, modifierSkills, fortune,
 
 
         const finisher = attackMode === "finisher" ? mergeFinishers(baseAttackProfile, modifierSkills, actor) : null;
-        // TODO: Should unique this.
-        const finisherDamageTypes = finisher ? finisher.type : attackProfile.damage.map(d => d.type);
+        const finisherDamageTypes = finisher ? finisher.type : attackProfile.damage.map(d => d.type).reduce((result, damageType) => { if (!result.includes(damageType)) { result.push(damageType) }; return result; }, []);
 
         const showAttack = ['attack', 'feint', 'finisher'].includes(attackMode);
         const isFeint = attackMode === 'feint';

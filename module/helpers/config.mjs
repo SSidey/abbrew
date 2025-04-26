@@ -22,6 +22,18 @@ ABBREW.durationsLabels = {
   day: "ABBREW.Durations.day"
 }
 
+ABBREW.size = {
+  fine: { label: "ABBREW.size.fine", value: -4 },
+  diminutive: { label: "ABBREW.size.diminutive", value: -3 },
+  tiny: { label: "ABBREW.size.tiny", value: -2 },
+  small: { label: "ABBREW.size.small", value: -1 },
+  standard: { label: "ABBREW.size.standard", value: 0 },
+  large: { label: "ABBREW.size.large", value: 1 },
+  huge: { label: "ABBREW.size.huge", value: 2 },
+  gargantuan: { label: "ABBREW.size.gargantuan", value: 3 },
+  colossal: { label: "ABBREW.size.colossal", value: 4 }
+}
+
 /**
  * The set of Attribute Scores used within the system.
  * @type {Object}
@@ -253,30 +265,35 @@ ABBREW.lingeringWounds = Object.entries(ABBREW.wounds).filter(w => w[1].lingerin
 
 ABBREW.conditions = {
   dead: {
+    id: "abbrewCDead00000",
     name: "ABBREW.EFFECT.Condition.Dead.name",
     img: "systems/abbrew/assets/icons/statuses/dead.svg",
     description: "ABBREW.EFFECT.Condition.Dead.description",
     statuses: ['dead', 'defeated']
   },
   defeated: {
+    id: "abbrewCDefeated0",
     name: "ABBREW.EFFECT.Condition.Defeated.name",
     img: "systems/abbrew/assets/icons/statuses/defeated.svg",
     description: "ABBREW.EFFECT.Condition.Defeated.description",
     statuses: ['defeated']
   },
   disoriented: {
+    id: "abbrewCDisorient",
     name: "ABBREW.EFFECT.Condition.disoriented.name",
     img: "systems/abbrew/assets/icons/statuses/disoriented.svg",
     description: "ABBREW.EFFECT.Condition.Disoriented.description",
     statuses: ['disoriented']
   },
   guardBreak: {
+    id: "abbrewCGuardBrea",
     name: "ABBREW.EFFECT.Condition.GuardBreak.name",
     img: "systems/abbrew/assets/icons/statuses/guardBreak.svg",
     description: "ABBREW.EFFECT.Condition.GuardBreak.description",
     statuses: ['offGuard']
   },
   offGuard: {
+    id: "abbrewCOffGuard0",
     name: "ABBREW.EFFECT.Condition.OffGuard.name",
     img: "systems/abbrew/assets/icons/statuses/offGuard.svg",
     description: "ABBREW.EFFECT.Condition.OffGuard.description",
@@ -467,6 +484,8 @@ ABBREW.modifierPrefixes = {
   "actor": "ABBREW.ModifierPrefixes.actor",
   "item": "ABBREW.ModifierPrefixes.item",
   "this": "ABBREW.ModifierPrefixes.this",
+  "wound": "ABBREW.ModifierPrefixes.wound",
+  "condition": "ABBREW.ModifierPrefixes.condition",
   "resource": "ABBREW.ModifierPrefixes.resource",
   "damagelastDealt": "ABBREW.ModifierPrefixes.damageLastDealt",
   "damagelastReceived": "ABBREW.ModifierPrefixes.damageLastReceived",

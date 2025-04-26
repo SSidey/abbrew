@@ -81,7 +81,6 @@ export default class AbbrewSkill extends AbbrewItemBase {
             }),
             uses: new fields.SchemaField({
                 hasUses: new fields.BooleanField({ required: true, initial: false }),
-                // TODO: Implement AsStacks
                 asStacks: new fields.BooleanField({ required: true, initial: false }),
                 removeStackOnUse: new fields.BooleanField({ required: true, initial: true }),
                 value: new fields.NumberField({ ...requiredInteger, initial: 0 }),

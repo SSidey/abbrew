@@ -99,7 +99,7 @@ export default class AbbrewActor extends Actor {
     const fieldValue = getObjectValueByStringPath(this, path);
 
     let fullValue = [...updateValues, ...fieldValue].reduce((result, wound) => {
-      if (!result.find(r => r.type === wound.type)) {
+      if (!result.find(r => r.type === wound.type) && wound.value > 0) {
         result.push(wound);
       }
 
@@ -253,10 +253,8 @@ export default class AbbrewActor extends Actor {
     successes -= this.system.defense.inflexibility.resistance.value;
     successes -= Math.max(0, this.system.defense.protection[finisherType].resistance - data.damage.find(d => d.damageType === finisherType)?.penetration ?? 0);
     successes += this.system.defense.protection[finisherType].weakness;
-    // TODO: Size Diff
-    // TODO: Tier Diff
-    // TODO: Lethal Diff
-    // TODO: Material Tier Diff
+    successes += (data.actorSize - this.system.meta.size); // TODO Question, do we include this + (data.weaponSize - this.system.meta.size))
+    successes += (data.actorTier - this.system.meta.tier); // TODO: Material Tier Diff    
     return successes;
   }
 
@@ -440,7 +438,7 @@ export default class AbbrewActor extends Actor {
   }
 
   getActorAnatomy() {
-    return this.items.filter(i => i.type === 'anatomy');
+    return this.system.anatomy
   }
 
   doesActorHaveSkillTrait(feature, subFeature, effect, data) {

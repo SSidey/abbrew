@@ -127,7 +127,7 @@
                 data-dtype="Number" readonly />
             </div>
           </div>
-          {{> "systems/abbrew/templates/actor/parts/actor-anatomy.hbs"}}
+          {{> "systems/abbrew/templates/actor/parts/actor-anatomy.hbs" showDeleteControl=false}}
           {{> "systems/abbrew/templates/actor/parts/actor-armour.hbs" showEquipState=false}}
           {{> "systems/abbrew/templates/actor/parts/actor-weapons.hbs" weaponsList=equippedWeapons
           showAttackProfiles=true showEquipState=false showItemControls=false}}
@@ -139,7 +139,6 @@
     {{!-- Owned Skills Tab --}}
     <div class="tab skills" data-group="primary" data-tab="skills">
       <section>
-        {{!-- TODO: 25 total skills for background? Grid of 5--}}
         {{> "systems/abbrew/templates/actor/parts/actor-skills.hbs"}}
       </section>
     </div>

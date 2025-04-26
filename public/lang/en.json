@@ -10,6 +10,17 @@
       "Vis": { "long": "Visualisation", "abbr": "vis" },
       "Wil": { "long": "Will", "abbr": "wil" }
     },
+    "size": {
+      "fine": "Fine",
+      "diminutive": "Diminutive",
+      "tiny": "Tiny",
+      "small": "Small",
+      "standard": "Standard",
+      "large": "Large",
+      "huge": "Huge",
+      "gargantuan": "Gargantuan",
+      "colossal": "Colossal"
+    },
     "SheetLabels": {
       "Actor": "Abbrew Actor Sheet",
       "Item": "Abbrew Item Sheet",
@@ -257,6 +268,8 @@
       "actor": "Actor",
       "item": "Item",
       "this": "This",
+      "wound": "Wound",
+      "condition": "Condition",
       "resource": "Resource",
       "damageLastDealt": "Last Damage Dealt",
       "damageLastReceived": "Last Damage Taken",

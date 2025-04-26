@@ -1,14 +1,14 @@
 {
   "name": "Off Guard",
   "type": "skill",
-  "_id": "0pO9PPeGhf9L5Gpk",
+  "_id": "abbrewCOffGuard0",
   "img": "systems/abbrew/assets/icons/statuses/offGuard.svg",
   "system": {
     "description": "",
     "traits": "",
     "abbrewId": {
-      "value": "abbrew.skill.offguard.0pO9PPeGhf9L5Gpk",
-      "uuid": "0pO9PPeGhf9L5Gpk"
+      "value": "abbrew.skill.offguard.abbrewCOffGuard0",
+      "uuid": "abbrewCOffGuard0"
     },
     "skillTraits": "",
     "skillModifiers": {
@@ -192,7 +192,7 @@
     {
       "name": "Off Guard",
       "img": "systems/abbrew/assets/icons/statuses/offGuard.svg",
-      "origin": "Compendium.abbrew.conditions.Item.0pO9PPeGhf9L5Gpk",
+      "origin": "Compendium.abbrew.conditions.Item.abbrewCOffGuard0",
       "duration": {
         "rounds": null,
         "startTime": null,
@@ -233,7 +233,7 @@
         "modifiedTime": 1745176325414,
         "lastModifiedBy": "abbrewpacks00000"
       },
-      "_key": "!items.effects!0pO9PPeGhf9L5Gpk.D67DoGye8q8GRK7v"
+      "_key": "!items.effects!abbrewCOffGuard0.D67DoGye8q8GRK7v"
     }
   ],
   "folder": null,
@@ -251,5 +251,5 @@
     "modifiedTime": 1745176328901,
     "lastModifiedBy": "abbrewpacks00000"
   },
-  "_key": "!items!0pO9PPeGhf9L5Gpk"
+  "_key": "!items!abbrewCOffGuard0"
 }

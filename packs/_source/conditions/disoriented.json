@@ -1,14 +1,14 @@
 {
   "name": "Disoriented",
   "type": "skill",
-  "_id": "r7VMjvyw8EKDplwf",
+  "_id": "abbrewCDisorient",
   "img": "systems/abbrew/assets/icons/statuses/disoriented.svg",
   "system": {
     "description": "<p>You have been disoriented, you cannot restore guard nor parry while you have this condition.</p>",
     "traits": "",
     "abbrewId": {
-      "value": "abbrew.skill.disoriented.r7VMjvyw8EKDplwf",
-      "uuid": "r7VMjvyw8EKDplwf"
+      "value": "abbrew.skill.disoriented.abbrewCDisorient",
+      "uuid": "abbrewCDisorient"
     },
     "skillTraits": "",
     "skillModifiers": {
@@ -29,8 +29,8 @@
       },
       "uses": {
         "hasUses": true,
-        "value": 1,
-        "max": 0,
+        "value": 5,
+        "max": 5,
         "period": "",
         "asStacks": true,
         "removeWhenNoUsesRemain": true,
@@ -136,7 +136,7 @@
     {
       "name": "Disoriented",
       "img": "systems/abbrew/assets/icons/statuses/disoriented.svg",
-      "origin": "Compendium.abbrew.conditions.Item.r7VMjvyw8EKDplwf",
+      "origin": "Compendium.abbrew.conditions.Item.abbrewCDisorient",
       "duration": {
         "rounds": null,
         "startTime": null,
@@ -169,7 +169,7 @@
         },
         "abbrew": {
           "skill": {
-            "stacks": 1
+            "stacks": 5
           }
         }
       },
@@ -180,10 +180,10 @@
         "systemId": "abbrew",
         "systemVersion": "0.0.2-prerelease31",
         "createdTime": 1745177790062,
-        "modifiedTime": 1745358944430,
+        "modifiedTime": 1745690574356,
         "lastModifiedBy": "abbrewpacks00000"
       },
-      "_key": "!items.effects!r7VMjvyw8EKDplwf.3mx7LChk26e1LPl0"
+      "_key": "!items.effects!abbrewCDisorient.3mx7LChk26e1LPl0"
     }
   ],
   "folder": null,
@@ -198,8 +198,8 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743076241070,
-    "modifiedTime": 1745358944423,
+    "modifiedTime": 1745690574353,
     "lastModifiedBy": "abbrewpacks00000"
   },
-  "_key": "!items!r7VMjvyw8EKDplwf"
+  "_key": "!items!abbrewCDisorient"
 }

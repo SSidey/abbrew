@@ -10,9 +10,7 @@ export default class AbbrewAnatomy extends AbbrewPhysicalItem {
     const schema = super.defineSchema();
 
     schema.parts = new fields.StringField({ required: true, blank: true });
-    // TODO: Discount broken limbs but keep them in anatomy
     schema.isBroken = new fields.BooleanField({ required: true, nullable: false, initial: false });
-    // TODO: Discount dismembered limbs and removed them from anatomy but include them in items (set to dropped?)
     schema.isDismembered = new fields.BooleanField({ required: true, nullable: false, initial: false });
     schema.hands = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
     schema.speed = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });

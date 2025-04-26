@@ -5,7 +5,7 @@ export async function handleInstantModifierExpiry(actor, modifierSkills) {
         const skill = modifierSkills[index];
         if (skill.system.action.duration.precision === "0") {
             const effect = actor.effects.find(e => e.flags?.abbrew?.skill?.trackDuration === skill._id);
-            await effect?.delete();
+            await manualSkillExpiry(effect);
         }
 
         await handlePairedSkills(skill, actor);
@@ -13,5 +13,5 @@ export async function handleInstantModifierExpiry(actor, modifierSkills) {
 }
 
 export async function manualSkillExpiry(effect) {
-    await effect.delete();
+    await effect?.delete();
 }

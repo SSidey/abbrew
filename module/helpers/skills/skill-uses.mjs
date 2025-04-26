@@ -1,8 +1,15 @@
+import { rechargeSkill } from "./skill-activation.mjs";
 import { manualSkillExpiry } from "./skill-expiry.mjs";
 
 export async function handleSkillUsesAndCharges(actor, skill, modifierSkills) {
-    const usesSkills = [...modifierSkills, skill].filter(s => s.system.action.uses.hasUses).filter(s => s._id !== skill._id);
-    const chargedSkills = [...modifierSkills, skill].filter(s => s.system.action.charges.hasCharges);
+    const usesSkills = [...modifierSkills, skill]
+        .filter(s => s.system.action.uses.hasUses)  // Filter those with uses
+        .filter(s => s._id !== skill._id)           // Filter our the main skill
+        .filter(s => !s.system.action.isActive);   // We only want to reduce uses where a skill is passive with 
+    // a number of contributions. Activatable skills will already
+    // have been decremented.
+    const chargedSkills = [...modifierSkills, skill]
+        .filter(s => s.system.action.charges.hasCharges); // Any charges should be decremented however.
 
     for (const index in usesSkills) {
         const skill = usesSkills[index];
@@ -10,13 +17,13 @@ export async function handleSkillUsesAndCharges(actor, skill, modifierSkills) {
         if (currentCharges > 0) {
             continue;
         }
-        let currentUses = skill.system.action.uses.value
+        
         const item = actor.items.find(i => i._id === skill._id);
         if (item.system.action.uses.asStacks && !item.system.action.uses.removeStackOnUse) {
             continue;
         }
 
-        await item.update({ "system.action.uses.value": currentUses -= 1 });
+        await rechargeSkill(actor, skill);
     }
 
     for (const index in chargedSkills) {

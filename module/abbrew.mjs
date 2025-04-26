@@ -363,7 +363,7 @@ Hooks.on("updateItem", async (document, changed, options, userId) => {
     const effect = document.effects.find(e => e.flags.abbrew.skill.stacks);
     if (effect) {
       const stacks = changed.system.action.uses.value;
-      await effect.update({ "flags.abbrew.skill.stacks": stacks });
+      await effect.update({ "flags.abbrew.skill.stacks": stacks, "flags.statuscounter.visible": stacks > 1, });
     }
   }
 });
@@ -392,13 +392,13 @@ Hooks.on("preCreateActiveEffect", effect => {
   });
 });
 
-Hooks.on("createActiveEffect", (document, options, userId) => {
-  console.log("Created");
-});
+// Hooks.on("createActiveEffect", (document, options, userId) => {
+//   console.log("Created");
+// });
 
-Hooks.on("preUpdateDocument", (document, changed, options, userId) => {
-  console.log("Preupdate");
-});
+// Hooks.on("preUpdateDocument", (document, changed, options, userId) => {
+//   console.log("Preupdate");
+// });
 
 Hooks.on("updateActiveEffect", async (effect, update, options, user) => {
   if (effect.parent && effect.parent.type === "skill" && doesNestedFieldExist(update, "flags.abbrew.skill.stacks")) {
@@ -407,12 +407,12 @@ Hooks.on("updateActiveEffect", async (effect, update, options, user) => {
   }
 });
 
-Hooks.on("preUpdateActiveEffect", async (effect, update, options, user) => {
-});
+// Hooks.on("preUpdateActiveEffect", async (effect, update, options, user) => {
+// });
 
-Hooks.on("preDeleteActiveEffect", async (effect, options, userId) => {
-  console.log(effect);
-});
+// Hooks.on("preDeleteActiveEffect", async (effect, options, userId) => {
+//   console.log(effect);
+// });
 
 Hooks.on("dropActorSheetData", async (actor, sheet, data) => {
   console.log(data);
@@ -439,7 +439,7 @@ Hooks.on("dropActorSheetData", async (actor, sheet, data) => {
     }
   }
 });
-// TODO: Display resources somewhere.
+
 /* -------------------------------------------- */
 /*  Module Specific Hooks                                 */
 /* -------------------------------------------- */

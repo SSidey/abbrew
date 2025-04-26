@@ -129,8 +129,6 @@ export function reduceParsedModifiers(parsedValues, startingValue = 0) {
     }, startingValue);
 }
 
-// TODO: Add html changed hook and preparse the value, setting to 0 if not correct syntax?
-// TODO: Add format for status tracker? 
 /* 
     Expects either a number value which will be returned early, or:
     actor.<pathToValue e.g. system.defense.guard.value>
@@ -154,6 +152,10 @@ export function parsePath(rawValue, actor, source) {
     const entityType = rawValue.split('.').slice(0, 1).shift();
 
     switch (entityType) {
+        case 'condition':
+            return getConditionValue(actor, rawValue.split('.').slice(1).shift());
+        case 'wound':
+            return getWoundValue(actor, rawValue.split('.').slice(1).shift());
         case 'resource':
             return getResourceValue(actor, rawValue.split('.').slice(1).shift());
         case 'damage':
@@ -188,6 +190,18 @@ export function parsePath(rawValue, actor, source) {
 
 function getResourceValue(actor, id) {
     return actor.system.resources.values.find(r => r.id === id)?.value ?? 0;
+}
+
+function getWoundValue(actor, woundType) {
+    return actor.system.wounds.find(w => w.type === woundType)?.value ?? 0;
+}
+
+function getConditionValue(actor, conditionName) {
+    const name = conditionName.toLowerCase();
+    const id = CONFIG.ABBREW.conditions[name].id;
+    const skill = actor.items.filter(i => i.type === "skill").find(s => s.system.abbrewId.uuid === id);
+    const stacks = skill ? skill.system.action.uses.value : 0;
+    return stacks;
 }
 
 function getLastDamageValue(actor, instance, damageType) {

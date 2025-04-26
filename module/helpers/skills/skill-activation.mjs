@@ -1,5 +1,9 @@
+import { applyFullyParsedComplexModifiers } from "../modifierBuilderFieldHelpers.mjs";
+import { applyOperator } from "../operators.mjs";
+import { getSafeJson } from "../utils.mjs";
 import { applySkillEffects, getModifierSkills } from "./skill-application.mjs";
 import { addSkillToActiveSkills, addSkillToQueuedSkills, trackSkillDuration } from "./skill-duration.mjs";
+import { mergeResourceSelfModifiers } from "./skill-modifiers.mjs";
 
 export async function handleSkillActivate(actor, skill, checkActions = true) {
     const isSkillProxied = skill.system.isProxied;
@@ -45,8 +49,6 @@ export function isSkillBlocked(actor, skill) {
 }
 
 export function getModifiedSkillActionCost(actor, skill) {
-    // Question: Why was this a thing
-    // const minActions = parseInt(skill.system.action.actionCost) === 0 ? 0 : 1;
     const minActions = 0;
     return Math.max(minActions, getModifierSkills(actor, skill).filter(s => s.system.action.modifiers.actionCost.operator).map(s => s.system.action.modifiers.actionCost).reduce((result, actionCost) => { result = applyOperator(result, actionCost.value, actionCost.operator); return result; }, skill.system.action.actionCost));
 }
@@ -72,21 +74,25 @@ export async function rechargeSkill(actor, skill) {
         updates["system.action.charges.value"] = maxCharges;
     }
     if (skill.system.action.uses.hasUses) {
-        let currentUses = skill.system.action.uses.value
-        updates["system.action.uses.value"] = currentUses -= 1;
+        const updateUses = skill.system.action.uses.value - 1;
+        if (updateUses > -1) {
+            updates["system.action.uses.value"] = updateUses;
+        }
     }
 
     await item.update(updates);
 }
 
 function doesActorMeetSkillRequirements(actor, skill) {
-    // TODO: Preparse for the early skills with resources
-    const insufficientResources = skill.system.action.modifiers.resources.self.filter(r => r.operator === "minus").map(r => { const summary = JSON.parse(r.summary)[0]; return ({ id: summary.id, name: summary.value, value: r.value }) }).filter(r => !actor.system.resources.values.some(vr => vr.id === r.id) || (actor.system.resources.values.some(vr => vr.id === r.id) && actor.system.resources.values.find(vr => vr.id === r.id).value < r.value));
+    const modifierSkills = getModifierSkills(actor, skill);
+    const mergedSelfResources = mergeResourceSelfModifiers([...modifierSkills, skill], actor);
+    const appliedSelfResource = applyFullyParsedComplexModifiers(mergedSelfResources, actor, "system.resources.values", "id");
+    const insufficientResources = Object.entries(appliedSelfResource).flatMap(e => e[1].filter(v => v.value < 0)).map(v => actor.system.resources.owned.find(r => r.id === v.id).name);
     if (insufficientResources.length > 0) {
         const resourceNames = new Intl.ListFormat("en-GB", {
             style: "long",
             type: "conjunction",
-        }).format(insufficientResources.map(r => r.name))
+        }).format(insufficientResources)
         ui.notifications.info(`You do not have enough ${resourceNames} to use ${skill.name}`);
         return false;
     }

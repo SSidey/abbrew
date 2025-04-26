@@ -11,6 +11,10 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     return this.parent.getActorHeldItems().filter(i => i.type === 'armour').reduce((result, a) => result += a.system.defense.guard, 0);
   }
 
+  get anatomy() {
+    return this._prepareAnatomy();
+  }
+
   static defineSchema() {
     const fields = foundry.data.fields;
     const requiredInteger = { required: true, nullable: false, integer: true };
@@ -18,7 +22,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     const schema = {};
 
     schema.traits = new fields.StringField({ required: true, blank: true });
-    schema.actions = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 5 })
+    schema.actions = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 5 });
     schema.wounds = new fields.ArrayField(
       new fields.SchemaField({
         type: new fields.StringField({ required: true }),
@@ -144,7 +148,8 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     schema.meta = new fields.SchemaField({
       tier: new fields.SchemaField({
         value: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0, max: 10 })
-      })
+      }),
+      size: new fields.NumberField({ ...requiredInteger, initial: 0 })
     });
 
     schema.skillTraining = new fields.ArrayField(
@@ -288,7 +293,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   }
 
   _prepareAnatomy() {
-    const res = this.parent.items.filter(i => i.type == 'anatomy').reduce((result, a) => {
+    const res = this.parent.items.filter(i => i.type == "anatomy").filter(a => !(a.system.isBroken || a.system.isDismembered)).reduce((result, a) => {
       const values = a.system;
       result.hands += values.hands;
       result.speed += values.speed;
@@ -304,7 +309,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
   _prepareDefenses() {
     const armour = this.parent.items.filter(i => i.type === 'armour');
-    const anatomy = this.parent.items.filter(i => i.type === 'anatomy');
+    const anatomy = this.parent.items.filter(i => i.type === "anatomy");
     const wornArmour = this._getAppliedArmour(armour);
     this._prepareDamageReduction(wornArmour, anatomy);
     this._prepareGuard(wornArmour, anatomy);

@@ -168,8 +168,12 @@ export class AbbrewActorSheet extends ActorSheet {
             skills.untyped.push(i);
         }
       }
-      else if (i.type === 'anatomy') {
-        anatomy.push(i);
+      else if (i.type === "anatomy") {
+        if (i.system.isDismembered) {
+          gear.push(i);
+        } else {
+          anatomy.push(i);
+        }
       }
       else if (i.type === 'armour') {
         armour.push(i);
