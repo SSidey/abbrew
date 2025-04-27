@@ -222,6 +222,7 @@ ol li.damage-reduction {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-column-gap: 1em;
+    align-items: center;
 
     >label {
       grid-column: 1 / span 2;
@@ -238,6 +239,7 @@ ol li.damage-reduction {
     display: grid;
     grid-template-columns: auto 1fr;
     grid-column-gap: 1em;
+    align-items: center;
   }
 
   .item-equip-detail.item-equip-held {

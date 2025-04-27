@@ -1,5 +1,12 @@
-<ol class="form-list">
-    <div class="grid grid-3col">
+<ol class="armour-defense">
+    <div class="armour-details">
+        <div class="armour-size-detail">
+            <label class="label">Size</label>
+            <select class="" name="system.meta.size">
+                {{selectOptions config.size selected=system.meta.size valueAttr="value" labelAttr="label"
+                localize=true}}
+            </select>
+        </div>
         <div class="guard">
             <label class="guard-label">Guard</label>
             <input type="text" name="system.defense.guard" value="{{system.defense.guard}}" data-dtype="Number" />
@@ -9,30 +16,33 @@
             <input type="text" name="system.defense.inflexibility" value="{{system.defense.inflexibility}}"
                 data-dtype="Number" />
         </div>
-        {{#if showEquipType}}
-        {{> "systems/abbrew/templates/item/parts/item-equipstate.hbs"}}
-        {{/if}}
     </div>
+    {{#if showEquipType}}
+    {{> "systems/abbrew/templates/item/parts/item-equipstate.hbs"}}
+    {{/if}}
+    <h3>Damage Reduction</h3>
+    <li class="armour-protection-header">
+        <label class="armour-protection-type">{{ localize "ABBREW.Type" }}</label>
+        <label class="armour-protection-resistance">{{ localize "ABBREW.Resistance" }}</label>
+        <label class="armour-protection-immunity">{{ localize "ABBREW.Immunity" }}</label>
+        <label class="armour-protection-weakness">{{ localize "ABBREW.Weakness" }}</label>
+    </li>
     {{#each system.defense.protection as |protection i|}}
-    <li class="item effect flexrow" data-id="{{i}}">
-        <div>
-            <label>{{ localize "ABBREW.Type" }}</label>
+    <li class="item armour-protection-detail" data-id="{{i}}">
+        <div class="armour-protection-type">
             <select name="system.defense.protection.{{i}}.type">
                 {{selectOptions ../config.damageTypes selected=protection.type localize=true}}
             </select>
         </div>
-        <div>
-            <label>{{ localize "ABBREW.Resistance" }}</label>
+        <div class="armour-protection-resistance">
             <input type="text" name="system.defense.protection.{{i}}.resistance" value="{{protection.resistance}}"
                 data-dtype="Number" />
         </div>
-        <div>
-            <label>{{ localize "ABBREW.Immunity" }}</label>
+        <div class="armour-protection-immunity">
             <input type="text" name="system.defense.protection.{{i}}.immunity" value="{{protection.immunity}}"
                 data-dtype="Number" />
         </div>
-        <div>
-            <label>{{ localize "ABBREW.Weakness" }}</label>
+        <div class="armour-protection-weakness">
             <input type="text" name="system.defense.protection.{{i}}.weakness" value="{{protection.weakness}}"
                 data-dtype="Number" />
         </div>
@@ -41,7 +51,7 @@
         </a>
     </li>
     {{/each}}
-    <li class="damage-reduction add">
+    <li class="damage-reduction add armour-protection-add">
         <div class="form-group">
             <label>
                 <a class="damage-reduction-control" data-action="add-damage-reduction">

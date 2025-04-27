@@ -9,6 +9,7 @@ ABBREW.durations = {
   minute: { label: "ABBREW.Durations.minute", value: 60 },
   hour: { label: "ABBREW.Durations.hour", value: 3600 },
   day: { label: "ABBREW.Durations.day", value: 86400 },
+  combat: { label: "ABBREW.Durations.combat", value: -2 },
   permanent: { label: "ABBREW.Durations.permanent", value: -1 }
 }
 
@@ -19,6 +20,7 @@ ABBREW.durationsLabels = {
   round: "ABBREW.Durations.round",
   minute: "ABBREW.Durations.minute",
   hour: "ABBREW.Durations.hour",
+  combat: "ABBREW.Durations.combat",
   day: "ABBREW.Durations.day"
 }
 

@@ -11,6 +11,14 @@ export async function handleCombatStart(actors) {
     }
 }
 
+export async function handleCombatEnd(actors) {
+    actors.forEach(a => {
+        const combatDurationSkills = a.items.filter(i => i.type === "skill").filter(s => s.system.action.isActive && s.system.action.duration.precision === "-2").map(s => s._id);
+        const effects = a.effects.filter(e => combatDurationSkills.includes(e.flags.abbrew.skill.trackDuration));
+        effects.forEach(async e => await e.delete());
+    });
+}
+
 export async function handleTurnChange(prior, current, priorActor, currentActor) {
     if (current.round < prior.round || (prior.round == current.round && current.turn < prior.turn)) {
         return;

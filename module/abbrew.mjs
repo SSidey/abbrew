@@ -9,7 +9,7 @@ import * as models from './data/_module.mjs';
 // Import Documents Classes
 import * as documents from './documents/_module.mjs';
 import * as abbrewCanvas from './canvas/_module.mjs';
-import { handleActorWoundConditions, handleActorGuardConditions, handleCombatStart } from './helpers/combat.mjs';
+import { handleActorWoundConditions, handleActorGuardConditions, handleCombatStart, handleCombatEnd } from './helpers/combat.mjs';
 import { staticID, doesNestedFieldExist, getSafeJson } from './helpers/utils.mjs';
 import { registerSystemSettings } from './settings.mjs';
 import { AbbrewCreatureFormSheet } from './sheets/items/item-creature-form-sheet.mjs';
@@ -263,6 +263,11 @@ Hooks.on("combatTurnChange", async (combat, prior, current) => {
     await emitForAll("system.abbrew", new SocketMessage(null, "handleCombatTurnChange", { prior, current }));
   }
 })
+
+Hooks.on("deleteCombat", async (document, options, userId) => {
+  const actors = document.combatants.toObject().map(c => canvas.tokens.get(c.tokenId).actor);
+  await handleCombatEnd(actors);
+});
 
 Hooks.on("updateToken", (document, changed, options, userId) => {
   // const combatId = game.combat._id;

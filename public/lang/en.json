@@ -262,6 +262,7 @@
       "minute": "Minute",
       "hour": "Hour",
       "day": "Day",
+      "combat": "Combat",
       "permanent": "Permanent"
     },
     "ModifierPrefixes": {

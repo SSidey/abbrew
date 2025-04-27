@@ -1,0 +1,51 @@
+.armour-defense {
+    .armour-details {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-column-gap: 1em;
+        align-items: center;
+        margin-bottom: 1em;
+
+        .armour-size-detail {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            grid-column-gap: 1em;
+            align-items: center;
+        }
+
+        .guard {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            align-items: center;
+            grid-column-gap: 1em;
+        }
+
+        .inflexibility {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            align-items: center;
+            grid-column-gap: 1em;
+        }
+    }
+
+    .armour-protection-header,
+    .armour-protection-detail {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr auto;
+        grid-column-gap: 1em;
+        padding-bottom: 1em;
+        border-bottom: 1px gray solid;
+        margin-bottom: 1em;
+
+        .armour-protection-type,
+        .armour-protection-resistance,
+        .armour-protection-immunity,
+        .armour-protection-weakness {
+            grid-column: span 1;
+        }
+    }
+
+    .damarmour-protection-add {
+        grid-column: 1 / span 5;
+    }
+}
