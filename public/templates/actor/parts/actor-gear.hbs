@@ -19,7 +19,7 @@
             <h4 class="item-label">{{item.name}}</h4>
         </div>
         {{#if ../showEquipState}}
-        <select class="item-select" name="system.equipState">
+        <select class="item-select item-equipState" name="system.equipState">
             {{selectOptions system.validEquipStates selected=item.system.equipState valueAttr="value" labelAttr="label"
             localize=true}}
         </select>

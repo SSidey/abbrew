@@ -8,6 +8,7 @@ import { ABBREW } from './helpers/config.mjs';
 import * as models from './data/_module.mjs';
 // Import Documents Classes
 import * as documents from './documents/_module.mjs';
+import * as abbrewCanvas from './canvas/_module.mjs';
 import { handleActorWoundConditions, handleActorGuardConditions, handleCombatStart } from './helpers/combat.mjs';
 import { staticID, doesNestedFieldExist, getSafeJson } from './helpers/utils.mjs';
 import { registerSystemSettings } from './settings.mjs';
@@ -71,6 +72,9 @@ Hooks.once('init', function () {
     skillDeck: models.AbbrewSkillDeck,
     creatureForm: models.AbbrewCreatureForm
   }
+
+  CONFIG.Token.documentClass = documents.AbbrewTokenDocument;
+  CONFIG.Token.objectClass = abbrewCanvas.AbbrewToken;
 
   // Register System Settings  
   registerSystemSettings();

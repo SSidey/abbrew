@@ -498,6 +498,7 @@ ABBREW.checkTypes = {
 }
 
 ABBREW.damageTypes = {
+  untyped: { label: "ABBREW.DamageTypes.untyped" },
   crushing: { label: "ABBREW.DamageTypes.crushing", },
   piercing: { label: "ABBREW.DamageTypes.piercing", },
   slashing: { label: "ABBREW.DamageTypes.slashing", },

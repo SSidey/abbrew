@@ -39,7 +39,7 @@ export async function applyAttackProfiles(actor, skill, modifierSkills, fortune,
 
 
         const finisher = attackMode === "finisher" ? mergeFinishers(baseAttackProfile, modifierSkills, actor) : null;
-        const finisherDamageTypes = finisher ? finisher.type : attackProfile.damage.map(d => d.type).reduce((result, damageType) => { if (!result.includes(damageType)) { result.push(damageType) }; return result; }, []);
+        const finisherDamageTypes = finisher ? Object.values(finisher).map(f => f.type) : attackProfile.damage.map(d => d.type).reduce((result, damageType) => { if (!result.includes(damageType)) { result.push(damageType) }; return result; }, []);
 
         const showAttack = ['attack', 'feint', 'finisher'].includes(attackMode);
         const isFeint = attackMode === 'feint';
@@ -214,7 +214,8 @@ function mergeFinishers(baseAttackProfile, modifierSkills, actor) {
 
     const allAttackProfiles = [baseAttackProfile, ...modifierAttackProfiles];
     const finisherCost = mergeFinisherCost(allAttackProfiles);
-    const finisherType = mergeFinisherType(allAttackProfiles) ?? "untyped";
+    const mergedFinisherTypes = mergeFinisherType(allAttackProfiles);
+    const finisherType = mergedFinisherTypes.length > 0 ? mergedFinisherTypes : "untyped";
     const finisherDescription = mergeFinisherDescriptions(allAttackProfiles);
     const finisherWounds = mergeFinisherWounds(allAttackProfiles, actor);
 

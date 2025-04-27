@@ -157,6 +157,10 @@ div.skill-card.skill-active {
             align-items: center;
             grid-column: 1 / 3;
 
+            .editor {
+                height: 30px;
+            }
+
             .editor.prosemirror {
                 height: 300px;
             }
@@ -165,7 +169,7 @@ div.skill-card.skill-active {
 }
 
 .skill-check-result {
-    .editor-content {
+    .editor {
         height: 30px;
     }
 
@@ -336,7 +340,8 @@ div.skill-card.skill-active {
     }
 }
 
-.attribute-check:hover, .attribute-check:focus {
+.attribute-check:hover,
+.attribute-check:focus {
     color: #000;
     text-shadow: 0 0 10px red;
     cursor: pointer;

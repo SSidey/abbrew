@@ -10,14 +10,15 @@
     "armourPoints": "",
     "equipState": "stowed",
     "weapon": {
-      "size": 8
+      "size": 8,
+      "heft": 8
     },
     "attackProfiles": [
       {
         "name": "Slash",
         "attackType": "arc",
-        "finisherLimit": 10,
-        "hasStrongAttack": true,
+        "lethal": 0,
+        "critical": 10,
         "damage": [
           {
             "type": "slashing",
@@ -25,17 +26,18 @@
             "attributeModifier": "str",
             "attributeMultiplier": 1,
             "damageMultiplier": 1,
-            "overallMultiplier": 1
+            "overallMultiplier": 1,
+            "penetration": 0
           }
         ],
-        "lethal": 0,
-        "critical": 10
+        "finisherLimit": 10,
+        "hasStrongAttack": true
       },
       {
         "name": "Stab",
         "attackType": "thrust",
-        "finisherLimit": 10,
-        "hasStrongAttack": false,
+        "lethal": 0,
+        "critical": 10,
         "damage": [
           {
             "type": "piercing",
@@ -43,11 +45,12 @@
             "attributeModifier": "str",
             "attributeMultiplier": 1,
             "damageMultiplier": 1,
-            "overallMultiplier": 1
+            "overallMultiplier": 1,
+            "penetration": 0
           }
         ],
-        "lethal": 0,
-        "critical": 10
+        "finisherLimit": 10,
+        "hasStrongAttack": false
       }
     ],
     "handsRequired": "twoHand",
@@ -75,7 +78,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075324307,
-    "modifiedTime": 1743076006786,
+    "modifiedTime": 1745756113896,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_id": "daBNLIlM2sYINFMv",

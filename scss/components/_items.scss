@@ -142,7 +142,7 @@ ol li.damage-reduction {
 
   .item-name {
     display: grid;
-    grid-column: 1 / 7;
+    grid-column: 1 / 6;
     grid-template-columns: repeat(7, 1fr);
 
     >div.item-image {
@@ -154,12 +154,12 @@ ol li.damage-reduction {
     }
 
     >h4.item-label {
-      grid-column: 2 / 8;
+      grid-column: 2 / 7;
     }
   }
 
   .item-equipState {
-    grid-column: 7 / 8;
+    grid-column: 6 / 7;
 
   }
 
@@ -168,7 +168,7 @@ ol li.damage-reduction {
   }
 
   .icon-label-2 {
-    grid-column: 7 / 9;
+    grid-column: span 2;
   }
 
   .item-controls {
@@ -192,6 +192,138 @@ ol li.damage-reduction {
       font-size: 12px;
       text-align: center;
       margin: 0 6px;
+    }
+  }
+}
+
+.weapon-size {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-column-gap: 1em;
+  align-items: center;
+  margin-bottom: 1em;
+
+  .weapon-size-detail {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-column-gap: 1em;
+    align-items: center;
+  }
+}
+
+.item-equip-state {
+
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-column-gap: 2em;
+  margin-bottom: 1em;
+
+  >.item-equip-type {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-column-gap: 1em;
+
+    >label {
+      grid-column: 1 / span 2;
+      display: flex;
+      align-items: center;
+    }
+
+    >select {
+      grid-column: span 2;
+    }
+  }
+
+  .item-equip-detail.item-equip-armour-points {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-column-gap: 1em;
+  }
+
+  .item-equip-detail.item-equip-held {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-column-gap: 1em;
+    align-items: center;
+  }
+
+}
+
+.weapon {
+  ol.attack-profiles {
+    list-style: none;
+    padding-left: 0px;
+
+    li.attack-profile {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      list-style: none;
+      grid-column-gap: 1em;
+
+      .attack-profile-detail {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+
+        .attack-profile-name {
+          grid-column: 1 / span 4;
+          display: grid;
+          grid-template-columns: auto 1fr;
+          grid-column-gap: 1em;
+          align-items: center;
+          margin-bottom: 1em;
+
+          input {
+            border-bottom: 0px;
+            border-bottom-left-radius: 0px;
+            border-bottom-right-radius: 0px;
+          }
+        }
+
+        .attack-profile-detail-entries {
+          grid-column: 1 / span 4;
+          display: grid;
+          grid-template-columns: 1fr 1fr auto;
+          grid-column-gap: 1em;
+          border-bottom: 1px gray solid;
+          padding-bottom: 1em;
+          margin-bottom: 1em;
+          align-items: center;
+
+          .attack-profile-detail-entry {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            grid-column-gap: 0.5em;
+            align-items: center
+          }
+        }
+
+        .attack-profile-damage-list {
+          display: grid;
+          grid-column: 1 / span 4;
+          list-style: none;
+          padding-left: 0px;
+          grid-template-columns: 1fr 1fr 1fr 1.5em;
+
+          .attack-profile-damage-header {
+            grid-column: 1 / span 3;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            align-items: center;
+            grid-column-gap: 0.5em;
+          }
+
+          .attack-profile-damage {
+            grid-column: 1 / span 4;
+            display: grid;
+            align-items: center;
+            grid-column-gap: 0.5em;
+            padding-top: 1em;
+            padding-bottom: 1em;
+            border-bottom: 1px gray solid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+          }
+        }
+      }
     }
   }
 }

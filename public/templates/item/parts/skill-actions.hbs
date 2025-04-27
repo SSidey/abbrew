@@ -598,7 +598,21 @@
                         <input type="text" name="system.action.modifiers.attackProfile.finisher.cost"
                             value="{{system.action.modifiers.attackProfile.finisher.cost}}" data-dtype="String" />
                     </div>
-                    <div></div>
+                    <div class="attack-profile-element-2">
+                        <label>{{ localize "ABBREW.Type" }}</label>
+                        <select name="system.action.modifiers.attackProfile.finisher.type">
+                            {{selectOptions config.damageTypes
+                            selected=system.action.modifiers.attackProfile.finisher.type
+                            blank="" localize=true}}
+                        </select>
+                    </div>
+                    <div class="attack-profile-element-max-input">
+                        <label>Finisher Description</label>
+                        {{editor enrichedFinisherDescription
+                        target="system.action.modifiers.attackProfile.finisher.description"
+                        engine="prosemirror" button=true
+                        owner=owner editable=editable}}
+                    </div>
                     <div>
                         <h4>Wounds</h4>
                         <ol class="form-list wound-modifier-container">

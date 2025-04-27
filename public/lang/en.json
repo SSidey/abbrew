@@ -54,6 +54,7 @@
       "guard": "Guard"
     },
     "DamageTypes": {
+      "untyped": "Untyped",
       "physical": "Physical",
       "crushing": "Crushing",
       "piercing": "Piercing",

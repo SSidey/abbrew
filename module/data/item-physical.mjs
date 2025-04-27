@@ -8,6 +8,9 @@ export default class AbbrewPhysicalItem extends AbbrewItemBase {
         const fields = foundry.data.fields;
         const requiredInteger = { required: true, nullable: false, integer: true };
 
+        schema.meta = new fields.SchemaField({
+            size: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 9 }),
+        });
         schema.equipType = new fields.StringField({ required: true, blank: true });
         schema.armourPoints = new fields.StringField({ required: true, blank: true });
         schema.handsRequired = new fields.StringField({ required: true, blank: true });

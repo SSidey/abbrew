@@ -180,7 +180,9 @@ export default class AbbrewSkill extends AbbrewItemBase {
                         operator: new fields.StringField({ required: true, blank: true })
                     }),
                     finisher: new fields.SchemaField({
+                        type: new fields.StringField({ required: true, blank: true }),
                         cost: new fields.NumberField({ nullable: true, min: 0, integer: true }),
+                        description: new fields.StringField({ required: true, blank: true }),
                         wounds: new fields.ArrayField(
                             new fields.SchemaField({
                                 type: new fields.StringField({ ...blankString }),

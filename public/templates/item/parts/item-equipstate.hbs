@@ -1,21 +1,23 @@
 <div class="item-equip-state">
-    <label>Equip Type</label>
-    <select name="system.equipType">
-        {{selectOptions config.equipTypes selected=system.equipType localize=true}}
-    </select>
+    <div class="item-equip-type">
+        <label>Equip Type</label>
+        <select name="system.equipType">
+            {{selectOptions config.equipTypes selected=system.equipType localize=true}}
+        </select>
+    </div>
+    {{#if (eq system.equipType "worn")}}
+    <div class="item-equip-detail item-equip-armour-points">
+        <label>{{localize "ABBREW.ArmourPoints.label"}}</label>
+        <input type="text" name="system.armourPoints" value="{{system.armourPoints}}" data-dtype="text" />
+    </div>
+    {{/if}}
+    {{#if (eq system.equipType "held")}}
+    <div class="item-equip-detail item-equip-held">
+        <label class="resource-label">Hands</label>
+        {{!-- <input type="text" name="system.hands" value="{{system.hands}}" data-dtype="Number" /> --}}
+        <select name="system.handsRequired">
+            {{selectOptions config.hands selected=system.handsRequired localize=true}}
+        </select>
+    </div>
+    {{/if}}
 </div>
-{{#if (eq system.equipType "worn")}}
-<div>
-    <label>{{localize "ABBREW.ArmourPoints.label"}}</label>
-    <input type="text" name="system.armourPoints" value="{{system.armourPoints}}" data-dtype="text" />
-</div>
-{{/if}}
-{{#if (eq system.equipType "held")}}
-<div class="grid-span-1">
-    <label class="resource-label">Hands</label>
-    {{!-- <input type="text" name="system.hands" value="{{system.hands}}" data-dtype="Number" /> --}}
-    <select name="system.handsRequired">
-        {{selectOptions config.hands selected=system.handsRequired localize=true}}
-    </select>
-</div>
-{{/if}}

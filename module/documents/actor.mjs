@@ -222,10 +222,10 @@ export default class AbbrewActor extends Actor {
     let finisher = null;
     const uniqueFinisher = data.finisher ? Object.values(data.finisher)[0] : null;
     if (uniqueFinisher?.type && uniqueFinisher?.text) {
-      finisherCost = Object.keys(data.finisher)[0];
       const finisherConstruct = data.finisher;
-      this.getFinisherCost(finisherConstruct, totalRisk, data.attackProfile);
-      finisher = this.getFinisher(finisherConstruct, finisherCost);
+      const availableFinishers = Object.entries(finisherConstruct).filter(e => e[1].type === finisherType).reduce((result, e) => { result[e[0]] = e[1]; return result }, {});
+      finisherCost = this.getFinisherCost(availableFinishers, totalRisk, data.attackProfile);
+      finisher = this.getFinisher(availableFinishers, finisherCost);
     } else {
       const availableFinishers = this.getAvailableFinishersForDamageType(finisherType);
       finisherCost = this.getFinisherCost(availableFinishers, totalRisk, data.attackProfile);
@@ -261,7 +261,7 @@ export default class AbbrewActor extends Actor {
     successes += data.totalSuccesses;
     successes += this.system.defense.risk.value;
     successes -= this.system.defense.inflexibility.resistance.value;
-    successes -= Math.max(0, this.system.defense.protection[finisherType].resistance - data.damage.find(d => d.damageType === finisherType)?.penetration ?? 0);
+    successes -= Math.max(0, this.system.defense.protection[finisherType].resistance - (data.damage.find(d => d.damageType === finisherType)?.penetration ?? 0));
     successes += this.system.defense.protection[finisherType].weakness;
     successes += (data.actorSize - this.system.meta.size); // TODO Question, do we include this + (data.weaponSize - this.system.meta.size))
     successes += (data.actorTier - this.system.meta.tier.value); // TODO: Material Tier Diff    

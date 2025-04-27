@@ -16,8 +16,8 @@
       {
         "name": "Slash",
         "attackType": "arc",
-        "finisherLimit": 2,
-        "hasStrongAttack": false,
+        "lethal": 0,
+        "critical": 10,
         "damage": [
           {
             "type": "slashing",
@@ -25,17 +25,27 @@
             "attributeModifier": "str",
             "attributeMultiplier": 1,
             "damageMultiplier": 1,
-            "overallMultiplier": 1
+            "overallMultiplier": 1,
+            "penetration": 0
+          },
+          {
+            "type": "",
+            "value": 0,
+            "attributeModifier": "",
+            "attributeMultiplier": 1,
+            "damageMultiplier": 1,
+            "overallMultiplier": 1,
+            "penetration": 0
           }
         ],
-        "lethal": 0,
-        "critical": 10
+        "finisherLimit": 2,
+        "hasStrongAttack": true
       },
       {
         "name": "Stab",
         "attackType": "thrust",
-        "finisherLimit": 10,
-        "hasStrongAttack": false,
+        "lethal": 0,
+        "critical": 10,
         "damage": [
           {
             "type": "piercing",
@@ -43,11 +53,12 @@
             "attributeModifier": "str",
             "attributeMultiplier": 1,
             "damageMultiplier": 1,
-            "overallMultiplier": 1
+            "overallMultiplier": 1,
+            "penetration": 0
           }
         ],
-        "lethal": 0,
-        "critical": 10
+        "finisherLimit": 10,
+        "hasStrongAttack": false
       }
     ],
     "abbrewId": {
@@ -75,7 +86,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075360599,
-    "modifiedTime": 1745358212637,
+    "modifiedTime": 1745754969284,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_id": "kQFrvnG9djLFUEVU",
