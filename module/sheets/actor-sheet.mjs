@@ -297,6 +297,8 @@ export class AbbrewActorSheet extends ActorSheet {
 
     html.on('click', '.skill-stack', this._onSkillStackRemove.bind(this));
 
+    html.on('click', '.skill-concentrate', this._onSkillConcentrate.bind(this));
+
     // -------------------------------------------------------------
     // Everything below here is only needed if the sheet is editable
     if (!this.isEditable) return;
@@ -455,6 +457,20 @@ export class AbbrewActorSheet extends ActorSheet {
       if (stackUpdate === 0) {
         await cleanTemporarySkill(skill, this.actor);
       }
+    }
+  }
+
+  async _onSkillConcentrate(event) {
+    event.preventDefault();
+    const actionCost = event.target.closest("button").dataset.actionCost
+    const target = event.target.closest('.skill');
+    const id = target.dataset.itemId;
+    const skill = this.actor.items.get(id);
+    if (skill && game.combats.combats.length > 0) {
+      const effect = skill.actor.effects.find(e => e.flags.abbrew.skill.trackDuration === skill._id);
+      const updates = ({ duration: { rounds: 1, duration: 1, startTime: game.time.worldTime, startRound: game.combat.current.round } })
+      await skill.actor.update({ "system.actions": skill.actor.system.actions - parseInt(actionCost) });
+      await effect.update(updates);
     }
   }
 

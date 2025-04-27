@@ -75,6 +75,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
             actionCost: new fields.StringField({ ...blankString, nullable: true }),
             actionImage: new fields.StringField({ ...blankString }),
             duration: new fields.SchemaField({
+                isConcentration: new fields.BooleanField({ required: true, initial: false }),
                 precision: new fields.StringField({ ...blankString }),
                 value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
                 expireOnStartOfTurn: new fields.BooleanField({ required: true, initial: true })

@@ -40,6 +40,13 @@ export default class AbbrewItem extends Item {
     if (doesNestedFieldExist(changed, "system.isDismembered") && changed.system.isDismembered === true) {
       foundry.utils.setProperty(changed, `system.equipState`, "dropped");
     }
+
+    // Set appropriate values for concentration duration skill.
+    if (doesNestedFieldExist(changed, "system.action.duration.isConcentration") && changed.system.action.duration.isConcentration === true) {
+      foundry.utils.setProperty(changed, `system.action.duration.precision`, "6");
+      foundry.utils.setProperty(changed, `system.action.duration.expireOnStartOfTurn`, false);
+      foundry.utils.setProperty(changed, `system.action.duration.value`, 1);
+    }
   }
 
   // TODO: Drop items when not enough hands

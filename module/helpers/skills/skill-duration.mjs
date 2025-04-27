@@ -23,7 +23,7 @@ export async function addSkillToQueuedSkills(actor, skill) {
 }
 
 function getSkillDuration(skill) {
-    const precision = skill.system.action.duration.precision;
+    const precision = skill.system.action.duration.isConcentration ? "6" : skill.system.action.duration.precision;
     const duration = {};
     if (precision === "-1") {
         return duration;
@@ -38,14 +38,14 @@ function getSkillDuration(skill) {
         return duration;
     }
 
-    const expiresOnStartOfTurn = skill.system.action.duration.expireOnStartOfTurn;
+    const expiresOnStartOfTurn = skill.system.action.duration.isConcentration ? false : skill.system.action.duration.expireOnStartOfTurn;
     const value = Math.max(1, skill.system.action.duration.value);
     const roundOffset = 0.01
     duration["startTime"] = game.time.worldTime;
 
     if (precision === "6") {
         duration["rounds"] = value;
-        if (expiresOnStartOfTurn) {
+        if (!expiresOnStartOfTurn) {
             duration["turns"] = 1;
         }
         duration["startRound"] = game.combat?.round ?? 0;

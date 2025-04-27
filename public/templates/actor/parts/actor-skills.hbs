@@ -48,6 +48,12 @@
             class="actions-icon action-{{item.system.action.actionImage}}">Remove Stack</span></button>
         {{/if}}
         {{/unless}}
+        {{#if item.system.action.duration.isConcentration}}
+        {{#if item.system.action.isActive}}
+        <button class="skill-concentrate" type="button" data-action-cost="1"><span
+            class="actions-icon action-1a">Concentrate</span></button>
+        {{/if}}
+        {{/if}}
         {{#if (eq item.system.skillType "background")}}
         <h3 class="skill-attribute-increase">{{item.system.attributeIncreaseLong}}</h4>
           {{/if}}

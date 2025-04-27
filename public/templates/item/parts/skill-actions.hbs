@@ -116,6 +116,17 @@
     </div>
     <div>
         <h3>Duration</h3>
+        <label class="slide-toggle roboto-upper">
+            <input type="checkbox" name="system.action.duration.isConcentration" {{ checked
+                system.action.duration.isConcentration }}>
+            <span>Concentration?</span>
+            {{#if system.action.duration.isConcentration}}
+            <i class="fa fa-toggle-on"></i>
+            {{else}}
+            <i class="fa fa-toggle-off"></i>
+            {{/if}}
+        </label>
+        {{#unless system.action.duration.isConcentration}}
         <select name="system.action.duration.precision">
             {{selectOptions config.durations selected=system.action.duration.precision localize=true}}
         </select>
@@ -135,6 +146,7 @@
             <i class="fa fa-toggle-off"></i>
             {{/if}}
         </label>
+        {{/unless}}
     </div>
     <div>
         <h3>Uses</h3>

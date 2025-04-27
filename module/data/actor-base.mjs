@@ -202,6 +202,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
     this.resources.owned = this._getOwnedResources();
     this._limitResourceValues();
+    this._prepareDefenses();
   }
 
   _getOwnedResources() {
@@ -281,8 +282,6 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     const anatomy = this._prepareAnatomy();
 
     this._prepareMovement(anatomy);
-
-    this._prepareDefenses();
 
     this._prepareResolve();
 
