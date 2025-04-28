@@ -17,3 +17,5 @@ export { default as AbbrewWound } from "./wound.mjs";
 export { default as AbbrewBackground } from "./skill/background.mjs"
 export { default as AbbrewSkillDeck } from "./skill/skill-deck.mjs"
 export { default as AbbrewCreatureForm } from "./creature-form.mjs"
+export { default as AbbrewArchetype } from "./character-creation/archetype.mjs"
+export { default as AbbrewPath } from "./character-creation/path.mjs"

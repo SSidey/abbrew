@@ -137,7 +137,30 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
           value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
         })
       )
-    })
+    });
+
+    schema.progression = new fields.SchemaField({
+      archetypes: new fields.ArrayField(
+        new fields.SchemaField({
+          name: new fields.StringField({ ...blankString }),
+          roles: new fields.ArrayField(
+            new fields.SchemaField({
+              role: new fields.StringField({ ...blankString }),
+              path: new fields.SchemaField({
+                id: new fields.StringField({ ...blankString }),
+                name: new fields.StringField({ ...blankString }),
+              })
+            })
+          ),
+          skills: new fields.SchemaField({
+            total: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+            ranks: new fields.NumberField({ ...requiredInteger, initial: 1 })
+          }),
+          specialised: new fields.BooleanField({ required: true, initial: false }),
+          mastery: new fields.BooleanField({ required: true, initial: false }),
+        }),
+      )
+    });
 
     schema.biography = new fields.StringField({ required: true, blank: true });
 

@@ -17,6 +17,15 @@
   <section class="sheet-body">
 
     {{!-- Description Tab --}}
+    {{#if (eq system.skillType "path")}}
+    {{!-- Ability Rank --}}
+    <div class="form-group">
+      <label>{{ localize "ABBREW.AttributeRankIncrease" }}</label>
+      <select name="system.attributeRankIncrease">
+        {{selectOptions config.attributes selected=system.attributeRankIncrease blank="" localize=true}}
+      </select>
+    </div>
+    {{/if}}
     <div class="tab" data-group="primary" data-tab="description">
       {{editor enrichedDescription target="system.description" engine="prosemirror" rollData=rollData button=true
       owner=owner
@@ -27,7 +36,7 @@
     <div class="tab attributes" data-group="primary" data-tab="attributes">
       <div class="skill-element-max-input">
         <label class="resource-label">Skill Traits</label>
-        <input type="text" name="system.skillTraits" value="{{system.skillTraits}}" data-dtype="String" k
+        <input type="text" name="system.skillTraits" value="{{system.skillTraits}}" data-dtype="String"
           data-dropType="skillTrait" {{#unless (isGM)}}readonly{{/unless}} />
         <label class="resource-label">Synergy</label>
         <input type="text" name="system.skillModifiers.synergy" class="drop-with-fundamentals"

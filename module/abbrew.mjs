@@ -16,6 +16,8 @@ import { AbbrewCreatureFormSheet } from './sheets/items/item-creature-form-sheet
 import { AbbrewSkillDeckSheet } from './sheets/items/item-skill-deck-sheet.mjs';
 import { AbbrewAnatomySheet } from './sheets/items/item-anatomy-sheet.mjs';
 import { AbbrewSkillSheet } from './sheets/items/item-skill-sheet.mjs';
+import { AbbrewArchetypeSheet } from './sheets/items/item-archetype-sheet.mjs';
+import { AbbrewPathSheet } from './sheets/items/item-path-sheet.mjs';
 import { onWorldTimeUpdate } from './helpers/time.mjs';
 import { activateSocketListener, emitForAll, SocketMessage } from './socket.mjs';
 import { handleSkillActivate } from './helpers/skills/skill-activation.mjs';
@@ -70,7 +72,9 @@ Hooks.once('init', function () {
     wound: models.AbbrewWound,
     background: models.AbbrewBackground,
     skillDeck: models.AbbrewSkillDeck,
-    creatureForm: models.AbbrewCreatureForm
+    creatureForm: models.AbbrewCreatureForm,
+    path: models.AbbrewPath,
+    archetype: models.AbbrewArchetype
   }
 
   CONFIG.Token.documentClass = documents.AbbrewTokenDocument;
@@ -115,6 +119,16 @@ Hooks.once('init', function () {
     types: ["skill"],
     makeDefault: true,
     label: "ABBREW.SheetLabels.Skill"
+  });
+  Items.registerSheet('abbrew', AbbrewArchetypeSheet, {
+    types: ["archetype"],
+    makeDefault: true,
+    label: "ABBREW.SheetLabels.Archetype"
+  });
+  Items.registerSheet('abbrew', AbbrewPathSheet, {
+    types: ["path"],
+    makeDefault: true,
+    label: "ABBREW.SheetLabels.Path"
   });
 
   _configureStatusEffects();

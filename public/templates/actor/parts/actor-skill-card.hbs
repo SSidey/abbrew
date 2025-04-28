@@ -1,0 +1,84 @@
+<li class='skill item' data-item-id='{{item._id}}'>
+    <div class="skill-card {{#if item.system.action.isActive}}skill-active{{/if}}">
+        <h4 class="skill-name">{{item.name}}</h4>
+        <div class='skill-image'>
+            <a class='rollable' data-roll-type='item'>
+                <img src='{{item.img}}' title='{{item.name}}' />
+            </a>
+        </div>
+        {{#if item.system.isActivatable}}
+        {{#if item.system.action.isActive}}
+        {{#if item.system.action.charges.hasCharges}}
+        <button class="skill-activate" type="button"><span
+                class="actions-icon action-{{item.system.action.actionImage}}">Spend Charge</span></button>
+        {{else}}
+        {{#hasValue item.system.action.actionCost}}
+        <button class="skill-deactivate" type="button"><span class="actions-icon action-0a">Deactivate</span></button>
+        {{/hasValue}}
+        {{/if}}
+        {{else}}
+        {{#if item.system.action.actionCost}}
+        <button class="skill-activate" type="button"><span
+                class="actions-icon action-{{item.system.action.actionImage}}">Activate</span></button>
+        {{/if}}
+        {{/if}}
+        {{/if}}
+        {{#unless item.system.isActivatable}}
+        {{#if item.system.action.uses.stackRemovalActivation}}
+        <button class="skill-stack" type="button"><span
+                class="actions-icon action-{{item.system.action.actionImage}}">Remove Stack</span></button>
+        {{/if}}
+        {{/unless}}
+        {{#if item.system.action.duration.isConcentration}}
+        {{#if item.system.action.isActive}}
+        <button class="skill-concentrate" type="button" data-action-cost="1"><span
+                class="actions-icon action-1a">Concentrate</span></button>
+        {{/if}}
+        {{/if}}
+        {{#if (eq item.system.skillType "background")}}
+        <h3 class="skill-attribute-increase">{{item.system.attributeIncreaseLong}}</h4>
+            {{/if}}
+            <div>
+                {{#if item.system.action.uses.hasUses}}
+                <div class="skill-uses">
+                    {{#if system.action.uses.asStacks}}
+                    <label for="system.action.uses" class="resource-label">Stacks</label>
+                    {{else}}
+                    <label for="system.action.uses" class="resource-label">Uses</label>
+                    {{/if}}
+                    <div class="resource-content flexrow flex-center flex-between">
+                        <input type="text" name="system.action.uses.value" value="{{item.system.action.uses.value}}"
+                            data-dtype="Number" />
+                        {{#unless system.action.uses.asStacks}}
+                        <span class="skill-per"> / </span>
+                        <input type="text"
+                            value="{{#if item.system.action.uses.period}}{{item.system.action.uses.period}}{{else}}{{item.system.action.uses.max}}{{/if}}"
+                            data-dtype="String" readonly />
+                        {{/unless}}
+                    </div>
+                </div>
+                {{/if}}
+            </div>
+            <div>
+                {{#if item.system.action.charges.hasCharges}}
+                <div class="skill-charges">
+                    <label for="system.action.charges" class="resource-label">Charges</label>
+                    <div class="resource-content flexrow flex-center flex-between">
+                        <input type="text" name="system.action.charges.value"
+                            value="{{item.system.action.charges.value}}" data-dtype="Number" />
+                        <span class="skill-per"> / </span>
+                        <input type="text" value="{{system.action.charges.max}}" data-dtype="Number" readonly />
+                    </div>
+                </div>
+                {{/if}}
+            </div>
+            <div class='skill-controls'>
+                <a class='skill-control skill-edit' title='{{localize "DOCUMENT.Edit" type=' skill'}}'>
+                    <i class='fas fa-edit'></i>
+                </a>
+                <a class='skill-control skill-delete' title='{{localize "DOCUMENT.Delete" type=' skill'}}'>
+                    <i class='fas fa-trash'></i>
+                </a>
+            </div>
+    </div>
+</li>

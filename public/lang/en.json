@@ -21,13 +21,52 @@
       "gargantuan": "Gargantuan",
       "colossal": "Colossal"
     },
+    "Roles": {
+      "Name": {
+        "melee": "Melee",
+        "ranged": "Ranged",
+        "martial": "Martial",
+        "magic": "Magic",
+        "face": "Face",
+        "crafter": "Crafter",
+        "vanguard": "Vanguard",
+        "protector": "Protector",
+        "healer": "Healer",
+        "scoundrel": "Scoundrel",
+        "acolyte": "Acolyte",
+        "bound": "Bound",
+        "director": "Director",
+        "innerpower": "Innerpower",
+        "implement": "Implement"
+      },
+      "Description": {
+        "melee": "You fight primarily in melee with your opponents.",
+        "ranged": "You prefer to fight at a distance from your opponents.",
+        "martial": "Your primary tools in combat are your weapons.",
+        "magic": "You primarily harness magic to combat your foes.",
+        "face": "You weaponise your wits and charm to bring the downfall of your foes.",
+        "crafter": "You create and/or modify equipment to bolster your power as well as that of the party.",
+        "vanguard": "Your main role in combat is to bring down your enemies as quickly as possible.",
+        "protector": "Your main role in combat is in reducing the damage dealt to your allies.",
+        "healer": "You are well acquainted with fixing up the party after a fight.",
+        "thug": "You utilise underhanded tactics in combat.",
+        "scoundrel": "You are proficient in illicit skills.",
+        "acolyte": "You derive your abilities from a higher power.",
+        "bound": "You are bound to another being, this fusion provides you with your abilities.",
+        "director": "You have a keen knowledge or sense for the energies around you and can direct them at will.",
+        "innerpower": "Your magic comes from within yourself.",
+        "implement": "You harness magic through implements of power."
+      }
+    },
     "SheetLabels": {
       "Actor": "Abbrew Actor Sheet",
       "Item": "Abbrew Item Sheet",
       "CreatureForm": "Abbrew Creature Form Sheet",
       "SkillDeck": "Skill Deck",
       "Anatomy": "Anatomy",
-      "Skill": "Skill"
+      "Skill": "Skill",
+      "Archetype": "Archetype",
+      "Path": "Path"
     },
     "CheckTypes": {
       "successes": "Successes",

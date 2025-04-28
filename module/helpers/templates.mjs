@@ -17,6 +17,7 @@ export const preloadHandlebarsTemplates = async function () {
     'systems/abbrew/templates/actor/parts/actor-weapons.hbs',
     'systems/abbrew/templates/actor/parts/actor-defenses.hbs',
     'systems/abbrew/templates/actor/parts/actor-resources.hbs',
+    'systems/abbrew/templates/actor/parts/actor-skill-card.hbs',
     // Item partials.
     'systems/abbrew/templates/item/parts/item-effects.hbs',
     'systems/abbrew/templates/item/parts/item-defenses.hbs',

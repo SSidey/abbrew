@@ -15,11 +15,9 @@
 </div>
 {{/if}}
 {{#if (eq system.skillType "path")}}
-{{!-- Ability Rank --}}
-<div class="form-group">
-    <label>{{ localize "ABBREW.AttributeRankIncrease" }}</label>
-    <select name="system.attributeRankIncrease">
-        {{selectOptions config.attributes selected=system.attributeRankIncrease blank="" localize=true}}
-    </select>
+{{!-- Path --}}
+<div class="skill-path">
+    <label>Path</label>
+    <input type="text" name="system.path" value="{{system.path}}" data-dtype="string" />
 </div>
 {{/if}}

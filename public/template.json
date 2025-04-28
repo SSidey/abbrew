@@ -14,7 +14,9 @@
       "wound",
       "background",
       "creatureForm",
-      "skillDeck"
+      "skillDeck",
+      "archetype",
+      "path"
     ]
   }
 }

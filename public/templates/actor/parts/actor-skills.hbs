@@ -1,4 +1,35 @@
 {{!-- TODO: Add toggle for dragging skills --}}
+<div>
+  <div class='item flexrow items-header archetypes-header' data-skill-section="archetypes">
+    <div class='item-name'>Archetypes</div>
+  </div>
+  <ol class="archetype-list">
+    {{#each archetypes as |archetype id|}}
+    <li class="archetype" data-id="{{id}}" data-item-id="{{archetype.id}}" data-source-id="{{archetype.sourceId}}">
+      <div class="archetype=header">
+        <div class="image-container"><img src="{{archetype.image}}" /></div>
+        <div class="name"><span>{{archetype.name}}</span></div>
+        <a class='item-control archetype-delete' title='{{localize "DOCUMENT.Delete" type=' archetype'}}'>
+          <i class='fas fa-trash'></i>
+        </a>
+      </div>
+      <div class="archetype-skills">
+        <ol class='skill-container' style="display: {{display}}" data-skill-section="{{localize (skillType)}}">
+          {{!-- TODO: This will need a different source, how do we link skill to archetype --}}
+          {{!-- TODO: Add archetypeSkills to ActorSheet, group path skills by archetypeId --}}
+          {{!-- TODO: On drop onto archetype, update the item to have archetypeId === archetypeId --}}
+          {{#each (getProperty ../archetypeSkills (archetype.id)) as |item id|}}
+          {{> "systems/abbrew/templates/actor/parts/actor-skill-card.hbs" item=item}}
+          {{/each}}
+        </ol>
+      </div>
+    </li>
+    {{/each}}
+    <li class="empty-drop-list-element">
+      <span>+ Archetype</span>
+    </li>
+  </ol>
+</div>
 <ol class='items-list'>
   {{#each skillSections as |display skillType|}}
   <li>
@@ -17,90 +48,7 @@
   </li>
   <ol class='skill-container' style="display: {{display}}" data-skill-section="{{localize (skillType)}}">
     {{#each (getProperty ../skills (localize (skillType))) as |item id|}}
-    <li class='skill item' data-item-id='{{item._id}}'>
-      <div class="skill-card {{#if item.system.action.isActive}}skill-active{{/if}}">
-        <h4 class="skill-name">{{item.name}}</h4>
-        <div class='skill-image'>
-          <a class='rollable' data-roll-type='item'>
-            <img src='{{item.img}}' title='{{item.name}}' />
-          </a>
-        </div>
-        {{#if item.system.isActivatable}}
-        {{#if item.system.action.isActive}}
-        {{#if item.system.action.charges.hasCharges}}
-        <button class="skill-activate" type="button"><span
-            class="actions-icon action-{{item.system.action.actionImage}}">Spend Charge</span></button>
-        {{else}}
-        {{#hasValue item.system.action.actionCost}}
-        <button class="skill-deactivate" type="button"><span class="actions-icon action-0a">Deactivate</span></button>
-        {{/hasValue}}
-        {{/if}}
-        {{else}}
-        {{#if item.system.action.actionCost}}
-        <button class="skill-activate" type="button"><span
-            class="actions-icon action-{{item.system.action.actionImage}}">Activate</span></button>
-        {{/if}}
-        {{/if}}
-        {{/if}}
-        {{#unless item.system.isActivatable}}
-        {{#if item.system.action.uses.stackRemovalActivation}}
-        <button class="skill-stack" type="button"><span
-            class="actions-icon action-{{item.system.action.actionImage}}">Remove Stack</span></button>
-        {{/if}}
-        {{/unless}}
-        {{#if item.system.action.duration.isConcentration}}
-        {{#if item.system.action.isActive}}
-        <button class="skill-concentrate" type="button" data-action-cost="1"><span
-            class="actions-icon action-1a">Concentrate</span></button>
-        {{/if}}
-        {{/if}}
-        {{#if (eq item.system.skillType "background")}}
-        <h3 class="skill-attribute-increase">{{item.system.attributeIncreaseLong}}</h4>
-          {{/if}}
-          <div>
-            {{#if item.system.action.uses.hasUses}}
-            <div class="skill-uses">
-              {{#if system.action.uses.asStacks}}
-              <label for="system.action.uses" class="resource-label">Stacks</label>
-              {{else}}
-              <label for="system.action.uses" class="resource-label">Uses</label>
-              {{/if}}
-              <div class="resource-content flexrow flex-center flex-between">
-                <input type="text" name="system.action.uses.value" value="{{item.system.action.uses.value}}"
-                  data-dtype="Number" />
-                {{#unless system.action.uses.asStacks}}
-                <span class="skill-per"> / </span>
-                <input type="text"
-                  value="{{#if item.system.action.uses.period}}{{item.system.action.uses.period}}{{else}}{{item.system.action.uses.max}}{{/if}}"
-                  data-dtype="String" readonly />
-                {{/unless}}
-              </div>
-            </div>
-            {{/if}}
-          </div>
-          <div>
-            {{#if item.system.action.charges.hasCharges}}
-            <div class="skill-charges">
-              <label for="system.action.charges" class="resource-label">Charges</label>
-              <div class="resource-content flexrow flex-center flex-between">
-                <input type="text" name="system.action.charges.value" value="{{item.system.action.charges.value}}"
-                  data-dtype="Number" />
-                <span class="skill-per"> / </span>
-                <input type="text" value="{{system.action.charges.max}}" data-dtype="Number" readonly />
-              </div>
-            </div>
-            {{/if}}
-          </div>
-          <div class='skill-controls'>
-            <a class='skill-control skill-edit' title='{{localize "DOCUMENT.Edit" type=' skill'}}'>
-              <i class='fas fa-edit'></i>
-            </a>
-            <a class='skill-control skill-delete' title='{{localize "DOCUMENT.Delete" type=' skill'}}'>
-              <i class='fas fa-trash'></i>
-            </a>
-          </div>
-      </div>
-    </li>
+    {{> "systems/abbrew/templates/actor/parts/actor-skill-card.hbs" item=item}}
     {{/each}}
   </ol>
   </li>

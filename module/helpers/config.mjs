@@ -517,3 +517,21 @@ ABBREW.damageTypes = {
   emotion: { label: "ABBREW.DamageTypes.emotion", },
   psychic: { label: "ABBREW.DamageTypes.psychic" }
 }
+
+ABBREW.roles = {
+  melee: { label: "ABBREW.Roles.Name.melee", value: "melee", description: "ABBREW.Roles.Description.melee" },
+  ranged: { label: "ABBREW.Roles.Name.ranged", value: "ranged", description: "ABBREW.Roles.Description.ranged" },
+  martial: { label: "ABBREW.Roles.Name.martial", value: "martial", description: "ABBREW.Roles.Description.martial" },
+  magic: { label: "ABBREW.Roles.Name.magic", value: "magic", description: "ABBREW.Roles.Description.magic" },
+  face: { label: "ABBREW.Roles.Name.face", value: "face", description: "ABBREW.Roles.Description.face" },
+  crafter: { label: "ABBREW.Roles.Name.crafter", value: "crafter", description: "ABBREW.Roles.Description.crafter" },
+  vanguard: { label: "ABBREW.Roles.Name.vanguard", value: "vanguard", description: "ABBREW.Roles.Description.vanguard" },
+  protector: { label: "ABBREW.Roles.Name.protector", value: "protector", description: "ABBREW.Roles.Description.protector" },
+  healer: { label: "ABBREW.Roles.Name.healer", value: "healer", description: "ABBREW.Roles.Description.healer" },
+  scoundrel: { label: "ABBREW.Roles.Name.scoundrel", value: "scoundrel", description: "ABBREW.Roles.Description.scoundrel" },
+  acolyte: { label: "ABBREW.Roles.Name.acolyte", value: "acolyte", description: "ABBREW.Roles.Description.acolyte" },
+  bound: { label: "ABBREW.Roles.Name.bound", value: "bound", description: "ABBREW.Roles.Description.bound" },
+  director: { label: "ABBREW.Roles.Name.director", value: "director", description: "ABBREW.Roles.Description.director" },
+  innerpower: { label: "ABBREW.Roles.Name.innerpower", value: "innerpower", description: "ABBREW.Roles.Description.innerpower" },
+  implement: { label: "ABBREW.Roles.Name.implement", value: "implement", description: "ABBREW.Roles.Description.implement" },
+}
