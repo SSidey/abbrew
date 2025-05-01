@@ -198,7 +198,12 @@ Handlebars.registerHelper('getProperty', function (parent, child) {
     if (+match === 0) return "";
     return index === 0 ? match.toLowerCase() : match.toUpperCase();
   });
-  return parent[preparedChild];
+
+  return parent[preparedChild] ?? original;
+});
+
+Handlebars.registerHelper('getPropertyById', function (parent, child) {
+  return parent[child];
 });
 
 Handlebars.registerHelper('hasValue', function (arg1, opts) {

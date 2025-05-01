@@ -250,6 +250,16 @@ export default class AbbrewItem extends Item {
     }
   }
 
+  async _preDelete(options, userId) {
+    if (this.actor) {
+      const archetypes = this.actor.items.filter(i => i.type === "archetype").filter(a => a.system.skillIds.includes(this.system.abbrewId.uuid));
+      archetypes.forEach(async a => {
+        const update = a.system.skillIds.filter(s => s !== this.system.abbrewId.uuid);
+        await a.update({ "system.skillIds": update });
+      });
+    }
+  }
+
   async handleAttackDamageAction(actor, attackProfileId, attackMode) {
     const attackProfile = this.system.attackProfiles[attackProfileId];
     const actionCost = attackMode === "overpower" ? this.system.exertActionCost : this.system.actionCost;

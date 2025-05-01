@@ -36,6 +36,10 @@ export default class AbbrewArchetype extends AbbrewItemBase {
             return obj;
         }, {}));
 
+        schema.skillIds = new fields.ArrayField(
+            new fields.StringField({ required: true, blank: true })
+        );
+
         return schema;
     }
 
@@ -44,8 +48,8 @@ export default class AbbrewArchetype extends AbbrewItemBase {
         Object.values(this.roleRequirements).forEach(requirement => {
             requirement.parsedRoles = getSafeJson(requirement.roles, []);
             requirement.parsedRestrictedRoles = getSafeJson(requirement.restrictedRoles, []);
-            const path = getSafeJson(requirement.path.raw, { name: "", id: "" });
-            requirement.path.name = path.name;
+            const path = getSafeJson(requirement.path.raw, [{ name: "", id: "" }])[0];
+            requirement.path.name = path.value;
             requirement.path.id = path.id;
         });
     }

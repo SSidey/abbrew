@@ -142,7 +142,7 @@ export class AbbrewActorSheet extends ActorSheet {
 
       if (i.type === 'archetype') {
         archetypes.push(i);
-        // archetypeSkills[i.id] = [];
+        archetypeSkills[i._id] = context.items.filter(j => i.system.skillIds.includes(j.system.abbrewId.uuid));
       }
     }
 
@@ -396,7 +396,6 @@ export class AbbrewActorSheet extends ActorSheet {
 
     html.on('contextmenu', '.wound', this._onWoundRightClick.bind(this));
 
-    // TODO: Store these a different way, may need to tie ids to the archetype itself
     html.on('drop', '.archetype', async (event) => {
       event.preventDefault();
       if (!this.actor.testUserPermission(game.user, 'OWNER')) {
@@ -408,8 +407,19 @@ export class AbbrewActorSheet extends ActorSheet {
       if (eventJson && eventJson.type === "Item") {
         const item = await fromUuid(eventJson.uuid);
         if (item.type === "skill") {
-          item.system.archetype = event.currentTarget.dataset.itemId
-          await Item.create(item, { parent: this.actor });
+          const archetype = this.actor.items.find(i => i._id === event.currentTarget.dataset.itemId);
+          const archetypeRequirements = Object.values(archetype.system.roleRequirements);
+          const validPaths = archetypeRequirements.map(r => r.path.id).filter(id => id !== "");
+          const validRoles = new Set(validPaths.flatMap(vp => CONFIG.ABBREW.paths.find(p => p.id === vp).roles));
+          const itemRoles = new Set(item.system.path.value.id === "abbrewpuniversal" ? item.system.roles.parsed : []);
+          if (validRoles.intersection(itemRoles).size > 0) {
+            const skillIds = archetype.system.skillIds;
+            const update = [...skillIds, item.system.abbrewId.uuid];
+            await archetype.update({ "system.skillIds": update });
+          } else {
+            // TODO: Stop the item from creating?
+            ui.notifications.warn(`That skill isn't valid for the archetype ${archetype.name}`);
+          }
         }
       }
     })

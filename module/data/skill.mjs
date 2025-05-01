@@ -294,7 +294,9 @@ export default class AbbrewSkill extends AbbrewItemBase {
         schema.skillType = new fields.StringField({ ...blankString });
         schema.path = new fields.SchemaField({
             raw: new fields.StringField({ ...blankString }),
-            value: new fields.StringField({ ...blankString })
+            value: new fields.SchemaField({
+                id: new fields.StringField({ ...blankString })
+            })
         });
         schema.roles = new fields.SchemaField({
             raw: new fields.StringField({ ...blankString }),
@@ -348,7 +350,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
         };
 
         if (this.path.raw) {
-            this.path.value = getSafeJson(this.path.raw, [{ label: "" }])[0].label;
+            this.path.value.id = getSafeJson(this.path.raw, [{ label: "" }])[0].id;
         }
 
         if (this.roles.raw) {

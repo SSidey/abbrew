@@ -25,7 +25,7 @@
         <input type="text" name="system.path.raw" value="{{system.path.raw}}" data-dtype="string" {{#unless
           (isGM)}}readonly{{/unless}} />
       </div>
-      {{#if (eq system.path.value "universal")}}
+      {{#if (eq system.path.value.id "abbrewpuniversal")}}
       <div class="skill-element-max-input">
         <span>Roles</span>
         <input type="text" name="system.roles.raw" value="{{system.roles.raw}}" data-dtype="string" {{#unless

@@ -23,7 +23,7 @@
       </div>
       <div class="archetype-skills">
         <ol class='skill-container'>
-          {{#each (getProperty ../archetypeSkills archetype._id) as |item id|}}
+          {{#each (getPropertyById ../archetypeSkills archetype._id) as |item id|}}
           {{> "systems/abbrew/templates/actor/parts/actor-skill-card.hbs" item=item}}
           {{/each}}
         </ol>

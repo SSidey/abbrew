@@ -408,7 +408,8 @@ export class AbbrewSkillSheet extends ItemSheet {
                 label: path.value,
                 value: game.i18n.localize(path.label),
                 roles: path.roles,
-                title: game.i18n.localize(path.description)
+                title: game.i18n.localize(path.description),
+                id: path.id
             }))
         };
         if (path) {
