@@ -245,6 +245,8 @@ export class AbbrewSkillSheet extends ItemSheet {
         this._activateResourceDrop(html);
         this._activateSkillCheck(html);
         this._activateSkillCheckRequestFields(html);
+        this._activateRoles(html);
+        this._activatePath(html);
     }
 
     _activateSkillTraits(html) {
@@ -360,6 +362,57 @@ export class AbbrewSkillSheet extends ItemSheet {
                 var taggedResourceDrop = new Tagify(drop, settings);
                 taggedResourceDrops.push(taggedResourceDrop);
             });
+        }
+    }
+
+    _activateRoles(html) {
+        const roles = html[0].querySelector('input[name="system.roles.raw"]');
+        const settings = {
+            dropdown: {
+                maxItems: 20,               // <- mixumum allowed rendered suggestions
+                classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
+                enabled: 0,                 // <- show suggestions on focus
+                closeOnSelect: false,       // <- do not hide the suggestions dropdown once an item has been selected
+                includeSelectedTags: false   // <- Should the suggestions list Include already-selected tags (after filtering)
+            },
+            userInput: true,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+            duplicates: true,             // <- Should duplicate tags be allowed or not
+            whitelist: [...Object.values(CONFIG.ABBREW.roles).map(role => ({
+                label: role.value,
+                value: game.i18n.localize(role.label),
+                title: game.i18n.localize(role.description)
+            }))],
+        };
+        if (roles) {
+            var taggedRoles = new Tagify(roles, settings);
+        }
+    }
+
+    _activatePath(html) {
+        const path = html[0].querySelector('input[name="system.path.raw"]');
+        const settings = {
+            dropdown: {
+                maxItems: 20,               // <- mixumum allowed rendered suggestions
+                classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
+                enabled: 0,                 // <- show suggestions on focus
+                closeOnSelect: false,       // <- do not hide the suggestions dropdown once an item has been selected
+                includeSelectedTags: false   // <- Should the suggestions list Include already-selected tags (after filtering)
+            },
+            userInput: false,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+            duplicates: false,             // <- Should duplicate tags be allowed or not
+            maxTags: 1,
+            whitelist: [
+                CONFIG.ABBREW.universalPath,
+                ...CONFIG.ABBREW.paths
+            ].map(path => ({
+                label: path.value,
+                value: game.i18n.localize(path.label),
+                roles: path.roles,
+                title: game.i18n.localize(path.description)
+            }))
+        };
+        if (path) {
+            var taggedPath = new Tagify(path, settings);
         }
     }
 

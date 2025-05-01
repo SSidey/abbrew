@@ -1,0 +1,103 @@
+.archetype-list {
+    list-style: none;
+    padding-left: 0px;
+
+
+    .archetype {
+        .archetype-header {
+            display: grid;
+            grid-template-columns: auto 1fr 2fr auto;
+            border: 1px solid;
+            align-items: center;
+
+            div.image-container {
+                grid-column: span 1;
+                height: 50px;
+                align-items: center;
+                display: flex;
+                border-right: 1px black solid;
+
+                img {
+                    height: 50px;
+                    width: auto;
+                    border: none;
+                }
+            }
+
+            div.name {
+                grid-column: span 1;
+                height: 50px;
+                line-height: 50px;
+                text-align: center;
+                background: rgba(0, 0, 0, 0.05);
+
+                span {
+                    display: inline-block;
+                    vertical-align: middle;
+                    line-height: normal;
+                }
+            }
+
+            div.archetype-paths {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+                height: 100%;
+
+                .archetype-path {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, 50%);
+
+                    .path-role {
+                        align-self: center;
+                        justify-self: center;
+                    }
+                }
+            }
+
+            .item-controls {
+                margin-left: 1em;
+                margin-right: 1em;
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                grid-column-gap: 1em;
+
+                a {
+                    grid-column: span 1;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    i {
+                        display: block;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.archetype-requirements-list {
+    list-style: none;
+    padding-left: 0px;
+
+    .requirement-row {
+        display: grid;
+        grid-template-columns: 20% 80%;
+        padding-bottom: 1em;
+        align-items: center;
+        justify-items: center;
+
+
+        tags.tagify {
+            width: 100%;
+        }
+    }
+}
+
+.archetype-requirement::after {
+    content: '';
+    display: inherit;
+    width: 50%;
+    margin: 10px auto;
+    border-top: 1px solid gray;
+}

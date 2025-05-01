@@ -58,6 +58,18 @@
         "implement": "You harness magic through implements of power."
       }
     },
+    "Paths": {
+      "Name": {
+        "universal": "Universal",
+        "fenceroflostbriarith": "Fencer Of Lost Briarith",
+        "divineadherent": "Divine Adherent"
+      },
+      "Description": {
+        "universal": "A universal path, skills with this path can be selected if it has roles matching thosee of your paths",
+        "fenceroflostbriarith": "A fighting style that relies on specialised weapon techniques and swapping between stances.",
+        "divineadherent": "You worship a deity and derive your powers from prayer and devotion to that deity."
+      }
+    },
     "SheetLabels": {
       "Actor": "Abbrew Actor Sheet",
       "Item": "Abbrew Item Sheet",
@@ -291,7 +303,8 @@
         "feint": "Feint Training",
         "parryCounter": "Counter Parry Training",
         "feintCounter": "Counter Feint Training"
-      }
+      },
+      "stance": "Stance"
     },
     "Durations": {
       "instant": "Instant",
@@ -337,7 +350,9 @@
       "wound": "Wound",
       "background": "Background",
       "creatureForm": "Creature Form",
-      "skillDeck": "Skill Deck"
+      "skillDeck": "Skill Deck",
+      "archetype": "Archetype",
+      "path": "Path"
     }
   },
   "SETTINGS.AnnounceTurnStart.Name": "Announce Turn Start",

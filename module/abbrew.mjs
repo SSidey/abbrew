@@ -245,6 +245,10 @@ Handlebars.registerHelper("eagerEvaluation", function (value, ...replacements) {
   return value;
 })
 
+Handlebars.registerHelper("lt", function (val1, val2) {
+  return parseFloat(val1) < parseFloat(val2);
+})
+
 /* -------------------------------------------- */
 /*  Ready Hook                                  */
 /* -------------------------------------------- */

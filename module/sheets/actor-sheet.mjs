@@ -134,6 +134,17 @@ export class AbbrewActorSheet extends ActorSheet {
     const armour = [];
     const weapons = [];
     const equippedWeapons = [];
+    const archetypes = [];
+    const archetypeSkills = [];
+
+    for (let i of context.items) {
+      i.img = i.img || Item.DEFAULT_ICON;
+
+      if (i.type === 'archetype') {
+        archetypes.push(i);
+        // archetypeSkills[i.id] = [];
+      }
+    }
 
     // Iterate through items, allocating to containers
     for (let i of context.items) {
@@ -156,7 +167,8 @@ export class AbbrewActorSheet extends ActorSheet {
             skills.basic.push(i);
             break;
           case 'path':
-            skills.path.push(i)
+            skills.path.push(i);
+            // archetypeSkills[i.archetypeId].push(i);
             break;
           case 'resource':
             skills.resource.push(i)
@@ -205,6 +217,8 @@ export class AbbrewActorSheet extends ActorSheet {
     context.armour = armour;
     context.weapons = weapons;
     context.equippedWeapons = equippedWeapons;
+    context.archetypes = archetypes;
+    context.archetypeSkills = archetypeSkills;
   }
 
   skillSectionDisplay = {};
@@ -322,6 +336,21 @@ export class AbbrewActorSheet extends ActorSheet {
       li.slideUp(200, () => this.render(false));
     });
 
+    // Delete Skill Item
+    html.on('click', '.archetype-edit', (ev) => {
+      const li = $(ev.currentTarget).parents('.archetype');
+      const skill = this.actor.items.get(li.data('itemId'));
+      skill.sheet.render(true);
+    });
+
+    // Delete Skill Item
+    html.on('click', '.archetype-delete', (ev) => {
+      const li = $(ev.currentTarget).parents('.archetype');
+      const skill = this.actor.items.get(li.data('itemId'));
+      skill.delete();
+      li.slideUp(200, () => this.render(false));
+    });
+
     // Active Effect management
     html.on('click', '.effect-control', (ev) => {
       const row = ev.currentTarget.closest('li');
@@ -366,6 +395,24 @@ export class AbbrewActorSheet extends ActorSheet {
     html.on('click', '.wound', this._onWoundClick.bind(this));
 
     html.on('contextmenu', '.wound', this._onWoundRightClick.bind(this));
+
+    // TODO: Store these a different way, may need to tie ids to the archetype itself
+    html.on('drop', '.archetype', async (event) => {
+      event.preventDefault();
+      if (!this.actor.testUserPermission(game.user, 'OWNER')) {
+        return;
+      }
+
+      const droppedData = event.originalEvent.dataTransfer.getData("text")
+      const eventJson = JSON.parse(droppedData);
+      if (eventJson && eventJson.type === "Item") {
+        const item = await fromUuid(eventJson.uuid);
+        if (item.type === "skill") {
+          item.system.archetype = event.currentTarget.dataset.itemId
+          await Item.create(item, { parent: this.actor });
+        }
+      }
+    })
 
     this._activateTraits(html);
 

@@ -5,20 +5,25 @@
   </div>
   <ol class="archetype-list">
     {{#each archetypes as |archetype id|}}
-    <li class="archetype" data-id="{{id}}" data-item-id="{{archetype.id}}" data-source-id="{{archetype.sourceId}}">
-      <div class="archetype=header">
-        <div class="image-container"><img src="{{archetype.image}}" /></div>
+    <li class="archetype" data-id="{{id}}" data-item-id="{{archetype._id}}" data-source-id="{{archetype._sourceId}}">
+      <div class="archetype-header">
+        <div class="image-container"><img src="{{archetype.img}}" /></div>
         <div class="name"><span>{{archetype.name}}</span></div>
-        <a class='item-control archetype-delete' title='{{localize "DOCUMENT.Delete" type=' archetype'}}'>
-          <i class='fas fa-trash'></i>
-        </a>
+        <div class="archetype-paths">
+
+        </div>
+        <div class='item-controls'>
+          <a class='item-control archetype-edit' title='{{localize "DOCUMENT.Edit" type=' archetype'}}'>
+            <i class='fas fa-edit'></i>
+          </a>
+          <a class='item-control archetype-delete' title='{{localize "DOCUMENT.Delete" type=' archetype'}}'>
+            <i class='fas fa-trash'></i>
+          </a>
+        </div>
       </div>
       <div class="archetype-skills">
-        <ol class='skill-container' style="display: {{display}}" data-skill-section="{{localize (skillType)}}">
-          {{!-- TODO: This will need a different source, how do we link skill to archetype --}}
-          {{!-- TODO: Add archetypeSkills to ActorSheet, group path skills by archetypeId --}}
-          {{!-- TODO: On drop onto archetype, update the item to have archetypeId === archetypeId --}}
-          {{#each (getProperty ../archetypeSkills (archetype.id)) as |item id|}}
+        <ol class='skill-container'>
+          {{#each (getProperty ../archetypeSkills archetype._id) as |item id|}}
           {{> "systems/abbrew/templates/actor/parts/actor-skill-card.hbs" item=item}}
           {{/each}}
         </ol>

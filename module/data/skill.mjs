@@ -15,8 +15,6 @@ export default class AbbrewSkill extends AbbrewItemBase {
             synergy: new fields.StringField({ ...blankString }),
             discord: new fields.StringField({ ...blankString })
         });
-        schema.path = new fields.StringField({ ...blankString, nullable: true });
-        schema.archetypeId = new fields.StringField({ ...blankString });
         schema.configurable = new fields.BooleanField({ required: true });
         schema.isActivatable = new fields.BooleanField({ required: true, initial: false, label: "ABBREW.IsActivatable" });
         schema.activateOnCreate = new fields.BooleanField({ required: true, initial: false });
@@ -295,9 +293,16 @@ export default class AbbrewSkill extends AbbrewItemBase {
         });
         schema.skillType = new fields.StringField({ ...blankString });
         schema.path = new fields.SchemaField({
-            value: new fields.StringField({ ...blankString }),
-            archetype: new fields.StringField({ ...blankString })
+            raw: new fields.StringField({ ...blankString }),
+            value: new fields.StringField({ ...blankString })
         });
+        schema.roles = new fields.SchemaField({
+            raw: new fields.StringField({ ...blankString }),
+            parsed: new fields.ArrayField(
+                new fields.StringField({ ...blankString }),
+            ),
+        });
+        schema.archetype = new fields.StringField({ ...blankString })
         schema.attributeIncrease = new fields.StringField({ ...blankString });
         schema.attributeIncreaseLong = new fields.StringField({ ...blankString });
         schema.attributeRankIncrease = new fields.StringField({ ...blankString });
@@ -341,6 +346,14 @@ export default class AbbrewSkill extends AbbrewItemBase {
             const typeId = getSafeJson(resourceField.summary, [{ id: "" }])[0].id;
             this.action.modifiers.resources.target[index].type = typeId;
         };
+
+        if (this.path.raw) {
+            this.path.value = getSafeJson(this.path.raw, [{ label: "" }])[0].label;
+        }
+
+        if (this.roles.raw) {
+            this.roles.parsed = getSafeJson(this.roles.raw, []).map(r => r.label);
+        }
     }
 
     // Post Active Effects

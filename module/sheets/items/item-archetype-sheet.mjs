@@ -90,10 +90,18 @@ export class AbbrewArchetypeSheet extends ItemSheet {
         });
 
         this._activateRoles(html);
+        this._activateArchetypePaths(html);
     }
 
     _activateRoles(html) {
-        const roles = html[0].querySelector('input[name="system.roles"]');
+        // TODO: Add to collection as with resources input[name^="system.roleRequirements."].
+        const roles = html[0].querySelectorAll('input[name$=".roles"]');
+        const restrictedRoles = html[0].querySelectorAll('input[name$=".restrictedRoles"]');
+        const allRoles = [...Object.values(CONFIG.ABBREW.roles).map(role => ({
+            label: role.value,
+            value: game.i18n.localize(role.label),
+            title: game.i18n.localize(role.description)
+        }))];
         const roleSettings = {
             dropdown: {
                 maxItems: 20,               // <- mixumum allowed rendered suggestions
@@ -104,14 +112,63 @@ export class AbbrewArchetypeSheet extends ItemSheet {
             },
             userInput: true,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
             duplicates: true,             // <- Should duplicate tags be allowed or not
-            whitelist: [...Object.values(CONFIG.ABBREW.roles).map(role => ({
-                label: role.value,
-                value: game.i18n.localize(role.label),
-                title: game.i18n.localize(role.description)
-            }))],
+            whitelist: [],
         };
         if (roles) {
-            var taggedRoles = new Tagify(roles, roleSettings);
+            var taggedRoles = [];
+            roles.forEach(role => {
+                const restrictedRoles = this.item.system.roleRequirements[role.dataset.requirementId].parsedRestrictedRoles.map(r => r.label);
+                const whitelist = allRoles.filter(r => !restrictedRoles.includes(r.label));
+                const settings = foundry.utils.deepClone(roleSettings);
+                settings.whitelist = whitelist;
+                var taggedRole = new Tagify(role, settings);
+                taggedRoles.push(taggedRole);
+            });
+            restrictedRoles.forEach(role => {
+                const currentRoles = this.item.system.roleRequirements[role.dataset.requirementId].parsedRoles.map(r => r.label);
+                const whitelist = allRoles.filter(r => !currentRoles.includes(r.label));
+                const settings = foundry.utils.deepClone(roleSettings);
+                settings.whitelist = whitelist;
+                var taggedRole = new Tagify(role, settings);
+                taggedRoles.push(taggedRole);
+            });
+        }
+    }
+
+    _activateArchetypePaths(html) {
+        const paths = html[0].querySelectorAll('input[name$="path.raw"]');
+        const allPaths = CONFIG.ABBREW.paths.map(path => ({
+            label: path.value,
+            value: game.i18n.localize(path.label),
+            roles: path.roles,
+            title: game.i18n.localize(path.description)
+        }));
+        const pathSettings = {
+            dropdown: {
+                maxItems: 1,               // <- mixumum allowed rendered suggestions
+                classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
+                enabled: 0,                 // <- show suggestions on focus
+                closeOnSelect: false,       // <- do not hide the suggestions dropdown once an item has been selected
+                includeSelectedTags: true   // <- Should the suggestions list Include already-selected tags (after filtering)
+            },
+            userInput: false,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+            duplicates: false,             // <- Should duplicate tags be allowed or not
+            // whitelist: [.../* Object.values( */CONFIG.ABBREW.traits/* ) */.map(trait => game.i18n.localize(trait.name))]
+            whitelist: [],
+        };
+        if (paths) {
+            var taggedPaths = [];
+            paths.forEach(path => {
+                const archetype = this.item;
+                const requirement = path.dataset.requirementId;
+                const roles = new Set(archetype.system.roleRequirements[requirement].parsedRoles.map(r => r.label));
+                const restrictedRoles = new Set(archetype.system.roleRequirements[requirement].parsedRestrictedRoles.map(r => r.label));
+                const pathWhitelist = allPaths.filter(p => { const rolePaths = new Set(p.roles); return rolePaths.intersection(roles).size > 0 && restrictedRoles.intersection(rolePaths).size === 0 });
+                const settings = foundry.utils.deepClone(pathSettings);
+                settings.whitelist = pathWhitelist;
+                const tagify = new Tagify(path, settings);
+                taggedPaths.push(tagify);
+            });
         }
     }
 }

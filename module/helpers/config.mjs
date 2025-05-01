@@ -397,6 +397,7 @@ const skillTraining = [
 ]
 
 ABBREW.traits = [
+  { key: "stance", value: "ABBREW.Traits.stance", feature: "combat", subFeature: "", effect: "", data: "" },
   ...acuteWoundImmunities,
   ...lingeringWoundImmunities,
   ...skillTraining,
@@ -535,3 +536,10 @@ ABBREW.roles = {
   innerpower: { label: "ABBREW.Roles.Name.innerpower", value: "innerpower", description: "ABBREW.Roles.Description.innerpower" },
   implement: { label: "ABBREW.Roles.Name.implement", value: "implement", description: "ABBREW.Roles.Description.implement" },
 }
+
+ABBREW.universalPath = { label: "ABBREW.Paths.Name.universal", id: "abbrewpuniversal", value: "universal", roles: [], description: "ABBREW.Paths.Description.universal" };
+
+ABBREW.paths = [
+  { label: "ABBREW.Paths.Name.fenceroflostbriarith", id: "abbrewpfelopb000", value: "fenceroflostbriarith", roles: ["melee", "martial", "vanguard"], description: "ABBREW.Paths.Description.fenceroflostbriarith" },
+  { label: "ABBREW.Paths.Name.divineadherent", id: "abbrewpdivadh000", value: "divineadherent", roles: ["acolyte", "magic"], description: "ABBREW.Paths.Description.divineadherent" },
+]

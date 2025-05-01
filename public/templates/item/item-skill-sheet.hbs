@@ -17,16 +17,34 @@
   <section class="sheet-body">
 
     {{!-- Description Tab --}}
-    {{#if (eq system.skillType "path")}}
-    {{!-- Ability Rank --}}
-    <div class="form-group">
-      <label>{{ localize "ABBREW.AttributeRankIncrease" }}</label>
-      <select name="system.attributeRankIncrease">
-        {{selectOptions config.attributes selected=system.attributeRankIncrease blank="" localize=true}}
-      </select>
-    </div>
-    {{/if}}
     <div class="tab" data-group="primary" data-tab="description">
+      {{#if (eq system.skillType "path")}}
+      {{!-- Path --}}
+      <div class="skill-element-max-input">
+        <label>Path</label>
+        <input type="text" name="system.path.raw" value="{{system.path.raw}}" data-dtype="string" {{#unless
+          (isGM)}}readonly{{/unless}} />
+      </div>
+      {{#if (eq system.path.value "universal")}}
+      <div class="skill-element-max-input">
+        <span>Roles</span>
+        <input type="text" name="system.roles.raw" value="{{system.roles.raw}}" data-dtype="string" {{#unless
+          (isGM)}}readonly{{/unless}} />
+      </div>
+      {{/if}}
+      {{!-- Ability Rank --}}
+      <div class="skill-element-max-input">
+        <label>{{ localize "ABBREW.AttributeRankIncrease" }}</label>
+        <select name="system.attributeRankIncrease">
+          {{selectOptions config.attributes selected=system.attributeRankIncrease blank="" localize=true}}
+        </select>
+      </div>
+      {{/if}}
+      <div class="skill-element-max-input">
+        <label class="resource-label">Skill Traits</label>
+        <input type="text" name="system.skillTraits" value="{{system.skillTraits}}" data-dtype="String"
+          data-dropType="skillTrait" {{#unless (isGM)}}readonly{{/unless}} />
+      </div>
       {{editor enrichedDescription target="system.description" engine="prosemirror" rollData=rollData button=true
       owner=owner
       editable=editable}}
@@ -35,9 +53,6 @@
     {{!-- Attributes Tab --}}
     <div class="tab attributes" data-group="primary" data-tab="attributes">
       <div class="skill-element-max-input">
-        <label class="resource-label">Skill Traits</label>
-        <input type="text" name="system.skillTraits" value="{{system.skillTraits}}" data-dtype="String"
-          data-dropType="skillTrait" {{#unless (isGM)}}readonly{{/unless}} />
         <label class="resource-label">Synergy</label>
         <input type="text" name="system.skillModifiers.synergy" class="drop-with-fundamentals"
           value="{{system.skillModifiers.synergy}}" data-dtype="String" data-dropType="skill" {{#unless
