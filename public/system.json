@@ -48,6 +48,19 @@
       }
     },
     {
+      "name": "archetypes",
+      "label": "Archetypes",
+      "system": "abbrew",
+      "path": "packs/archetypes",
+      "type": "Item",
+      "private": false,
+      "flags": {
+        "abbrew": {
+          "types": ["archetype"]
+        }
+      }
+    },
+    {
       "name": "backgrounds",
       "label": "Backgrounds",
       "system": "abbrew",
@@ -100,6 +113,32 @@
       }
     },
     {
+      "name": "paths",
+      "label": "Paths",
+      "system": "abbrew",
+      "path": "packs/paths",
+      "type": "Item",
+      "private": false,
+      "flags": {
+        "abbrew": {
+          "types": ["skill"]
+        }
+      }
+    },
+    {
+      "name": "playerskills",
+      "label": "Skills",
+      "system": "abbrew",
+      "path": "packs/playerskills",
+      "type": "Item",
+      "private": false,
+      "flags": {
+        "abbrew": {
+          "types": ["skill"]
+        }
+      }
+    },
+    {
       "name": "skilldecks",
       "label": "Skill Decks",
       "system": "abbrew",
@@ -139,7 +178,28 @@
       }
     }
   ],
-  "packFolders": [],
+  "packFolders": [
+    {
+      "name": "Character Creation",
+      "sorting": "m",
+      "color": "#cd2c1e",
+      "packs": [],
+      "folders": [
+        {
+          "name": "Character Background",
+          "sorting": "m",
+          "color": "#b72c1f",
+          "packs": ["backgrounds"]
+        },
+        {
+          "name": "Progression",
+          "sorting": "m",
+          "color": "#941919 ",
+          "packs": ["archetypes", "paths", "playerskills"]
+        }
+      ]
+    }
+  ],
   "socket": true,
   "manifest": "https://raw.githubusercontent.com/SSidey/abbrew/refs/heads/master/public/system.json",
   "download": "https://github.com/SSidey/abbrew/releases/download/0.0.2-prerelease31/0.0.2-prerelease31.zip",

@@ -32,12 +32,16 @@
         "vanguard": "Vanguard",
         "protector": "Protector",
         "healer": "Healer",
+        "honourbound": "Hounour Bound",
         "scoundrel": "Scoundrel",
         "acolyte": "Acolyte",
         "bound": "Bound",
         "director": "Director",
-        "innerpower": "Innerpower",
-        "implement": "Implement"
+        "innerpower": "Inner Power",
+        "implement": "Implement",
+        "style": "Style",
+        "durable": "Durable",
+        "professional": "Professional"
       },
       "Description": {
         "melee": "You fight primarily in melee with your opponents.",
@@ -49,25 +53,32 @@
         "vanguard": "Your main role in combat is to bring down your enemies as quickly as possible.",
         "protector": "Your main role in combat is in reducing the damage dealt to your allies.",
         "healer": "You are well acquainted with fixing up the party after a fight.",
-        "thug": "You utilise underhanded tactics in combat.",
-        "scoundrel": "You are proficient in illicit skills.",
+        "honourbound": "You are bound by a code of ethics that you must uphold.",
+        "scoundrel": "You are proficient in illicit skills, engaging in underhanded tactics.",
         "acolyte": "You derive your abilities from a higher power.",
         "bound": "You are bound to another being, this fusion provides you with your abilities.",
         "director": "You have a keen knowledge or sense for the energies around you and can direct them at will.",
         "innerpower": "Your magic comes from within yourself.",
-        "implement": "You harness magic through implements of power."
+        "implement": "You harness magic through implements of power.",
+        "style": "You do your thing with panache, drawing attention to yourself.",
+        "durable": "You are capable of withstanding more abuse than most.",
+        "professional": "You are skilled in a profession."
       }
     },
     "Paths": {
       "Name": {
         "universal": "Universal",
         "fenceroflostbriarith": "Fencer Of Lost Briarith",
-        "divineadherent": "Divine Adherent"
+        "divineadherent": "Divine Adherent",
+        "poisoner": "Poisoner",
+        "snake": "Snake"
       },
       "Description": {
         "universal": "A universal path, skills with this path can be selected if it has roles matching thosee of your paths",
         "fenceroflostbriarith": "A fighting style that relies on specialised weapon techniques and swapping between stances.",
-        "divineadherent": "You worship a deity and derive your powers from prayer and devotion to that deity."
+        "divineadherent": "You worship a deity and derive your powers from prayer and devotion to that deity.",
+        "poisoner": "Adept at the production and the usage of poisons.",
+        "snake": "A style employing the use of two short weapons and relies on rapid speed and dodges."
       }
     },
     "SheetLabels": {
@@ -142,6 +153,8 @@
     "AttributeRankIncrease": "Attribute Rank Increase",
     "SkillType": "Skill Type",
     "Resistance": "Resistance",
+    "Reduction": "Reduction",
+    "Intensification": "Intensification",
     "Damage": "Damage",
     "Immunity": "Immunity",
     "Weakness": "Weakness",
@@ -288,7 +301,9 @@
         "dreadImmunity": "Dread Immunity",
         "enragedImmunity": "Enraged Immunity",
         "instabilityImmunity": "Instability Immunity",
-        "sinImmunity": "Sin Immunity"
+        "sinImmunity": "Sin Immunity",
+        "decayImmunity": "Decay Immunity",
+        "necroticImmunity": "Necrotic Immunity"
       },
       "SkillTraining": {
         "attackBase": "Attack Base",

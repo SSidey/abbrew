@@ -32,7 +32,7 @@
           <label for="system.attributes.level.value" class="resource-label">Tier</label>
           <div class="resource-content flexrow flex-center flex-between">
             <input type="text" name="system.meta.tier.value" value="{{system.meta.tier.value}}" data-dtype="Number"
-              readonly />
+              {{#unless (isGM)}}readonly{{/unless}} />
           </div>
         </div>
 

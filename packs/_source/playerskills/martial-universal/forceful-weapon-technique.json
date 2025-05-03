@@ -1,0 +1,267 @@
+{
+  "folder": "vorhKnkHWl5yof2D",
+  "name": "Forceful Weapon Technique",
+  "type": "skill",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "abbrew.skill.forcefulweapontechnique.bAGeebFps0nxhDtE",
+      "uuid": "bAGeebFps0nxhDtE"
+    },
+    "skillTraits": "[{\"key\":\"overpowerBaseTraining\",\"value\":\"Overpower Base\",\"feature\":\"skillTraining\",\"subFeature\":\"offensiveSkills\",\"effect\":\"base\",\"data\":\"overpower\"}]",
+    "skillModifiers": {
+      "synergy": "",
+      "discord": ""
+    },
+    "configurable": false,
+    "isActivatable": false,
+    "skills": {
+      "granted": [],
+      "paired": [],
+      "grantedOnActivation": [],
+      "grantedOnAccept": []
+    },
+    "action": {
+      "activationType": "",
+      "actionCost": "",
+      "actionImage": "",
+      "duration": {
+        "precision": "",
+        "value": 0,
+        "isConcentration": false,
+        "expireOnStartOfTurn": true
+      },
+      "uses": {
+        "hasUses": false,
+        "value": 0,
+        "max": 0,
+        "period": "",
+        "asStacks": false,
+        "removeStackOnUse": true,
+        "stackRemovalActivation": false,
+        "removeWhenNoUsesRemain": false
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "attackProfile": {
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": null,
+        "attackMode": "",
+        "damage": [],
+        "finisherLimit": 10,
+        "isEnabled": true,
+        "finisher": {
+          "type": "",
+          "cost": null,
+          "description": "",
+          "wounds": []
+        }
+      },
+      "modifiers": {
+        "fortune": 0,
+        "actionCost": {
+          "value": 0,
+          "operator": ""
+        },
+        "attackProfile": {
+          "attackType": "",
+          "attackMode": "",
+          "handsSupplied": 0,
+          "finisherLimit": {
+            "value": 0,
+            "operator": ""
+          },
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "damage": [],
+          "combineAttacks": {
+            "isEnabled": false,
+            "value": null
+          },
+          "penetration": {
+            "value": 10,
+            "operator": ""
+          },
+          "finisher": {
+            "type": "",
+            "cost": null,
+            "description": "",
+            "wounds": []
+          }
+        },
+        "guard": {
+          "self": {
+            "value": [
+              {
+                "operator": "",
+                "type": "",
+                "path": "",
+                "multiplier": 1,
+                "lateParse": false
+              }
+            ],
+            "operator": ""
+          },
+          "target": {
+            "value": [
+              {
+                "operator": "",
+                "type": "",
+                "path": "",
+                "multiplier": 1,
+                "lateParse": true
+              }
+            ],
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": [
+              {
+                "operator": "",
+                "type": "",
+                "path": "",
+                "multiplier": 1,
+                "lateParse": false
+              }
+            ],
+            "operator": ""
+          },
+          "target": {
+            "value": [
+              {
+                "operator": "",
+                "type": "",
+                "path": "",
+                "multiplier": 1,
+                "lateParse": true
+              }
+            ],
+            "operator": "",
+            "lateParse": false
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": [
+              {
+                "operator": "",
+                "type": "",
+                "path": "",
+                "multiplier": 1,
+                "lateParse": false
+              }
+            ],
+            "operator": ""
+          },
+          "target": {
+            "value": [
+              {
+                "operator": "",
+                "type": "",
+                "path": "",
+                "multiplier": 1,
+                "lateParse": true
+              }
+            ],
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": []
+        }
+      },
+      "skillCheck": [],
+      "skillRequest": {
+        "isEnabled": false,
+        "isContested": false,
+        "selfCheck": false,
+        "checkType": "",
+        "requirements": {
+          "modifiers": "",
+          "successes": 0,
+          "result": 0
+        },
+        "targetModifiers": "",
+        "results": {
+          "success": {
+            "description": ""
+          },
+          "failure": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "skillType": "path",
+    "path": {
+      "value": {
+        "id": ""
+      },
+      "raw": ""
+    },
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": "",
+    "activateOnCreate": false,
+    "applyTurnStart": false,
+    "applyTurnEnd": false,
+    "applyOnExpiry": false,
+    "activateOnDamageAccept": false,
+    "resource": {
+      "capacity": 0,
+      "operator": "",
+      "relatedResource": null,
+      "fillCapacityOnCreate": false
+    },
+    "roles": {
+      "raw": "",
+      "parsed": []
+    },
+    "archetype": "",
+    "isProxied": false,
+    "siblingSkillModifiers": []
+  },
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746223939260,
+    "modifiedTime": 1746223939260,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_id": "mdZiRCjDtdpcf7GN",
+  "sort": 600000,
+  "_key": "!items!mdZiRCjDtdpcf7GN"
+}

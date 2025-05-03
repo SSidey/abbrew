@@ -88,6 +88,8 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         obj[damageType] = new fields.SchemaField({
           label: new fields.StringField({ required: true, blank: true }),
           type: new fields.StringField({ required: true, blank: true }),
+          reduction: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+          intensification: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
           resistance: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
           weakness: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
           immunity: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 })
@@ -172,8 +174,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       tier: new fields.SchemaField({
         value: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0, max: 10 })
       }),
-      size: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-      actionRecovery: new fields.NumberField({ ...requiredInteger, initial: 5, min: 0, max: 5 })
+      size: new fields.NumberField({ ...requiredInteger, initial: 0 })
     });
 
     schema.skillTraining = new fields.ArrayField(
@@ -196,9 +197,13 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
     schema.momentum = new fields.NumberField({ ...requiredInteger, initial: 0 });
 
+    schema.modifiers = new fields.SchemaField({
+      actionRecovery: new fields.NumberField({ ...requiredInteger, initial: 5, min: 0, max: 5 }),
+      initiative: new fields.NumberField({ ...requiredInteger, initial: 0 })
+    })
+
     return schema;
   }
-
 
   // Prior to Active Effects
   prepareBaseData() {
@@ -226,6 +231,40 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     this.resources.owned = this._getOwnedResources();
     this._limitResourceValues();
     this._prepareDefenses();
+    const anatomy = this._prepareAnatomy();
+    this._prepareMovement(anatomy);
+  }
+
+  // Post Active Effects
+  prepareDerivedData() {
+    // Loop through attribute scores, and add their modifiers to our sheet output.
+    for (const key in this.attributes) {
+      const rankBonus = this.attributes[key].rank;
+      // Handle attribute label localization.
+      this.attributes[key].label = game.i18n.localize(CONFIG.ABBREW.attributes[key]) ?? key;
+      // // Rank total for the attribute
+      this.attributes[key].rank = rankBonus + this.parent.items.filter(i => i.type === 'skill' && i.system.skillType === 'path' && i.system.attributeRankIncrease === key).length;
+      // Tier of the attribute
+      this.attributes[key].tier = 1 + Math.floor(this.attributes[key].rank / 10);
+    }
+
+    for (const key in this.defense.protection) {
+      this.defense.protection[key].label = game.i18n.localize(CONFIG.ABBREW.damageTypes[key].label) ?? key;
+      this.defense.protection[key].type = key;
+    }
+
+    for (const key in this.defense.recovery) {
+      this.defense.recovery[key].type = key;
+      this.defense.recovery[key].label = game.i18n.localize(CONFIG.ABBREW.wounds[key].name) ?? type;
+    }
+
+    this._prepareResolve();
+
+    const skillTraining = this.parent.items.filter(i => i.type === "skill").filter(s => s.system.skillTraits).flatMap(s => getSafeJson(s.system.skillTraits, []).filter(st => st.feature === "skillTraining").map(st => st.data)).reduce((result, st) => { if (st in result) { result[st] += 1; } else { result[st] = 1; } return result; }, {});
+    const mappedTraining = Object.entries(skillTraining).map(e => ({ type: e[0], value: e[1] }));
+    this.skillTraining = foundry.utils.mergeObject(this.skillTraining, mappedTraining);
+
+    this._limitResourceValues();
   }
 
   _getOwnedResources() {
@@ -277,42 +316,6 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
   _getMaxFromAttributes(attributes) {
     return Object.keys(this.attributes).filter(a => attributes.includes(a)).reduce((result, attribute) => Math.max(result, this.attributes[attribute].value), 0);
-  }
-
-  // Post Active Effects
-  prepareDerivedData() {
-    // Loop through attribute scores, and add their modifiers to our sheet output.
-    for (const key in this.attributes) {
-      const rankBonus = this.attributes[key].rank;
-      // Handle attribute label localization.
-      this.attributes[key].label = game.i18n.localize(CONFIG.ABBREW.attributes[key]) ?? key;
-      // // Rank total for the attribute
-      this.attributes[key].rank = rankBonus + this.parent.items.filter(i => i.type === 'skill' && i.system.skillType === 'path' && i.system.attributeRankIncrease === key).length;
-      // Tier of the attribute
-      this.attributes[key].tier = 1 + Math.floor(this.attributes[key].rank / 10);
-    }
-
-    for (const key in this.defense.protection) {
-      this.defense.protection[key].label = game.i18n.localize(CONFIG.ABBREW.damageTypes[key].label) ?? key;
-      this.defense.protection[key].type = key;
-    }
-
-    for (const key in this.defense.recovery) {
-      this.defense.recovery[key].type = key;
-      this.defense.recovery[key].label = game.i18n.localize(CONFIG.ABBREW.wounds[key].name) ?? type;
-    }
-
-    const anatomy = this._prepareAnatomy();
-
-    this._prepareMovement(anatomy);
-
-    this._prepareResolve();
-
-    const skillTraining = this.parent.items.filter(i => i.type === "skill").filter(s => s.system.skillTraits).flatMap(s => getSafeJson(s.system.skillTraits, []).filter(st => st.feature === "skillTraining").map(st => st.data)).reduce((result, st) => { if (st in result) { result[st] += 1; } else { result[st] = 1; } return result; }, {});
-    const mappedTraining = Object.entries(skillTraining).map(e => ({ type: e[0], value: e[1] }));
-    this.skillTraining = foundry.utils.mergeObject(this.skillTraining, mappedTraining);
-
-    this._limitResourceValues();
   }
 
   _prepareAnatomy() {

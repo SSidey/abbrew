@@ -343,7 +343,7 @@ export default class AbbrewActor extends Actor {
         multiplier = 2;
       }
 
-      const dmg = Math.floor(d.value * multiplier);
+      const dmg = Math.floor(d.value * multiplier) + protection.intensification - protection.reduction;
 
       return result += dmg;
     }, 0);

@@ -28,6 +28,7 @@ export default class AbbrewArchetype extends AbbrewItemBase {
                 ),
                 isMajor: new fields.BooleanField({ required: true, initial: false, nullable: false }),
                 path: new fields.SchemaField({
+                    isRequired: new fields.BooleanField({ required: true, initial: true }),
                     raw: new fields.StringField({ required: true, blank: true }),
                     name: new fields.StringField({ required: true, blank: true }),
                     id: new fields.StringField({ required: true, blank: true })

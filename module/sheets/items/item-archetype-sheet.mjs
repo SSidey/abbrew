@@ -146,7 +146,7 @@ export class AbbrewArchetypeSheet extends ItemSheet {
         }));
         const pathSettings = {
             dropdown: {
-                maxItems: 1,               // <- mixumum allowed rendered suggestions
+                maxItems: 20,               // <- mixumum allowed rendered suggestions
                 classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
                 enabled: 0,                 // <- show suggestions on focus
                 closeOnSelect: false,       // <- do not hide the suggestions dropdown once an item has been selected
@@ -164,7 +164,7 @@ export class AbbrewArchetypeSheet extends ItemSheet {
                 const requirement = path.dataset.requirementId;
                 const roles = new Set(archetype.system.roleRequirements[requirement].parsedRoles.map(r => r.label));
                 const restrictedRoles = new Set(archetype.system.roleRequirements[requirement].parsedRestrictedRoles.map(r => r.label));
-                const pathWhitelist = allPaths.filter(p => { const rolePaths = new Set(p.roles); return rolePaths.intersection(roles).size > 0 && restrictedRoles.intersection(rolePaths).size === 0 });
+                const pathWhitelist = allPaths.filter(p => { const rolePaths = new Set(p.roles); return (rolePaths.intersection(roles).size === roles.size) && (restrictedRoles.intersection(rolePaths).size === 0) });
                 const settings = foundry.utils.deepClone(pathSettings);
                 settings.whitelist = pathWhitelist;
                 const tagify = new Tagify(path, settings);

@@ -260,6 +260,16 @@ ABBREW.wounds = {
     lingeringWounds: [],
     concepts: ["mind"]
   },
+  decay: {
+    name: "ABBREW.Wounds.decay",
+    lingeringWounds: ["necrotic"],
+    concepts: ["death"]
+  },
+  decay: {
+    name: "ABBREW.Wounds.necrotic",
+    lingeringWounds: [],
+    concepts: ["death"]
+  }
 }
 
 ABBREW.acuteWounds = Object.entries(ABBREW.wounds).filter(w => w[1].lingeringWounds.length === 0).map(w => w[0]);
@@ -367,7 +377,8 @@ const lingeringWoundImmunities = [
   { key: "dreadImmunity", value: "ABBREW.Traits.WoundImmunities.dreadImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "dread" },
   { key: "enragedImmunity", value: "ABBREW.Traits.WoundImmunities.enragedImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "enraged" },
   { key: "instabilityImmunity", value: "ABBREW.Traits.WoundImmunities.instabilityImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "instability" },
-  { key: "sinImmunity", value: "ABBREW.Traits.WoundImmunities.sinImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "sin" }
+  { key: "sinImmunity", value: "ABBREW.Traits.WoundImmunities.sinImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "sin" },
+  { key: "decayImmunity", value: "ABBREW.Traits.WoundImmunities.decayImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "decay" }
 ]
 
 const acuteWoundImmunities = [
@@ -378,7 +389,8 @@ const acuteWoundImmunities = [
   { key: "terrorImmunity", value: "ABBREW.Traits.WoundImmunities.terrorImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "terror" },
   { key: "rageImmunity", value: "ABBREW.Traits.WoundImmunities.rageImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "rage" },
   { key: "mutationImmunity", value: "ABBREW.Traits.WoundImmunities.mutationImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "mutation" },
-  { key: "corruptionImmunity", value: "ABBREW.Traits.WoundImmunities.corruptionImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "corruption" }
+  { key: "corruptionImmunity", value: "ABBREW.Traits.WoundImmunities.corruptionImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "corruption" },
+  { key: "necroticImmunity", value: "ABBREW.Traits.WoundImmunities.necroticImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "necrotic" }
 ]
 
 const skillTraining = [
@@ -529,17 +541,23 @@ ABBREW.roles = {
   vanguard: { label: "ABBREW.Roles.Name.vanguard", value: "vanguard", description: "ABBREW.Roles.Description.vanguard" },
   protector: { label: "ABBREW.Roles.Name.protector", value: "protector", description: "ABBREW.Roles.Description.protector" },
   healer: { label: "ABBREW.Roles.Name.healer", value: "healer", description: "ABBREW.Roles.Description.healer" },
+  honourbound: { label: "ABBREW.Roles.Name.honourbound", value: "honourbound", description: "ABBREW.Roles.Description.honourbound" },
   scoundrel: { label: "ABBREW.Roles.Name.scoundrel", value: "scoundrel", description: "ABBREW.Roles.Description.scoundrel" },
   acolyte: { label: "ABBREW.Roles.Name.acolyte", value: "acolyte", description: "ABBREW.Roles.Description.acolyte" },
   bound: { label: "ABBREW.Roles.Name.bound", value: "bound", description: "ABBREW.Roles.Description.bound" },
   director: { label: "ABBREW.Roles.Name.director", value: "director", description: "ABBREW.Roles.Description.director" },
   innerpower: { label: "ABBREW.Roles.Name.innerpower", value: "innerpower", description: "ABBREW.Roles.Description.innerpower" },
   implement: { label: "ABBREW.Roles.Name.implement", value: "implement", description: "ABBREW.Roles.Description.implement" },
+  style: { label: "ABBREW.Roles.Name.style", value: "style", description: "ABBREW.Roles.Description.style" },
+  durable: { label: "ABBREW.Roles.Name.durable", value: "durable", description: "ABBREW.Roles.Description.durable" },
+  professional: { label: "ABBREW.Roles.Name.professional", value: "professional", description: "ABBREW.Roles.Description.professional" }
 }
 
 ABBREW.universalPath = { label: "ABBREW.Paths.Name.universal", id: "abbrewpuniversal", value: "universal", roles: [], description: "ABBREW.Paths.Description.universal" };
 
 ABBREW.paths = [
   { label: "ABBREW.Paths.Name.fenceroflostbriarith", id: "abbrewpfelopb000", value: "fenceroflostbriarith", roles: ["melee", "martial", "vanguard"], description: "ABBREW.Paths.Description.fenceroflostbriarith" },
-  { label: "ABBREW.Paths.Name.divineadherent", id: "abbrewpdivadh000", value: "divineadherent", roles: ["acolyte", "magic"], description: "ABBREW.Paths.Description.divineadherent" },
+  { label: "ABBREW.Paths.Name.divineadherent", id: "abbrewpdivadh000", value: "divineadherent", roles: ["acolyte", "magic", "melee", "ranged"], description: "ABBREW.Paths.Description.divineadherent" },
+  { label: "ABBREW.Paths.Name.poisoner", id: "abbrewppoisoner0", value: "poisoner", roles: ["professional", "scoundrel"], description: "ABBREW.Paths.Description.poisoner" },
+  { label: "ABBREW.Paths.Name.snake", id: "abbrewpsnake0000", value: "snake", roles: ["martial", "melee", "ranges", "scoundrel"], description: "ABBREW.Paths.Description.snake" },
 ]

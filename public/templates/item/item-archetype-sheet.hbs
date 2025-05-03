@@ -52,6 +52,21 @@
               value="{{requirement.restrictedRoles}}" data-dtype="string" data-requirement-id="{{key}}" {{#unless
               (isGM)}}readonly{{/unless}} />
           </div>
+          {{#gm}}
+          <div class="requirement-row">
+            <label class="slide-toggle roboto-upper">
+              <input type="checkbox" name="system.roleRequirements.{{key}}.path.isRequired" {{#unless
+                (isGM)}}disabled{{/unless}} {{ checked requirement.path.isRequired }}>
+              <span>Path Required?</span>
+              {{#if requirement.path.isRequired}}
+              <i class="fa fa-toggle-on"></i>
+              {{else}}
+              <i class="fa fa-toggle-off"></i>
+              {{/if}}
+            </label>
+          </div>
+          {{/gm}}
+          {{#if requirement.path.isRequired}}
           <div class="requirement-row">
             <span>Path</span>
             <input type="text" name="system.roleRequirements.{{key}}.path.raw" value="{{requirement.path.raw}}"
@@ -68,6 +83,7 @@
             <i class="fa fa-toggle-off"></i>
             {{/if}}
           </label>
+          {{/if}}
           {{/if}}
         </li>
         {{/if}}

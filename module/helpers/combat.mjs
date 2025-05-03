@@ -13,9 +13,15 @@ export async function handleCombatStart(actors) {
 
 export async function handleCombatEnd(actors) {
     actors.forEach(a => {
-        const combatDurationSkills = a.items.filter(i => i.type === "skill").filter(s => s.system.action.isActive && s.system.action.duration.precision === "-2").map(s => s._id);
+        const actorSkills = a.items.filter(i => i.type === "skill");
+        const combatDurationSkills = actorSkills.filter(s => s.system.action.isActive && s.system.action.duration.precision === "-2").map(s => s._id);
         const effects = a.effects.filter(e => combatDurationSkills.includes(e.flags.abbrew.skill.trackDuration));
         effects.forEach(async e => await e.delete());
+        const combatFrequencySkills = actorSkills.filter(s => (s.system.action.uses.hasUses) && (s.system.action.uses.period === "combat"));
+        combatFrequencySkills.forEach(async s => {
+            const update = s.system.action.uses.max;
+            await s.update({ "system.action.uses.value": update });
+        });
     });
 }
 
@@ -151,7 +157,7 @@ async function turnEnd(actor) {
     await actor.unsetFlag("abbrew", "combat.damage.lastRoundReceived")
     await applyActiveSkills(actor, "end");
     await handleSkillExpiry("end", actor);
-    await actor.update({ "system.actions": actor.system.meta.actionRecovery });
+    await actor.update({ "system.actions": actor.system.modifiers.actionRecovery });
 }
 
 async function turnStart(actor) {

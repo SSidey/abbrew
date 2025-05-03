@@ -209,13 +209,17 @@
     "skillType": "path",
     "path": {
       "value": "",
-      "archetype": ""
+      "archetype": "",
+      "raw": "[{\"label\":\"universal\",\"value\":\"Universal\",\"roles\":[],\"title\":\"A universal path, skills with this path can be selected if it has roles matching thosee of your paths\",\"id\":\"abbrewpuniversal\"}]"
     },
     "attributeIncrease": "",
     "attributeIncreaseLong": "",
     "attributeRankIncrease": "",
     "isProxied": false,
-    "siblingSkillModifiers": []
+    "siblingSkillModifiers": [],
+    "roles": {
+      "raw": "[{\"label\":\"acolyte\",\"value\":\"Acolyte\",\"title\":\"You derive your abilities from a higher power.\"}]"
+    }
   },
   "effects": [],
   "sort": 0,
@@ -229,7 +233,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1745436213694,
-    "modifiedTime": 1745436570284,
+    "modifiedTime": 1746142641435,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!SLCTSt5eg4pitavm"

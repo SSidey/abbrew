@@ -24,7 +24,15 @@
     "applyOnExpiry": false,
     "activateOnDamageAccept": false,
     "skills": {
-      "granted": [],
+      "granted": [
+        {
+          "name": "Faith",
+          "id": "kA1SK7pW64oepEjs",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.kA1SK7pW64oepEjs",
+          "skillType": ""
+        }
+      ],
       "paired": [],
       "grantedOnActivation": [],
       "grantedOnAccept": []
@@ -197,13 +205,17 @@
     "skillType": "path",
     "path": {
       "value": "",
-      "archetype": ""
+      "archetype": "",
+      "raw": "[{\"label\":\"universal\",\"value\":\"Universal\",\"roles\":[],\"title\":\"A universal path, skills with this path can be selected if it has roles matching thosee of your paths\",\"id\":\"abbrewpuniversal\"}]"
     },
     "attributeIncrease": "",
     "attributeIncreaseLong": "",
     "attributeRankIncrease": "",
     "isProxied": false,
-    "siblingSkillModifiers": []
+    "siblingSkillModifiers": [],
+    "roles": {
+      "raw": "[{\"label\":\"acolyte\",\"value\":\"Acolyte\",\"title\":\"You derive your abilities from a higher power.\"}]"
+    }
   },
   "effects": [],
   "sort": 0,
@@ -217,7 +229,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1745681070452,
-    "modifiedTime": 1745681101214,
+    "modifiedTime": 1746143653228,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!XNMP79Kkyy10cOqu"

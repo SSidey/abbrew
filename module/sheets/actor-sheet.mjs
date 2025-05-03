@@ -226,7 +226,7 @@ export class AbbrewActorSheet extends ActorSheet {
   _prepareDefenses(actorData, context) {
     const activeProtection = Object.keys(actorData.system.defense.protection).reduce((result, key) => {
       const protection = actorData.system.defense.protection[key];
-      if (protection.resistance !== 0 || protection.immunity !== 0 || protection.weakness !== 0) {
+      if (protection.reduction !== 0 || protection.intensification !== 0 || protection.resistance !== 0 || protection.immunity !== 0 || protection.weakness !== 0) {
         result.push(protection);
       }
 
@@ -409,10 +409,12 @@ export class AbbrewActorSheet extends ActorSheet {
         if (item.type === "skill") {
           const archetype = this.actor.items.find(i => i._id === event.currentTarget.dataset.itemId);
           const archetypeRequirements = Object.values(archetype.system.roleRequirements);
-          const validPaths = archetypeRequirements.map(r => r.path.id).filter(id => id !== "");
-          const validRoles = new Set(validPaths.flatMap(vp => CONFIG.ABBREW.paths.find(p => p.id === vp).roles));
+          const archetypePaths = archetypeRequirements.map(r => r.path.id).filter(id => id !== "");
+          const validPaths = new Set(archetypePaths);
+          const validRoles = new Set(archetypePaths.flatMap(vp => CONFIG.ABBREW.paths.find(p => p.id === vp).roles));
+          const itemPath = new Set([item.system.path.value.id]);
           const itemRoles = new Set(item.system.path.value.id === "abbrewpuniversal" ? item.system.roles.parsed : []);
-          if (validRoles.intersection(itemRoles).size > 0) {
+          if ((validPaths.intersection(itemPath).size > 0) || (validRoles.intersection(itemRoles).size > 0)) {
             const skillIds = archetype.system.skillIds;
             const update = [...skillIds, item.system.abbrewId.uuid];
             await archetype.update({ "system.skillIds": update });

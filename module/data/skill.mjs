@@ -118,7 +118,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
                 })
             }),
             attackProfile: new fields.SchemaField({
-                isEnabled: new fields.BooleanField({ required: true, initial: true }),
+                isEnabled: new fields.BooleanField({ required: true, initial: false }),
                 name: new fields.StringField({ required: true, blank: true }),
                 attackType: new fields.StringField({ required: true, blank: true }),
                 lethal: new fields.NumberField({ ...requiredInteger, initial: 0 }),

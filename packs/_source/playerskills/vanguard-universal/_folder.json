@@ -1,0 +1,21 @@
+{
+  "name": "Vanguard Universal",
+  "sorting": "a",
+  "folder": null,
+  "type": "Item",
+  "_id": "ITQGhDQMgyrN9twc",
+  "description": "",
+  "sort": 100000,
+  "color": null,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746223940675,
+    "modifiedTime": 1746223940686,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!ITQGhDQMgyrN9twc"
+}

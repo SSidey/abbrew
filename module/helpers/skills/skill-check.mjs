@@ -11,7 +11,7 @@ export function getTierFromArray(array) {
 }
 
 export async function makeSkillCheck(actor, skill, allSkills, fortune, templateData, data) {
-    let skillResult = { dice: [], modifier: 0, baseDicePool: 0, result: false, isContested: false };
+    let skillResult = { dice: [], modifier: 0, baseDicePool: 0, result: true, isContested: false };
     if (skill.system.action.skillCheck.length > 0) {
         const combinedSkillModifier = allSkills
             .flatMap(s => parseModifierFieldValue(s.system.action.skillCheck, actor, s))
