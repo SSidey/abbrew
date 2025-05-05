@@ -51,6 +51,41 @@ export default class AbbrewActor extends Actor {
   }
 
   /**
+   * @override
+   **/
+  applyActiveEffects() {
+    const overrides = {};
+    this.statuses.clear();
+
+    // Organize non-disabled effects by their application priority
+    const changes = [];
+    this.allApplicableEffects().forEach(effect => {
+      if (effect.active) {
+        changes.push(...effect.changes.map((change, index) => {
+          const c = foundry.utils.deepClone(change);
+          c.effect = effect;
+          c.priority = c.priority ?? (c.mode * 10);
+          c.index = index;
+          return c;
+        }));
+        for (const statusId of effect.statuses) this.statuses.add(statusId);
+      }
+    });
+    changes.sort((a, b) => a.priority - b.priority);
+
+    // Apply all changes
+    changes.forEach(change => {
+      if (change.key) {
+        const changes = change.effect.apply(this, change);
+        Object.assign(overrides, changes);
+      }
+    });
+
+    // Expand the set of final overrides
+    this.overrides = foundry.utils.expandObject(overrides);
+  }
+
+  /**
    * 
    * @override
    * Augment the actor's default getRollData() method by appending the data object
@@ -324,8 +359,9 @@ export default class AbbrewActor extends Actor {
   applyModifiersToDamage(data) {
     let rollSuccesses = data.totalSuccesses;
     return data.damage.reduce((result, d) => {
+      const allProtection = this.system.defense.protection["all"];
       const protection = this.system.defense.protection[d.damageType];
-      if (protection.immunity > 0) {
+      if (protection.immunity > 0 || allProtection.immunity > 0) {
         return result;
       }
 
@@ -335,7 +371,7 @@ export default class AbbrewActor extends Actor {
         return result;
       }
 
-      let multiplierSelector = Math.max(0, protection.resistance - d.penetration) - protection.weakness;
+      let multiplierSelector = allProtection.resistance + Math.max(0, protection.resistance - d.penetration) - (protection.weakness + allProtection.weakness);
       let multiplier = 1;
       if (multiplierSelector > 0) {
         multiplier = 0.5;
@@ -343,7 +379,7 @@ export default class AbbrewActor extends Actor {
         multiplier = 2;
       }
 
-      const dmg = Math.floor(d.value * multiplier) + protection.intensification - protection.reduction;
+      const dmg = Math.floor(d.value * multiplier) + (protection.intensification + allProtection.intensification) - (protection.reduction + allProtection.reduction);
 
       return result += dmg;
     }, 0);
@@ -523,6 +559,7 @@ export default class AbbrewActor extends Actor {
     return true;
   }
 
+  // TODO: Tidy this
   async handleDeleteActiveEffect(effect) {
     const itemId = effect?.flags?.abbrew?.skill?.trackDuration;
     if (itemId) {
@@ -535,6 +572,10 @@ export default class AbbrewActor extends Actor {
         if (item.system.skillType === "temporary") {
           await item.delete();
         }
+        const effects = item.effects;
+        const promises = [];
+        effects.forEach(e => promises.push(e.update({ "disabled": true })));
+        await Promise.all(promises);
       }
     }
 

@@ -347,186 +347,204 @@
                 {{/if}}
             </label>
             {{#if system.action.attackProfile.isEnabled}}
-            <div class="skill-attack-profile">
-                <div class="attack-profile-row">
-                    <div class="attack-profile-element-2">
-                        <label>Attack Type</label>
-                        <select name="system.action.attackProfile.attackType">
-                            {{selectOptions config.attackTypes selected=system.action.attackProfile.attackType
-                            blank="" localize=true}}
-                        </select>
-                    </div>
-                    <div class="attack-profile-element-3">
-                        <label>Finisher Limit</label>
-                        <input type="text" name="system.action.attackProfile.finisherLimit"
-                            value="{{system.action.attackProfile.finisherLimit}}" data-dtype="String" />
-                    </div>
-                </div>
-                <div class="attack-profile-row">
-                    <div class="attack-profile-element-2">
-                        <label>Attack Mode</label>
-                        <select name="system.action.attackProfile.attackMode">
-                            {{selectOptions config.attackModes selected=system.action.attackProfile.attackMode
-                            blank=""
-                            localize=true}}
-                        </select>
-                    </div>
-                    <div class="attack-profile-element-3">
-                        <label>Critical</label>
-                        <input type="text" name="system.action.attackProfile.critical"
-                            value="{{system.action.attackProfile.critical}}" data-dtype="String" />
-                    </div>
-                </div>
-                <div class="attack-profile-row">
-                    <div class="attack-profile-element-2">
-                        <label>Hands Supplied</label>
-                        <input type="text" name="system.action.attackProfile.handsSupplied"
-                            value="{{system.action.attackProfile.handsSupplied}}" data-dtype="String" />
-                    </div>
-                    <div class="attack-profile-element-3">
-                        <label>Lethal</label>
-                        <input type="text" name="system.action.attackProfile.lethal"
-                            value="{{system.action.attackProfile.lethal}}" data-dtype="String" />
-                    </div>
-                </div>
-                {{#if (eq system.action.attackProfile.attackMode "finisher")}}
-                <div class="attack-profile-row">
-                    <div class="attack-profile-element-2">
-                        <label>Finisher Cost</label>
-                        <input type="text" name="system.action.attackProfile.finisher.cost"
-                            value="{{system.action.attackProfile.finisher.cost}}" data-dtype="String" />
-                    </div>
-                    <div class="attack-profile-element-2">
-                        <label>{{ localize "ABBREW.Type" }}</label>
-                        <select name="system.action.attackProfile.finisher.type">
-                            {{selectOptions config.damageTypes selected=system.action.attackProfile.finisher.type
-                            blank="" localize=true}}
-                        </select>
-                        <div></div>
-                    </div>
-                    <div class="attack-profile-element-max-input">
-                        <label>Finisher Description</label>
-                        {{editor enrichedFinisherDescription target="system.action.attackProfile.finisher.description"
-                        engine="prosemirror" button=true
-                        owner=owner editable=editable}}
-                    </div>
-                </div>
-                <div>
-                    <h4>Wounds</h4>
-                    <ol class="form-list wound-modifier-container">
-                        {{#each system.action.attackProfile.finisher.wounds as |wound k|}}
-                        <li class="item resource wound-row" data-id="{{k}}">
-                            <div class="wound-element-2 wound-element-value">
-                                <label>Value</label>
-                                <input type="text" name="system.action.attackProfile.finisher.wounds.{{k}}.value"
-                                    value="{{wound.value}}" data-dtype="Number" />
-                            </div>
-                            <div class="wound-element-2 wound-element-type">
-                                <label>Type</label>
-                                <select name="system.action.attackProfile.finisher.wounds.{{k}}.type">
-                                    {{selectOptions ../config.wounds selected=wound.type
-                                    blank=""
-                                    localize=true}}
-                                </select>
-                            </div>
-                            <div class="wound-element-2 wound-element-operator">
-                                <label>{{ localize "ABBREW.Operator" }}</label>
-                                <select name="system.action.attackProfile.finisher.wounds.{{k}}.operator">
-                                    {{selectOptions ../config.operators selected=wound.operator
-                                    blank=""
-                                    localize=true}}
-                                </select>
-                            </div>
-                            <div class="wound-remove">
-                                <a class="skill-action-modifier-wound-control"
-                                    data-action="remove-skill-action-attackProfile-wound-finisher-modifier">
-                                    <i class="fa-solid fa-minus"></i>
-                                </a>
-                            </div>
-                        </li>
-                        {{/each}}
-                        <li class="skillModifierWound add">
-                            <div class="form-group">
-                                <label>
-                                    <a class="skill-action-modifier-wound-control"
-                                        data-action="add-skill-action-attackProfile-wound-finisher-modifier">
-                                        Add Wound Modifier
-                                        <i class="fa-solid fa-plus"></i>
-                                    </a>
-                                </label>
-                            </div>
-                        </li>
-                    </ol>
-                </div>
-                {{/if}}
-            </div>
-            <ol class="skill-damage-list">
-                {{#each system.action.attackProfile.damage as |damage j|}}
-                <li class="item skill-damage-row" data-id="{{j}}">
-                    <div class="skill-damage-profile">
-                        <div class="damage-profile-element-2">
-                            <label>Overall Multiplier</label>
-                            <input type="text" name="system.action.attackProfile.damage.{{j}}.overallMultiplier"
-                                value="{{damage.overallMultiplier}}" data-dtype="String" />
-                        </div>
-                        <div class="damage-profile-element-2">
-                            <label>{{ localize "ABBREW.Damage" }}</label>
-                            <input type="text" name="system.action.attackProfile.damage.{{j}}.value"
-                                value="{{damage.value}}" data-dtype="Number" />
-                        </div>
-                        <div class="damage-profile-element-2">
-                            <label>{{ localize "ABBREW.Type" }}</label>
-                            <select name="system.action.attackProfile.damage.{{j}}.type">
-                                {{selectOptions ../config.damageTypes selected=damage.type blank="" localize=true}}
+            <div>
+                <div class="skill-attack-profile">
+                    <div class="attack-profile-row">
+                        <div class="attack-profile-element-2">
+                            <label>Attack Type</label>
+                            <select name="system.action.attackProfile.attackType">
+                                {{selectOptions config.attackTypes selected=system.action.attackProfile.attackType
+                                blank="" localize=true}}
                             </select>
                         </div>
-                        <div class="damage-profile-element-2">
-                            <label>Damage Multiplier</label>
-                            <input type="text" name="system.action.attackProfile.damage.{{j}}.damageMultiplier"
-                                value="{{damage.damageMultiplier}}" data-dtype="String" />
+                        <div class="attack-profile-element-3">
+                            <label>Finisher Limit</label>
+                            <input type="text" name="system.action.attackProfile.finisherLimit"
+                                value="{{system.action.attackProfile.finisherLimit}}" data-dtype="String" />
                         </div>
-                        <div class="damage-profile-element-2">
-                            <label>Attribute</label>
-                            <select name="system.action.attackProfile.damage.{{j}}.attributeModifier">
-                                {{selectOptions ../config.attributes selected=damage.attributeModifier blank=""
+                    </div>
+                    <div class="attack-profile-row">
+                        <div class="attack-profile-element-2">
+                            <label>Attack Mode</label>
+                            <select name="system.action.attackProfile.attackMode">
+                                {{selectOptions config.attackModes selected=system.action.attackProfile.attackMode
+                                blank=""
                                 localize=true}}
                             </select>
                         </div>
-                        <div class="damage-profile-element-2">
-                            <label>Attribute Multiplier</label>
-                            <input type="text" name="system.action.attackProfile.damage.{{j}}.attributeMultiplier"
-                                value="{{damage.attributeMultiplier}}" data-dtype="String" />
-                        </div>
-                        <div class="damage-profile-element-2">
-                            <label>Penetration</label>
-                            <input type="text" name="system.action.attackProfile.damage.{{j}}.penetration"
-                                value="{{damage.penetration}}" data-dtype="String" />
+                        <div class="attack-profile-element-3">
+                            <label>Critical</label>
+                            <input type="text" name="system.action.attackProfile.critical"
+                                value="{{system.action.attackProfile.critical}}" data-dtype="String" />
                         </div>
                     </div>
-                    <div class="skill-damage-control">
-                        <a class="damage-control remove-damage" data-action="remove-damage">
-                            <i class="fa-solid fa-minus"></i>
-                        </a>
+                    <div class="attack-profile-row">
+                        <div class="attack-profile-element-2">
+                            <label>Hands Supplied</label>
+                            <input type="text" name="system.action.attackProfile.handsSupplied"
+                                value="{{system.action.attackProfile.handsSupplied}}" data-dtype="String" />
+                        </div>
+                        <div class="attack-profile-element-3">
+                            <label>Lethal</label>
+                            <input type="text" name="system.action.attackProfile.lethal"
+                                value="{{system.action.attackProfile.lethal}}" data-dtype="String" />
+                        </div>
                     </div>
-                </li>
-                {{/each}}
-                <li class="damage add">
-                    <div class="form-group">
-                        <label>
-                            <a class="damage-control" data-action="add-damage">
-                                Add Damage
-                                <i class="fa-solid fa-plus"></i>
+                    {{#if (eq system.action.attackProfile.attackMode "finisher")}}
+                    {{!-- <div>
+                        <div class="attack-profile-row">
+                            <div class="attack-profile-element-2">
+                                <label>Finisher Cost</label>
+                                <input type="text" name="system.action.attackProfile.finisher.cost"
+                                    value="{{system.action.attackProfile.finisher.cost}}" data-dtype="String" />
+                            </div>
+                            <div class="attack-profile-element-2">
+                                <label>{{ localize "ABBREW.Type" }}</label>
+                                <select name="system.action.attackProfile.finisher.type">
+                                    {{selectOptions config.damageTypes
+                                    selected=system.action.attackProfile.finisher.type
+                                    blank="" localize=true}}
+                                </select>
+                                <div></div>
+                            </div>
+                            <div class="attack-profile-element-max-input">
+                                <label>Finisher Description</label>
+                                {{editor enrichedFinisherDescription
+                                target="system.action.attackProfile.finisher.description"
+                                engine="prosemirror" button=true
+                                owner=owner editable=editable}}
+                            </div>
+                        </div>
+                        <div>
+                            <h4>Wounds</h4>
+                            <ol class="form-list wound-modifier-container">
+                                {{#each system.action.attackProfile.finisher.wounds as |wound k|}}
+                                <li class="item resource wound-row" data-id="{{k}}">
+                                    <div class="wound-element-2 wound-element-value">
+                                        <label>Value</label>
+                                        <input type="text"
+                                            name="system.action.attackProfile.finisher.wounds.{{k}}.value"
+                                            value="{{wound.value}}" data-dtype="Number" />
+                                    </div>
+                                    <div class="wound-element-2 wound-element-type">
+                                        <label>Type</label>
+                                        <select name="system.action.attackProfile.finisher.wounds.{{k}}.type">
+                                            {{selectOptions ../config.wounds selected=wound.type
+                                            blank=""
+                                            localize=true}}
+                                        </select>
+                                    </div>
+                                    <div class="wound-element-2 wound-element-operator">
+                                        <label>{{ localize "ABBREW.Operator" }}</label>
+                                        <select name="system.action.attackProfile.finisher.wounds.{{k}}.operator">
+                                            {{selectOptions ../config.operators selected=wound.operator
+                                            blank=""
+                                            localize=true}}
+                                        </select>
+                                    </div>
+                                    <div class="wound-remove">
+                                        <a class="skill-action-modifier-wound-control"
+                                            data-action="remove-skill-action-attackProfile-wound-finisher-modifier">
+                                            <i class="fa-solid fa-minus"></i>
+                                        </a>
+                                    </div>
+                                </li>
+                                {{/each}}
+                                <li class="skillModifierWound add">
+                                    <div class="form-group">
+                                        <label>
+                                            <a class="skill-action-modifier-wound-control"
+                                                data-action="add-skill-action-attackProfile-wound-finisher-modifier">
+                                                Add Wound Modifier
+                                                <i class="fa-solid fa-plus"></i>
+                                            </a>
+                                        </label>
+                                    </div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div> --}}
+                    {{/if}}
+                </div>
+                <ol class="skill-damage-list">
+                    {{#each system.action.attackProfile.damage as |damage j|}}
+                    <li class="item skill-damage-row" data-id="{{j}}">
+                        <div class="skill-damage-profile">
+                            <div class="damage-profile-element-2">
+                                <label>Overall Multiplier</label>
+                                <input type="text" name="system.action.attackProfile.damage.{{j}}.overallMultiplier"
+                                    value="{{damage.overallMultiplier}}" data-dtype="String" />
+                            </div>
+                            <div class="damage-profile-element-2">
+                                <label>{{ localize "ABBREW.Damage" }}</label>
+                                <input type="text" name="system.action.attackProfile.damage.{{j}}.value"
+                                    value="{{damage.value}}" data-dtype="Number" />
+                            </div>
+                            <div class="damage-profile-element-2">
+                                <label>{{ localize "ABBREW.Type" }}</label>
+                                <select name="system.action.attackProfile.damage.{{j}}.type">
+                                    {{selectOptions ../config.damageTypes selected=damage.type blank="" localize=true}}
+                                </select>
+                            </div>
+                            <div class="damage-profile-element-2">
+                                <label>Damage Multiplier</label>
+                                <input type="text" name="system.action.attackProfile.damage.{{j}}.damageMultiplier"
+                                    value="{{damage.damageMultiplier}}" data-dtype="String" />
+                            </div>
+                            <div class="damage-profile-element-2">
+                                <label>Attribute</label>
+                                <select name="system.action.attackProfile.damage.{{j}}.attributeModifier">
+                                    {{selectOptions ../config.attributes selected=damage.attributeModifier blank=""
+                                    localize=true}}
+                                </select>
+                            </div>
+                            <div class="damage-profile-element-2">
+                                <label>Attribute Multiplier</label>
+                                <input type="text" name="system.action.attackProfile.damage.{{j}}.attributeMultiplier"
+                                    value="{{damage.attributeMultiplier}}" data-dtype="String" />
+                            </div>
+                            <div class="damage-profile-element-2">
+                                <label>Penetration</label>
+                                <input type="text" name="system.action.attackProfile.damage.{{j}}.penetration"
+                                    value="{{damage.penetration}}" data-dtype="String" />
+                            </div>
+                        </div>
+                        <div class="skill-damage-control">
+                            <a class="damage-control remove-damage" data-action="remove-damage">
+                                <i class="fa-solid fa-minus"></i>
                             </a>
-                        </label>
-                    </div>
-                </li>
-            </ol>
+                        </div>
+                    </li>
+                    {{/each}}
+                    <li class="damage add">
+                        <div class="form-group">
+                            <label>
+                                <a class="damage-control" data-action="add-damage">
+                                    Add Damage
+                                    <i class="fa-solid fa-plus"></i>
+                                </a>
+                            </label>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+            {{/if}}
         </div>
-        {{/if}}
         {{/if}}
         {{#if (eq system.action.activationType "synergy")}}
         <div>
             <h3>Attack Profile Modifiers</h3>
+            <label class="slide-toggle roboto-upper">
+                <input type="checkbox" name="system.action.modifiers.attackProfile.isEnabled" {{ checked
+                    system.action.modifiers.attackProfile.isEnabled }}>
+                <span>Modify Attacks?</span>
+                {{#if system.action.modifiers.attackProfile.isEnabled}}
+                <i class="fa fa-toggle-on"></i>
+                {{else}}
+                <i class="fa fa-toggle-off"></i>
+                {{/if}}
+            </label>
+            {{#if system.action.modifiers.attackProfile.isEnabled}}
             <div>
                 <label class="slide-toggle roboto-upper">
                     <input type="checkbox" name="system.action.modifiers.attackProfile.combineAttacks.isEnabled" {{
@@ -702,7 +720,7 @@
                         <div class="damage-profile-element-2">
                             <label>{{ localize "ABBREW.Damage" }}</label>
                             <input type="text" name="system.action.modifiers.attackProfile.damage.{{j}}.value"
-                                value="{{damage.value}}" data-dtype="Number" />
+                                value="{{damage.value}}" data-dtype="String" />
                         </div>
                         <div class="damage-profile-element-2">
                             <label>{{ localize "ABBREW.Type" }}</label>
@@ -754,6 +772,7 @@
                     </div>
                 </li>
             </ol>
+            {{/if}}
         </div>
         {{/if}}
         <div>

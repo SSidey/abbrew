@@ -1,4 +1,5 @@
 .effects .item {
+
   .effect-source,
   .effect-duration,
   .effect-controls {
@@ -10,5 +11,11 @@
 
   .effect-controls {
     border: none;
+  }
+}
+
+.effect-change {
+  tag.tagify__tag+span.tagify__input {
+    display: none
   }
 }

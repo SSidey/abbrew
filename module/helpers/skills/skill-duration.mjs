@@ -2,7 +2,7 @@
 
 export async function trackSkillDuration(actor, skill) {
     const duration = getSkillDuration(skill);
-    if (duration && !(skill.system.action.activationType === "standalone" && skill.system.action.duration.precision === "0")) {
+    if (duration && (!(skill.system.action.activationType === "standalone" && skill.system.action.duration.precision === "0") || (skill.system.skillType === "temporary"))) {
         await createDurationActiveEffect(actor, skill, duration);
         return true;
     }

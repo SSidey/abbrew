@@ -1,6 +1,7 @@
 // Import sheet classes.
 import { AbbrewActorSheet } from './sheets/actor-sheet.mjs';
 import { AbbrewItemSheet } from './sheets/item-sheet.mjs';
+import { AbbrewActiveEffectSheet } from './sheets/active-effect-sheet.mjs'
 // Import helper/utility classes and constants.
 import { preloadHandlebarsTemplates } from './helpers/templates.mjs';
 import { ABBREW } from './helpers/config.mjs';
@@ -87,6 +88,17 @@ Hooks.once('init', function () {
   // but will still apply to the Actor from within the Item
   // if the transfer property on the Active Effect is true.
   CONFIG.ActiveEffect.legacyTransferral = false;
+  CONFIG.ActiveEffect.documentClass = documents.AbbrewActiveEffect;
+  CONFIG.ActiveEffect.dataModels = {
+    base: models.AbbrewActiveEffect
+  }
+  DocumentSheetConfig.registerSheet(documents.AbbrewActiveEffect, "abbrew", AbbrewActiveEffectSheet,
+    {
+      types: ["base", "passive", "temporary", "inactive"],
+      makeDefault: true,
+      label: "ABBREW.SheetLabels.ActiveEffect",
+    }
+  );
 
   // Register sheet application classes
   Actors.unregisterSheet('core', ActorSheet);

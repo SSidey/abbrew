@@ -230,7 +230,7 @@ export default class AbbrewItem extends Item {
 
     if (data.type === "skill") {
       await this.actor?.acceptSkillDeck(data);
-      if (this.actor && !this.system.isActivatable && this.system.action.duration.value > 0) {
+      if (this.actor && ((!this.system.isActivatable && this.system.action.duration.value > 0) || (this.system.skillType === "temporary"))) {
         await trackSkillDuration(this.actor, this);
       }
       if (this.actor && this.system.isActivatable && this.system.activateOnCreate) {
@@ -252,11 +252,14 @@ export default class AbbrewItem extends Item {
 
   async _preDelete(options, userId) {
     if (this.actor) {
-      const archetypes = this.actor.items.filter(i => i.type === "archetype").filter(a => a.system.skillIds.includes(this.system.abbrewId.uuid));
-      archetypes.forEach(async a => {
-        const update = a.system.skillIds.filter(s => s !== this.system.abbrewId.uuid);
-        await a.update({ "system.skillIds": update });
-      });
+      // If we have one left then clear it out of archetype lists.
+      if (this.actor.items.filter(i => i.type === "skill").filter(s => s.system.abbrewId.uuid === this.system.abbrewId.uuid).length === 1) {
+        const archetypes = this.actor.items.filter(i => i.type === "archetype").filter(a => a.system.skillIds.includes(this.system.abbrewId.uuid));
+        archetypes.forEach(async a => {
+          const update = a.system.skillIds.filter(s => s !== this.system.abbrewId.uuid);
+          await a.update({ "system.skillIds": update });
+        });
+      }
     }
   }
 

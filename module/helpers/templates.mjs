@@ -34,5 +34,7 @@ export const preloadHandlebarsTemplates = async function () {
     'systems/abbrew/templates/chat/lost-resolve-card.hbs',
     'systems/abbrew/templates/chat/attack-result-card.hbs',
     'systems/abbrew/templates/chat/notification-card.hbs',
+    // Effect Template
+    'systems/abbrew/templates/effect/active-effect.hbs'
   ]);
 };

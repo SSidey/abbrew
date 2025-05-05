@@ -84,7 +84,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         label: new fields.StringField({ required: true, blank: true }),
 
       }),
-      protection: new fields.SchemaField(Object.keys(CONFIG.ABBREW.damageTypes).reduce((obj, damageType) => {
+      protection: new fields.SchemaField([...Object.keys(CONFIG.ABBREW.allDamage), ...Object.keys(CONFIG.ABBREW.damageTypes)].reduce((obj, damageType) => {
         obj[damageType] = new fields.SchemaField({
           label: new fields.StringField({ required: true, blank: true }),
           type: new fields.StringField({ required: true, blank: true }),
@@ -248,8 +248,9 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       this.attributes[key].tier = 1 + Math.floor(this.attributes[key].rank / 10);
     }
 
+    const allDamageTypes = { ...CONFIG.ABBREW.allDamage, ...CONFIG.ABBREW.damageTypes }
     for (const key in this.defense.protection) {
-      this.defense.protection[key].label = game.i18n.localize(CONFIG.ABBREW.damageTypes[key].label) ?? key;
+      this.defense.protection[key].label = game.i18n.localize(allDamageTypes[key].label) ?? key;
       this.defense.protection[key].type = key;
     }
 

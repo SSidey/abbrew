@@ -20,7 +20,7 @@ export function parseModifierFieldValue(modifierFieldValue, actor, source) {
         if (v.type === "numeric") {
             parsedValue = parseInt(v.path) ?? 0;
         } else {
-            parsedValue = parsePath(fullPath, actor, source) ?? 0;
+            parsedValue = parsePathSync(fullPath, actor, source) ?? 0;
         }
 
         if (!isNaN(parsedValue)) {
@@ -135,8 +135,12 @@ export function reduceParsedModifiers(parsedValues, startingValue = 0) {
     item.<pathToValue e.g. system.isActivatable>
     resource.<resourceId e.g. this is the abbrewId.uuid>
     damage.<"lastDealt"/"lastReceived"/"roundReceived", damageType e.g. all damage "all" / specific "slashing">
+    wound.<"sin"/"corruption">
+    conditionType.<positive/negative>
+    condition.<"offguard">
+    skillCount.<AbbrewId.uuid>
  */
-export function parsePath(rawValue, actor, source) {
+export async function parsePath(rawValue, actor, source) {
     if (typeof rawValue != "string") {
         return rawValue;
     }
@@ -152,8 +156,50 @@ export function parsePath(rawValue, actor, source) {
     const entityType = rawValue.split('.').slice(0, 1).shift();
 
     switch (entityType) {
+        case 'dialog':
+            // Doesn't work, cba asyncing all the way up
+            const dialogValue = await getDialogValue(actor, rawValue.split('.').slice(1).shift());
+            return dialogValue;
+        default:
+            return parsePathSync(rawValue, actor, source);
+    }
+}
+
+/* 
+    Expects either a number value which will be returned early, or:
+    actor.<pathToValue e.g. system.defense.guard.value>
+    item.<pathToValue e.g. system.isActivatable>
+    resource.<resourceId e.g. this is the abbrewId.uuid>
+    damage.<"lastDealt"/"lastReceived"/"roundReceived", damageType e.g. all damage "all" / specific "slashing">
+    wound.<"sin"/"corruption">
+    conditionType.<positive/negative>
+    condition.<"offguard">
+    skillCount.<AbbrewId.uuid>
+ */
+export function parsePathSync(rawValue, actor, source) {
+    if (typeof rawValue != "string") {
+        return rawValue;
+    }
+
+    if (!isNaN(rawValue)) {
+        return parseFloat(rawValue);
+    }
+
+    if (rawValue === "") {
+        return 0;
+    }
+
+    const entityType = rawValue.split('.').slice(0, 1).shift();
+
+    switch (entityType) {
+        case 'numeric':
+            return parseFloat(rawValue.split('.').slice(1).shift()) ?? 0;
+        case 'skillCount':
+            return getSkillCount(actor, rawValue.split('.').slice(1).shift());
         case 'condition':
             return getConditionValue(actor, rawValue.split('.').slice(1).shift());
+        case 'statustype':
+            return getStatusTypeValue(actor, rawValue.split('.').slice(1).shift());
         case 'wound':
             return getWoundValue(actor, rawValue.split('.').slice(1).shift());
         case 'resource':
@@ -196,12 +242,22 @@ function getWoundValue(actor, woundType) {
     return actor.system.wounds.find(w => w.type === woundType)?.value ?? 0;
 }
 
+function getSkillCount(actor, id) {
+    return actor.items.filter(i => i.type === "skill").filter(s => s.system.abbrewId.uuid === id).length;
+}
+
 function getConditionValue(actor, conditionName) {
     const name = conditionName.toLowerCase();
     const id = CONFIG.ABBREW.conditions[name].id;
     const skill = actor.items.filter(i => i.type === "skill").find(s => s.system.abbrewId.uuid === id);
     const stacks = skill ? skill.system.action.uses.value : 0;
     return stacks;
+}
+
+function getStatusTypeValue(actor, conditionType) {
+    const type = conditionType.toLowerCase();
+    const value = actor.statuses.toObject().map(s => CONFIG.ABBREW.statusEffects[s].polarity).filter(p => p === type).length;
+    return value;
 }
 
 function getLastDamageValue(actor, instance, damageType) {
@@ -222,6 +278,25 @@ function getLastDamageValue(actor, instance, damageType) {
     }
 
     return 0;
+}
+
+async function getDialogValue(actor, title) {
+    let result = 0;
+    try {
+        result = await foundry.applications.api.DialogV2.prompt({
+            window: { title: title },
+            content: '<input name="fieldValue" type="number" min="0" step="1" autofocus>',
+            ok: {
+                label: "Submit",
+                callback: (event, button, dialog) => button.form.elements.fieldValue.valueAsNumber
+            }
+        });
+    } catch {
+        console.log(`${actor.name} did not enter a value.`);
+        return;
+    }
+
+    return result;
 }
 
 export function mergeLateComplexModifiers(modifiers, actor, path, key) {

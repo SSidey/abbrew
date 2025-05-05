@@ -101,6 +101,7 @@ function doesActorMeetSkillRequirements(actor, skill) {
 }
 
 async function activateSkill(actor, skill) {
+    await activateSkillEffects(skill);
     if (skill.system.action.activationType === "synergy") {
         await trackSkillDuration(actor, skill);
         await addSkillToQueuedSkills(actor, skill);
@@ -135,6 +136,15 @@ async function activateSkill(actor, skill) {
     const skillResult = await applySkillEffects(actor, skill);
     await handleGrantOnUse(skill, actor);
     return skillResult;
+}
+
+async function activateSkillEffects(skill) {
+    const effects = skill.effects;
+    if (effects) {
+        const promises = [];
+        effects.forEach(e => promises.push(e.update({ "disabled": false })));
+        await Promise.all(promises);
+    }
 }
 
 async function handleGrantOnUse(skill, actor) {

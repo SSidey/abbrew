@@ -1,4 +1,4 @@
-import { parsePath } from "../modifierBuilderFieldHelpers.mjs";
+import { parsePathSync } from "../modifierBuilderFieldHelpers.mjs";
 import { getResultDice, getRollFormula, getTotalSuccessesForResult } from "./skill-roll.mjs";
 
 export async function applyAttackProfiles(actor, skill, modifierSkills, fortune, templateData, data) {
@@ -12,24 +12,29 @@ export async function applyAttackProfiles(actor, skill, modifierSkills, fortune,
         const attackMode = attackProfile.attackMode;
         const attributeMultiplier = getAttributeModifier(attackMode, attackProfile);
         const damage = Object.entries(attackProfile.damage.map(d => {
+            if (d.type === "") {
+                return null;
+            }
+
             let attributeModifier = 0;
             if (d.attributeModifier) {
                 attributeModifier = Math.floor(attributeMultiplier * actor.system.attributes[d.attributeModifier].value);
             }
 
-            const finalDamage = Math.floor(d.overallMultiplier * (attributeModifier + (d.damageMultiplier * parsePath(d.value, actor, actor))));
+            const finalDamage = Math.floor(d.overallMultiplier * (attributeModifier + (d.damageMultiplier * parsePathSync(d.value, actor, actor))));
 
             return { damageType: d.type, value: finalDamage, penetration: d.penetration };
-        }).reduce((result, damage) => {
-            if (damage.damageType in result) {
-                result[damage.damageType].value += damage.value;
-                result[damage.damageType].penetration = Math.min(damage.penetration, result[damage.penetration]) ?? 0;
-            } else {
-                result[damage.damageType] = ({ value: damage.value, penetration: damage.penetration });
-            }
+        }).filter(d => d)
+            .reduce((result, damage) => {
+                if (damage.damageType in result) {
+                    result[damage.damageType].value += damage.value;
+                    result[damage.damageType].penetration = Math.min(damage.penetration, result[damage.penetration]) ?? 0;
+                } else {
+                    result[damage.damageType] = ({ value: damage.value, penetration: damage.penetration });
+                }
 
-            return result;
-        }, {})).map(e => ({ damageType: e[0], value: e[1].value, penetration: e[1].penetration }));
+                return result;
+            }, {})).map(e => ({ damageType: e[0], value: e[1].value, penetration: e[1].penetration }));
 
         await actor.setFlag("abbrew", "combat.damage.lastDealt", damage);
 
@@ -39,7 +44,7 @@ export async function applyAttackProfiles(actor, skill, modifierSkills, fortune,
 
 
         const finisher = attackMode === "finisher" ? mergeFinishers(baseAttackProfile, modifierSkills, actor) : null;
-        const finisherDamageTypes = finisher ? Object.values(finisher).map(f => f.type) : attackProfile.damage.map(d => d.type).reduce((result, damageType) => { if (!result.includes(damageType)) { result.push(damageType) }; return result; }, []);
+        const finisherDamageTypes = finisher ? Object.values(finisher).map(f => f.type) : attackProfile.damage.map(d => d.type).filter(d => d).reduce((result, damageType) => { if (!result.includes(damageType)) { result.push(damageType) }; return result; }, []);
 
         const showAttack = ['attack', 'feint', 'finisher'].includes(attackMode);
         const isFeint = attackMode === 'feint';
@@ -86,6 +91,10 @@ function mergeAttackProfiles(attackProfile, allSkills) {
 
 function mergeAttackProfile(base, attackProfile) {
     let baseAttackProfile = base;
+    if (!attackProfile.isEnabled) {
+        return baseAttackProfile;
+    }
+
     if (attackProfile.attackType) {
         baseAttackProfile.attackProfile = attackProfile.attackType;
     }
@@ -248,9 +257,9 @@ function mergeWoundsForTarget(woundArrays, actor) {
     return Object.entries(woundArrays.reduce((result, woundArray) => {
         woundArray.filter(w => !["suppress", "intensify"].includes(w.operator)).forEach(w => {
             if (w.type in result) {
-                result[w.type] = applyOperator(result[w.type], parsePath(w.value, actor, actor), w.operator);
+                result[w.type] = applyOperator(result[w.type], parsePathSync(w.value, actor, actor), w.operator);
             } else {
-                result[w.type] = applyOperator(0, parsePath(w.value, actor, actor), w.operator);
+                result[w.type] = applyOperator(0, parsePathSync(w.value, actor, actor), w.operator);
             }
         });
 

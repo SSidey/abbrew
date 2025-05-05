@@ -17,7 +17,7 @@ export async function handleCombatEnd(actors) {
         const combatDurationSkills = actorSkills.filter(s => s.system.action.isActive && s.system.action.duration.precision === "-2").map(s => s._id);
         const effects = a.effects.filter(e => combatDurationSkills.includes(e.flags.abbrew.skill.trackDuration));
         effects.forEach(async e => await e.delete());
-        const combatFrequencySkills = actorSkills.filter(s => (s.system.action.uses.hasUses) && (s.system.action.uses.period === "combat"));
+        const combatFrequencySkills = actorSkills.filter(s => (s.system.action.uses.hasUses) && ["combat", "turn", "round"].includes(s.system.action.uses.period));
         combatFrequencySkills.forEach(async s => {
             const update = s.system.action.uses.max;
             await s.update({ "system.action.uses.value": update });

@@ -3,6 +3,9 @@ import AbbrewItemBase from "./item-base.mjs";
 
 export default class AbbrewSkill extends AbbrewItemBase {
 
+    // TODO: Add Rank for path skills
+    // TODO: Need to enrich skil check results i.e. number of success / fail
+    // TODO: Skill improvement item (just a skill that merges in? Would need more than skill schema e.g. increasing duration)
     static defineSchema() {
         const fields = foundry.data.fields;
         const schema = super.defineSchema();
@@ -157,6 +160,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
                     operator: new fields.StringField({ ...blankString }),
                 }),
                 attackProfile: new fields.SchemaField({
+                    isEnabled: new fields.BooleanField({ required: true, initial: false, nullable: true }),
                     combineAttacks: new fields.SchemaField({
                         isEnabled: new fields.BooleanField({ required: true }),
                         value: new fields.NumberField({ ...requiredInteger, min: 2, nullable: true }),

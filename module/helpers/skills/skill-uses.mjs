@@ -17,7 +17,7 @@ export async function handleSkillUsesAndCharges(actor, skill, modifierSkills) {
         if (currentCharges > 0) {
             continue;
         }
-        
+
         const item = actor.items.find(i => i._id === skill._id);
         if (item.system.action.uses.asStacks && !item.system.action.uses.removeStackOnUse) {
             continue;
@@ -58,10 +58,18 @@ export async function cleanTemporarySkill(skill, actor) {
     }
 }
 
+export function skillHasInfiniteUses(skill) {
+    return !skill.system.action.uses.hasUses;
+}
+
+export function skillDoesNotUseCharges(skill) {
+    return !skill.system.action.charges.hasCharges;
+}
+
 export function skillHasUsesRemaining(skill) {
-    return !skill.system.action.uses.hasUses || (skill.system.action.uses.hasUses && skill.system.action.uses.value > 0);
+    return skill.system.action.uses.hasUses && skill.system.action.uses.value > 0;
 }
 
 export function skillHasChargesRemaining(skill) {
-    return !skill.system.action.charges.hasCharges || (skill.system.action.charges.hasCharges && skill.system.action.charges.value > 0);
+    return skill.system.action.charges.hasCharges && skill.system.action.charges.value > 0;
 }

@@ -1,6 +1,5 @@
 import { getFundamentalAttributeSkill } from "../fundamental-skills.mjs";
-import { parseModifierFieldValue } from "../modifierBuilderFieldHelpers.mjs";
-import { applyOperator } from "../operators.mjs";
+import { parseModifierFieldValue, reduceParsedModifiers } from "../modifierBuilderFieldHelpers.mjs";
 import { getObjectValueByStringPath, getSafeJson } from "../utils.mjs";
 import { handleSkillActivate } from "./skill-activation.mjs";
 import { getDiceCount, getResultDice, getRollFormula } from "./skill-roll.mjs";
@@ -16,7 +15,7 @@ export async function makeSkillCheck(actor, skill, allSkills, fortune, templateD
         const combinedSkillModifier = allSkills
             .flatMap(s => parseModifierFieldValue(s.system.action.skillCheck, actor, s))
             .reduce((result, check) => {
-                result = applyOperator(result, check.value[0].path, check.value[0].operator);
+                result = reduceParsedModifiers(check.value, result);
                 return result;
             }, 0);
 
@@ -32,7 +31,7 @@ export async function makeSkillCheck(actor, skill, allSkills, fortune, templateD
         skillResult.modifier = combinedSkillModifier;
         const baseDicePool = getDiceCount(tier, fortune);
         skillResult.baseDicePool = baseDicePool;
-        skillResult.simpleResult = baseDicePool === 0 ? combinedSkillModifier : Math.max(resultDice.slice(0, baseDicePool).map(d => d.result + combinedSkillModifier));
+        skillResult.simpleResult = baseDicePool === 0 ? combinedSkillModifier : Math.max(...skillResult.dice.map(d => d.result).map(r => r + combinedSkillModifier));
         data.skillCheckResult = skillResult;
         templateData = {
             ...templateData,

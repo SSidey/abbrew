@@ -21,6 +21,19 @@
       "gargantuan": "Gargantuan",
       "colossal": "Colossal"
     },
+    "ActiveEffectKeys": {
+      "guardMax": "Guard Max",
+      "allReduction": "All Reduction",
+      "allWeakness": "All Weakness",
+      "crushingReduction": "Crushing Reduction",
+      "crushingWeakness": "Crushing Weakness",
+      "piercingReduction": "Piercing Reduction",
+      "piercingWeakness": "Piercing Weakness",
+      "slashingReduction": "Slashing Reduction",
+      "slashingWeakness": "Slashing Weakness",
+      "initiativeBonus": "Initiative Bonus",
+      "baseSpeed": "Base Speed"
+    },
     "Roles": {
       "Name": {
         "melee": "Melee",
@@ -71,6 +84,7 @@
         "fenceroflostbriarith": "Fencer Of Lost Briarith",
         "divineadherent": "Divine Adherent",
         "poisoner": "Poisoner",
+        "shieldguardian": "Shield Guardian",
         "snake": "Snake"
       },
       "Description": {
@@ -78,6 +92,7 @@
         "fenceroflostbriarith": "A fighting style that relies on specialised weapon techniques and swapping between stances.",
         "divineadherent": "You worship a deity and derive your powers from prayer and devotion to that deity.",
         "poisoner": "Adept at the production and the usage of poisons.",
+        "shieldguardian": "A selfless fighting style, one where you put yourself in harm's way to shield your allies and prevent your enemies from reaching them.",
         "snake": "A style employing the use of two short weapons and relies on rapid speed and dodges."
       }
     },
@@ -89,7 +104,8 @@
       "Anatomy": "Anatomy",
       "Skill": "Skill",
       "Archetype": "Archetype",
-      "Path": "Path"
+      "Path": "Path",
+      "ActiveEffect": "Active Effect"
     },
     "CheckTypes": {
       "successes": "Successes",
@@ -116,6 +132,7 @@
       "guard": "Guard"
     },
     "DamageTypes": {
+      "all": "All",
       "untyped": "Untyped",
       "physical": "Physical",
       "crushing": "Crushing",
@@ -249,6 +266,7 @@
         "defeated": "Defeated",
         "disoriented": "Disoriented",
         "guardBreak": "Guard Break",
+        "hidden": "Hidden",
         "offGuard": "Off Guard"
       },
       "Condition": {
@@ -268,6 +286,10 @@
           "name": "Guard Break",
           "description": "Your guard is broken, your foes can directly capitalise on your weakpoints. You can be targeted by finishers."
         },
+        "Hidden": {
+          "name": "Hidden",
+          "description": "Your are hidden from your foes, if you were previously detected (or your presence becomes known) they can attempt to locate you with a Scan Check."
+        },
         "OffGuard": {
           "name": "Off Guard",
           "description": "Your are harried and your guard compromised, your foes can directly capitalise on your weakpoints. You can be targeted by finishers."
@@ -286,6 +308,12 @@
       "twoHand": "Two Handed"
     },
     "Traits": {
+      "General": {
+        "detection": "Detection",
+        "disease": "Disease",
+        "poison": "Poison",
+        "stance": "Stance"
+      },
       "WoundImmunities": {
         "physicalImmunity": "Physical Immunity",
         "vitalImmunity": "Vital Immunity",
@@ -339,10 +367,13 @@
       "this": "This",
       "wound": "Wound",
       "condition": "Condition",
+      "statusType": "Status Type",
       "resource": "Resource",
       "damageLastDealt": "Last Damage Dealt",
       "damageLastReceived": "Last Damage Taken",
-      "damageRoundReceived": "Round Damage Taken"
+      "damageRoundReceived": "Round Damage Taken",
+      "skillCount": "Skill Count",
+      "dialog": "Dialog"
     }
   },
   "Speeds": {

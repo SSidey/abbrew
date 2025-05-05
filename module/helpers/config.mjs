@@ -265,7 +265,7 @@ ABBREW.wounds = {
     lingeringWounds: ["necrotic"],
     concepts: ["death"]
   },
-  decay: {
+  necrotic: {
     name: "ABBREW.Wounds.necrotic",
     lingeringWounds: [],
     concepts: ["death"]
@@ -304,6 +304,13 @@ ABBREW.conditions = {
     description: "ABBREW.EFFECT.Condition.GuardBreak.description",
     statuses: ['offGuard']
   },
+  hidden: {
+    id: "abbrewCHidden000",
+    name: "ABBREW.EFFECT.Condition.Hidden.name",
+    img: "systems/abbrew/assets/icons/statuses/hidden.svg",
+    description: "ABBREW.EFFECT.Condition.Hidden.description",
+    statuses: ['offGuard']
+  },
   offGuard: {
     id: "abbrewCOffGuard0",
     name: "ABBREW.EFFECT.Condition.OffGuard.name",
@@ -318,6 +325,7 @@ ABBREW.statusEffects = {
     name: "ABBREW.EFFECT.Status.dead",
     img: "systems/abbrew/assets/icons/statuses/dead.svg",
     description: "You have suffered fatal wounds, resulting in death.",
+    polarity: "negative",
     order: 2,
     statuses: ['defeated']
   },
@@ -325,23 +333,33 @@ ABBREW.statusEffects = {
     name: "ABBREW.EFFECT.Status.defeated",
     img: "systems/abbrew/assets/icons/statuses/defeated.svg",
     description: "You resolve buckles as you are unable to continue the fight.",
+    polarity: "negative",
     special: "DEFEATED",
     order: 1
   },
   disoriented: {
     name: "ABBREW.EFFECT.Status.disoriented",
     img: "systems/abbrew/assets/icons/statuses/disoriented.svg",
-    description: "You have been disoriented, you cannot restore guard nor parry while you have this condition."
+    description: "You have been disoriented, you cannot restore guard nor parry while you have this condition.",
+    polarity: "negative"
   },
   guardBreak: {
     name: "ABBREW.EFFECT.Status.guardBreak",
     img: "systems/abbrew/assets/icons/statuses/guardBreak.svg",
-    description: "Your guard is broken, your foes can directly capitalise on your weakpoints. You can be targeted by finishers."
+    description: "Your guard is broken, your foes can directly capitalise on your weakpoints. You can be targeted by finishers.",
+    polarity: "negative"
+  },
+  hidden: {
+    name: "ABBREW.EFFECT.Status.hidden",
+    img: "systems/abbrew/assets/icons/statuses/hidden.svg",
+    description: "You are hidden from your foes and can not be targeted directly, treat any creature hidden from you as Off Guard; if you were previously detected (or your presence becomes known) they can attempt to locate you with a Scan Check.",
+    polarity: "positive"
   },
   offGuard: {
     name: "ABBREW.EFFECT.Status.offGuard",
     img: "systems/abbrew/assets/icons/statuses/offGuard.svg",
-    description: "Your are harried and your guard compromised, your foes can directly capitalise on your weakpoints. You can be targeted by finishers."
+    description: "Your are harried and your guard compromised, your foes can directly capitalise on your weakpoints. You can be targeted by finishers.",
+    polarity: "negative"
   }
 }
 
@@ -408,8 +426,15 @@ const skillTraining = [
   { key: "parryCounterTraining", value: "ABBREW.Traits.SkillTraining.parryCounter", feature: "skillTraining", subFeature: "defensiveSkills", effect: "increase", data: "parryCounter" }
 ]
 
+const generalTraits = [
+  { key: "detection", value: "ABBREW.Traits.General.detection", feature: "detection", subFeature: "", effect: "", data: "" },
+  { key: "disease", value: "ABBREW.Traits.General.disease", feature: "type", subFeature: "", effect: "", data: "" },
+  { key: "poison", value: "ABBREW.Traits.General.poison", feature: "type", subFeature: "", effect: "", data: "" },
+  { key: "stance", value: "ABBREW.Traits.General.stance", feature: "combat", subFeature: "", effect: "", data: "" }
+]
+
 ABBREW.traits = [
-  { key: "stance", value: "ABBREW.Traits.stance", feature: "combat", subFeature: "", effect: "", data: "" },
+  ...generalTraits,
   ...acuteWoundImmunities,
   ...lingeringWoundImmunities,
   ...skillTraining,
@@ -454,7 +479,7 @@ ABBREW.fundamentalAttributeSkillMap = {
   "agi": { id: "abbrewAgiCheck00", name: "Agility Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "agi" },
   "con": { id: "abbrewConCheck00", name: "Constitution Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "con" },
   "int": { id: "abbrewIntCheck00", name: "Intelligence Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "int" },
-  "wit": { id: "abbrewWitCheck00", name: "Wisdom Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "wit" },
+  "wit": { id: "abbrewWitCheck00", name: "Wits Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "wit" },
   "vis": { id: "abbrewVisCheck00", name: "Visualisation Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "vis" },
   "wil": { id: "abbrewWilCheck00", name: "Will Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "wil" },
 }
@@ -465,7 +490,7 @@ ABBREW.fundamentalAttributeSkills = {
   "abbrewAgiCheck00": { id: "abbrewAgiCheck00", name: "Agility Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "agi" },
   "abbrewConCheck00": { id: "abbrewConCheck00", name: "Constitution Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "con" },
   "abbrewIntCheck00": { id: "abbrewIntCheck00", name: "Intelligence Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "int" },
-  "abbrewWitCheck00": { id: "abbrewWitCheck00", name: "Wisdom Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "wit" },
+  "abbrewWitCheck00": { id: "abbrewWitCheck00", name: "Wits Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "wit" },
   "abbrewVisCheck00": { id: "abbrewVisCheck00", name: "Visualisation Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "vis" },
   "abbrewWilCheck00": { id: "abbrewWilCheck00", name: "Will Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "wil" },
 }
@@ -476,7 +501,7 @@ ABBREW.fundamentalAttributeSkillSummaries = [
   { id: "abbrewAgiCheck00", value: "Agility Check", sourceId: "Compendium.abbrew.skills.Item.abbrewAgiCheck00" },
   { id: "abbrewConCheck00", value: "Constitution Check", sourceId: "Compendium.abbrew.skills.Item.abbrewConCheck00" },
   { id: "abbrewIntCheck00", value: "Intelligence Check", sourceId: "Compendium.abbrew.skills.Item.abbrewIntCheck00" },
-  { id: "abbrewWitCheck00", value: "Wisdom Check", sourceId: "Compendium.abbrew.skills.Item.abbrewWitCheck00" },
+  { id: "abbrewWitCheck00", value: "Wits Check", sourceId: "Compendium.abbrew.skills.Item.abbrewWitCheck00" },
   { id: "abbrewVisCheck00", value: "Visualisation Check", sourceId: "Compendium.abbrew.skills.Item.abbrewVisCheck00" },
   { id: "abbrewWilCheck00", value: "Will Check", sourceId: "Compendium.abbrew.skills.Item.abbrewWilCheck00" }
 ]
@@ -501,16 +526,21 @@ ABBREW.modifierPrefixes = {
   "this": "ABBREW.ModifierPrefixes.this",
   "wound": "ABBREW.ModifierPrefixes.wound",
   "condition": "ABBREW.ModifierPrefixes.condition",
+  "statustype": "ABBREW.ModifierPrefixes.statusType",
   "resource": "ABBREW.ModifierPrefixes.resource",
   "damagelastDealt": "ABBREW.ModifierPrefixes.damageLastDealt",
   "damagelastReceived": "ABBREW.ModifierPrefixes.damageLastReceived",
   "damageroundReceived": "ABBREW.ModifierPrefixes.damageRoundReceived",
+  "skillCount": "ABBREW.ModifierPrefixes.skillCount",
+  "dialog": "ABBREW.ModifierPrefixes.dialog"
 }
 
 ABBREW.checkTypes = {
   "successes": "ABBREW.CheckTypes.successes",
   "result": "ABBREW.CheckTypes.result"
 }
+
+ABBREW.allDamage = { all: { label: "ABBREW.DamageTypes.all" } };
 
 ABBREW.damageTypes = {
   untyped: { label: "ABBREW.DamageTypes.untyped" },
@@ -559,5 +589,20 @@ ABBREW.paths = [
   { label: "ABBREW.Paths.Name.fenceroflostbriarith", id: "abbrewpfelopb000", value: "fenceroflostbriarith", roles: ["melee", "martial", "vanguard"], description: "ABBREW.Paths.Description.fenceroflostbriarith" },
   { label: "ABBREW.Paths.Name.divineadherent", id: "abbrewpdivadh000", value: "divineadherent", roles: ["acolyte", "magic", "melee", "ranged"], description: "ABBREW.Paths.Description.divineadherent" },
   { label: "ABBREW.Paths.Name.poisoner", id: "abbrewppoisoner0", value: "poisoner", roles: ["professional", "scoundrel"], description: "ABBREW.Paths.Description.poisoner" },
+  { label: "ABBREW.Paths.Name.shieldguardian", id: "abbrewpshieldgua", value: "shieldguardian", roles: ["martial", "melee", "protector", "durable"], description: "ABBREW.Paths.Description.shieldguardian" },
   { label: "ABBREW.Paths.Name.snake", id: "abbrewpsnake0000", value: "snake", roles: ["martial", "melee", "ranges", "scoundrel"], description: "ABBREW.Paths.Description.snake" },
+]
+
+ABBREW.activeEffectKeys = [
+  { value: "system.defense.guard.max", label: "ABBREW.ActiveEffectKeys.guardMax" },
+  { value: "system.defense.protection.all.reduction", label: "ABBREW.ActiveEffectKeys.allReduction" },
+  { value: "system.defense.protection.all.weakness", label: "ABBREW.ActiveEffectKeys.allWeakness" },
+  { value: "system.defense.protection.crushing.reduction", label: "ABBREW.ActiveEffectKeys.crushingReduction" },
+  { value: "system.defense.protection.crushing.weakness", label: "ABBREW.ActiveEffectKeys.crushingWeakness" },
+  { value: "system.defense.protection.piercing.reduction", label: "ABBREW.ActiveEffectKeys.piercingReduction" },
+  { value: "system.defense.protection.piercing.weakness", label: "ABBREW.ActiveEffectKeys.piercingWeakness" },
+  { value: "system.defense.protection.slashing.reduction", label: "ABBREW.ActiveEffectKeys.slashingReduction" },
+  { value: "system.defense.protection.slashing.weakness", label: "ABBREW.ActiveEffectKeys.slashingWeakness" },
+  { value: "system.modifiers.initiative", label: "ABBREW.ActiveEffectKeys.initiativeBonus" },
+  { value: "system.movement.baseSpeed", label: "ABBREW.ActiveEffectKeys.baseSpeed" }
 ]
