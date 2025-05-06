@@ -1,0 +1,21 @@
+{
+  "name": "Snake",
+  "sorting": "a",
+  "folder": null,
+  "type": "Item",
+  "_id": "DDDWQfVbOIQoy9IS",
+  "description": "",
+  "sort": 0,
+  "color": null,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746270052709,
+    "modifiedTime": 1746270052709,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!DDDWQfVbOIQoy9IS"
+}

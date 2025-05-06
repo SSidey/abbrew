@@ -22,7 +22,9 @@
             {{#each system.wounds as |wound|}}
             <li class="wound" data-wound-type="{{wound.type}}" data-wound-value="{{wound.value}}">
               <div class="wound-value">{{wound.value}}</div>
-              <img src="systems/abbrew/assets/icons/wounds/{{wound.type}}.webp" alt="{{wound.type}} {{wound.value}}">
+              <img class="wound-image" src="systems/abbrew/assets/icons/wounds/{{wound.type}}.webp"
+                alt="{{wound.type}} {{wound.value}}">
+              <span class="wound-tooltip">{{wound.type}}</span>
             </li>
             {{/each}}
           </ol>

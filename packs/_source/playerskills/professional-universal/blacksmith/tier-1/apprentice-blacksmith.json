@@ -3,9 +3,9 @@
   "name": "Apprentice Blacksmith",
   "type": "skill",
   "_id": "FDLGQCRh3mNjGd6a",
-  "img": "systems/abbrew/assets/icons/skills/todo.svg",
+  "img": "systems/abbrew/assets/icons/general/anvil.svg",
   "system": {
-    "description": "<p>You can make Blacksmith checks when required, you can </p>",
+    "description": "<p>You can make Blacksmith checks when required, you can now select skills from the Blacksmith path.</p>",
     "traits": "",
     "abbrewId": {
       "value": "abbrew.skill.apprenticeblacksmith.FDLGQCRh3mNjGd6a",
@@ -24,7 +24,15 @@
     "applyOnExpiry": false,
     "activateOnDamageAccept": false,
     "skills": {
-      "granted": [],
+      "granted": [
+        {
+          "name": "Blacksmith (Check)",
+          "id": "6GQuhRfuOZjc5kaG",
+          "image": "systems/abbrew/assets/icons/general/anvil.svg",
+          "sourceId": "Compendium.abbrew.playerskills.Item.6GQuhRfuOZjc5kaG",
+          "skillType": ""
+        }
+      ],
       "paired": [],
       "grantedOnActivation": [],
       "grantedOnAccept": []
@@ -36,12 +44,12 @@
       "fillCapacityOnCreate": false
     },
     "action": {
-      "activationType": "",
-      "actionCost": "",
+      "activationType": "standalone",
+      "actionCost": null,
       "actionImage": "",
       "duration": {
         "isConcentration": false,
-        "precision": "",
+        "precision": "0",
         "value": 0,
         "expireOnStartOfTurn": true
       },
@@ -83,12 +91,12 @@
         }
       },
       "attackProfile": {
-        "isEnabled": true,
+        "isEnabled": false,
         "name": "",
         "attackType": "",
         "lethal": 0,
         "critical": 10,
-        "handsSupplied": null,
+        "handsSupplied": 0,
         "attackMode": "",
         "finisher": {
           "type": "",
@@ -182,15 +190,15 @@
         }
       }
     },
-    "skillType": "",
+    "skillType": "path",
     "path": {
-      "raw": "",
+      "raw": "[{\"label\":\"universal\",\"value\":\"Universal\",\"roles\":[],\"title\":\"A universal path, skills with this path can be selected if it has roles matching thosee of your paths\",\"id\":\"abbrewpuniversal\"}]",
       "value": {
         "id": ""
       }
     },
     "roles": {
-      "raw": "",
+      "raw": "[{\"label\":\"professional\",\"value\":\"Professional\",\"title\":\"You are skilled in a profession.\"}]",
       "parsed": []
     },
     "archetype": "",
@@ -212,7 +220,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746226420400,
-    "modifiedTime": 1746226671169,
+    "modifiedTime": 1746271612994,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!FDLGQCRh3mNjGd6a"

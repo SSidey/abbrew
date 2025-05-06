@@ -1,0 +1,32 @@
+{
+  "name": "Shield Guardian",
+  "type": "path",
+  "_id": "NdNl96xj8we3bPWG",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "roles": ""
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746382248779,
+    "modifiedTime": 1746382248779,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!NdNl96xj8we3bPWG"
+}

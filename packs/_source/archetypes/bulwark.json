@@ -4,7 +4,7 @@
   "_id": "TVO0gpc8AY5WBpY8",
   "img": "icons/svg/item-bag.svg",
   "system": {
-    "description": "",
+    "description": "<p><span style=\"font-family: Arial,sans-serif\">A selfless fighting style, one where you put yourself in harm's way to shield your allies and prevent your enemies from reaching them.</span></p>",
     "traits": "",
     "abbrewId": {
       "value": "",
@@ -13,7 +13,7 @@
     "roleRequirements": {
       "1": {
         "isActive": true,
-        "roles": "[{\"label\":\"melee\",\"value\":\"Melee\",\"title\":\"You fight primarily in melee with your opponents.\"},{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"},{\"label\":\"protector\",\"value\":\"Protector\",\"title\":\"Your main role in combat is in reducing the damage dealt to your allies.\"}]",
+        "roles": "[{\"label\":\"melee\",\"value\":\"Melee\",\"title\":\"You fight primarily in melee with your opponents.\"},{\"label\":\"protector\",\"value\":\"Protector\",\"title\":\"Your main role in combat is in reducing the damage dealt to your allies.\"}]",
         "parsedRoles": [],
         "restrictedRoles": "[{\"label\":\"ranged\",\"value\":\"Ranged\",\"title\":\"You prefer to fight at a distance from your opponents.\"}]",
         "parsedRestrictedRoles": [],
@@ -25,8 +25,8 @@
         }
       },
       "2": {
-        "isActive": false,
-        "roles": "",
+        "isActive": true,
+        "roles": "[{\"label\":\"professional\",\"value\":\"Professional\",\"title\":\"You are skilled in a profession.\"}]",
         "parsedRoles": [],
         "restrictedRoles": "",
         "parsedRestrictedRoles": [],
@@ -34,7 +34,8 @@
         "path": {
           "raw": "",
           "name": "",
-          "id": ""
+          "id": "",
+          "isRequired": false
         }
       },
       "3": {
@@ -92,7 +93,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746215931168,
-    "modifiedTime": 1746215975423,
+    "modifiedTime": 1746381422956,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!TVO0gpc8AY5WBpY8"

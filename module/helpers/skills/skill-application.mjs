@@ -5,6 +5,7 @@ import { handlePairedSkills, isSkillBlocked } from "./skill-activation.mjs";
 import { handleEarlySelfModifiers, handleLateSelfModifiers, handleTargetUpdates } from "./skill-modifiers.mjs";
 import { applyAttackProfiles } from "./skill-attack.mjs";
 import { renderChatMessage } from "./skill-chat.mjs";
+import { parsePath } from "../modifierBuilderFieldHelpers.mjs";
 
 export function getModifierSkills(actor, skill) {
     // Get all queued synergy skills (Only include filter out those with charges but 0 remaining)
@@ -19,11 +20,85 @@ export function getModifierSkills(actor, skill) {
     return [...passiveSynergies, ...queuedSynergies];
 }
 
-function getGroupedModifierSkills(actor, skill) {
+async function getGroupedModifierSkills(actor, skill) {
     const mainModifierSkills = getModifierSkills(actor, skill);
-    const modifierSkills = [...mainModifierSkills, ...skill.system.siblingSkillModifiers];
-    const allSkills = [...modifierSkills, skill].filter(s => !s.system.action.charges.hasCharges || (s.system.action.charges.value > 0));
+    const modifierSkills = structuredClone([...mainModifierSkills, ...skill.system.siblingSkillModifiers]);
+    const allSkills = structuredClone([...modifierSkills, skill].filter(s => !s.system.action.charges.hasCharges || (s.system.action.charges.value > 0)));
+    await handleAsyncModifierTypes(actor, modifierSkills);
+    await handleAsyncModifierTypes(actor, allSkills);
+
     return [mainModifierSkills, modifierSkills, allSkills]
+}
+
+async function handleAsyncModifierTypes(actor, skills) {
+    const promises = [];
+    skills.filter(s =>
+        s.system.action.skillCheck.some(x => x.type === "dialog") || s.system.action.modifiers.guard.self.value.some(x => x.type === "dialog") || s.system.action.modifiers.risk.self.value.some(x => x.type === "dialog") || s.system.action.modifiers.resolve.self.value.some(x => x.type === "dialog") || s.system.action.modifiers.wounds.self.some(w => w.value.some(x => x.type === dialog)) || s.system.action.modifiers.resources.self.some(w => w.value.some(x => x.type === dialog))
+        || s.system.action.modifiers.guard.target.value.some(x => x.type === "dialog") || s.system.action.modifiers.risk.target.value.some(x => x.type === "dialog") || s.system.action.modifiers.resolve.target.value.some(x => x.type === "dialog") || s.system.action.modifiers.wounds.target.some(w => w.value.some(x => x.type === dialog)) || s.system.action.modifiers.resources.target.some(w => w.value.some(x => x.type === dialog))
+    ).forEach(s => {
+        s.system.action.skillCheck.filter(x => x.type === "dialog").forEach(v => {
+            promises.push(preparseDialogs(actor, v));
+        });
+        s.system.action.modifiers.guard.self.value.filter(x => x.type === "dialog").forEach(v => {
+            promises.push(preparseDialogs(actor, v));
+        });
+        s.system.action.modifiers.risk.self.value.filter(x => x.type === "dialog").forEach(v => {
+            promises.push(preparseDialogs(actor, v));
+        });
+        s.system.action.modifiers.resolve.self.value.filter(x => x.type === "dialog").forEach(v => {
+            promises.push(preparseDialogs(actor, v));
+        });
+        s.system.action.modifiers.wounds.self.filter(w => w.value.filter(x => x.type === "dialog")).forEach(v => {
+            v.value.filter(x => x.type === "dialog").forEach(y => {
+                promises.push(preparseDialogs(actor, y));
+            })
+        });
+        s.system.action.modifiers.resources.self.filter(w => w.value.filter(x => x.type === "dialog")).forEach(v => {
+            v.value.filter(x => x.type === "dialog").forEach(y => {
+                promises.push(preparseDialogs(actor, y));
+            })
+        });
+        s.system.action.modifiers.guard.target.value.filter(x => x.type === "dialog").forEach(v => {
+            promises.push(preparseDialogs(actor, v));
+        });
+        s.system.action.modifiers.risk.target.value.filter(x => x.type === "dialog").forEach(v => {
+            promises.push(preparseDialogs(actor, v));
+        });
+        s.system.action.modifiers.resolve.target.value.filter(x => x.type === "dialog").forEach(v => {
+            promises.push(preparseDialogs(actor, v));
+        });
+        s.system.action.modifiers.wounds.target.filter(w => w.value.filter(x => x.type === "dialog")).forEach(v => {
+            v.value.filter(x => x.type === "dialog").forEach(y => {
+                promises.push(preparseDialogs(actor, y));
+            })
+        });
+        s.system.action.modifiers.resources.target.filter(w => w.value.filter(x => x.type === "dialog")).forEach(v => {
+            v.value.filter(x => x.type === "dialog").forEach(y => {
+                promises.push(preparseDialogs(actor, y));
+            })
+        });
+    });
+
+    await Promise.all(promises);
+}
+
+async function preparseDialogs(actor, modifierfield) {
+    const path = modifierfield.path;
+    const type = modifierfield.type;
+    const result = await parsePath([modifierfield.type, modifierfield.path].join("."), actor, actor);
+    modifierfield.reversion.isRequired = true;
+    modifierfield.reversion.path = path;
+    modifierfield.reversion.type = type;
+    modifierfield.path = result;
+    modifierfield.type = "numeric";
+}
+
+async function handleSkillReversion(v) {
+    v.reversion.isRequired = false;
+    v.path = v.reversion.path;
+    v.type = v.reversion.type;
+    v.reversion.path = null;
+    v.reversion.type = null;
 }
 
 function getSkillSummaries(skill, modifierSkills) {
@@ -48,7 +123,8 @@ export async function applySkillEffects(actor, skill) {
     let templateData = { user: game.user, skillCheck: { attempts: [] }, actorSize: actor.system.meta.size, actorTier: actor.system.meta.tier };
     let data = { actorSize: actor.system.meta.size, actorTier: actor.system.meta.tier.value };
 
-    const [mainModifierSkills, modifierSkills, allSkills] = getGroupedModifierSkills(actor, skill);
+    // TODO: Check result, when wound and skillCheck, skillCheck was being reset early?
+    const [mainModifierSkills, modifierSkills, allSkills] = await getGroupedModifierSkills(actor, skill);
     const [mainSummary, modifierSummaries] = getSkillSummaries(skill, modifierSkills);
 
     templateData = {

@@ -1,0 +1,32 @@
+{
+  "name": "Snake",
+  "type": "path",
+  "_id": "ojdNHCSM8aJtEI4U",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "roles": ""
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746270039892,
+    "modifiedTime": 1746270039892,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!ojdNHCSM8aJtEI4U"
+}

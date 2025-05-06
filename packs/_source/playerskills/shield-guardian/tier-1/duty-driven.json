@@ -1,0 +1,271 @@
+{
+  "folder": "uqcVv0hiv3PLH98k",
+  "name": "Duty Driven",
+  "type": "skill",
+  "_id": "STc6sgfAl5kM2B4d",
+  "img": "systems/abbrew/assets/icons/skills/todo.svg",
+  "system": {
+    "description": "<p>// TODO: Need section on skill that allows for movement speed modification. Modifiers bonus to speed would be a good one.</p><p><span style=\"font-family: Arial,sans-serif\">Your base movement speed is increased by your Duty stacks.</span></p>",
+    "traits": "",
+    "abbrewId": {
+      "value": "abbrew.skill.dutydriven.STc6sgfAl5kM2B4d",
+      "uuid": "STc6sgfAl5kM2B4d"
+    },
+    "skillTraits": "",
+    "skillModifiers": {
+      "synergy": "",
+      "discord": ""
+    },
+    "configurable": false,
+    "isActivatable": false,
+    "activateOnCreate": false,
+    "applyTurnStart": false,
+    "applyTurnEnd": false,
+    "applyOnExpiry": false,
+    "activateOnDamageAccept": false,
+    "skills": {
+      "granted": [],
+      "paired": [],
+      "grantedOnActivation": [],
+      "grantedOnAccept": []
+    },
+    "resource": {
+      "capacity": 0,
+      "operator": "",
+      "relatedResource": null,
+      "fillCapacityOnCreate": false
+    },
+    "action": {
+      "activationType": "standalone",
+      "actionCost": null,
+      "actionImage": "",
+      "duration": {
+        "isConcentration": false,
+        "precision": "0",
+        "value": 0,
+        "expireOnStartOfTurn": true
+      },
+      "uses": {
+        "hasUses": false,
+        "asStacks": false,
+        "removeStackOnUse": true,
+        "value": 0,
+        "max": 0,
+        "period": "",
+        "stackRemovalActivation": false,
+        "removeWhenNoUsesRemain": false
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "skillCheck": [],
+      "skillRequest": {
+        "isEnabled": false,
+        "isContested": false,
+        "selfCheck": false,
+        "checkType": "",
+        "requirements": {
+          "modifiers": "",
+          "successes": 0,
+          "result": 0
+        },
+        "targetModifiers": "",
+        "results": {
+          "success": {
+            "description": ""
+          },
+          "failure": {
+            "description": ""
+          }
+        }
+      },
+      "attackProfile": {
+        "isEnabled": false,
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": null,
+        "attackMode": "",
+        "finisher": {
+          "type": "",
+          "cost": null,
+          "description": "",
+          "wounds": []
+        },
+        "damage": [],
+        "finisherLimit": 10
+      },
+      "modifiers": {
+        "fortune": 0,
+        "actionCost": {
+          "value": 0,
+          "operator": ""
+        },
+        "attackProfile": {
+          "isEnabled": false,
+          "combineAttacks": {
+            "isEnabled": false,
+            "value": null
+          },
+          "attackType": "",
+          "attackMode": "",
+          "handsSupplied": null,
+          "finisherLimit": {
+            "value": 10,
+            "operator": ""
+          },
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "penetration": {
+            "value": 10,
+            "operator": ""
+          },
+          "finisher": {
+            "type": "",
+            "cost": null,
+            "description": "",
+            "wounds": []
+          },
+          "damage": []
+        },
+        "guard": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": "",
+            "lateParse": false
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": []
+        }
+      }
+    },
+    "skillType": "path",
+    "path": {
+      "raw": "[{\"label\":\"shieldguardian\",\"value\":\"Shield Guardian\",\"roles\":[\"martial\",\"melee\",\"protector\",\"durable\"],\"title\":\"A selfless fighting style, one where you put yourself in harm's way to shield your allies and prevent your enemies from reaching them.\",\"id\":\"abbrewpshieldgua\"}]",
+      "value": {
+        "id": ""
+      }
+    },
+    "roles": {
+      "raw": "",
+      "parsed": []
+    },
+    "archetype": "",
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": "",
+    "isProxied": false,
+    "siblingSkillModifiers": []
+  },
+  "effects": [
+    {
+      "name": "Duty Driven",
+      "img": "icons/svg/aura.svg",
+      "origin": "Compendium.abbrew.playerskills.Item.STc6sgfAl5kM2B4d",
+      "duration": {
+        "rounds": null,
+        "startTime": null,
+        "seconds": null,
+        "combat": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "disabled": false,
+      "_id": "ocnx3tizE5y0diN7",
+      "type": "base",
+      "system": {},
+      "changes": [],
+      "description": "<p><span style=\"font-family:Arial, sans-serif\">Your base movement speed is increased by your Duty stacks.</span></p>",
+      "tint": "#ffffff",
+      "transfer": true,
+      "statuses": [],
+      "sort": 0,
+      "flags": {
+        "statuscounter": {
+          "config": {
+            "dataSource": "flags.abbrew.skill.stacks",
+            "type": "default"
+          },
+          "visible": false,
+          "value": 1
+        },
+        "abbrew": {
+          "skill": {
+            "stacks": 1
+          }
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "coreVersion": "12.331",
+        "systemId": "abbrew",
+        "systemVersion": "0.0.2-prerelease31",
+        "createdTime": 1746384115164,
+        "modifiedTime": 1746384164760,
+        "lastModifiedBy": "abbrewpacks00000"
+      },
+      "_key": "!items.effects!STc6sgfAl5kM2B4d.ocnx3tizE5y0diN7"
+    }
+  ],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746384024519,
+    "modifiedTime": 1746384287661,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!STc6sgfAl5kM2B4d"
+}

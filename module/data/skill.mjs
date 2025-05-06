@@ -330,7 +330,12 @@ export default class AbbrewSkill extends AbbrewItemBase {
                 type: new fields.StringField({ ...blankString }),
                 path: new fields.StringField({ ...blankString }),
                 multiplier: new fields.NumberField({ ...requiredNumber, initial: 1 }),
-                lateParse: new fields.BooleanField({ required: true, initial: lateParseInitial })
+                lateParse: new fields.BooleanField({ required: true, initial: lateParseInitial }),
+                reversion: new fields.SchemaField({
+                    isRequired: new fields.BooleanField({ required: true, initial: false }),
+                    type: new fields.StringField({ ...blankString, nullable: true, initial: null }),
+                    path: new fields.StringField({ ...blankString, nullable: true, initial: null }),
+                })
             })
         );
     }

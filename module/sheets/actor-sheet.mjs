@@ -226,7 +226,7 @@ export class AbbrewActorSheet extends ActorSheet {
   _prepareDefenses(actorData, context) {
     const activeProtection = Object.keys(actorData.system.defense.protection).reduce((result, key) => {
       const protection = actorData.system.defense.protection[key];
-      if (protection.reduction !== 0 || protection.intensification !== 0 || protection.resistance !== 0 || protection.immunity !== 0 || protection.weakness !== 0) {
+      if (protection.reduction !== 0 || protection.amplification !== 0 || protection.resistance !== 0 || protection.immunity !== 0 || protection.weakness !== 0) {
         result.push(protection);
       }
 

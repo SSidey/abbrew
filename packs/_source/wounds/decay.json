@@ -1,0 +1,35 @@
+{
+  "name": "Decay",
+  "type": "wound",
+  "_id": "QBunTJkia3qtNfKx",
+  "img": "systems/abbrew/assets/icons/wounds/decay.webp",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "wound": {
+      "type": "decay",
+      "value": 1
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746298086641,
+    "modifiedTime": 1746298432429,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!QBunTJkia3qtNfKx"
+}

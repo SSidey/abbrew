@@ -1,0 +1,219 @@
+{
+  "folder": "JmqvSalIibJltKn2",
+  "name": "Cleave",
+  "type": "skill",
+  "_id": "utEv2AtdCvuIn2xe",
+  "img": "systems/abbrew/assets/icons/skills/todo.svg",
+  "system": {
+    "description": "<p>Requirements: Wielding a weapon with at least ??? reach.</p><hr><p>Make an attack against two adjacent creatures within your reach.</p>",
+    "traits": "",
+    "abbrewId": {
+      "value": "abbrew.skill.cleave.utEv2AtdCvuIn2xe",
+      "uuid": "utEv2AtdCvuIn2xe"
+    },
+    "skillTraits": "",
+    "skillModifiers": {
+      "synergy": "[{\"id\":\"abbrewAttack0000\",\"value\":\"Attack\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewAttack0000\"},{\"id\":\"abbrewOverpower0\",\"value\":\"Overpower\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewOverpower0\"}]",
+      "discord": ""
+    },
+    "configurable": true,
+    "isActivatable": true,
+    "activateOnCreate": false,
+    "applyTurnStart": false,
+    "applyTurnEnd": false,
+    "applyOnExpiry": false,
+    "activateOnDamageAccept": false,
+    "skills": {
+      "granted": [],
+      "paired": [],
+      "grantedOnActivation": [],
+      "grantedOnAccept": []
+    },
+    "resource": {
+      "capacity": 0,
+      "operator": "",
+      "relatedResource": null,
+      "fillCapacityOnCreate": false
+    },
+    "action": {
+      "activationType": "synergy",
+      "actionCost": "0",
+      "actionImage": "",
+      "duration": {
+        "isConcentration": false,
+        "precision": "0",
+        "value": 0,
+        "expireOnStartOfTurn": true
+      },
+      "uses": {
+        "hasUses": false,
+        "asStacks": false,
+        "removeStackOnUse": true,
+        "value": 0,
+        "max": 0,
+        "period": "",
+        "stackRemovalActivation": false,
+        "removeWhenNoUsesRemain": false
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "skillCheck": [],
+      "skillRequest": {
+        "isEnabled": false,
+        "isContested": false,
+        "selfCheck": false,
+        "checkType": "",
+        "requirements": {
+          "modifiers": "",
+          "successes": 0,
+          "result": 0
+        },
+        "targetModifiers": "",
+        "results": {
+          "success": {
+            "description": ""
+          },
+          "failure": {
+            "description": ""
+          }
+        }
+      },
+      "attackProfile": {
+        "isEnabled": false,
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": 0,
+        "attackMode": "",
+        "finisher": {
+          "type": "",
+          "cost": null,
+          "description": "",
+          "wounds": []
+        },
+        "damage": [],
+        "finisherLimit": 10
+      },
+      "modifiers": {
+        "fortune": 0,
+        "actionCost": {
+          "value": 1,
+          "operator": "add"
+        },
+        "attackProfile": {
+          "combineAttacks": {
+            "isEnabled": false,
+            "value": null
+          },
+          "attackType": "",
+          "attackMode": "",
+          "handsSupplied": 0,
+          "finisherLimit": {
+            "value": 10,
+            "operator": ""
+          },
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "penetration": {
+            "value": 10,
+            "operator": ""
+          },
+          "finisher": {
+            "type": "",
+            "cost": null,
+            "description": "",
+            "wounds": []
+          },
+          "damage": []
+        },
+        "guard": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": "",
+            "lateParse": false
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": []
+        }
+      }
+    },
+    "skillType": "path",
+    "path": {
+      "raw": "[{\"label\":\"universal\",\"value\":\"Universal\",\"roles\":[],\"title\":\"A universal path, skills with this path can be selected if it has roles matching thosee of your paths\",\"id\":\"abbrewpuniversal\"}]",
+      "value": {
+        "id": ""
+      }
+    },
+    "roles": {
+      "raw": "[{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"}]",
+      "parsed": []
+    },
+    "archetype": "",
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": "",
+    "isProxied": false,
+    "siblingSkillModifiers": []
+  },
+  "effects": [],
+  "sort": 200000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746224185486,
+    "modifiedTime": 1746347352780,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!utEv2AtdCvuIn2xe"
+}

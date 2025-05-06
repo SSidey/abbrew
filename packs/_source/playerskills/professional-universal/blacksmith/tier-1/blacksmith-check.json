@@ -1,0 +1,227 @@
+{
+  "folder": "0xWMnObEXrMQ4yOl",
+  "name": "Blacksmith (Check)",
+  "type": "skill",
+  "_id": "6GQuhRfuOZjc5kaG",
+  "img": "systems/abbrew/assets/icons/general/anvil.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "abbrew.skill.blacksmith(check).6GQuhRfuOZjc5kaG",
+      "uuid": "6GQuhRfuOZjc5kaG"
+    },
+    "skillTraits": "",
+    "skillModifiers": {
+      "synergy": "",
+      "discord": ""
+    },
+    "configurable": false,
+    "isActivatable": true,
+    "activateOnCreate": false,
+    "applyTurnStart": false,
+    "applyTurnEnd": false,
+    "applyOnExpiry": false,
+    "activateOnDamageAccept": false,
+    "skills": {
+      "granted": [],
+      "paired": [],
+      "grantedOnActivation": [],
+      "grantedOnAccept": []
+    },
+    "resource": {
+      "capacity": 0,
+      "operator": "",
+      "relatedResource": null,
+      "fillCapacityOnCreate": false
+    },
+    "action": {
+      "activationType": "standalone",
+      "actionCost": "1",
+      "actionImage": "",
+      "duration": {
+        "isConcentration": false,
+        "precision": "0",
+        "value": 0,
+        "expireOnStartOfTurn": true
+      },
+      "uses": {
+        "hasUses": false,
+        "asStacks": false,
+        "removeStackOnUse": true,
+        "value": 0,
+        "max": 0,
+        "period": "",
+        "stackRemovalActivation": false,
+        "removeWhenNoUsesRemain": false
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "skillCheck": [
+        {
+          "operator": "add",
+          "type": "actor",
+          "path": "system.attributes.str.value",
+          "lateParse": false,
+          "multiplier": 1
+        }
+      ],
+      "skillRequest": {
+        "isEnabled": false,
+        "isContested": false,
+        "selfCheck": false,
+        "checkType": "",
+        "requirements": {
+          "modifiers": "",
+          "successes": 0,
+          "result": 0
+        },
+        "targetModifiers": "",
+        "results": {
+          "success": {
+            "description": ""
+          },
+          "failure": {
+            "description": ""
+          }
+        }
+      },
+      "attackProfile": {
+        "isEnabled": false,
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": 0,
+        "attackMode": "",
+        "finisher": {
+          "type": "",
+          "cost": null,
+          "description": "",
+          "wounds": []
+        },
+        "damage": [],
+        "finisherLimit": 10
+      },
+      "modifiers": {
+        "fortune": 0,
+        "actionCost": {
+          "value": 0,
+          "operator": ""
+        },
+        "attackProfile": {
+          "combineAttacks": {
+            "isEnabled": false,
+            "value": null
+          },
+          "attackType": "",
+          "attackMode": "",
+          "handsSupplied": null,
+          "finisherLimit": {
+            "value": 10,
+            "operator": ""
+          },
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "penetration": {
+            "value": 10,
+            "operator": ""
+          },
+          "finisher": {
+            "type": "",
+            "cost": null,
+            "description": "",
+            "wounds": []
+          },
+          "damage": []
+        },
+        "guard": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": "",
+            "lateParse": false
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": []
+        }
+      }
+    },
+    "skillType": "path",
+    "path": {
+      "raw": "",
+      "value": {
+        "id": ""
+      }
+    },
+    "roles": {
+      "raw": "",
+      "parsed": []
+    },
+    "archetype": "",
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": "",
+    "isProxied": false,
+    "siblingSkillModifiers": []
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746271118684,
+    "modifiedTime": 1746271569303,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!6GQuhRfuOZjc5kaG"
+}

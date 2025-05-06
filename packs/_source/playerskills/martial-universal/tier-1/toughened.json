@@ -1,0 +1,282 @@
+{
+  "folder": "JmqvSalIibJltKn2",
+  "name": "Toughened",
+  "type": "skill",
+  "_id": "TeyM5fQxVSTbqKCI",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "<p>Your life of combat has toughened your resolve. Increase your maximum resolve by 50%.</p>",
+    "traits": "",
+    "abbrewId": {
+      "value": "abbrew.skill.toughened.TeyM5fQxVSTbqKCI",
+      "uuid": "TeyM5fQxVSTbqKCI"
+    },
+    "skillTraits": "",
+    "skillModifiers": {
+      "synergy": "",
+      "discord": ""
+    },
+    "configurable": false,
+    "isActivatable": false,
+    "activateOnCreate": false,
+    "applyTurnStart": false,
+    "applyTurnEnd": false,
+    "applyOnExpiry": false,
+    "activateOnDamageAccept": false,
+    "skills": {
+      "granted": [],
+      "paired": [],
+      "grantedOnActivation": [],
+      "grantedOnAccept": []
+    },
+    "resource": {
+      "capacity": 0,
+      "operator": "",
+      "relatedResource": null,
+      "fillCapacityOnCreate": false
+    },
+    "action": {
+      "activationType": "standalone",
+      "actionCost": null,
+      "actionImage": "",
+      "duration": {
+        "isConcentration": false,
+        "precision": "0",
+        "value": 0,
+        "expireOnStartOfTurn": true
+      },
+      "uses": {
+        "hasUses": false,
+        "asStacks": false,
+        "removeStackOnUse": true,
+        "value": 0,
+        "max": 0,
+        "period": "",
+        "stackRemovalActivation": false,
+        "removeWhenNoUsesRemain": false
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "skillCheck": [],
+      "skillRequest": {
+        "isEnabled": false,
+        "isContested": false,
+        "selfCheck": false,
+        "checkType": "",
+        "requirements": {
+          "modifiers": "",
+          "successes": 0,
+          "result": 0
+        },
+        "targetModifiers": "",
+        "results": {
+          "success": {
+            "description": ""
+          },
+          "failure": {
+            "description": ""
+          }
+        }
+      },
+      "attackProfile": {
+        "isEnabled": true,
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": 0,
+        "attackMode": "",
+        "finisher": {
+          "type": "",
+          "cost": null,
+          "description": "",
+          "wounds": []
+        },
+        "damage": [],
+        "finisherLimit": 10
+      },
+      "modifiers": {
+        "fortune": 0,
+        "actionCost": {
+          "value": 0,
+          "operator": ""
+        },
+        "attackProfile": {
+          "combineAttacks": {
+            "isEnabled": false,
+            "value": null
+          },
+          "attackType": "",
+          "attackMode": "",
+          "handsSupplied": null,
+          "finisherLimit": {
+            "value": 10,
+            "operator": ""
+          },
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "penetration": {
+            "value": 10,
+            "operator": ""
+          },
+          "finisher": {
+            "type": "",
+            "cost": null,
+            "description": "",
+            "wounds": []
+          },
+          "damage": []
+        },
+        "guard": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": "",
+            "lateParse": false
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": []
+        }
+      }
+    },
+    "skillType": "path",
+    "path": {
+      "raw": "[{\"label\":\"universal\",\"value\":\"Universal\",\"roles\":[],\"title\":\"A universal path, skills with this path can be selected if it has roles matching thosee of your paths\",\"id\":\"abbrewpuniversal\"}]",
+      "value": {
+        "id": ""
+      }
+    },
+    "roles": {
+      "raw": "[{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"}]",
+      "parsed": []
+    },
+    "archetype": "",
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": "",
+    "isProxied": false,
+    "siblingSkillModifiers": []
+  },
+  "effects": [
+    {
+      "name": "Toughened",
+      "img": "icons/svg/aura.svg",
+      "origin": "Compendium.abbrew.paths.Item.TeyM5fQxVSTbqKCI",
+      "duration": {
+        "rounds": null,
+        "startTime": null,
+        "seconds": null,
+        "combat": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "disabled": false,
+      "_id": "37KoTgQsZ8nn4AqJ",
+      "type": "base",
+      "system": {},
+      "changes": [
+        {
+          "key": "system.defense.resolve.max",
+          "mode": 1,
+          "value": "1.5",
+          "priority": null
+        }
+      ],
+      "description": "",
+      "tint": "#ffffff",
+      "transfer": true,
+      "statuses": [],
+      "sort": 0,
+      "flags": {
+        "statuscounter": {
+          "config": {
+            "dataSource": "flags.abbrew.skill.stacks",
+            "type": "default"
+          },
+          "visible": false,
+          "value": 1
+        },
+        "abbrew": {
+          "skill": {
+            "stacks": 1
+          }
+        },
+        "visual-active-effects": {
+          "data": {
+            "inclusion": -1
+          }
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "coreVersion": "12.331",
+        "systemId": "abbrew",
+        "systemVersion": "0.0.2-prerelease31",
+        "createdTime": null,
+        "modifiedTime": null,
+        "lastModifiedBy": null
+      },
+      "_key": "!items.effects!TeyM5fQxVSTbqKCI.37KoTgQsZ8nn4AqJ"
+    }
+  ],
+  "sort": 115625,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746223939260,
+    "modifiedTime": 1746347358944,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!TeyM5fQxVSTbqKCI"
+}

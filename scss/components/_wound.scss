@@ -33,3 +33,21 @@ ol.wound-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
 }
+
+.wound-tooltip {
+    display: none;
+    position: absolute;
+    z-index: 10;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: #fff;
+    text-align: center;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.wound:hover .wound-tooltip {
+    display: block;
+    pointer-events: none;
+}

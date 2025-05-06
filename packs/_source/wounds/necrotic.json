@@ -1,0 +1,35 @@
+{
+  "name": "Necrotic",
+  "type": "wound",
+  "_id": "6xTDAF2GPsfeyNyc",
+  "img": "systems/abbrew/assets/icons/wounds/necrotic.webp",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "wound": {
+      "type": "necrotic",
+      "value": 1
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746298109319,
+    "modifiedTime": 1746298424612,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!6xTDAF2GPsfeyNyc"
+}

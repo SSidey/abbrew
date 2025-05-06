@@ -89,7 +89,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
           label: new fields.StringField({ required: true, blank: true }),
           type: new fields.StringField({ required: true, blank: true }),
           reduction: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-          intensification: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+          amplification: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
           resistance: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
           weakness: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
           immunity: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 })

@@ -157,7 +157,6 @@ export async function parsePath(rawValue, actor, source) {
 
     switch (entityType) {
         case 'dialog':
-            // Doesn't work, cba asyncing all the way up
             const dialogValue = await getDialogValue(actor, rawValue.split('.').slice(1).shift());
             return dialogValue;
         default:
