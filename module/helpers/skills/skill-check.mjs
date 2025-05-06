@@ -24,7 +24,7 @@ export async function makeSkillCheck(actor, skill, allSkills, fortune, templateD
         const tier = getTierFromArray(attributeTiers);
         const critical = 10;
         const rollFormula = getRollFormula(tier, critical, fortune);
-        const skillRoll = new Roll(rollFormula, skill.system.actor);
+        const skillRoll = new Roll(rollFormula, actor);
         const result = await skillRoll.evaluate();
         const resultDice = getResultDice(result);
         skillResult.dice = resultDice;

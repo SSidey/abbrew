@@ -436,6 +436,51 @@ Hooks.on("preCreateActiveEffect", effect => {
   });
 });
 
+Hooks.on("actorMustDropItem", async (actor) => {
+  const items = actor.getActorHeldItems().map(i => ({ label: i.name, value: i._id }));
+  const anatomy = actor.system.anatomy;
+  let selectedItem;
+  if (items.length === 1) {
+    selectedItem = actor.items.find(i => i._id === items[0].value);
+  } else {
+    const fields = foundry.applications.fields;
+    const selectInput = fields.createSelectInput({
+      options: items,
+      name: 'items'
+    })
+    const selectGroup = fields.createFormGroup({
+      input: selectInput,
+      label: "Drop an Item"
+    })
+
+    const content = `${selectGroup.outerHTML}`
+
+    let id = items[0]._id;
+    try {
+      id = await foundry.applications.api.DialogV2.prompt({
+        window: { title: "Drop an Item (Title)" },
+        content: content,
+        ok: {
+          label: "Drop",
+          callback: (event, button, dialog) => button.form.elements.items.selectedOptions[0]?.value ?? button.form.elements.items.options[0].value
+        }
+      });
+    } catch (ex) {
+      console.log(`${actor.name} did not select a value.`);
+    }
+
+    selectedItem = actor.items.find(i => i._id === id);
+  }
+
+  const handsRequired = selectedItem.system.handsRequired;
+  const handsAvailable = anatomy.hands;
+  if (handsRequired === "versatile" && handsAvailable > 0 && selectedItem.system.handsSupplied > 1) {
+    await selectedItem.update({ "system.handsSupplied": 1, "system.equipState": "held1H" });
+  } else {
+    await selectedItem.update({ "system.handsSupplied": 0, "system.equipState": "dropped" });
+  }
+})
+
 // Hooks.on("createActiveEffect", (document, options, userId) => {
 //   console.log("Created");
 // });

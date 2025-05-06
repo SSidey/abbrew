@@ -12,7 +12,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   }
 
   get anatomy() {
-    return this._prepareAnatomy();
+    return this.mapAnatomy();
   }
 
   static defineSchema() {
@@ -320,6 +320,16 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   }
 
   _prepareAnatomy() {
+    const res = this.mapAnatomy();
+    const occupiedHands = this.parent.getActorHeldItems().reduce((result, item) => result += item.system.handsSupplied, 0);
+    if (occupiedHands > res.hands) {
+      Hooks.call("actorMustDropItem", this.parent);
+    }
+
+    return res;
+  }
+
+  mapAnatomy() {
     const res = this.parent.items.filter(i => i.type == "anatomy").filter(a => !(a.system.isBroken || a.system.isDismembered)).reduce((result, a) => {
       const values = a.system;
       result.hands += values.hands;
@@ -327,6 +337,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       result.parts = result.parts.concat(JSON.parse(values.parts).map(a => a.value));
       return result;
     }, { hands: 0, speed: 0, parts: [] });
+
     return res;
   }
 

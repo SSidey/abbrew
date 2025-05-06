@@ -532,7 +532,8 @@ ABBREW.modifierPrefixes = {
   "damagelastReceived": "ABBREW.ModifierPrefixes.damageLastReceived",
   "damageroundReceived": "ABBREW.ModifierPrefixes.damageRoundReceived",
   "skillCount": "ABBREW.ModifierPrefixes.skillCount",
-  "dialog": "ABBREW.ModifierPrefixes.dialog"
+  "dialog": "ABBREW.ModifierPrefixes.dialog",
+  "async": "ABBREW.ModifierPrefixes.async"
 }
 
 ABBREW.checkTypes = {

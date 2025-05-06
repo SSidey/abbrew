@@ -22,67 +22,149 @@ export function getModifierSkills(actor, skill) {
 
 async function getGroupedModifierSkills(actor, skill) {
     const mainModifierSkills = getModifierSkills(actor, skill);
-    const modifierSkills = structuredClone([...mainModifierSkills, ...skill.system.siblingSkillModifiers]);
-    const allSkills = structuredClone([...modifierSkills, skill].filter(s => !s.system.action.charges.hasCharges || (s.system.action.charges.value > 0)));
-    await handleAsyncModifierTypes(actor, modifierSkills);
-    await handleAsyncModifierTypes(actor, allSkills);
+    const [clonedSkill, clonedModifiers, clonedSiblingModifiers] = await handleAsyncModifierTypes(actor, skill, mainModifierSkills, skill.system.siblingSkillModifiers);
+    const modifierSkills = [...clonedModifiers, ...clonedSiblingModifiers];
+    const allSkills = [...modifierSkills, ...clonedSkill].filter(s => !s.system.action.charges.hasCharges || (s.system.action.charges.value > 0));
 
-    return [mainModifierSkills, modifierSkills, allSkills]
+    return [...clonedSkill, mainModifierSkills, modifierSkills, allSkills]
 }
 
-async function handleAsyncModifierTypes(actor, skills) {
+async function handleAsyncModifierTypes(actor, skill, mainModifierSkills, siblingSkillModifiers) {
     const promises = [];
-    skills.filter(s =>
-        s.system.action.skillCheck.some(x => x.type === "dialog") || s.system.action.modifiers.guard.self.value.some(x => x.type === "dialog") || s.system.action.modifiers.risk.self.value.some(x => x.type === "dialog") || s.system.action.modifiers.resolve.self.value.some(x => x.type === "dialog") || s.system.action.modifiers.wounds.self.some(w => w.value.some(x => x.type === dialog)) || s.system.action.modifiers.resources.self.some(w => w.value.some(x => x.type === dialog))
-        || s.system.action.modifiers.guard.target.value.some(x => x.type === "dialog") || s.system.action.modifiers.risk.target.value.some(x => x.type === "dialog") || s.system.action.modifiers.resolve.target.value.some(x => x.type === "dialog") || s.system.action.modifiers.wounds.target.some(w => w.value.some(x => x.type === dialog)) || s.system.action.modifiers.resources.target.some(w => w.value.some(x => x.type === dialog))
-    ).forEach(s => {
-        s.system.action.skillCheck.filter(x => x.type === "dialog").forEach(v => {
-            promises.push(preparseDialogs(actor, v));
-        });
-        s.system.action.modifiers.guard.self.value.filter(x => x.type === "dialog").forEach(v => {
-            promises.push(preparseDialogs(actor, v));
-        });
-        s.system.action.modifiers.risk.self.value.filter(x => x.type === "dialog").forEach(v => {
-            promises.push(preparseDialogs(actor, v));
-        });
-        s.system.action.modifiers.resolve.self.value.filter(x => x.type === "dialog").forEach(v => {
-            promises.push(preparseDialogs(actor, v));
-        });
-        s.system.action.modifiers.wounds.self.filter(w => w.value.filter(x => x.type === "dialog")).forEach(v => {
-            v.value.filter(x => x.type === "dialog").forEach(y => {
-                promises.push(preparseDialogs(actor, y));
+    const clonedSkill = [structuredClone(skill)];
+    const clonedModifiers = structuredClone(mainModifierSkills);
+    const clonedSiblingModifiers = structuredClone(siblingSkillModifiers);
+    const skillsList = [clonedSkill, clonedModifiers, clonedSiblingModifiers]
+    skillsList.forEach(skills => {
+        skills.filter(s =>
+            s.system.action.modifiers.attackProfile.damage.some(d => d.value.split('.').slice(0, 1).shift() === "dialog") || s.system.action.skillCheck.some(x => x.type === "dialog") || s.system.action.modifiers.guard.self.value.some(x => x.type === "dialog") || s.system.action.modifiers.risk.self.value.some(x => x.type === "dialog") || s.system.action.modifiers.resolve.self.value.some(x => x.type === "dialog") || s.system.action.modifiers.wounds.self.some(w => w.value.some(x => x.type === "dialog")) || s.system.action.modifiers.resources.self.some(w => w.value.some(x => x.type === "dialog"))
+            || s.system.action.modifiers.guard.target.value.some(x => x.type === "dialog") || s.system.action.modifiers.risk.target.value.some(x => x.type === "dialog") || s.system.action.modifiers.resolve.target.value.some(x => x.type === "dialog") || s.system.action.modifiers.wounds.target.some(w => w.value.some(x => x.type === "dialog")) || s.system.action.modifiers.resources.target.some(w => w.value.some(x => x.type === "dialog"))
+        ).forEach(s => {
+            s.system.action.skillCheck.filter(x => x.type === "dialog").forEach(v => {
+                promises.push(preparseDialogs(actor, s, "system.action.skillCheck", v));
+            });
+            s.system.action.modifiers.guard.self.value.filter(x => x.type === "dialog").forEach(v => {
+                promises.push(preparseDialogs(actor, s, "system.action.modifiers.guard.self.value", v));
+            });
+            s.system.action.modifiers.risk.self.value.filter(x => x.type === "dialog").forEach(v => {
+                promises.push(preparseDialogs(actor, s, "system.action.modifiers.risk.self.value", v));
+            });
+            s.system.action.modifiers.resolve.self.value.filter(x => x.type === "dialog").forEach(v => {
+                promises.push(preparseDialogs(actor, s, "system.action.modifiers.resolve.self.value", v));
+            });
+            s.system.action.modifiers.attackProfile.damage.filter(d => d.value.split('.').slice(0, 1).shift() === "dialog").forEach(d => {
+                promises.push(preparseSimple(actor, s, "system.action.modifiers.attackProfile.damage", d));
             })
-        });
-        s.system.action.modifiers.resources.self.filter(w => w.value.filter(x => x.type === "dialog")).forEach(v => {
-            v.value.filter(x => x.type === "dialog").forEach(y => {
-                promises.push(preparseDialogs(actor, y));
-            })
-        });
-        s.system.action.modifiers.guard.target.value.filter(x => x.type === "dialog").forEach(v => {
-            promises.push(preparseDialogs(actor, v));
-        });
-        s.system.action.modifiers.risk.target.value.filter(x => x.type === "dialog").forEach(v => {
-            promises.push(preparseDialogs(actor, v));
-        });
-        s.system.action.modifiers.resolve.target.value.filter(x => x.type === "dialog").forEach(v => {
-            promises.push(preparseDialogs(actor, v));
-        });
-        s.system.action.modifiers.wounds.target.filter(w => w.value.filter(x => x.type === "dialog")).forEach(v => {
-            v.value.filter(x => x.type === "dialog").forEach(y => {
-                promises.push(preparseDialogs(actor, y));
-            })
-        });
-        s.system.action.modifiers.resources.target.filter(w => w.value.filter(x => x.type === "dialog")).forEach(v => {
-            v.value.filter(x => x.type === "dialog").forEach(y => {
-                promises.push(preparseDialogs(actor, y));
-            })
+            s.system.action.modifiers.wounds.self.filter(w => w.value.filter(x => x.type === "dialog")).forEach(v => {
+                v.value.filter(x => x.type === "dialog").forEach(y => {
+                    promises.push(preparseDialogs(actor, s, `system.action.modifiers.wounds.self`, y));
+                })
+            });
+            s.system.action.modifiers.resources.self.filter(w => w.value.filter(x => x.type === "dialog")).forEach(v => {
+                v.value.filter(x => x.type === "dialog").forEach(y => {
+                    promises.push(preparseDialogs(actor, s, `system.action.modifiers.resources.self`, y));
+                })
+            });
+            s.system.action.modifiers.guard.target.value.filter(x => x.type === "dialog").forEach(v => {
+                promises.push(preparseDialogs(actor, s, "system.action.modifiers.guard.target.value", v));
+            });
+            s.system.action.modifiers.risk.target.value.filter(x => x.type === "dialog").forEach(v => {
+                promises.push(preparseDialogs(actor, s, "system.action.modifiers.risk.target.value", v));
+            });
+            s.system.action.modifiers.resolve.target.value.filter(x => x.type === "dialog").forEach(v => {
+                promises.push(preparseDialogs(actor, s, "system.action.modifiers.resolve.target.value", v));
+            });
+            s.system.action.modifiers.wounds.target.filter(w => w.value.filter(x => x.type === "dialog")).forEach(v => {
+                v.value.filter(x => x.type === "dialog").forEach(y => {
+                    promises.push(preparseDialogs(actor, s, `system.action.modifiers.wounds.target`, y));
+                })
+            });
+            s.system.action.modifiers.resources.target.filter(w => w.value.filter(x => x.type === "dialog")).forEach(v => {
+                v.value.filter(x => x.type === "dialog").forEach(y => {
+                    promises.push(preparseDialogs(actor, s, `system.action.modifiers.resources.target`, y));
+                })
+            });
         });
     });
 
     await Promise.all(promises);
+
+    skillsList.forEach(skills => {
+        skills.filter(s =>
+            s.system.action.modifiers.attackProfile.damage.some(d => d.value.split('.').slice(0, 1).shift() === "async") || s.system.action.skillCheck.some(x => x.type === "async") || s.system.action.modifiers.guard.self.value.some(x => x.type === "async") || s.system.action.modifiers.risk.self.value.some(x => x.type === "async") || s.system.action.modifiers.resolve.self.value.some(x => x.type === "async") || s.system.action.modifiers.wounds.self.some(w => w.value.some(x => x.type === "async")) || s.system.action.modifiers.resources.self.some(w => w.value.some(x => x.type === "async"))
+            || s.system.action.modifiers.guard.target.value.some(x => x.type === "async") || s.system.action.modifiers.risk.target.value.some(x => x.type === "async") || s.system.action.modifiers.resolve.target.value.some(x => x.type === "async") || s.system.action.modifiers.wounds.target.some(w => w.value.some(x => x.type === "async")) || s.system.action.modifiers.resources.target.some(w => w.value.some(x => x.type === "async"))
+        ).forEach(s => {
+            s.system.action.skillCheck.filter(x => x.type === "async").forEach(v => {
+                handleAsyncResults(s, v);
+            });
+            s.system.action.modifiers.guard.self.value.filter(x => x.type === "async").forEach(v => {
+                handleAsyncResults(s, v);
+            });
+            s.system.action.modifiers.risk.self.value.filter(x => x.type === "async").forEach(v => {
+                handleAsyncResults(s, v);
+            });
+            s.system.action.modifiers.resolve.self.value.filter(x => x.type === "async").forEach(v => {
+                handleAsyncResults(s, v);
+            });
+            s.system.action.modifiers.attackProfile.damage.filter(d => d.value.split('.').slice(0, 1).shift() === "async").forEach(d => {
+                handleSimpleAsyncResults(s, d);
+            })
+            s.system.action.modifiers.wounds.self.filter(w => w.value.filter(x => x.type === "async")).forEach(v => {
+                v.value.filter(x => x.type === "async").forEach(y => {
+                    handleAsyncResults(s, y);
+                })
+            });
+            s.system.action.modifiers.resources.self.filter(w => w.value.filter(x => x.type === "async")).forEach(v => {
+                v.value.filter(x => x.type === "async").forEach(y => {
+                    handleAsyncResults(s, y);
+                })
+            });
+            s.system.action.modifiers.guard.target.value.filter(x => x.type === "async").forEach(v => {
+                handleAsyncResults(s, v);
+            });
+            s.system.action.modifiers.risk.target.value.filter(x => x.type === "async").forEach(v => {
+                handleAsyncResults(s, v);
+            });
+            s.system.action.modifiers.resolve.target.value.filter(x => x.type === "async").forEach(v => {
+                handleAsyncResults(s, v);
+            });
+            s.system.action.modifiers.wounds.target.filter(w => w.value.filter(x => x.type === "async")).forEach(v => {
+                v.value.filter(x => x.type === "async").forEach(y => {
+                    handleAsyncResults(s, y);
+                })
+            });
+            s.system.action.modifiers.resources.target.filter(w => w.value.filter(x => x.type === "async")).forEach(v => {
+                v.value.filter(x => x.type === "async").forEach(y => {
+                    handleAsyncResults(s, y);
+                })
+            });
+        });
+    });
+
+    return [clonedSkill, clonedModifiers, clonedSiblingModifiers];
 }
 
-async function preparseDialogs(actor, modifierfield) {
+function handleSimpleAsyncResults(skill, field) {
+    const path = field.value.split('.').slice(1).join(".")
+    field.value = skill.asyncValues[path];
+}
+
+function handleAsyncResults(skill, field) {
+    field.value = skill.asyncValues[field.path];
+}
+
+async function preparseSimple(actor, skill, fieldPath, field) {
+    const result = await parsePath(field.value, actor, actor);
+    field.value = result;
+    if (!skill.asyncValues) {
+        skill.asyncValues = {};
+        skill.asyncValues[fieldPath] = result;
+    } else {
+        skill.asyncValues[fieldPath] = result;
+    }
+}
+
+async function preparseDialogs(actor, skill, fieldPath, modifierfield) {
     const path = modifierfield.path;
     const type = modifierfield.type;
     const result = await parsePath([modifierfield.type, modifierfield.path].join("."), actor, actor);
@@ -91,14 +173,12 @@ async function preparseDialogs(actor, modifierfield) {
     modifierfield.reversion.type = type;
     modifierfield.path = result;
     modifierfield.type = "numeric";
-}
-
-async function handleSkillReversion(v) {
-    v.reversion.isRequired = false;
-    v.path = v.reversion.path;
-    v.type = v.reversion.type;
-    v.reversion.path = null;
-    v.reversion.type = null;
+    if (!skill.asyncValues) {
+        skill.asyncValues = {};
+        skill.asyncValues[fieldPath] = result;
+    } else {
+        skill.asyncValues[fieldPath] = result;
+    }
 }
 
 function getSkillSummaries(skill, modifierSkills) {
@@ -123,8 +203,7 @@ export async function applySkillEffects(actor, skill) {
     let templateData = { user: game.user, skillCheck: { attempts: [] }, actorSize: actor.system.meta.size, actorTier: actor.system.meta.tier };
     let data = { actorSize: actor.system.meta.size, actorTier: actor.system.meta.tier.value };
 
-    // TODO: Check result, when wound and skillCheck, skillCheck was being reset early?
-    const [mainModifierSkills, modifierSkills, allSkills] = await getGroupedModifierSkills(actor, skill);
+    const [asyncParsedSkill, mainModifierSkills, modifierSkills, allSkills] = await getGroupedModifierSkills(actor, skill);
     const [mainSummary, modifierSummaries] = getSkillSummaries(skill, modifierSkills);
 
     templateData = {
@@ -137,9 +216,9 @@ export async function applySkillEffects(actor, skill) {
     const lateSelfUpdates = await handleEarlySelfModifiers(actor, allSkills);
 
     let skillResult;
-    [skillResult, templateData, data] = await makeSkillCheck(actor, skill, allSkills, fortune, templateData, data);
+    [skillResult, templateData, data] = await makeSkillCheck(actor, asyncParsedSkill, allSkills, fortune, templateData, data);
 
-    [skillResult, templateData, data] = await makeSkillCheckRequest(actor, skill, modifierSkills, skillResult, templateData, data);
+    [skillResult, templateData, data] = await makeSkillCheckRequest(actor, asyncParsedSkill, modifierSkills, skillResult, templateData, data);
     modifierSkills.filter(s => s.system.action.skillRequest.isEnabled).forEach(async s => {
         let modData = deepClone(data);
         let modTemplate = deepClone(templateData);
@@ -148,12 +227,12 @@ export async function applySkillEffects(actor, skill) {
         await renderChatMessage(true, actor, s, modTemplate, modData);
     });
 
-    [templateData, data] = await applyAttackProfiles(actor, skill, modifierSkills, fortune, templateData, data);
+    [templateData, data] = await applyAttackProfiles(actor, asyncParsedSkill, modifierSkills, fortune, templateData, data);
 
     // Target updates
     [templateData, data] = await handleTargetUpdates(actor, allSkills, templateData, data);
 
-    await renderChatMessage(shouldRenderChatMessage, actor, skill, templateData, data);
+    await renderChatMessage(shouldRenderChatMessage, actor, asyncParsedSkill, templateData, data);
 
     await handleLateSelfModifiers(actor, lateSelfUpdates);
 

@@ -132,6 +132,7 @@ export class AbbrewActorSheet extends ActorSheet {
     };
     const anatomy = [];
     const armour = [];
+    const wornArmour = [];
     const weapons = [];
     const equippedWeapons = [];
     const archetypes = [];
@@ -189,6 +190,9 @@ export class AbbrewActorSheet extends ActorSheet {
       }
       else if (i.type === 'armour') {
         armour.push(i);
+        if (['held1H', 'held2H', 'worn'].includes(i.system.equipState)) {
+          wornArmour.push(i);
+        }
       }
       else if (i.type === 'weapon') {
         weapons.push(i);
@@ -215,6 +219,7 @@ export class AbbrewActorSheet extends ActorSheet {
     context.skills = skills;
     context.anatomy = anatomy;
     context.armour = armour;
+    context.wornArmour = wornArmour;
     context.weapons = weapons;
     context.equippedWeapons = equippedWeapons;
     context.archetypes = archetypes;

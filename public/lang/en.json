@@ -374,7 +374,8 @@
       "damageLastReceived": "Last Damage Taken",
       "damageRoundReceived": "Round Damage Taken",
       "skillCount": "Skill Count",
-      "dialog": "Dialog"
+      "dialog": "Dialog",
+      "async": "Async Result"
     }
   },
   "Speeds": {

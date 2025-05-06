@@ -47,27 +47,24 @@ export function getAttackSkillWithActions(id, name, actionCost, image, attackPro
                 },
                 modifiers: {
                     fortune: 0,
-                    attackProfile: {},
-                    damage: {
-                        self: []
-                    },
+                    attackProfile: { damage: [] },
                     guard: {
                         self: {
-                            value: 0,
+                            value: [],
                             operator: ""
                         },
                         target: {
-                            value: 0,
+                            value: [],
                             operator: ""
                         }
                     },
                     risk: {
                         self: {
-                            value: 0,
+                            value: [],
                             operator: ""
                         },
                         target: {
-                            value: 0,
+                            value: [],
                             operator: ""
                         }
                     },
@@ -77,11 +74,11 @@ export function getAttackSkillWithActions(id, name, actionCost, image, attackPro
                     },
                     resolve: {
                         self: {
-                            value: 0,
+                            value: [],
                             operator: ""
                         },
                         target: {
-                            value: 0,
+                            value: [],
                             operator: ""
                         }
                     },
@@ -149,27 +146,24 @@ export function getParrySkillWithActions(actionCost, siblingSkillModifiers = [])
                 },
                 modifiers: {
                     fortune: 0,
-                    attackProfile: {},
-                    damage: {
-                        self: []
-                    },
+                    attackProfile: { damage: [] },
                     guard: {
                         self: {
-                            value: 0,
+                            value: [],
                             operator: ""
                         },
                         target: {
-                            value: 0,
+                            value: [],
                             operator: ""
                         }
                     },
                     risk: {
                         self: {
-                            value: 0,
+                            value: [],
                             operator: ""
                         },
                         target: {
-                            value: 0,
+                            value: [],
                             operator: ""
                         }
                     },
@@ -179,11 +173,11 @@ export function getParrySkillWithActions(actionCost, siblingSkillModifiers = [])
                     },
                     resolve: {
                         self: {
-                            value: 0,
+                            value: [],
                             operator: ""
                         },
                         target: {
-                            value: 0,
+                            value: [],
                             operator: ""
                         }
                     },
@@ -260,27 +254,24 @@ export function getFundamentalAttributeSkill(fundamental, siblingSkillModifiers 
                 },
                 modifiers: {
                     fortune: 0,
-                    attackProfile: {},
-                    damage: {
-                        self: []
-                    },
+                    attackProfile: { damage: [] },
                     guard: {
                         self: {
-                            value: 0,
+                            value: [],
                             operator: ""
                         },
                         target: {
-                            value: 0,
+                            value: [],
                             operator: ""
                         }
                     },
                     risk: {
                         self: {
-                            value: 0,
+                            value: [],
                             operator: ""
                         },
                         target: {
-                            value: 0,
+                            value: [],
                             operator: ""
                         }
                     },
@@ -290,11 +281,11 @@ export function getFundamentalAttributeSkill(fundamental, siblingSkillModifiers 
                     },
                     resolve: {
                         self: {
-                            value: 0,
+                            value: [],
                             operator: ""
                         },
                         target: {
-                            value: 0,
+                            value: [],
                             operator: ""
                         }
                     },
