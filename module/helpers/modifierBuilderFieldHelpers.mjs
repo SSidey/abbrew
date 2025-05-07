@@ -279,6 +279,11 @@ function getLastDamageValue(actor, instance, damageType) {
     return 0;
 }
 
+// TODO: Make 0 if NAN
+// TODO: Why players see ?? on cards
+// TODO: Why is initiative privated
+// TODO: Hooks for combat turns are applying multiple times
+// TODO: Hooks firing multiple times, reee
 async function getDialogValue(actor, title) {
     let result = 0;
     try {

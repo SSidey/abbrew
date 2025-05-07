@@ -18,6 +18,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
             synergy: new fields.StringField({ ...blankString }),
             discord: new fields.StringField({ ...blankString })
         });
+        schema.isFavourited = new fields.BooleanField({ required: true, initial: false });
         schema.configurable = new fields.BooleanField({ required: true });
         schema.isActivatable = new fields.BooleanField({ required: true, initial: false, label: "ABBREW.IsActivatable" });
         schema.activateOnCreate = new fields.BooleanField({ required: true, initial: false });

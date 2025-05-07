@@ -151,6 +151,7 @@
       "emotion": "Emotion",
       "psychic": "Psychic"
     },
+    "Favourite": "Favourite",
     "AttributeIncrease": "Attribute Increase",
     "SkillActivationType": "Activation Type",
     "SkillActivationTypes": {
@@ -219,7 +220,9 @@
       "heldTwo": "Held 2H",
       "worn": "Worn",
       "stowed": "Stowed",
-      "dropped": "Dropped"
+      "dropped": "Dropped",
+      "active": "Active",
+      "inactive": "Inactive"
     },
     "SkillTypes": {
       "basic": "Basic",
@@ -300,7 +303,8 @@
     "EquipTypes": {
       "none": "None",
       "held": "Held",
-      "worn": "Worn"
+      "worn": "Worn",
+      "innate": "Innate"
     },
     "Hands": {
       "none": "None",

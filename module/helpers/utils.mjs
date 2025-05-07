@@ -134,3 +134,14 @@ export function compareModifierIndices(modifier1, modifier2) {
 
     return 0;
 }
+
+export function filterKeys(raw, allowedKeys) {
+    return Object.keys(raw)
+        .filter(key => allowedKeys.includes(key))
+        .reduce((obj, key) => {
+            return {
+                ...obj,
+                [key]: raw[key]
+            };
+        }, {});
+}

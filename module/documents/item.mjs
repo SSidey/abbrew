@@ -47,9 +47,28 @@ export default class AbbrewItem extends Item {
       foundry.utils.setProperty(changed, `system.action.duration.expireOnStartOfTurn`, false);
       foundry.utils.setProperty(changed, `system.action.duration.value`, 1);
     }
+
+    if (doesNestedFieldExist(changed, "system.isFavourited")) {
+      if (this.actor) {
+        if (changed.system.isFavourited) {
+          const favourites = this.actor.system.favourites;
+          const currentFavourites = favourites[this.type];
+          const updateFavourites = [...currentFavourites, this._id];
+          const update = { system: { favourites: favourites } };
+          update.system.favourites[this.type] = updateFavourites;
+          await this.actor.update(update);
+        } else {
+          const favourites = this.actor.system.favourites;
+          const currentFavourites = favourites[this.type];
+          const updateFavourites = currentFavourites.filter(f => f !== this._id);
+          const update = { system: { favourites: favourites } };
+          update.system.favourites[this.type] = updateFavourites;
+          await this.actor.update(update);
+        }
+      }
+    }
   }
 
-  // TODO: Drop items when not enough hands
   isWornEquipStateChangePossible() {
     const armourPoints = JSON.parse(this.system.armourPoints).map(ap => ap.value);
     const usedArmourPoints = this.actor.getActorWornArmour().flatMap(a => JSON.parse(a.system.armourPoints).map(ap => ap.value));

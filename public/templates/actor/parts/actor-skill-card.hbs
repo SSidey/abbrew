@@ -71,6 +71,16 @@
                 {{/if}}
             </div>
             <div class='skill-controls'>
+                <label class="slide-toggle roboto-upper">
+                    <input type="checkbox" class="action-activatable" name="system.isFavourited" {{ checked
+                        system.isFavourited }}>
+                    <span></span>
+                    {{#if system.isFavourited}}
+                    <i class="fa-solid fa-star"></i>
+                    {{else}}
+                    <i class="fa-regular fa-star"></i>
+                    {{/if}}
+                </label>
                 <a class='skill-control skill-edit' title='{{localize "DOCUMENT.Edit" type=' skill'}}'>
                     <i class='fas fa-edit'></i>
                 </a>

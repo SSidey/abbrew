@@ -8,6 +8,7 @@ import { getFundamentalAttributeSkill } from '../helpers/fundamental-skills.mjs'
 import { cleanTemporarySkill } from '../helpers/skills/skill-uses.mjs';
 import { handleSkillActivate } from '../helpers/skills/skill-activation.mjs';
 import { manualSkillExpiry } from '../helpers/skills/skill-expiry.mjs';
+import { filterKeys } from '../helpers/utils.mjs';
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -137,6 +138,8 @@ export class AbbrewActorSheet extends ActorSheet {
     const equippedWeapons = [];
     const archetypes = [];
     const archetypeSkills = [];
+    const favouriteSkills = [];
+    const activeSkills = [];
 
     for (let i of context.items) {
       i.img = i.img || Item.DEFAULT_ICON;
@@ -144,6 +147,14 @@ export class AbbrewActorSheet extends ActorSheet {
       if (i.type === 'archetype') {
         archetypes.push(i);
         archetypeSkills[i._id] = context.items.filter(j => i.system.skillIds.includes(j.system.abbrewId.uuid));
+      }
+
+      if (i.system.isFavourited) {
+        favouriteSkills.push(i);
+      }
+
+      if (i.type === "skill" && i.system.action.isActive) {
+        activeSkills.push(i);
       }
     }
 
@@ -199,7 +210,7 @@ export class AbbrewActorSheet extends ActorSheet {
         // TODO: May want to handle unarmed etc. differently i.e. worn weapons with no hands required.
         // TODO: Non physical weapons?
         // Unarmed technically should take 1h but stowed / dropped seem a little funny
-        if (['held1H', 'held2H'].includes(i.system.equipState)) {
+        if (['held1H', 'held2H', 'active'].includes(i.system.equipState)) {
           equippedWeapons.push(i);
         }
       }
@@ -215,7 +226,13 @@ export class AbbrewActorSheet extends ActorSheet {
     context.gear = gear;
     context.features = features;
     context.spells = spells;
-    context.skillSections = this.updateObjectValueByKey(this.getSkillSectionDisplays(CONFIG.ABBREW.skillTypes, skills), this.skillSectionDisplay);
+    const sections = this.getSkillSectionDisplays(CONFIG.ABBREW.skillTypes, skills);
+    sections.favourites = favouriteSkills.length > 0 ? "grid" : "none";
+    sections.active = activeSkills.length > 0 ? "grid" : "none";
+    sections.archetypes = favouriteSkills.length > 0 ? "grid" : "none";
+    const allSkillSections = this.updateObjectValueByKey(sections, this.skillSectionDisplay);
+    context.allSkillSections = allSkillSections;
+    context.skillSections = filterKeys(allSkillSections, ["background", "basic", "path", "resource", "temporary", "untyped"]);
     context.skills = skills;
     context.anatomy = anatomy;
     context.armour = armour;
@@ -224,6 +241,8 @@ export class AbbrewActorSheet extends ActorSheet {
     context.equippedWeapons = equippedWeapons;
     context.archetypes = archetypes;
     context.archetypeSkills = archetypeSkills;
+    context.favouriteSkills = favouriteSkills;
+    context.activeSkills = activeSkills;
   }
 
   skillSectionDisplay = {};
@@ -341,14 +360,14 @@ export class AbbrewActorSheet extends ActorSheet {
       li.slideUp(200, () => this.render(false));
     });
 
-    // Delete Skill Item
+    // Edit Archetype Item
     html.on('click', '.archetype-edit', (ev) => {
       const li = $(ev.currentTarget).parents('.archetype');
       const skill = this.actor.items.get(li.data('itemId'));
       skill.sheet.render(true);
     });
 
-    // Delete Skill Item
+    // Delete Archetype Item
     html.on('click', '.archetype-delete', (ev) => {
       const li = $(ev.currentTarget).parents('.archetype');
       const skill = this.actor.items.get(li.data('itemId'));
@@ -396,6 +415,9 @@ export class AbbrewActorSheet extends ActorSheet {
     });
 
     html.on('click', '.skill-header', this._onToggleSkillHeader.bind(this));
+    html.on('click', '.archetypes-header', this._onToggleSkillHeader.bind(this));
+    html.on('click', '.favourites-header', this._onToggleSkillHeader.bind(this));
+    html.on('click', '.active-header', this._onToggleSkillHeader.bind(this));
 
     html.on('click', '.wound', this._onWoundClick.bind(this));
 

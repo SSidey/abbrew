@@ -211,7 +211,7 @@ Handlebars.registerHelper('getProperty', function (parent, child) {
     return index === 0 ? match.toLowerCase() : match.toUpperCase();
   });
 
-  return parent[preparedChild] ?? original;
+  return parent[preparedChild];
 });
 
 Handlebars.registerHelper('getPropertyById', function (parent, child) {

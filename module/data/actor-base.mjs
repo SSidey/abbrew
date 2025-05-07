@@ -202,6 +202,12 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       initiative: new fields.NumberField({ ...requiredInteger, initial: 0 })
     })
 
+    schema.favourites = new fields.SchemaField({
+      skill: new fields.ArrayField(
+        new fields.StringField({ ...blankString })
+      )
+    });
+
     return schema;
   }
 

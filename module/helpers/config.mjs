@@ -146,6 +146,11 @@ ABBREW.wornEquipState = {
   dropped: "ABBREW.EquipState.dropped"
 }
 
+ABBREW.innateEquipState = {
+  active: "ABBREW.EquipState.active",
+  inactive: "ABBREW.EquipState.inactive"
+}
+
 ABBREW.skillTypes = {
   basic: "ABBREW.SkillTypes.basic",
   path: "ABBREW.SkillTypes.path",
@@ -366,7 +371,8 @@ ABBREW.statusEffects = {
 ABBREW.equipTypes = {
   none: "ABBREW.EquipTypes.none",
   held: "ABBREW.EquipTypes.held",
-  worn: "ABBREW.EquipTypes.worn"
+  worn: "ABBREW.EquipTypes.worn",
+  innate: "ABBREW.EquipTypes.innate"
 }
 
 ABBREW.hands = {

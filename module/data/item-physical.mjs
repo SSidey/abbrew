@@ -28,9 +28,6 @@ export default class AbbrewPhysicalItem extends AbbrewItemBase {
         return schema;
     }
 
-
-
-
     // Prior to Active Effects
     prepareBaseData() {
         switch (this.equipType) {
@@ -46,11 +43,12 @@ export default class AbbrewPhysicalItem extends AbbrewItemBase {
                 break;
         }
 
-        const baseEquipStates = Object.entries(CONFIG.ABBREW.wornEquipState).map(s => ({ value: s[0], label: s[1] }));
+        const baseEquipStateObject = this.equipType === "innate" ? CONFIG.ABBREW.innateEquipState : CONFIG.ABBREW.wornEquipState;
+        const baseEquipStates = Object.entries(baseEquipStateObject).map(s => ({ value: s[0], label: s[1] }));
         const validHands = CONFIG.ABBREW.hands[this.handsRequired]?.states ?? [];
-        const additionalEquipStates = validHands.map(s => ({ value: s, label: CONFIG.ABBREW.equipState[s] }))
+        const additionalEquipStates = this.equipType === "innate" ? [] : validHands.map(s => ({ value: s, label: CONFIG.ABBREW.equipState[s] }))
         this.validEquipStates = [...additionalEquipStates, ...baseEquipStates];
-        this.handsSupplied = getNumericParts(this.equipState);
+        this.handsSupplied = this.equipType === "innate" ? 1 : getNumericParts(this.equipState);
         this.actionCost = 0 + this.handsSupplied ?? 1;
         this.exertActionCost = 1 + this.handsSupplied ?? 2;
     }
