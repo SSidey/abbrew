@@ -27,12 +27,15 @@ async function handleMessage(message) {
             break;
         case "handleCombatTurnChange":
             await executeAsGM(handleCombatTurnChange, message.userId, message.data);
+        case "handleCombatTime":
+            await executeAsGM(handleCombatTime, message.userId, message.data);
     }
 }
 
 const GMProxyFunctions = [
     updateMessageForCheck,
-    handleCombatTurnChange
+    handleCombatTurnChange,
+    handleCombatTime
 ];
 
 async function updateMessageForCheck(data) {
@@ -47,13 +50,18 @@ async function handleCombatTurnChange(data) {
 }
 
 async function executeAsGM(func, userId, data) {
-    if (game.user !== game.users.activeGM) {
+    // TODO isActiveGM doesn't seem available but would be preferable: game.user !== game.users.isActiveGM 
+    if (!game.user.isGM) {
         return;
     }
 
     if (GMProxyFunctions.includes(func)) {
         await func(data);
     }
+}
+
+async function handleCombatTime(data) {
+    game.time.advance(CONFIG.ABBREW.durations.round.value);
 }
 
 export { activateSocketListener, emitForAll, SocketMessage }

@@ -247,6 +247,49 @@
         <input type="text" name="system.action.charges.max" value="{{system.action.charges.max}}" data-dtype="Number" />
         {{/if}}
     </div>
+    {{#if system.isActivatable}}
+    <div>
+        <h3>Dialog Prompts</h3>
+        <ol class="async-values-list">
+            {{#each system.action.asyncValues as |value i|}}
+            <li class="effect-change flexrow" data-id="{{i}}">
+                <div class="key">
+                    <input type="text" name="system.action.asyncValues.{{i}}.name" value="{{value.name}}" />
+                </div>
+                <div class="type">
+                    <select name="system.action.asyncValues.{{i}}.type">
+                        {{selectOptions ../config.asyncValueTypes selected=value.type
+                        localize=true}}
+                    </select>
+                </div>
+                <div class="title">
+                    <input type="text" name="system.action.asyncValues.{{i}}.title" value="{{value.title}}" />
+                </div>
+                <div class="numerator">
+                    <input type="number" name="system.action.asyncValues.{{i}}.numerator" value="{{value.numerator}}" />
+                </div>
+                <div class="denominator">
+                    <input type="number" name="system.action.asyncValues.{{i}}.denominator"
+                        value="{{value.denominator}}" />
+                </div>
+                <div class="value-controls">
+                    <a class="value-control" data-action="remove"><i class="fas fa-trash"></i></a>
+                </div>
+            </li>
+            {{/each}}
+            <li class="value add">
+                <div class="value-add">
+                    <label>
+                        <a class="value-control" data-action="add">
+                            Add Value
+                            <i class="fa-solid fa-plus"></i>
+                        </a>
+                    </label>
+                </div>
+            </li>
+        </ol>
+    </div>
+    {{/if}}
     <div>
         <div>
             <h3>Fortune</h3>
@@ -391,6 +434,7 @@
                         </div>
                     </div>
                     {{#if (eq system.action.attackProfile.attackMode "finisher")}}
+                    {{!-- TODO: Fix this I assume? --}}
                     {{!-- <div>
                         <div class="attack-profile-row">
                             <div class="attack-profile-element-2">

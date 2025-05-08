@@ -224,13 +224,19 @@
       "active": "Active",
       "inactive": "Inactive"
     },
+    "AsyncValueTypes": {
+      "singleValue": "Single",
+      "choice": "Choice"
+    },
     "SkillTypes": {
       "basic": "Basic",
       "path": "Path",
+      "archetype": "Archetype",
       "resource": "Resource",
       "temporary": "Temporary",
       "untyped": "Untyped",
-      "background": "Background"
+      "background": "Background",
+      "tier": "Tier"
     },
     "ActionCosts": {
       "passive": "Passive",
@@ -378,7 +384,6 @@
       "damageLastReceived": "Last Damage Taken",
       "damageRoundReceived": "Round Damage Taken",
       "skillCount": "Skill Count",
-      "dialog": "Dialog",
       "async": "Async Result"
     }
   },

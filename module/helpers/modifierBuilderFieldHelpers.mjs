@@ -140,41 +140,6 @@ export function reduceParsedModifiers(parsedValues, startingValue = 0) {
     condition.<"offguard">
     skillCount.<AbbrewId.uuid>
  */
-export async function parsePath(rawValue, actor, source) {
-    if (typeof rawValue != "string") {
-        return rawValue;
-    }
-
-    if (!isNaN(rawValue)) {
-        return parseFloat(rawValue);
-    }
-
-    if (rawValue === "") {
-        return 0;
-    }
-
-    const entityType = rawValue.split('.').slice(0, 1).shift();
-
-    switch (entityType) {
-        case 'dialog':
-            const dialogValue = await getDialogValue(actor, rawValue.split('.').slice(1).shift());
-            return dialogValue;
-        default:
-            return parsePathSync(rawValue, actor, source);
-    }
-}
-
-/* 
-    Expects either a number value which will be returned early, or:
-    actor.<pathToValue e.g. system.defense.guard.value>
-    item.<pathToValue e.g. system.isActivatable>
-    resource.<resourceId e.g. this is the abbrewId.uuid>
-    damage.<"lastDealt"/"lastReceived"/"roundReceived", damageType e.g. all damage "all" / specific "slashing">
-    wound.<"sin"/"corruption">
-    conditionType.<positive/negative>
-    condition.<"offguard">
-    skillCount.<AbbrewId.uuid>
- */
 export function parsePathSync(rawValue, actor, source) {
     if (typeof rawValue != "string") {
         return rawValue;
@@ -279,23 +244,41 @@ function getLastDamageValue(actor, instance, damageType) {
     return 0;
 }
 
-// TODO: Make 0 if NAN
 // TODO: Why players see ?? on cards
 // TODO: Why is initiative privated
 // TODO: Hooks for combat turns are applying multiple times
 // TODO: Hooks firing multiple times, reee
-async function getDialogValue(actor, title) {
+export async function getDialogValue(actor, asyncValues) {
     let result = 0;
+
+    const fields = foundry.applications.fields;
+    const content = asyncValues.map(a => {
+        if (a.type === "single") {
+            const singleInput = fields.createNumberInput({
+                name: a.name,
+                value: 0
+            });
+
+            const singleGroup = fields.createFormGroup({
+                input: singleInput,
+                label: a.title
+            });
+
+            return singleGroup.outerHTML;
+        }
+    }).join(" ");
+
     try {
         result = await foundry.applications.api.DialogV2.prompt({
-            window: { title: title },
-            content: '<input name="fieldValue" type="number" min="0" step="1" autofocus>',
+            window: { title: "Enter Skill Values" },
+            content: content,
             ok: {
                 label: "Submit",
-                callback: (event, button, dialog) => button.form.elements.fieldValue.valueAsNumber
+                callback: (event, button, dialog) => new FormDataExtended(button.form).object
             }
         });
-    } catch {
+    } catch (ex) {
+        console.log(ex);
         console.log(`${actor.name} did not enter a value.`);
         return;
     }

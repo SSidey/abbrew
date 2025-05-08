@@ -149,6 +149,11 @@ export class AbbrewSkillSheet extends ItemSheet {
             if (t.dataset.action) this._onModifierControlAction(t, t.dataset.action);
         });
 
+        html.find(".value-control").click(event => {
+            const t = event.currentTarget;
+            if (t.dataset.action) this._onAsyncValueAction(t, t.dataset.action);
+        });
+
         html.on('dragover', (event) => {
             event.preventDefault();
         });
@@ -417,6 +422,30 @@ export class AbbrewSkillSheet extends ItemSheet {
         }
     }
 
+    _onAsyncValueAction(target, action) {
+        if (this.item.system.configurable) {
+            switch (action) {
+                case "add":
+                    return this.addAsyncValue(target);
+                case "remove":
+                    return this.removeAsyncValue(target);
+            }
+        }
+    }
+
+    addAsyncValue() {
+        let action = foundry.utils.deepClone(this.item.system.action);
+        action.asyncValues = [...action.asyncValues, {}];
+        return this.item.update({ "system.action": action });
+    }
+
+    removeAsyncValue(target) {
+        const id = target.closest("li").dataset.id;
+        const action = foundry.utils.deepClone(this.item.system.action);
+        action.asyncValues.splice(Number(id), 1);
+        return this.item.update({ "system.action": action });
+    }
+
     _onModifierControlAction(target, action) {
         if (this.item.system.configurable) {
             switch (action) {
@@ -521,7 +550,6 @@ export class AbbrewSkillSheet extends ItemSheet {
         let action = foundry.utils.deepClone(this.item.system.action);
         action.attackProfile.finisher.wounds = [...action.attackProfile.finisher.wounds, {}];
         return this.item.update({ "system.action": action });
-
     }
 
     removeSkillActionAtackProfileWound(target) {

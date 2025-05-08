@@ -154,10 +154,12 @@ ABBREW.innateEquipState = {
 ABBREW.skillTypes = {
   basic: "ABBREW.SkillTypes.basic",
   path: "ABBREW.SkillTypes.path",
+  archetype: "ABBREW.SkillTypes.archetype",
   resource: "ABBREW.SkillTypes.resource",
   temporary: "ABBREW.SkillTypes.temporary",
   untyped: "ABBREW.SkillTypes.untyped",
-  background: "ABBREW.SkillTypes.background"
+  background: "ABBREW.SkillTypes.background",
+  tier: "ABBREW.SkillTypes.tier"
 }
 
 ABBREW.actionCosts = {
@@ -545,6 +547,11 @@ ABBREW.modifierPrefixes = {
 ABBREW.checkTypes = {
   "successes": "ABBREW.CheckTypes.successes",
   "result": "ABBREW.CheckTypes.result"
+}
+
+ABBREW.asyncValueTypes = {
+  "single": "ABBREW.AsyncValueTypes.singleValue",
+  "choice": "ABBREW.AsyncValueTypes.choice"
 }
 
 ABBREW.allDamage = { all: { label: "ABBREW.DamageTypes.all" } };

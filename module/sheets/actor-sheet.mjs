@@ -118,7 +118,7 @@ export class AbbrewActorSheet extends ActorSheet {
     // Initialize containers.    
     const gear = [];
     const features = [];
-    const skills = { background: [], basic: [], path: [], resource: [], temporary: [], untyped: [] };
+    const skills = { background: [], basic: [], path: [], resource: [], temporary: [], untyped: [], archetype: [], tier: [] };
     const spells = {
       0: [],
       1: [],
@@ -207,9 +207,7 @@ export class AbbrewActorSheet extends ActorSheet {
       }
       else if (i.type === 'weapon') {
         weapons.push(i);
-        // TODO: May want to handle unarmed etc. differently i.e. worn weapons with no hands required.
         // TODO: Non physical weapons?
-        // Unarmed technically should take 1h but stowed / dropped seem a little funny
         if (['held1H', 'held2H', 'active'].includes(i.system.equipState)) {
           equippedWeapons.push(i);
         }
@@ -229,7 +227,7 @@ export class AbbrewActorSheet extends ActorSheet {
     const sections = this.getSkillSectionDisplays(CONFIG.ABBREW.skillTypes, skills);
     sections.favourites = favouriteSkills.length > 0 ? "grid" : "none";
     sections.active = activeSkills.length > 0 ? "grid" : "none";
-    sections.archetypes = favouriteSkills.length > 0 ? "grid" : "none";
+    sections.archetypes = Object.keys(archetypeSkills).length > 0 ? "grid" : "none";
     const allSkillSections = this.updateObjectValueByKey(sections, this.skillSectionDisplay);
     context.allSkillSections = allSkillSections;
     context.skillSections = filterKeys(allSkillSections, ["background", "basic", "path", "resource", "temporary", "untyped"]);

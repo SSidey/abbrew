@@ -5,7 +5,7 @@ import { handlePairedSkills, isSkillBlocked } from "./skill-activation.mjs";
 import { handleEarlySelfModifiers, handleLateSelfModifiers, handleTargetUpdates } from "./skill-modifiers.mjs";
 import { applyAttackProfiles } from "./skill-attack.mjs";
 import { renderChatMessage } from "./skill-chat.mjs";
-import { parsePath } from "../modifierBuilderFieldHelpers.mjs";
+import { getDialogValue } from "../modifierBuilderFieldHelpers.mjs";
 
 export function getModifierSkills(actor, skill) {
     // Get all queued synergy skills (Only include filter out those with charges but 0 remaining)
@@ -37,54 +37,10 @@ async function handleAsyncModifierTypes(actor, skill, mainModifierSkills, siblin
     const skillsList = [clonedSkill, clonedModifiers, clonedSiblingModifiers]
     skillsList.forEach(skills => {
         skills.filter(s =>
-            s.system.action.modifiers.attackProfile.damage.some(d => d.value.split('.').slice(0, 1).shift() === "dialog") || s.system.action.skillCheck.some(x => x.type === "dialog") || s.system.action.modifiers.guard.self.value.some(x => x.type === "dialog") || s.system.action.modifiers.risk.self.value.some(x => x.type === "dialog") || s.system.action.modifiers.resolve.self.value.some(x => x.type === "dialog") || s.system.action.modifiers.wounds.self.some(w => w.value.some(x => x.type === "dialog")) || s.system.action.modifiers.resources.self.some(w => w.value.some(x => x.type === "dialog"))
-            || s.system.action.modifiers.guard.target.value.some(x => x.type === "dialog") || s.system.action.modifiers.risk.target.value.some(x => x.type === "dialog") || s.system.action.modifiers.resolve.target.value.some(x => x.type === "dialog") || s.system.action.modifiers.wounds.target.some(w => w.value.some(x => x.type === "dialog")) || s.system.action.modifiers.resources.target.some(w => w.value.some(x => x.type === "dialog"))
+            s.system.action.asyncValues.length > 0
         ).forEach(s => {
-            s.system.action.skillCheck.filter(x => x.type === "dialog").forEach(v => {
-                promises.push(preparseDialogs(actor, s, "system.action.skillCheck", v));
-            });
-            s.system.action.modifiers.guard.self.value.filter(x => x.type === "dialog").forEach(v => {
-                promises.push(preparseDialogs(actor, s, "system.action.modifiers.guard.self.value", v));
-            });
-            s.system.action.modifiers.risk.self.value.filter(x => x.type === "dialog").forEach(v => {
-                promises.push(preparseDialogs(actor, s, "system.action.modifiers.risk.self.value", v));
-            });
-            s.system.action.modifiers.resolve.self.value.filter(x => x.type === "dialog").forEach(v => {
-                promises.push(preparseDialogs(actor, s, "system.action.modifiers.resolve.self.value", v));
-            });
-            s.system.action.modifiers.attackProfile.damage.filter(d => d.value.split('.').slice(0, 1).shift() === "dialog").forEach(d => {
-                promises.push(preparseSimple(actor, s, "system.action.modifiers.attackProfile.damage", d));
-            })
-            s.system.action.modifiers.wounds.self.filter(w => w.value.filter(x => x.type === "dialog")).forEach(v => {
-                v.value.filter(x => x.type === "dialog").forEach(y => {
-                    promises.push(preparseDialogs(actor, s, `system.action.modifiers.wounds.self`, y));
-                })
-            });
-            s.system.action.modifiers.resources.self.filter(w => w.value.filter(x => x.type === "dialog")).forEach(v => {
-                v.value.filter(x => x.type === "dialog").forEach(y => {
-                    promises.push(preparseDialogs(actor, s, `system.action.modifiers.resources.self`, y));
-                })
-            });
-            s.system.action.modifiers.guard.target.value.filter(x => x.type === "dialog").forEach(v => {
-                promises.push(preparseDialogs(actor, s, "system.action.modifiers.guard.target.value", v));
-            });
-            s.system.action.modifiers.risk.target.value.filter(x => x.type === "dialog").forEach(v => {
-                promises.push(preparseDialogs(actor, s, "system.action.modifiers.risk.target.value", v));
-            });
-            s.system.action.modifiers.resolve.target.value.filter(x => x.type === "dialog").forEach(v => {
-                promises.push(preparseDialogs(actor, s, "system.action.modifiers.resolve.target.value", v));
-            });
-            s.system.action.modifiers.wounds.target.filter(w => w.value.filter(x => x.type === "dialog")).forEach(v => {
-                v.value.filter(x => x.type === "dialog").forEach(y => {
-                    promises.push(preparseDialogs(actor, s, `system.action.modifiers.wounds.target`, y));
-                })
-            });
-            s.system.action.modifiers.resources.target.filter(w => w.value.filter(x => x.type === "dialog")).forEach(v => {
-                v.value.filter(x => x.type === "dialog").forEach(y => {
-                    promises.push(preparseDialogs(actor, s, `system.action.modifiers.resources.target`, y));
-                })
-            });
-        });
+            promises.push(preparseDialogs(actor, s.system.action.asyncValues));
+        })
     });
 
     await Promise.all(promises);
@@ -141,44 +97,24 @@ async function handleAsyncModifierTypes(actor, skill, mainModifierSkills, siblin
         });
     });
 
+
     return [clonedSkill, clonedModifiers, clonedSiblingModifiers];
 }
 
 function handleSimpleAsyncResults(skill, field) {
     const path = field.value.split('.').slice(1).join(".")
-    field.value = skill.asyncValues[path];
+    field.value = skill.system.action.asyncValues.find(a => a.name === path)?.value ?? 0;
 }
 
 function handleAsyncResults(skill, field) {
-    field.value = skill.asyncValues[field.path];
+    field.type = "numeric";
+    field.path = skill.system.action.asyncValues.find(a => a.name === field.path)?.value ?? 0;
 }
 
-async function preparseSimple(actor, skill, fieldPath, field) {
-    const result = await parsePath(field.value, actor, actor);
-    field.value = result;
-    if (!skill.asyncValues) {
-        skill.asyncValues = {};
-        skill.asyncValues[fieldPath] = result;
-    } else {
-        skill.asyncValues[fieldPath] = result;
-    }
-}
 
-async function preparseDialogs(actor, skill, fieldPath, modifierfield) {
-    const path = modifierfield.path;
-    const type = modifierfield.type;
-    const result = await parsePath([modifierfield.type, modifierfield.path].join("."), actor, actor);
-    modifierfield.reversion.isRequired = true;
-    modifierfield.reversion.path = path;
-    modifierfield.reversion.type = type;
-    modifierfield.path = result;
-    modifierfield.type = "numeric";
-    if (!skill.asyncValues) {
-        skill.asyncValues = {};
-        skill.asyncValues[fieldPath] = result;
-    } else {
-        skill.asyncValues[fieldPath] = result;
-    }
+async function preparseDialogs(actor, asyncValues) {
+    const result = await getDialogValue(actor, asyncValues);
+    asyncValues.forEach(a => a.value = result[a.name])
 }
 
 function getSkillSummaries(skill, modifierSkills) {

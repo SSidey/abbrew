@@ -156,7 +156,8 @@ async function turnEnd(actor) {
     // TODO: Conditions could modify this?
     await actor.unsetFlag("abbrew", "combat.damage.lastRoundReceived")
     await applyActiveSkills(actor, "end");
-    await handleSkillExpiry("end", actor);
+    // TODO: Determine if we can remove this, time should handle it.
+    // await handleSkillExpiry("end", actor);
     await actor.update({ "system.actions": actor.system.modifiers.actionRecovery });
 }
 
@@ -167,7 +168,8 @@ async function turnStart(actor) {
 
     await handleSkillToRounds(actor);
     await applyActiveSkills(actor, "start");
-    await handleSkillExpiry("start", actor);
+    // TODO: Determine if we can remove this, time should handle it.
+    // await handleSkillExpiry("start", actor);
     await updateTurnStartWounds(actor);
 
     await rechargePerRoundSkills(actor);

@@ -24,6 +24,7 @@ export function getAttackSkillWithActions(id, name, actionCost, image, attackPro
                 activationType: "standalone",
                 actionCost: actionCost,
                 actionImage: image,
+                asyncValues: [],
                 duration: {
                     precision: "0",
                     value: 0
@@ -123,6 +124,7 @@ export function getParrySkillWithActions(actionCost, siblingSkillModifiers = [])
                 activationType: "standalone",
                 actionCost: Math.max(1, actionCost),
                 actionImage: skill.image,
+                asyncValues: [],
                 duration: {
                     precision: "0",
                     value: 0
@@ -221,6 +223,7 @@ export function getFundamentalAttributeSkill(fundamental, siblingSkillModifiers 
                 activationType: "standalone",
                 actionCost: 0,
                 actionImage: fundamental.image,
+                asyncValues: [],
                 duration: {
                     precision: "0",
                     value: 0

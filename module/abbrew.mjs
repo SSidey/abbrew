@@ -10,7 +10,7 @@ import * as models from './data/_module.mjs';
 // Import Documents Classes
 import * as documents from './documents/_module.mjs';
 import * as abbrewCanvas from './canvas/_module.mjs';
-import { handleActorWoundConditions, handleActorGuardConditions, handleCombatStart, handleCombatEnd } from './helpers/combat.mjs';
+import { handleActorWoundConditions, handleActorGuardConditions, handleCombatStart, handleCombatEnd, handleTurnChange } from './helpers/combat.mjs';
 import { staticID, doesNestedFieldExist, getSafeJson } from './helpers/utils.mjs';
 import { registerSystemSettings } from './settings.mjs';
 import { AbbrewCreatureFormSheet } from './sheets/items/item-creature-form-sheet.mjs';
@@ -287,15 +287,18 @@ Hooks.on("combatStart", async (combat, updateData, updateOptions) => {
 });
 
 Hooks.on("combatRound", async (combat, updateData, updateOptions) => {
-  game.time.advance(CONFIG.ABBREW.durations.round.value);
+  await emitForAll("system.abbrew", new SocketMessage(null, "handleCombatTime", {}));
 })
 
 Hooks.on("combatTurn", async (combat, updateData, updateOptions) => {
 })
 
 Hooks.on("combatTurnChange", async (combat, prior, current) => {
-  if (canvas.tokens.get(current.tokenId).actor.isOwner) {
-    await emitForAll("system.abbrew", new SocketMessage(null, "handleCombatTurnChange", { prior, current }));
+  // if (canvas.tokens.get(current.tokenId).actor.isOwner) {
+  //   
+  // }
+  if (game.user.isGM) {
+    await handleTurnChange(prior, current, canvas.tokens.get(prior.tokenId)?.actor, canvas.tokens.get(current.tokenId).actor)
   }
 })
 
