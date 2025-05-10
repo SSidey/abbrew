@@ -178,7 +178,7 @@
         }
       }
     },
-    "skillType": "path",
+    "skillType": "temporary",
     "path": {
       "value": "",
       "archetype": ""
@@ -202,7 +202,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1745363128436,
-    "modifiedTime": 1745363194405,
+    "modifiedTime": 1746567693246,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!RwNQg7ASkvt8wL0a"

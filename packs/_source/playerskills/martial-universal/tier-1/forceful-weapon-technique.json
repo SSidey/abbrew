@@ -223,7 +223,7 @@
       "value": {
         "id": ""
       },
-      "raw": ""
+      "raw": "[{\"label\":\"universal\",\"value\":\"Universal\",\"roles\":[],\"title\":\"A universal path, skills with this path can be selected if it has roles matching thosee of your paths\",\"id\":\"abbrewpuniversal\"}]"
     },
     "attributeIncrease": "",
     "attributeIncreaseLong": "",
@@ -240,7 +240,7 @@
       "fillCapacityOnCreate": false
     },
     "roles": {
-      "raw": "",
+      "raw": "[{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"}]",
       "parsed": []
     },
     "archetype": "",
@@ -258,7 +258,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746223939260,
-    "modifiedTime": 1746347354419,
+    "modifiedTime": 1746552272037,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_id": "mdZiRCjDtdpcf7GN",

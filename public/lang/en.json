@@ -105,7 +105,9 @@
       "Skill": "Skill",
       "Archetype": "Archetype",
       "Path": "Path",
-      "ActiveEffect": "Active Effect"
+      "ActiveEffect": "Active Effect",
+      "Ammunition": "Ammunition",
+      "Weapon": "Weapon"
     },
     "CheckTypes": {
       "successes": "Successes",
@@ -207,13 +209,26 @@
     "AttackTypes": {
       "arc": "Arc",
       "thrust": "Thrust",
-      "static": "Static"
+      "static": "Static",
+      "thrown": "Thrown",
+      "ranged": "Ranged"
     },
     "AttackModes": {
       "attack": "Attack",
       "feint": "Feint",
       "overpower": "Overpower",
       "finisher": "Finisher"
+    },
+    "ReloadType": {
+      "draw": "Draw",
+      "reload": "Reload"
+    },
+    "AmmunitionType": {
+      "shot": "Shot",
+      "arrow": "Arrow",
+      "bolt": "Bolt",
+      "bullet": "Bullet",
+      "cell": "Cell"
     },
     "EquipState": {
       "heldOne": "Held 1H",
@@ -409,7 +424,8 @@
       "creatureForm": "Creature Form",
       "skillDeck": "Skill Deck",
       "archetype": "Archetype",
-      "path": "Path"
+      "path": "Path",
+      "ammunition": "Ammunition"
     }
   },
   "SETTINGS.AnnounceTurnStart.Name": "Announce Turn Start",

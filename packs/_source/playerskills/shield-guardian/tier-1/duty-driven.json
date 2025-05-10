@@ -3,9 +3,9 @@
   "name": "Duty Driven",
   "type": "skill",
   "_id": "STc6sgfAl5kM2B4d",
-  "img": "systems/abbrew/assets/icons/skills/todo.svg",
+  "img": "systems/abbrew/assets/icons/actions/0a.webp",
   "system": {
-    "description": "<p>// TODO: Need section on skill that allows for movement speed modification. Modifiers bonus to speed would be a good one.</p><p><span style=\"font-family: Arial,sans-serif\">Your base movement speed is increased by your Duty stacks.</span></p>",
+    "description": "<p><span style=\"font-family: Arial,sans-serif\">Your base movement speed is increased by your Duty stacks.</span></p>",
     "traits": "",
     "abbrewId": {
       "value": "abbrew.skill.dutydriven.STc6sgfAl5kM2B4d",
@@ -218,8 +218,23 @@
       "disabled": false,
       "_id": "ocnx3tizE5y0diN7",
       "type": "base",
-      "system": {},
-      "changes": [],
+      "system": {
+        "modifiers": [
+          {
+            "parseMode": "resource",
+            "numerator": 1,
+            "denominator": 1
+          }
+        ]
+      },
+      "changes": [
+        {
+          "key": "[{\"value\":\"Base Speed\",\"label\":\"system.movement.baseSpeed\"}]",
+          "mode": 2,
+          "value": "U3lWpCsnZ1FN3n56",
+          "priority": null
+        }
+      ],
       "description": "<p><span style=\"font-family:Arial, sans-serif\">Your base movement speed is increased by your Duty stacks.</span></p>",
       "tint": "#ffffff",
       "transfer": true,
@@ -247,7 +262,7 @@
         "systemId": "abbrew",
         "systemVersion": "0.0.2-prerelease31",
         "createdTime": 1746384115164,
-        "modifiedTime": 1746384164760,
+        "modifiedTime": 1746556916212,
         "lastModifiedBy": "abbrewpacks00000"
       },
       "_key": "!items.effects!STc6sgfAl5kM2B4d.ocnx3tizE5y0diN7"
@@ -264,7 +279,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746384024519,
-    "modifiedTime": 1746384287661,
+    "modifiedTime": 1746556966757,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!STc6sgfAl5kM2B4d"

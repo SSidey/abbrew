@@ -11,7 +11,7 @@ import * as models from './data/_module.mjs';
 import * as documents from './documents/_module.mjs';
 import * as abbrewCanvas from './canvas/_module.mjs';
 import { handleActorWoundConditions, handleActorGuardConditions, handleCombatStart, handleCombatEnd, handleTurnChange } from './helpers/combat.mjs';
-import { staticID, doesNestedFieldExist, getSafeJson } from './helpers/utils.mjs';
+import { staticID, doesNestedFieldExist, getSafeJson, getObjectValueByStringPath } from './helpers/utils.mjs';
 import { registerSystemSettings } from './settings.mjs';
 import { AbbrewCreatureFormSheet } from './sheets/items/item-creature-form-sheet.mjs';
 import { AbbrewSkillDeckSheet } from './sheets/items/item-skill-deck-sheet.mjs';
@@ -19,6 +19,8 @@ import { AbbrewAnatomySheet } from './sheets/items/item-anatomy-sheet.mjs';
 import { AbbrewSkillSheet } from './sheets/items/item-skill-sheet.mjs';
 import { AbbrewArchetypeSheet } from './sheets/items/item-archetype-sheet.mjs';
 import { AbbrewPathSheet } from './sheets/items/item-path-sheet.mjs';
+import { AbbrewAmmunitionSheet } from './sheets/items/item-ammunition-sheet.mjs';
+import { AbbrewWeaponSheet } from './sheets/items/item-weapon-sheet.mjs';
 import { onWorldTimeUpdate } from './helpers/time.mjs';
 import { activateSocketListener, emitForAll, SocketMessage } from './socket.mjs';
 import { handleSkillActivate } from './helpers/skills/skill-activation.mjs';
@@ -75,7 +77,8 @@ Hooks.once('init', function () {
     skillDeck: models.AbbrewSkillDeck,
     creatureForm: models.AbbrewCreatureForm,
     path: models.AbbrewPath,
-    archetype: models.AbbrewArchetype
+    archetype: models.AbbrewArchetype,
+    ammunition: models.AbbrewAmmunition
   }
 
   CONFIG.Token.documentClass = documents.AbbrewTokenDocument;
@@ -108,9 +111,14 @@ Hooks.once('init', function () {
   });
   Items.unregisterSheet('core', ItemSheet);
   Items.registerSheet('abbrew', AbbrewItemSheet, {
-    types: ["item", "feature", "spell", "armour", "weapon", "wound"],
+    types: ["item", "feature", "spell", "armour", "wound"],
     makeDefault: true,
     label: 'ABBREW.SheetLabels.Item',
+  });
+  Items.registerSheet('abbrew', AbbrewWeaponSheet, {
+    types: ["weapon"],
+    makeDefault: true,
+    label: 'ABBREW.SheetLabels.Weapon',
   });
   Items.registerSheet('abbrew', AbbrewCreatureFormSheet, {
     types: ["creatureForm"],
@@ -126,6 +134,11 @@ Hooks.once('init', function () {
     types: ["anatomy"],
     makeDefault: true,
     label: "ABBREW.SheetLabels.Anatomy"
+  });
+  Items.registerSheet('abbrew', AbbrewAmmunitionSheet, {
+    types: ["ammunition"],
+    makeDefault: true,
+    label: "ABBREW.SheetLabels.Ammunition"
   });
   Items.registerSheet('abbrew', AbbrewSkillSheet, {
     types: ["skill"],
@@ -264,6 +277,15 @@ Handlebars.registerHelper("eagerEvaluation", function (value, ...replacements) {
 
 Handlebars.registerHelper("lt", function (val1, val2) {
   return parseFloat(val1) < parseFloat(val2);
+})
+
+Handlebars.registerHelper("filter", function (array, path, filterValue) {
+  const filtered = array?.filter(a => {
+    const result = getObjectValueByStringPath(a, path)
+    return result === filterValue
+  });
+
+  return filtered ?? [];
 })
 
 /* -------------------------------------------- */

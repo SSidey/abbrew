@@ -129,7 +129,22 @@ ABBREW.facing = {
 ABBREW.attackTypes = {
   arc: "ABBREW.AttackTypes.arc",
   thrust: "ABBREW.AttackTypes.thrust",
-  static: "ABBREW.AttackTypes.static"
+  static: "ABBREW.AttackTypes.static",
+  thrown: "ABBREW.AttackTypes.thrown",
+  ranged: "ABBREW.AttackTypes.ranged"
+}
+
+ABBREW.reloadTypes = {
+  reload: "ABBREW.ReloadType.reload",
+  draw: "ABBREW.ReloadType.draw"
+}
+
+ABBREW.ammunitionTypes = {
+  shot: "ABBREW.AmmunitionType.shot",
+  arrow: "ABBREW.AmmunitionType.arrow",
+  bolt: "ABBREW.AmmunitionType.bolt",
+  bullet: "ABBREW.AmmunitionType.bullet",
+  cell: "ABBREW.AmmunitionType.cell"
 }
 
 ABBREW.equipState = {
@@ -468,6 +483,9 @@ ABBREW.fundamentalAttackSkills = {
   "feint": { id: "abbrewFeint00000", name: "Feint", image: "systems/abbrew/assets/icons/skills/feint.svg" },
   "finisher": { id: "abbrewFinisher00", name: "Finisher", image: "systems/abbrew/assets/icons/skills/finisher.svg" },
   "overpower": { id: "abbrewOverpower0", name: "Parry", image: "systems/abbrew/assets/icons/skills/overpower.svg" },
+  "ranged": { id: "abbrewRangedAtt0", name: "Ranged Attack", image: "systems/abbrew/assets/icons/skills/ranged-attack.svg" },
+  "aimedshot": { id: "abbrewAimedShot0", name: "Aimed Shot", image: "systems/abbrew/assets/icons/skills/aimed-shot.svg" },
+  "thrown": { id: "abbrewThrown0000", name: "Thrown", image: "systems/abbrew/assets/icons/skills/thrown.svg" },
 }
 
 ABBREW.fundamentalAttributeSkillIds = [
@@ -540,7 +558,6 @@ ABBREW.modifierPrefixes = {
   "damagelastReceived": "ABBREW.ModifierPrefixes.damageLastReceived",
   "damageroundReceived": "ABBREW.ModifierPrefixes.damageRoundReceived",
   "skillCount": "ABBREW.ModifierPrefixes.skillCount",
-  "dialog": "ABBREW.ModifierPrefixes.dialog",
   "async": "ABBREW.ModifierPrefixes.async"
 }
 

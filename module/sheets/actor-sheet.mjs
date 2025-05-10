@@ -4,9 +4,9 @@ import {
   prepareActiveEffectCategories,
 } from '../helpers/effects.mjs';
 import Tagify from '@yaireo/tagify'
-import { getFundamentalAttributeSkill } from '../helpers/fundamental-skills.mjs';
+import { getFundamentalAttributeSkill, getFundamentalSkillWithActionCost } from '../helpers/fundamental-skills.mjs';
 import { cleanTemporarySkill } from '../helpers/skills/skill-uses.mjs';
-import { handleSkillActivate } from '../helpers/skills/skill-activation.mjs';
+import { getModifiedSkillActionCost, handleSkillActivate } from '../helpers/skills/skill-activation.mjs';
 import { manualSkillExpiry } from '../helpers/skills/skill-expiry.mjs';
 import { filterKeys } from '../helpers/utils.mjs';
 
@@ -117,6 +117,8 @@ export class AbbrewActorSheet extends ActorSheet {
   _prepareItems(context) {
     // Initialize containers.    
     const gear = [];
+    const ammunition = [];
+    const ammunitionChoices = this.actor.items.filter(i => i.type === "ammunition").map(a => ({ label: a.name, type: a.system.type, value: a._id }));
     const features = [];
     const skills = { background: [], basic: [], path: [], resource: [], temporary: [], untyped: [], archetype: [], tier: [] };
     const spells = {
@@ -164,6 +166,10 @@ export class AbbrewActorSheet extends ActorSheet {
       // Append to gear.
       if (i.type === 'item') {
         gear.push(i);
+      }
+      if (i.type === 'ammunition') {
+        ammunition.push(i);
+        ammunitionChoices.push({ name: i.name, type: i.system.type, id: i._id });
       }
       // Append to features.
       else if (i.type === 'feature') {
@@ -223,6 +229,8 @@ export class AbbrewActorSheet extends ActorSheet {
     // Assign and return
     context.gear = gear;
     context.features = features;
+    context.ammunition = ammunition;
+    context.ammunitionChoices = ammunitionChoices;
     context.spells = spells;
     const sections = this.getSkillSectionDisplays(CONFIG.ABBREW.skillTypes, skills);
     sections.favourites = favouriteSkills.length > 0 ? "grid" : "none";
@@ -412,6 +420,49 @@ export class AbbrewActorSheet extends ActorSheet {
       await this._onAttackDamageAction(t, 'finisher');
     });
 
+    html.on('click', '.attack-ranged-button', async (event) => {
+      const t = event.currentTarget;
+      await this._onAttackDamageAction(t, 'ranged');
+    });
+
+    html.on('click', '.attack-aimedshot-button', async (event) => {
+      const t = event.currentTarget;
+      await this._onAttackDamageAction(t, 'aimedshot');
+    });
+
+    html.on('click', '.attack-reload-button', async (event) => {
+      const t = event.currentTarget;
+      await this._onAttackReloadAction(t, 'reload');
+    });
+
+    html.on('click', '.attack-throw-button', async (event) => {
+      const t = event.currentTarget;
+      await this._onAttackDamageAction(t, 'thrown');
+    });
+
+    html.on('click', '.attack-reload-button', async (event) => {
+      const t = event.currentTarget;
+      await this._onAttackPickUpAction(t, 'pickup');
+    });
+
+
+    html.on('change', '.attack-reload', async (event) => {
+      const t = event.currentTarget;
+      const attackProfile = t.closest(".attack-profile");
+      const weaponContainer = t.closest(".weapon-container");
+      const profileId = attackProfile.dataset.attackProfileId;
+      const weaponId = weaponContainer.dataset.itemId;
+      const weapon = this.actor.items.find(i => i._id === weaponId);
+      const attackProfiles = weapon.system.attackProfiles;
+      const profile = attackProfiles[attackProfileId];
+      const ammunition = this.actor.items.get(profile.ammunition.id);
+      const ammunitionAmount = ammunition.system.quantity + profile.ammunition.value;
+      attackProfiles[profileId].ammunition.id = event.currentTarget.value;
+      attackProfiles[profileId].ammunition.value = 0;
+      await weapon.update({ "system.attackProfiles": attackProfiles });
+      await ammunition.update({ "system.quantity": ammunitionAmount });
+    })
+
     html.on('click', '.skill-header', this._onToggleSkillHeader.bind(this));
     html.on('click', '.archetypes-header', this._onToggleSkillHeader.bind(this));
     html.on('click', '.favourites-header', this._onToggleSkillHeader.bind(this));
@@ -563,6 +614,54 @@ export class AbbrewActorSheet extends ActorSheet {
     const attackProfileId = target.closest('li .attack-profile').dataset.attackProfileId;
     const item = this.actor.items.get(itemId);
     await item.handleAttackDamageAction(this.actor, attackProfileId, attackMode);
+  }
+
+  async _onAttackPickUpAction(target, attackMode) {
+    if (!await this.actor.canActorUseActions(1)) {
+      return false;
+    }
+
+    if (!item.isHeldEquipStateChangePossible("held1H")) {
+      ui.notifications.warn("You don't have free hands to pick that up");
+      return false;
+    }
+
+    const itemId = target.closest('li.item').dataset.itemId;
+    const attackProfileId = target.closest('li .attack-profile').dataset.attackProfileId;
+    const item = this.actor.items.get(itemId);
+    await item.update({ "system.equipState": "held1H" })
+  }
+
+  async _onAttackReloadAction(target, attackMode) {
+    const itemId = target.closest('li.item').dataset.itemId;
+    const attackProfileId = target.closest('li .attack-profile').dataset.attackProfileId;
+    const item = this.actor.items.get(itemId);
+    const attackProfiles = item.system.attackProfiles;
+    const attackProfile = attackProfiles[attackProfileId];
+
+    if (attackProfile.ammunition.value === attackProfile.ammunition.max) {
+      ui.notifications.warn(`${item.name} is already fully loaded.`)
+      return false;
+    }
+
+    const skill = getFundamentalSkillWithActionCost(attackMode, attackProfile.ammunition.reloadActionCost)
+    if (!await this.actor.canActorUseActions(getModifiedSkillActionCost(this.actor, skill))) {
+      return false;
+    }
+
+    const ammunitionId = attackProfile.ammunition.id;
+    const ammunition = this.actor.items.get(ammunitionId);
+
+    if (ammunition.system.quantity === 0) {
+      ui.notifications.warn(`You have no ${ammunition.name} remaining.`)
+      return false;
+    }
+
+    const reloadedAmount = Math.min(ammunition.system.quantity, (attackProfile.ammunition.max - attackProfile.ammunition.value));
+    const updateAmmunitionAmount = ammunition.system.quantity -= reloadedAmount;
+    attackProfiles[attackProfileId].ammunition.value = attackProfile.ammunition.value + reloadedAmount;
+    await ammunition.update({ "system.quantity": updateAmmunitionAmount });
+    await item.update({ "system.attackProfiles": attackProfiles });
   }
 
   /**

@@ -5,7 +5,7 @@
   "_id": "LaP1x9w47SoTXI9F",
   "img": "icons/svg/item-bag.svg",
   "system": {
-    "description": "<p><span style=\"font-family: Arial,sans-serif\"><strong>Trigger:</strong> An enemy declares an attack on your Charge and the distance between you and your charge is equal to or less than your size.</span></p><hr><p dir=\"ltr\" style=\"line-height: 1.38; margin-top: 0pt; margin-bottom: 0pt\"><span style=\"font-family: Arial,sans-serif\">You may swap places with your charge, becoming the target of the attack.</span></p><p><span style=\"font-family: Arial,sans-serif\">Gain 1 Duty.</span></p>",
+    "description": "<p><span style=\"font-family: Arial,sans-serif\"><strong>Trigger:</strong> An enemy declares an attack on your Charge and you could step into their space.</span></p><hr><p dir=\"ltr\" style=\"line-height: 1.38; margin-top: 0pt; margin-bottom: 0pt\"><span style=\"font-family: Arial,sans-serif\">You become the target of the attack, you may swap places with your charge</span></p><p><span style=\"font-family: Arial,sans-serif\">Gain 1 Duty.</span></p>",
     "traits": "",
     "abbrewId": {
       "value": "abbrew.skill.bodyblock.LaP1x9w47SoTXI9F",
@@ -228,7 +228,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746383823444,
-    "modifiedTime": 1746383965599,
+    "modifiedTime": 1746557823270,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!LaP1x9w47SoTXI9F"

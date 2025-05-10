@@ -80,7 +80,8 @@
         <div class="dice-roll">
             <h3>Damage</h3>
             <div class="dice-result">
-                <div class="dice-formula" {{#unless (showGmSection user)}}data-visibility="gm" {{/unless}}>{{totalSuccesses}}</div>
+                <div class="dice-formula" {{#unless (showGmSection user)}}data-visibility="gm" {{/unless}}>
+                    {{totalSuccesses}}</div>
                 <div class="dice-formula" {{#unless (showGmSection user)}}data-visibility="player" {{/unless}}>??</div>
                 <div class="dice-tooltip" {{#unless (showGmSection user)}}data-visibility="gm" {{/unless}}>
                     <section class="tooltip-part">
@@ -132,10 +133,12 @@
         <button data-action="overpower">Overpower</button>
         {{/if}}
         {{/unless}}
+        {{#unless isStrongAttack}}
         {{#unless showFinisher}}
         {{#if showAttack}}
         <button data-action="parry"><span class="actions-icon action-{{actionCost}}a">Parry</span></button>
         {{/if}}
+        {{/unless}}
         {{/unless}}
         {{#if showFinisher}}
         <ol class="finisher-buttons">

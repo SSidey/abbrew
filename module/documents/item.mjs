@@ -282,9 +282,46 @@ export default class AbbrewItem extends Item {
     }
   }
 
+  _mergeRangedAttackAndAmmo(attackProfile, ammoAttackModifier) {
+    attackProfile.critical = ammoAttackModifier.critical;
+    attackProfile.lethal = ammoAttackModifier.lethal;
+    attackProfile.finisherLimit = ammoAttackModifier.finisherLimit;
+    const bonusPenetration = attackProfile.rangedPenetration;
+    attackProfile.damage = ammoAttackModifier.damage;
+    attackProfile.damage.forEach(d => d.penetration += bonusPenetration);
+
+    return attackProfile;
+  }
+
+  _getActionCost(attackMode) {
+    switch (attackMode) {
+      case "overpower": return this.system.exertActionCost;
+      case "ranged": return 1;
+      case "aimedshot": return 2;
+      default:
+        return this.system.actionCost;
+    }
+  }
+
   async handleAttackDamageAction(actor, attackProfileId, attackMode) {
-    const attackProfile = this.system.attackProfiles[attackProfileId];
-    const actionCost = attackMode === "overpower" ? this.system.exertActionCost : this.system.actionCost;
+    let attackProfile = structuredClone(this.system.attackProfiles[attackProfileId]);
+
+    if (["ranged", "aimedshot"].includes(attackMode)) {
+      if (this.system.attackProfiles[attackProfileId].ammunition.value === 0) {
+        ui.notifications.warn(`${this.name} needs to be reloaded.`)
+        return;
+      }
+      const ammunition = this.actor.items.find(i => i._id === this.system.attackProfiles[attackProfileId].ammunition.id);
+      if (ammunition) {
+        const ammoAttackModifier = ammunition.system.attackModifier;
+        attackProfile = this._mergeRangedAttackAndAmmo(attackProfile, ammoAttackModifier);
+        const attackProfiles = this.system.attackProfiles;
+        attackProfiles[attackProfileId].ammunition.value -= 1;
+        await this.update({ "system.attackProfiles": attackProfiles });
+      }
+    }
+
+    const actionCost = this._getActionCost(attackMode);
 
     let combineForSkill = actor.items.filter(i => i.type === "skill").find(s => s._id === actor.system.combinedAttacks.combineFor);
 
@@ -345,5 +382,9 @@ export default class AbbrewItem extends Item {
     const attackSkill = getAttackSkillWithActions(null, this.name, actionCost, this.img, attackProfile, attackMode, this.system.handsSupplied);
 
     await handleSkillActivate(actor, attackSkill);
+
+    if (attackMode === "thrown") {
+      await this.update({ "system.equipState": "dropped" });
+    }
   }
 }

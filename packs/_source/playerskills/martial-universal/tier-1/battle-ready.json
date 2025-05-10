@@ -226,7 +226,7 @@
       },
       "changes": [
         {
-          "key": "",
+          "key": "[{\"value\":\"Initiative Bonus\",\"label\":\"system.modifiers.initiative\"}]",
           "mode": 2,
           "value": "1",
           "priority": null
@@ -264,7 +264,7 @@
         "systemId": "abbrew",
         "systemVersion": "0.0.2-prerelease31",
         "createdTime": null,
-        "modifiedTime": 1746463210604,
+        "modifiedTime": 1746565085873,
         "lastModifiedBy": "abbrewpacks00000"
       },
       "_key": "!items.effects!9gcApg4g2EGwmLGC.ar0FrBkJY7GgmII5"

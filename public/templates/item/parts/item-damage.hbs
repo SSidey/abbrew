@@ -27,11 +27,87 @@
                             name="system.attackProfiles.{{i}}.hasStrongAttack" {{ checked attackProfile.hasStrongAttack
                             }}>
                     </div>
+                    <div class="attack-profile-detail-entry">
+                        <label>Critical</label>
+                        <input type="text" name="system.attackProfiles.{{i}}.critical"
+                            value="{{attackProfile.critical}}" data-dtype="Number" />
+                    </div>
+                    <div class="attack-profile-detail-entry">
+                        <label>Lethal</label>
+                        <input type="text" name="system.attackProfiles.{{i}}.lethal" value="{{attackProfile.lethal}}"
+                            data-dtype="Number" />
+                    </div>
+                    {{#unless (or (eq attackProfile.attackType "ranged") (eq attackProfile.attackType "thrown"))}}
+                    <div class="attack-profile-detail-entry">
+                        <label>Reach</label>
+                        <input type="text" name="system.attackProfiles.{{i}}.reach" value="{{attackProfile.reach}}"
+                            data-dtype="String" />
+                    </div>
+                    {{/unless}}
+                    {{#if (or (eq attackProfile.attackType "ranged") (eq attackProfile.attackType "thrown"))}}
+                    <div class="attack-profile-detail-entry">
+                        <label>Range</label>
+                        <input type="text" name="system.attackProfiles.{{i}}.range" value="{{attackProfile.range}}"
+                            data-dtype="Number" />
+                    </div>
+                    {{/if}}
+                    {{#if (eq attackProfile.attackType "ranged")}}
+                    <div class="attack-profile-detail-entry">
+                        <label>Ranged Penetration</label>
+                        <input type="text" name="system.attackProfiles.{{i}}.rangedPenetration"
+                            value="{{attackProfile.rangedPenetration}}" data-dtype="String" />
+                    </div>
+                    {{/if}}
                 </div>
+                {{#if (eq attackProfile.attackType "ranged")}}
+                <h4>Ammunition</h4>
+                <div class="attack-profile-detail-entries">
+                    <div class="attack-profile-detail-entry">
+                        <label>Type</label>
+                        <select name="system.attackProfiles.{{i}}.ammunition.type">
+                            {{selectOptions ../config.ammunitionTypes selected=attackProfile.ammunition.type blank=""
+                            localize=true}}
+                        </select>
+                    </div>
+                    <div class="attack-profile-detail-entry">
+                        <label>Choice</label>
+                        <select name="system.attackProfiles.{{i}}.ammunition.id">
+                            {{selectOptions (filter ../ammunitionChoices "type" attackProfile.ammunition.type)
+                            selected=attackProfile.ammunition.id blank=""
+                            localize=true}}
+                        </select>
+                    </div>
+                    <div class="attack-profile-detail-entry">
+                        <label>Ammo</label>
+                        <div class="ammo-count">
+                            <input type="text" name="system.attackProfiles.{{i}}.ammunition.value"
+                                value="{{attackProfile.ammunition.value}}" data-dtype="String" />
+                            <span> / </span>
+                            <input type="text" name="system.attackProfiles.{{i}}.ammunition.max"
+                                value="{{attackProfile.ammunition.max}}" data-dtype="String" {{#unless
+                                (isGM)}}readonly{{/unless}} />
+                        </div>
+                    </div>
+                    <div class="attack-profile-detail-entry">
+                        <label>Reload Type</label>
+                        <select name="system.attackProfiles.{{i}}.ammunition.reloadType">
+                            {{selectOptions ../config.reloadTypes selected=attackProfile.ammunition.reloadType blank=""
+                            localize=true}}
+                        </select>
+                    </div>
+                    <div class="attack-profile-detail-entry">
+                        <label>Reload Cost</label>
+                        <input type="text" name="system.attackProfiles.{{i}}.ammunition.reloadActionCost"
+                            value="{{attackProfile.ammunition.reloadActionCost}}" data-dtype="String" />
+                    </div>
+                </div>
+                {{/if}}
+                {{#unless (eq attackProfile.attackType "ranged")}}
                 <ol class="attack-profile-damage-list">
                     <li class="attack-profile-damage-header">
                         <label>{{ localize "ABBREW.Type" }}</label>
                         <label>{{ localize "ABBREW.Damage" }}</label>
+                        <label>Penetration</label>
                         <label>Attribute</label>
                     </li>
                     {{#each attackProfile.damage as |damage j|}}
@@ -44,6 +120,10 @@
                         <div>
                             <input type="text" name="system.attackProfiles.{{i}}.damage.{{j}}.value"
                                 value="{{damage.value}}" data-dtype="Number" />
+                        </div>
+                        <div>
+                            <input type="text" name="system.attackProfiles.{{i}}.damage.{{j}}.penetration"
+                                value="{{damage.penetration}}" data-dtype="Number" />
                         </div>
                         <div>
                             <select name="system.attackProfiles.{{i}}.damage.{{j}}.attributeModifier">
@@ -67,6 +147,7 @@
                         </div>
                     </li>
                 </ol>
+                {{/unless}}
             </div>
             <a class="attack-profile-control remove-attack-profile" data-action="remove-attack-profile">
                 <i class="fa-solid fa-minus"></i>

@@ -23,6 +23,7 @@
       {{#each item.system.attackProfiles as |attackProfile attackProfileId|}}
       <ol class="attack-profiles">
         <li class="attack-profile" data-attack-profile-id="{{attackProfileId}}">
+          {{#unless (or (eq attackProfile.attackType "ranged") (eq attackProfile.attackType "thrown"))}}
           <button type="button" class="attack-damage-button"><span
               class="actions-icon action-{{item.system.actionCost}}a">{{attackProfile.name}}</span></button>
           {{#if item.system.isOverpowerTrained}}
@@ -35,9 +36,43 @@
           {{/if}}
           {{/if}}
           <button type="button" class="attack-feint-button"><span
-              class="actions-icon action-{{item.system.actionCost}}a">Feint</span></button>
+              class="actions-icon action-{{item.system.actionCost}}a" /><span>Feint</span></button>
           <button type="button" class="attack-finisher-button"><span
               class="actions-icon action-{{item.system.actionCost}}a">Finisher</span></button>
+          {{/unless}}
+          {{#if (eq attackProfile.attackType "thrown")}}
+          <button type="button" class="attack-throw-button" {{#if (eq item.system.equipState "dropped"
+            )}}disabled{{/if}}><span
+              class="actions-icon action-{{item.system.exertActionCost}}a">{{attackProfile.name}}</span></button>
+          <button type="button" class="attack-pickup-button"><span class="actions-icon action-1a">Pick
+              Up</span></button>
+          <button type="button" class="attack-finisher-button"><span
+              class="actions-icon action-{{item.system.actionCost}}a">Finisher</span></button>
+          <div></div>
+          {{/if}}
+          {{#if (eq attackProfile.attackType "ranged")}}
+          <button type="button" class="attack-ranged-button"><span
+              class="actions-icon action-1a">{{attackProfile.name}}</span></button>
+          <button type="button" class="attack-aimedshot-button">
+            <span class="actions-icon action-2a">Aimed Shot</span>
+          </button>
+          {{#if (eq attackProfile.ammunition.reloadType "draw")}}
+          <button type="button" class="attack-reload-button">
+            <span
+              class="actions-icon action-{{attackProfile.ammunition.reloadActionCost}}a">{{attackProfile.ammunition.reloadType}}</span>
+          </button>
+          {{else}}
+          <button type="button" class="attack-reload-button">
+            <span
+              class="actions-icon action-{{attackProfile.ammunition.reloadActionCost}}a">{{attackProfile.ammunition.reloadType}}</span>
+          </button>
+          {{/if}}
+          <select class="attack-reload">
+            {{selectOptions (filter ../../ammunitionChoices "type" attackProfile.ammunition.type)
+            selected=attackProfile.ammunition.id blank=""
+            localize=true}}
+          </select>
+          {{/if}}
         </li>
       </ol>
       {{/each}}

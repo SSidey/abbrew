@@ -48,7 +48,7 @@ export async function applyAttackProfiles(actor, skill, modifierSkills, fortune,
 
         const showAttack = ['attack', 'feint', 'finisher'].includes(attackMode);
         const isFeint = attackMode === 'feint';
-        const isStrongAttack = attackMode === 'overpower';
+        const isStrongAttack = ['overpower', 'ranged', 'aimedshot', 'thrown'].includes(attackMode);
         const showFinisher = attackMode === 'finisher' || totalSuccesses > 0;
         const isFinisher = attackMode === 'finisher';
 

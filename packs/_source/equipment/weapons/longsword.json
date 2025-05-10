@@ -10,7 +10,8 @@
     "armourPoints": "",
     "equipState": "stowed",
     "weapon": {
-      "size": 6
+      "size": 6,
+      "heft": 6
     },
     "attackProfiles": [
       {
@@ -83,7 +84,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075307575,
-    "modifiedTime": 1745755447016,
+    "modifiedTime": 1746556727374,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "ownership": {

@@ -2,7 +2,7 @@
   "name": "Goblin Pox",
   "type": "skill",
   "system": {
-    "skillType": "path",
+    "skillType": "temporary",
     "description": "",
     "traits": "",
     "abbrewId": {
@@ -209,7 +209,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1745363095498,
-    "modifiedTime": 1745363394039,
+    "modifiedTime": 1746567688151,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_id": "uX8G3dqIreZJLhJQ",

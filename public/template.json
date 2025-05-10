@@ -16,7 +16,8 @@
       "creatureForm",
       "skillDeck",
       "archetype",
-      "path"
+      "path",
+      "ammunition"
     ]
   }
 }

@@ -1,6 +1,7 @@
 span.actions-icon {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 30px 1fr;
+    align-items: center;
 }
 
 span.actions-icon::before {

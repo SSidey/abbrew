@@ -8,7 +8,7 @@ export default class AbbrewItem extends AbbrewItemBase {
     const schema = super.defineSchema();
 
     // Pull to physical?
-    schema.quantity = new fields.NumberField({ ...requiredInteger, initial: 1, min: 1 });
+    schema.quantity = new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 });
     schema.weight = new fields.NumberField({ required: true, nullable: false, initial: 0, min: 0 });
 
     // Break down roll formula into three independent fields

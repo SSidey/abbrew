@@ -32,7 +32,7 @@
     "action": {
       "activationType": "standalone",
       "actionCost": "2",
-      "actionImage": "",
+      "actionImage": "2a",
       "duration": {
         "precision": "6",
         "value": 1,
@@ -232,7 +232,17 @@
           "self": [],
           "target": []
         }
-      }
+      },
+      "asyncValues": [
+        {
+          "name": "",
+          "type": "single",
+          "title": "",
+          "numerator": 1,
+          "denominator": 1,
+          "value": 0
+        }
+      ]
     },
     "skillType": "temporary",
     "path": {
@@ -259,7 +269,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1744146554637,
-    "modifiedTime": 1745694522109,
+    "modifiedTime": 1746733473658,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!4VY0xnsMtGtS4BGq"

@@ -226,7 +226,7 @@
       },
       "changes": [
         {
-          "key": "",
+          "key": "[{\"value\":\"Base Speed\",\"label\":\"system.movement.baseSpeed\"}]",
           "mode": 2,
           "value": "1",
           "priority": null
@@ -264,7 +264,7 @@
         "systemId": "abbrew",
         "systemVersion": "0.0.2-prerelease31",
         "createdTime": null,
-        "modifiedTime": 1746463621678,
+        "modifiedTime": 1746552234584,
         "lastModifiedBy": "abbrewpacks00000"
       },
       "_key": "!items.effects!NQrSoOjrBhVSPT6E.umnTXBOpdAwXEe3K"

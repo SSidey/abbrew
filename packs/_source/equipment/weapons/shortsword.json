@@ -44,7 +44,8 @@
       }
     ],
     "weapon": {
-      "size": 4
+      "size": 4,
+      "heft": 4
     },
     "armourPoints": "",
     "equipState": "stowed",
@@ -75,7 +76,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075348244,
-    "modifiedTime": 1745358233410,
+    "modifiedTime": 1746556731357,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_id": "6iQLPlRxcvCEe1YT",
