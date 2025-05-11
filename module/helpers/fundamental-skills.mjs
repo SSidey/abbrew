@@ -1,4 +1,4 @@
-export function getAttackSkillWithActions(id, name, actionCost, image, attackProfile, attackMode, handsSupplied, siblingSkillModifiers = []) {
+export function getAttackSkillWithActions(id, name, actionCost, image, attackProfile, attackMode, handsSupplied, siblingSkillModifiers = [], actorSource, itemSource) {
     const skill = CONFIG.ABBREW.fundamentalAttackSkills[attackMode];
     let critical;
     if (attackMode === "ranged") {
@@ -24,6 +24,10 @@ export function getAttackSkillWithActions(id, name, actionCost, image, attackPro
             attributeIncrease: "",
             attributeIncreaseLong: "",
             attributeRankIncrease: "",
+            sources: {
+                actor: actorSource,
+                items: itemSource
+            },
             skills: {
                 granted: [],
                 paired: [],

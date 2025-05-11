@@ -61,6 +61,30 @@
         <input type="text" name="system.skillModifiers.discord" class="drop-with-fundamentals"
           value="{{system.skillModifiers.discord}}" data-dtype="String" data-dropType="skill" {{#unless
           (isGM)}}readonly{{/unless}}>
+        <label>Granted By Actor</label>
+        <input type="text" name="system.grantedBy.actor" value="{{system.grantedBy.actor}}" data-dtype="String" />
+        <label>Granted By Item</label>
+        <input type="text" name="system.grantedBy.item" value="{{system.grantedBy.item}}" data-dtype="String" />
+        <label class="slide-toggle roboto-upper">
+          <input type="checkbox" class="action-activatable" name="system.skillModifiers.isActorGrantTriggerRequired" {{
+            checked system.skillModifiers.isActorGrantTriggerRequired }}>
+          <span>Is Item Trigger Required</span>
+          {{#if system.skillModifiers.isActorGrantTriggerRequired}}
+          <i class="fa fa-toggle-on"></i>
+          {{else}}
+          <i class="fa fa-toggle-off"></i>
+          {{/if}}
+        </label>
+        <label class="slide-toggle roboto-upper">
+          <input type="checkbox" class="action-activatable" name="system.skillModifiers.isItemGrantTriggerRequired" {{
+            checked system.skillModifiers.isItemGrantTriggerRequired }}>
+          <span>Is Item Trigger Required</span>
+          {{#if system.skillModifiers.isItemGrantTriggerRequired}}
+          <i class="fa fa-toggle-on"></i>
+          {{else}}
+          <i class="fa fa-toggle-off"></i>
+          {{/if}}
+        </label>
       </div>
       <div>
         <h3>Granted Skills</h3>

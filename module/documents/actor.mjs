@@ -2,6 +2,7 @@ import { mergeActorWounds } from "../helpers/combat.mjs";
 import { applyFullyParsedModifiers, mergeModifierFields, reduceParsedModifiers } from "../helpers/modifierBuilderFieldHelpers.mjs";
 import { handleSkillActivate, isSkillBlocked } from "../helpers/skills/skill-activation.mjs";
 import { applySkillEffects } from "../helpers/skills/skill-application.mjs";
+import { handleGrantedSkills, handleSkillsGrantedOnAccept } from "../helpers/skills/skill-grants.mjs";
 import { getAttackerAdvantageGuardResult, getAttackerAdvantageRiskResult, getDefenderAdvantageGuardResult, getDefenderAdvantageRiskResult } from "../helpers/trainedSkills.mjs";
 import { compareModifierIndices, doesNestedFieldExist, getObjectValueByStringPath } from "../helpers/utils.mjs";
 import { FINISHERS } from "../static/finishers.mjs";
@@ -214,15 +215,6 @@ export default class AbbrewActor extends Actor {
     return this;
   }
 
-  async handleSkillsGrantedOnAccept(data) {
-    data.skillsGrantedOnAccept.forEach(async s => {
-      const skill = await fromUuid(s.sourceId);
-      if (skill) {
-        await Item.create(skill, { parent: this });
-      }
-    });
-  }
-
   async activateDamageTakenSkill(damage) {
     this.items.filter(i => i.type === "skill").filter(s => s.system.activateOnDamageAccept).forEach(async s => {
       await handleSkillActivate(this, s, false);
@@ -234,7 +226,7 @@ export default class AbbrewActor extends Actor {
     await this.takeActionWounds(data);
     await this.takeActionResources(data);
 
-    await this.handleSkillsGrantedOnAccept(data);
+    await handleSkillsGrantedOnAccept(data, this);
   }
 
   async takeAttack(data, action) {
@@ -532,9 +524,7 @@ export default class AbbrewActor extends Actor {
 
   async acceptSkillDeck(skillDeck) {
     const skills = await Promise.all(skillDeck.system.skills.granted.map(async s => await fromUuid(s.sourceId)));
-    for (const index in skills) {
-      await Item.create(skills[index], { parent: this })
-    }
+    await handleGrantedSkills(skills, this, null);
   }
 
   async acceptAnatomy(anatomy) {

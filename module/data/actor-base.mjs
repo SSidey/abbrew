@@ -38,6 +38,9 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     schema.combinedAttacks = new fields.SchemaField({
       combineFor: new fields.StringField({ required: true, blank: true, nullable: true }),
       combined: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+      itemIds: new fields.ArrayField(
+        new fields.NumberField({ ...requiredInteger })
+      ),
       base: new fields.SchemaField({
         id: new fields.StringField({ required: true, blank: true }),
         name: new fields.StringField({ required: true, blank: true }),

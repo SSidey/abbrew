@@ -17,7 +17,27 @@ export function getModifierSkills(actor, skill) {
     // Get passives that have synergy with the main skill
     const passiveSynergies = passiveSkills.filter(s => s.system.skillModifiers.synergy).map(s => ({ skill: s, synergy: JSON.parse(s.system.skillModifiers.synergy).flatMap(s => [s.id, foundry.utils.parseUuid(s.sourceId).id]) })).filter(s => s.synergy.includes(skill.system.abbrewId.uuid)).map(s => s.skill)
     // Combine all relevant skills, filtering for those that are out of charges    
-    return [...passiveSynergies, ...queuedSynergies];
+    return [...passiveSynergies, ...queuedSynergies].filter(s => isSynergyValidForTrigger(skill, s));
+}
+
+function isSynergyValidForTrigger(skill, synergy) {
+    if (!(synergy.system.skillModifiers.isActorGrantTriggerRequired || synergy.system.skillModifiers.isItemGrantTriggerRequired)) {
+        return true;
+    }
+
+    if (synergy.system.skillModifiers.isActorGrantTriggerRequired && synergy.system.skillModifiers.isItemGrantTriggerRequired) {
+        return (skill.system.sources.actor === synergy.system.grantedBy.actor) && (skill.system.sources.items.includes(synergy.system.grantedBy.item));
+    }
+
+    if (synergy.system.skillModifiers.isActorGrantTriggerRequired) {
+        return skill.system.sources.actor === synergy.system.grantedBy.actor;
+    }
+
+    if (synergy.system.skillModifiers.isItemGrantTriggerRequired) {
+        return skill.system.sources.items.includes(synergy.system.grantedBy.item);
+    }
+
+    return true;
 }
 
 async function getGroupedModifierSkills(actor, skill) {

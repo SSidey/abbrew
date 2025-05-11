@@ -440,7 +440,7 @@ export class AbbrewActorSheet extends ActorSheet {
       await this._onAttackDamageAction(t, 'thrown');
     });
 
-    html.on('click', '.attack-reload-button', async (event) => {
+    html.on('click', '.attack-pickup-button', async (event) => {
       const t = event.currentTarget;
       await this._onAttackPickUpAction(t, 'pickup');
     });
@@ -453,14 +453,19 @@ export class AbbrewActorSheet extends ActorSheet {
       const profileId = attackProfile.dataset.attackProfileId;
       const weaponId = weaponContainer.dataset.itemId;
       const weapon = this.actor.items.find(i => i._id === weaponId);
-      const attackProfiles = weapon.system.attackProfiles;
-      const profile = attackProfiles[attackProfileId];
+      if (!weapon) {
+        return;
+      }
+      const attackProfiles = structuredClone(weapon.system.attackProfiles);
+      const profile = attackProfiles[profileId];
       const ammunition = this.actor.items.get(profile.ammunition.id);
-      const ammunitionAmount = ammunition.system.quantity + profile.ammunition.value;
+      if (ammunition) {
+        const ammunitionAmount = ammunition.system.quantity + profile.ammunition.value;
+        await ammunition.update({ "system.quantity": ammunitionAmount });
+      }
       attackProfiles[profileId].ammunition.id = event.currentTarget.value;
       attackProfiles[profileId].ammunition.value = 0;
       await weapon.update({ "system.attackProfiles": attackProfiles });
-      await ammunition.update({ "system.quantity": ammunitionAmount });
     })
 
     html.on('click', '.skill-header', this._onToggleSkillHeader.bind(this));

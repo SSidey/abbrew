@@ -537,7 +537,10 @@ ABBREW.fundamentalAttackSkillSummaries = [
   { id: "abbrewParry00000", value: "Parry", sourceId: "Compendium.abbrew.skills.Item.abbrewParry00000" },
   { id: "abbrewFeint00000", value: "Feint", sourceId: "Compendium.abbrew.skills.Item.abbrewFeint00000" },
   { id: "abbrewFinisher00", value: "Finisher", sourceId: "Compendium.abbrew.skills.Item.abbrewFinisher00" },
-  { id: "abbrewOverpower0", value: "Overpower", sourceId: "Compendium.abbrew.skills.Item.abbrewOverpower0" }
+  { id: "abbrewOverpower0", value: "Overpower", sourceId: "Compendium.abbrew.skills.Item.abbrewOverpower0" },
+  { id: "abbrewRangedAtt0", value: "Ranged Attack", sourceId: "Compendium.abbrew.skills.Item.abbrewRangedAtt0" },
+  { id: "abbrewAimedShot0", value: "Aimed Shot", sourceId: "Compendium.abbrew.skills.Item.abbrewAimedShot0" },
+  { id: "abbrewThrown0000", value: "Thrown", sourceId: "Compendium.abbrew.skills.Item.abbrewThrown0000" },
 ]
 
 ABBREW.fundamentalSkillSummaries = [

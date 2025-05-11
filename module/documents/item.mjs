@@ -6,6 +6,7 @@ import { acceptSkillCheck } from '../helpers/skills/skill-check.mjs';
 import { getModifiedSkillActionCost, handleSkillActivate } from '../helpers/skills/skill-activation.mjs';
 import { trackSkillDuration } from '../helpers/skills/skill-duration.mjs';
 import { manualSkillExpiry } from '../helpers/skills/skill-expiry.mjs';
+import { handleGrantedSkills } from '../helpers/skills/skill-grants.mjs';
 /**
  * Extend the basic Item with some very simple modifications.
  * @extends {Item}
@@ -48,6 +49,32 @@ export default class AbbrewItem extends Item {
       foundry.utils.setProperty(changed, `system.action.duration.value`, 1);
     }
 
+    if (doesNestedFieldExist(changed, "system.attackProfiles") && this.actor) {
+      let newGrantPromises = [];
+      const promises = [];
+      let newAmmunition;
+      this.system.attackProfiles.filter(p => p.attackType === "ranged").forEach((p, i) => {
+        if (this.system.attackProfiles[i].ammunition.id !== changed.system.attackProfiles[i].ammunition.id) {
+          const oldAmmunition = this.actor.items.get(p.ammunition.id);
+          newAmmunition = this.actor.items.get(changed.system.attackProfiles[i].ammunition.id);
+          if (oldAmmunition) {
+            const oldGrants = oldAmmunition.system.skills.granted.map(g => g.id);
+            const oldGranted = this.actor.items.filter(o => oldGrants.includes(o.system.abbrewId.uuid));
+            oldGranted.forEach(o => promises.push(o.delete()));
+          }
+          if (newAmmunition) {
+            const newGrants = newAmmunition.system.skills.granted;
+            newGrants.map(n => fromUuid(n.sourceId));
+            newGrantPromises = newGrants.map(n => fromUuid(n.sourceId));
+          }
+        }
+      })
+
+      const newGranted = await Promise.all(newGrantPromises) ?? [];
+      promises.push(handleGrantedSkills(newGranted, this.actor, newAmmunition));
+      await Promise.all(promises);
+    }
+
     if (doesNestedFieldExist(changed, "system.isFavourited")) {
       if (this.actor) {
         if (changed.system.isFavourited) {
@@ -67,6 +94,13 @@ export default class AbbrewItem extends Item {
         }
       }
     }
+
+    return super._preUpdate(changed, options, userId);
+  }
+
+  _onUpdate(changed, options, userId) {
+    // console.log("CHANGE");
+    super._onUpdate(changed, options, userId);
   }
 
   isWornEquipStateChangePossible() {
@@ -271,6 +305,11 @@ export default class AbbrewItem extends Item {
 
   async _preDelete(options, userId) {
     if (this.actor) {
+      const trackedEffects = this.actor.effects.toObject().filter(e => e.flags.abbrew.skill.trackDuration === this._id);
+      if (trackedEffects.length > 0) {
+        this.actor.deleteEmbeddedDocuments("ActiveEffect", trackedEffects.map(e => e._id));
+      }
+
       // If we have one left then clear it out of archetype lists.
       if (this.actor.items.filter(i => i.type === "skill").filter(s => s.system.abbrewId.uuid === this.system.abbrewId.uuid).length === 1) {
         const archetypes = this.actor.items.filter(i => i.type === "archetype").filter(a => a.system.skillIds.includes(this.system.abbrewId.uuid));
@@ -305,13 +344,16 @@ export default class AbbrewItem extends Item {
 
   async handleAttackDamageAction(actor, attackProfileId, attackMode) {
     let attackProfile = structuredClone(this.system.attackProfiles[attackProfileId]);
+    let ammunitionId;
 
     if (["ranged", "aimedshot"].includes(attackMode)) {
       if (this.system.attackProfiles[attackProfileId].ammunition.value === 0) {
         ui.notifications.warn(`${this.name} needs to be reloaded.`)
         return;
       }
-      const ammunition = this.actor.items.find(i => i._id === this.system.attackProfiles[attackProfileId].ammunition.id);
+
+      ammunitionId = this.system.attackProfiles[attackProfileId].ammunition.id;
+      const ammunition = this.actor.items.find(i => i._id === ammunitionId);
       if (ammunition) {
         const ammoAttackModifier = ammunition.system.attackModifier;
         attackProfile = this._mergeRangedAttackAndAmmo(attackProfile, ammoAttackModifier);
@@ -322,6 +364,7 @@ export default class AbbrewItem extends Item {
     }
 
     const actionCost = this._getActionCost(attackMode);
+    const itemTriggerIds = [this._id, ammunitionId].filter(i => i);
 
     let combineForSkill = actor.items.filter(i => i.type === "skill").find(s => s._id === actor.system.combinedAttacks.combineFor);
 
@@ -350,11 +393,12 @@ export default class AbbrewItem extends Item {
       const combined = actor.system.combinedAttacks.combined;
       if (actor.system.combinedAttacks.combined === 0 && !actor.system.combinedAttacks.base) {
         const base = { id: combineSkill.id, name: combineSkill.name, actionCost: combineSkill.actionCost, image: combineSkill.image, attackMode: combineSkill.attackMode, handsSupplied: combineSkill.handsSupplied, attackProfile: attackProfile };
-        await actor.update({ "system.combinedAttacks.combined": combined + 1, "system.combinedAttacks.base": base });
+        await actor.update({ "system.combinedAttacks.itemIds": itemTriggerIds, "system.combinedAttacks.combined": combined + 1, "system.combinedAttacks.base": base });
         return;
       }
 
       const combinedDamage = actor.system.combinedAttacks.additionalDamage;
+      const fullItemIds = [...actor.system.combinedAttacks.itemIds, ...itemTriggerIds];
       const fullCombinedDamage = [...combinedDamage, ...attackProfile.damage];
       const totalCombined = combined + 1;
       if (totalCombined < toCombine) {
@@ -363,7 +407,7 @@ export default class AbbrewItem extends Item {
 
       let base = actor.system.combinedAttacks.base;
       base.attackProfile.damage = [...base.attackProfile.damage, ...fullCombinedDamage];
-      let attackSkill = getAttackSkillWithActions(base.id, base.name, base.actionCost, base.image, base.attackProfile, base.attackMode, base.handsSupplied);
+      let attackSkill = getAttackSkillWithActions(base.id, base.name, base.actionCost, base.image, base.attackProfile, base.attackMode, base.handsSupplied, [], actor._id, fullItemIds);
       attackSkill.system.action.attackProfile.finisherLimit = applyOperator(attackSkill.system.action.attackProfile.finisherLimit, combineForSkill.system.action.modifiers.attackProfile.finisherLimit.value, combineForSkill.system.action.modifiers.attackProfile.finisherLimit.operator, 0);
       attackSkill.system.action.attackProfile.critical = applyOperator(attackSkill.system.action.attackProfile.critical, combineForSkill.system.action.modifiers.attackProfile.critical.value, combineForSkill.system.action.modifiers.attackProfile.critical.operator, 5);
       attackSkill.system.action.attackProfile.lethal = applyOperator(attackSkill.system.action.attackProfile.lethal, combineForSkill.system.action.modifiers.attackProfile.lethal.value, combineForSkill.system.action.modifiers.attackProfile.lethal.operator, 0);
@@ -379,7 +423,7 @@ export default class AbbrewItem extends Item {
       return;
     }
 
-    const attackSkill = getAttackSkillWithActions(null, this.name, actionCost, this.img, attackProfile, attackMode, this.system.handsSupplied);
+    const attackSkill = getAttackSkillWithActions(null, this.name, actionCost, this.img, attackProfile, attackMode, this.system.handsSupplied, [], actor._id, itemTriggerIds);
 
     await handleSkillActivate(actor, attackSkill);
 

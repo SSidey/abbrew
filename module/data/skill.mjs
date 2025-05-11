@@ -16,7 +16,11 @@ export default class AbbrewSkill extends AbbrewItemBase {
         schema.skillTraits = new fields.StringField({ ...blankString });
         schema.skillModifiers = new fields.SchemaField({
             synergy: new fields.StringField({ ...blankString }),
-            discord: new fields.StringField({ ...blankString })
+            discord: new fields.StringField({ ...blankString }),
+            // Whether or not to apply a skil in synergies, if true then the appropriate grantedBy 
+            // id(s) must be present in sources for it to be included
+            isActorGrantTriggerRequired: new fields.BooleanField({ required: true, intial: false }),
+            isItemGrantTriggerRequired: new fields.BooleanField({ required: true, intial: false })
         });
         schema.isFavourited = new fields.BooleanField({ required: true, initial: false });
         schema.configurable = new fields.BooleanField({ required: true });
@@ -26,6 +30,17 @@ export default class AbbrewSkill extends AbbrewItemBase {
         schema.applyTurnEnd = new fields.BooleanField({ required: true, initial: false });
         schema.applyOnExpiry = new fields.BooleanField({ required: true, initial: false });
         schema.activateOnDamageAccept = new fields.BooleanField({ required: true, initial: false });
+        // Who is sending the skill e.g. this will be tha attacker and their weapon's id on an attack
+        schema.sources = new fields.SchemaField({
+            actor: new fields.StringField({ ...blankString }),
+            items: new fields.ArrayField(
+                new fields.StringField({ ...blankString })
+            )
+        });
+        schema.grantedBy = new fields.SchemaField({
+            actor: new fields.StringField({ ...blankString }),
+            item: new fields.StringField({ ...blankString })
+        })
         schema.skills = new fields.SchemaField({
             granted: new fields.ArrayField(
                 new fields.SchemaField({

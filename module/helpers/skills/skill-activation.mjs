@@ -3,6 +3,7 @@ import { applyOperator } from "../operators.mjs";
 import { getSafeJson } from "../utils.mjs";
 import { applySkillEffects, getModifierSkills } from "./skill-application.mjs";
 import { addSkillToActiveSkills, addSkillToQueuedSkills, trackSkillDuration } from "./skill-duration.mjs";
+import { handleGrantOnUse } from "./skill-grants.mjs";
 import { mergeResourceSelfModifiers } from "./skill-modifiers.mjs";
 
 export async function handleSkillActivate(actor, skill, checkActions = true) {
@@ -144,16 +145,5 @@ async function activateSkillEffects(skill) {
         const promises = [];
         effects.forEach(e => promises.push(e.update({ "disabled": false })));
         await Promise.all(promises);
-    }
-}
-
-async function handleGrantOnUse(skill, actor) {
-    if (skill.system.skills.grantedOnActivation.length > 0) {
-        skill.system.skills.grantedOnActivation.forEach(async s => {
-            const grantedSkill = await fromUuid(s.sourceId);
-            if (grantedSkill) {
-                await Item.create(grantedSkill, { parent: actor });
-            }
-        });
     }
 }
