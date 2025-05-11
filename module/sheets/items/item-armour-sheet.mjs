@@ -9,7 +9,7 @@ import { renderSheetForStoredItem } from '../../helpers/utils.mjs';
  * Extend the basic ItemSheet with some very simple modifications
  * @extends {ItemSheet}
  */
-export class AbbrewWeaponSheet extends ItemSheet {
+export class AbbrewArmourSheet extends ItemSheet {
   /** @override */
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {

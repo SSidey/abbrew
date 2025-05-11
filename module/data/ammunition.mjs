@@ -30,18 +30,7 @@ export default class AbbrewAmmunition extends AbbrewPhysicalItem {
                     penetration: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
                 })
             )
-        }); // TODO: Skills granted on ammo and weapon use purely for that attack e.g. grant, activate on create, instant temporary 1use
-        schema.skills = new fields.SchemaField({
-            granted: new fields.ArrayField(
-                new fields.SchemaField({
-                    name: new fields.StringField({ required: true, blank: true }),
-                    skillType: new fields.StringField({ required: true, blank: true }),
-                    id: new fields.StringField({ required: true, blank: true }),
-                    image: new fields.StringField({ required: true, blank: true }),
-                    sourceId: new fields.StringField({ required: true, blank: true })
-                })
-            )
-        });
+        }); 
     }
 
     prepareDerivedData() {

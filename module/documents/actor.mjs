@@ -524,7 +524,7 @@ export default class AbbrewActor extends Actor {
 
   async acceptSkillDeck(skillDeck) {
     const skills = await Promise.all(skillDeck.system.skills.granted.map(async s => await fromUuid(s.sourceId)));
-    await handleGrantedSkills(skills, this, null);
+    await handleGrantedSkills(skills, this, skillDeck);
   }
 
   async acceptAnatomy(anatomy) {

@@ -22,19 +22,42 @@ export default class AbbrewItem extends Item {
   }
 
   async _preUpdate(changed, options, userId) {
-    if (doesNestedFieldExist(changed, "system.equipState") && changed.system.equipState === 'worn' && this.type === 'armour') {
-      if (!this.isWornEquipStateChangePossible()) {
-        ui.notifications.info("You are already wearing too many items, try stowing some");
-        this.actor.sheet.render();
-        return false;
+    // TODO: Could have items grant extra slots e.g. "belt" slot, which you could then have "worn" equip on a scabbard (require 1 belt)
+    // The scabbard which grants a sword slot so then you can wear your sword (worn items are less cost to draw?)
+    if (doesNestedFieldExist(changed, "system.equipState") && this.system.equipType === "worn") {
+      if (changed.system.equipState === 'worn' && this.type === 'armour') {
+        if (!this.isWornEquipStateChangePossible()) {
+          ui.notifications.info("You are already wearing too many items, try stowing some");
+          this.actor.sheet.render();
+          return false;
+        } else {
+          await this.grantSkills();
+        }
+      } else {
+        if ((this.system.skills?.granted?.length ?? 0) > 0) {
+          const grantedSkills = this.actor.items.filter(i => i.type === "skill").filter(s => s.system.grantedBy.item === this._id);
+          this.actor.deleteEmbeddedDocuments("Item", grantedSkills.map(s => s._id));
+        }
       }
     }
 
-    if (doesNestedFieldExist(changed, "system.equipState") && changed.system.equipState.startsWith('held')) {
-      if (!this.isHeldEquipStateChangePossible(changed.system.equipState)) {
-        ui.notifications.info("You are already holding too many items, try stowing some");
-        this.actor.sheet.render();
-        return false;
+    if (doesNestedFieldExist(changed, "system.equipState") && this.system.equipType === "held") {
+      if (changed.system.equipState.startsWith('held')) {
+        if (!this.isHeldEquipStateChangePossible(changed.system.equipState)) {
+          ui.notifications.info("You are already holding too many items, try stowing some");
+          this.actor.sheet.render();
+          return false;
+        } else {
+          await this.grantSkills();
+        }
+      } else if (changed.system.equipState === 'active') {
+        await this.grantSkills();
+      }
+      else {
+        if ((this.system.skills?.granted?.length ?? 0) > 0) {
+          const grantedSkills = this.actor.items.filter(i => i.type === "skill").filter(s => s.system.grantedBy.item === this._id);
+          this.actor.deleteEmbeddedDocuments("Item", grantedSkills.map(s => s._id));
+        }
       }
     }
 
@@ -96,6 +119,12 @@ export default class AbbrewItem extends Item {
     }
 
     return super._preUpdate(changed, options, userId);
+  }
+
+  async grantSkills() {
+    const grantedSkillPromises = this.system.skills.granted.map(n => fromUuid(n.sourceId));
+    const grantedSkills = await Promise.all(grantedSkillPromises);
+    await handleGrantedSkills(grantedSkills, this.actor, this);
   }
 
   _onUpdate(changed, options, userId) {
@@ -308,6 +337,11 @@ export default class AbbrewItem extends Item {
       const trackedEffects = this.actor.effects.toObject().filter(e => e.flags.abbrew.skill.trackDuration === this._id);
       if (trackedEffects.length > 0) {
         this.actor.deleteEmbeddedDocuments("ActiveEffect", trackedEffects.map(e => e._id));
+      }
+
+      if ((this.system.skills?.granted?.length ?? 0) > 0) {
+        const grantedSkills = this.actor.items.filter(i => i.type === "skill").filter(s => s.system.grantedBy.item === this._id);
+        this.actor.deleteEmbeddedDocuments("Item", grantedSkills.map(s => s._id));
       }
 
       // If we have one left then clear it out of archetype lists.

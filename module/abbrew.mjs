@@ -21,6 +21,7 @@ import { AbbrewArchetypeSheet } from './sheets/items/item-archetype-sheet.mjs';
 import { AbbrewPathSheet } from './sheets/items/item-path-sheet.mjs';
 import { AbbrewAmmunitionSheet } from './sheets/items/item-ammunition-sheet.mjs';
 import { AbbrewWeaponSheet } from './sheets/items/item-weapon-sheet.mjs';
+import { AbbrewArmourSheet } from './sheets/items/item-armour-sheet.mjs';
 import { onWorldTimeUpdate } from './helpers/time.mjs';
 import { activateSocketListener, emitForAll, SocketMessage } from './socket.mjs';
 import { handleSkillActivate } from './helpers/skills/skill-activation.mjs';
@@ -111,9 +112,14 @@ Hooks.once('init', function () {
   });
   Items.unregisterSheet('core', ItemSheet);
   Items.registerSheet('abbrew', AbbrewItemSheet, {
-    types: ["item", "feature", "spell", "armour", "wound"],
+    types: ["item", "feature", "spell", "wound"],
     makeDefault: true,
     label: 'ABBREW.SheetLabels.Item',
+  });
+  Items.registerSheet('abbrew', AbbrewArmourSheet, {
+    types: ["armour"],
+    makeDefault: true,
+    label: 'ABBREW.SheetLabels.Armour',
   });
   Items.registerSheet('abbrew', AbbrewWeaponSheet, {
     types: ["weapon"],
