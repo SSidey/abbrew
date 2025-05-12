@@ -30,6 +30,13 @@
     <div class="tab" data-group="primary" data-tab="description">
       {{!-- To render inline rolls in a TinyMCE editor, you need to pass the parent actor's (if any) roll data to the
       rollData prop. --}}
+      <h3>Traits</h3>
+      <div class="item-element-max-input">
+        <label class="resource-label">Traits</label>
+        <input type="text" name="system.traits.raw" value="{{system.traits.raw}}" data-dtype="String"
+          data-dropType="skillTrait" {{#unless (isGM)}}readonly{{/unless}} />
+      </div>
+      <h3>Description</h3>
       {{editor enrichedDescription target="system.description" engine="prosemirror" rollData=rollData button=true
       owner=owner
       editable=editable}}

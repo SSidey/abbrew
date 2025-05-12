@@ -64,6 +64,8 @@ export default class AbbrewPhysicalItem extends AbbrewItemBase {
         this.handsSupplied = this.equipType === "innate" ? 1 : getNumericParts(this.equipState);
         this.actionCost = 0 + this.handsSupplied ?? 1;
         this.exertActionCost = 1 + this.handsSupplied ?? 2;
+
+        super.prepareBaseData();
     }
 
     clearHeldDetails() {

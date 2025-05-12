@@ -1,0 +1,155 @@
+<form class="{{cssClass}}" autocomplete="off">
+    <header class="sheet-header">
+        <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" />
+        <div class="header-fields">
+            <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name" /></h1>
+        </div>
+    </header>
+
+    {{!-- Sheet Tab Navigation --}}
+    <nav class="sheet-tabs tabs" data-group="primary">
+        <a class="item" data-tab="description">Description</a>
+        <a class="item" data-tab="attributes">Attributes</a>
+    </nav>
+
+    {{!-- Sheet Body --}}
+    <section class="sheet-body">
+
+        {{!-- Description Tab --}}
+        <div class="tab" data-group="primary" data-tab="description">
+            {{!-- To render inline rolls in a TinyMCE editor, you need to pass the parent actor's (if any) roll data to
+            the
+            rollData prop. --}}
+            {{editor enrichedDescription target="system.description" engine="prosemirror" rollData=rollData button=true
+            owner=owner
+            editable=editable}}
+        </div>
+
+        {{!-- Attributes Tab --}}
+        <div class="enhancement" data-group="primary" data-tab="attributes">
+            <div class="enhancement-type">
+                <label>Type</label>
+                <select name="system.type">
+                    {{selectOptions config.enhancementTypes selected=system.type
+                    localize=true}}
+                </select>
+            </div>
+            <div class="target">
+                <label>Target</label>
+                <input type="text" name="system.target" data-target-uuid="system.target.uuid"
+                    value="{{system.target.name}}" readonly>
+            </div>
+            <div>
+                <h3>Duration</h3>
+                <select name="system.duration.precision">
+                    {{selectOptions config.durations selected=system.duration.precision localize=true}}
+                </select>
+                <input type="text" name="system.duration.value" value="{{system.duration.value}}" data-dtype="String" />
+                <label class="slide-toggle roboto-upper">
+                    <input type="checkbox" class="action-activatable" name="system.duration.expireOnStartOfTurn" {{
+                        checked system.duration.expireOnStartOfTurn }}>
+                    {{#if system.duration.expireOnStartOfTurn}}
+                    <span>Expires on start of turn</span>
+                    {{else}}
+                    <span>Expires at end of turn</span>
+                    {{/if}}
+                    {{#if system.duration.expireOnStartOfTurn}}
+                    <i class="fa fa-toggle-on"></i>
+                    {{else}}
+                    <i class="fa fa-toggle-off"></i>
+                    {{/if}}
+                </label>
+            </div>
+            <div>
+                <h3>Trait Filter</h3>
+                <input type="text" class="trait-filter" name="system.traitFilter.raw" value="{{system.traitFilter.raw}}"
+                    data-dtype="String" />
+            </div>
+            <div>
+                <h3>Modifications</h3>
+                <ol class="enhancement-modification-list" style="list-style: none; padding-left: 0px;">
+                    {{#each system.modifications as |modification i|}}
+                    <li class="item enhancement-modification" data-id="{{i}}">
+                        <div>
+                            <select name="system.modifications.{{i}}.operator">
+                                {{selectOptions ../config.enhancementOperators selected=modification.operator
+                                localize=true}}
+                            </select>
+                        </div>
+                        <div>
+                            <input type="text" name="system.modifications.{{i}}.path" value="{{modification.path}}"
+                                placeholder="Path e.g. system.wounds" data-dtype="String" />
+                        </div>
+                        <div>
+                            <input type="text" name="system.modifications.{{i}}.filterPath"
+                                placeholder="Filter Path e.g. type" value="{{modification.filterPath}}"
+                                data-dtype="String" />
+                        </div>
+                        <div>
+                            <input type="text" name="system.modifications.{{i}}.filterValue"
+                                placeholder="Filter Value e.g. bleed" value="{{modification.filterValue}}"
+                                data-dtype="String" />
+                        </div>
+                        <div>
+                            <input type="text" name="system.modifications.{{i}}.subPath"
+                                placeholder="Sub-Path e.g. value" value="{{modification.subPath}}"
+                                data-dtype="String" />
+                        </div>
+                        <div>
+                            <select name="system.modifications.{{i}}.type">
+                                {{selectOptions ../config.modifierPrefixes selected=modification.type
+                                localize=true}}
+                            </select>
+                        </div>
+                        <div>
+                            <input type="text" name="system.modifications.{{i}}.value" value="{{modification.value}}"
+                                placeholder="Value" data-dtype="String" />
+                        </div>
+                        <div>
+                            <input type="text" name="system.modifications.{{i}}.numerator"
+                                value="{{modification.numerator}}" data-dtype="Number" />
+                        </div>
+                        <div>
+                            <input type="text" name="system.modifications.{{i}}.denominator"
+                                value="{{modification.denominator}}" data-dtype="Number" />
+                        </div>
+                        <a class="modification-control remove-modification" data-action="remove-modification">
+                            <i class="fa-solid fa-minus"></i>
+                        </a>
+                    </li>
+                    {{/each}}
+                    <li class="modification add">
+                        <div class="form-group">
+                            <label>
+                                <a class="modification-control" data-action="add-modification">
+                                    Add modification
+                                    <i class="fa-solid fa-plus"></i>
+                                </a>
+                            </label>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+            <div>
+                <h3>Skills</h3>
+                <ol class="skill-deck-skills">
+                    {{#each system.skills.granted as |skill id|}}
+                    <li class="skill-deck-skill" data-id="{{id}}" data-item-id="{{skill.id}}"
+                        data-source-id="{{skill.sourceId}}">
+                        <div class="skill-deck-summary">
+                            <div class="image-container"><img src="{{skill.image}}" /></div>
+                            <div class="name"><span>{{skill.name}}</span></div>
+                            <a class='item-control skill-delete' title='{{localize "DOCUMENT.Delete" type=' skill'}}'>
+                                <i class='fas fa-trash'></i>
+                            </a>
+                        </div>
+                    </li>
+                    {{/each}}
+                    <li class="empty-drop-list-element">
+                        <span>+ Skill</span>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </section>
+</form>

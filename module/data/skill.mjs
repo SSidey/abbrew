@@ -13,7 +13,22 @@ export default class AbbrewSkill extends AbbrewItemBase {
         const requiredNumber = { required: true, nullable: false };
         const requiredInteger = { required: true, nullable: false, integer: true };
 
-        schema.skillTraits = new fields.StringField({ ...blankString });
+        schema.skillTraits = new fields.SchemaField({
+            raw: new fields.StringField({ ...blankString }),
+            value: new fields.ArrayField(
+                new fields.SchemaField({
+                    key: new fields.StringField({ ...blankString }),
+                    value: new fields.StringField({ ...blankString }),
+                    feature: new fields.StringField({ ...blankString }),
+                    subFeature: new fields.StringField({ ...blankString }),
+                    effect: new fields.StringField({ ...blankString }),
+                    data: new fields.StringField({ ...blankString }),
+                    exclude: new fields.ArrayField(
+                        new fields.StringField({ ...blankString })
+                    )
+                })
+            )
+        });
         schema.skillModifiers = new fields.SchemaField({
             synergy: new fields.StringField({ ...blankString }),
             discord: new fields.StringField({ ...blankString }),

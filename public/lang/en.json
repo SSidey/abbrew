@@ -96,6 +96,12 @@
         "snake": "A style employing the use of two short weapons and relies on rapid speed and dodges."
       }
     },
+    "EnhancementTypes": {
+      "weapon": "Weapon",
+      "armour": "Armour",
+      "skill": "Skill",
+      "amp": "Amp"
+    },
     "SheetLabels": {
       "Actor": "Abbrew Actor Sheet",
       "Item": "Abbrew Item Sheet",
@@ -107,7 +113,8 @@
       "Path": "Path",
       "ActiveEffect": "Active Effect",
       "Ammunition": "Ammunition",
-      "Weapon": "Weapon"
+      "Weapon": "Weapon",
+      "Enhancement": "Enhancement"
     },
     "CheckTypes": {
       "successes": "Successes",
@@ -168,7 +175,8 @@
       "suppress": "Suppress",
       "intensify": "Intensify",
       "upgrade": "Upgrade",
-      "downgrade": "Downgrade"
+      "downgrade": "Downgrade",
+      "merge": "Merge"
     },
     "AttributeRankIncrease": "Attribute Rank Increase",
     "SkillType": "Skill Type",
@@ -373,6 +381,23 @@
         "parryCounter": "Counter Parry Training",
         "feintCounter": "Counter Feint Training"
       },
+      "Item": {
+        "armour": "Armour",
+        "head": "Head",
+        "torso": "Torso",
+        "arm": "Arm",
+        "leg": "Leg",
+        "shield": "Shield",
+        "melee": "Melee",
+        "ranged": "Ranged",
+        "reload": "Reload",
+        "draw": "Draw",
+        "close": "Close",
+        "standard": "Standard",
+        "long": "Long",
+        "heavy": "Heavy",
+        "agile": "Agile"
+      },
       "stance": "Stance"
     },
     "Durations": {
@@ -399,7 +424,9 @@
       "damageLastReceived": "Last Damage Taken",
       "damageRoundReceived": "Round Damage Taken",
       "skillCount": "Skill Count",
-      "async": "Async Result"
+      "async": "Async Result",
+      "string": "String",
+      "trait": "Trait"
     }
   },
   "Speeds": {
@@ -425,7 +452,8 @@
       "skillDeck": "Skill Deck",
       "archetype": "Archetype",
       "path": "Path",
-      "ammunition": "Ammunition"
+      "ammunition": "Ammunition",
+      "enhancement": "Enhancement"
     }
   },
   "SETTINGS.AnnounceTurnStart.Name": "Announce Turn Start",

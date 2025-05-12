@@ -20,7 +20,7 @@ export default class AbbrewAttackBase extends foundry.abstract.TypeDataModel {
                 critical: new fields.NumberField({ ...requiredInteger, initial: 10, min: 5 }),
                 reach: new fields.StringField({ required: true, blank: true }),
                 range: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-                rangedPenetration: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                penetration: new fields.NumberField({ ...requiredInteger, initial: 0 }),
                 ammunition: new fields.SchemaField({
                     type: new fields.StringField({ required: true, blank: true }),
                     id: new fields.StringField({ required: true, blank: true }),

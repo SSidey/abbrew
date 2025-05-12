@@ -17,7 +17,8 @@
       "skillDeck",
       "archetype",
       "path",
-      "ammunition"
+      "ammunition",
+      "enhancement"
     ]
   }
 }

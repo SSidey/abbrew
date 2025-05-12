@@ -22,6 +22,7 @@ import { AbbrewPathSheet } from './sheets/items/item-path-sheet.mjs';
 import { AbbrewAmmunitionSheet } from './sheets/items/item-ammunition-sheet.mjs';
 import { AbbrewWeaponSheet } from './sheets/items/item-weapon-sheet.mjs';
 import { AbbrewArmourSheet } from './sheets/items/item-armour-sheet.mjs';
+import { AbbrewEnhancementSheet } from './sheets/items/item-enhancement-sheet.mjs';
 import { onWorldTimeUpdate } from './helpers/time.mjs';
 import { activateSocketListener, emitForAll, SocketMessage } from './socket.mjs';
 import { handleSkillActivate } from './helpers/skills/skill-activation.mjs';
@@ -79,7 +80,8 @@ Hooks.once('init', function () {
     creatureForm: models.AbbrewCreatureForm,
     path: models.AbbrewPath,
     archetype: models.AbbrewArchetype,
-    ammunition: models.AbbrewAmmunition
+    ammunition: models.AbbrewAmmunition,
+    enhancement: models.AbbrewEnhancement
   }
 
   CONFIG.Token.documentClass = documents.AbbrewTokenDocument;
@@ -160,6 +162,11 @@ Hooks.once('init', function () {
     types: ["path"],
     makeDefault: true,
     label: "ABBREW.SheetLabels.Path"
+  });
+  Items.registerSheet('abbrew', AbbrewEnhancementSheet, {
+    types: ["enhancement"],
+    makeDefault: true,
+    label: "ABBREW.SheetLabels.Enhancement"
   });
 
   _configureStatusEffects();

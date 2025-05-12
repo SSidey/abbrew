@@ -96,6 +96,11 @@ ABBREW.woundOperators = {
   intensify: "ABBREW.Operators.intensify"
 }
 
+ABBREW.enhancementOperators = {
+  ...ABBREW.operators,
+  merge: "ABBREW.Operators.merge"
+}
+
 ABBREW.Defense = {
   guard: 'ABBREW.Defense.guard'
 }
@@ -411,49 +416,74 @@ ABBREW.hands = {
   }
 }
 
+ABBREW.enhancementTypes = {
+  "weapon": "ABBREW.EnhancementTypes.weapon",
+  "armour": "ABBREW.EnhancementTypes.armour",
+  "skill": "ABBREW.EnhancementTypes.skill",
+  "amp": "ABBREW.EnhancementTypes.amp",
+}
+
 const lingeringWoundImmunities = [
-  { key: "bleedImmunity", value: "ABBREW.Traits.WoundImmunities.bleedImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "bleed" },
-  { key: "burningImmunity", value: "ABBREW.Traits.WoundImmunities.burningImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "burning" },
-  { key: "fatigueImmunity", value: "ABBREW.Traits.WoundImmunities.fatigueImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "fatigue" },
-  { key: "dreadImmunity", value: "ABBREW.Traits.WoundImmunities.dreadImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "dread" },
-  { key: "enragedImmunity", value: "ABBREW.Traits.WoundImmunities.enragedImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "enraged" },
-  { key: "instabilityImmunity", value: "ABBREW.Traits.WoundImmunities.instabilityImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "instability" },
-  { key: "sinImmunity", value: "ABBREW.Traits.WoundImmunities.sinImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "sin" },
-  { key: "decayImmunity", value: "ABBREW.Traits.WoundImmunities.decayImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "decay" }
+  { key: "bleedImmunity", value: "ABBREW.Traits.WoundImmunities.bleedImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "bleed", exclude: [] },
+  { key: "burningImmunity", value: "ABBREW.Traits.WoundImmunities.burningImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "burning", exclude: [] },
+  { key: "fatigueImmunity", value: "ABBREW.Traits.WoundImmunities.fatigueImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "fatigue", exclude: [] },
+  { key: "dreadImmunity", value: "ABBREW.Traits.WoundImmunities.dreadImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "dread", exclude: [] },
+  { key: "enragedImmunity", value: "ABBREW.Traits.WoundImmunities.enragedImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "enraged", exclude: [] },
+  { key: "instabilityImmunity", value: "ABBREW.Traits.WoundImmunities.instabilityImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "instability", exclude: [] },
+  { key: "sinImmunity", value: "ABBREW.Traits.WoundImmunities.sinImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "sin", exclude: [] },
+  { key: "decayImmunity", value: "ABBREW.Traits.WoundImmunities.decayImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "decay", exclude: [] }
 ]
 
 const acuteWoundImmunities = [
-  { key: "physicalImmunity", value: "ABBREW.Traits.WoundImmunities.physicalImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "physical" },
-  { key: "vitalImmunity", value: "ABBREW.Traits.WoundImmunities.vitalImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "vital" },
-  { key: "burnImmunity", value: "ABBREW.Traits.WoundImmunities.burnImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "burn" },
-  { key: "exhaustionImmunity", value: "ABBREW.Traits.WoundImmunities.exhaustionImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "exhaustion" },
-  { key: "terrorImmunity", value: "ABBREW.Traits.WoundImmunities.terrorImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "terror" },
-  { key: "rageImmunity", value: "ABBREW.Traits.WoundImmunities.rageImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "rage" },
-  { key: "mutationImmunity", value: "ABBREW.Traits.WoundImmunities.mutationImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "mutation" },
-  { key: "corruptionImmunity", value: "ABBREW.Traits.WoundImmunities.corruptionImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "corruption" },
-  { key: "necroticImmunity", value: "ABBREW.Traits.WoundImmunities.necroticImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "necrotic" }
+  { key: "physicalImmunity", value: "ABBREW.Traits.WoundImmunities.physicalImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "physical", exclude: [] },
+  { key: "vitalImmunity", value: "ABBREW.Traits.WoundImmunities.vitalImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "vital", exclude: [] },
+  { key: "burnImmunity", value: "ABBREW.Traits.WoundImmunities.burnImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "burn", exclude: [] },
+  { key: "exhaustionImmunity", value: "ABBREW.Traits.WoundImmunities.exhaustionImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "exhaustion", exclude: [] },
+  { key: "terrorImmunity", value: "ABBREW.Traits.WoundImmunities.terrorImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "terror", exclude: [] },
+  { key: "rageImmunity", value: "ABBREW.Traits.WoundImmunities.rageImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "rage", exclude: [] },
+  { key: "mutationImmunity", value: "ABBREW.Traits.WoundImmunities.mutationImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "mutation", exclude: [] },
+  { key: "corruptionImmunity", value: "ABBREW.Traits.WoundImmunities.corruptionImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "corruption", exclude: [] },
+  { key: "necroticImmunity", value: "ABBREW.Traits.WoundImmunities.necroticImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "necrotic", exclude: [] }
 ]
 
 const skillTraining = [
-  { key: "attackBaseTraining", value: "ABBREW.Traits.SkillTraining.attackBase", feature: "skillTraining", subFeature: "offensiveSkills", effect: "base", data: "attack" },
-  { key: "finisherBaseTraining", value: "ABBREW.Traits.SkillTraining.finisherBase", feature: "skillTraining", subFeature: "offensiveSkills", effect: "base", data: "finisher" },
-  { key: "feintBaseTraining", value: "ABBREW.Traits.SkillTraining.feintBase", feature: "skillTraining", subFeature: "offensiveSkills", effect: "base", data: "feint" },
-  { key: "parryBaseTraining", value: "ABBREW.Traits.SkillTraining.parryBase", feature: "skillTraining", subFeature: "defensiveSkills", effect: "base", data: "parry" },
-  { key: "overpowerBaseTraining", value: "ABBREW.Traits.SkillTraining.overpowerBase", feature: "skillTraining", subFeature: "offensiveSkills", effect: "base", data: "overpower" },
-  { key: "attackTraining", value: "ABBREW.Traits.SkillTraining.attack", feature: "skillTraining", subFeature: "offensiveSkills", effect: "increase", data: "attack" },
-  { key: "finisherTraining", value: "ABBREW.Traits.SkillTraining.finisher", feature: "skillTraining", subFeature: "offensiveSkills", effect: "increase", data: "finisher" },
-  { key: "overpowerTraining", value: "ABBREW.Traits.SkillTraining.overpower", feature: "skillTraining", subFeature: "offensiveSkills", effect: "increase", data: "overpower" },
-  { key: "feintTraining", value: "ABBREW.Traits.SkillTraining.feint", feature: "skillTraining", subFeature: "offensiveSkills", effect: "increase", data: "feint" },
-  { key: "parryTraining", value: "ABBREW.Traits.SkillTraining.parry", feature: "skillTraining", subFeature: "defensiveSkills", effect: "increase", data: "parry" },
-  { key: "feintCounterTraining", value: "ABBREW.Traits.SkillTraining.feintCounter", feature: "skillTraining", subFeature: "offensiveSkills", effect: "increase", data: "feintCounter" },
-  { key: "parryCounterTraining", value: "ABBREW.Traits.SkillTraining.parryCounter", feature: "skillTraining", subFeature: "defensiveSkills", effect: "increase", data: "parryCounter" }
+  { key: "attackBaseTraining", value: "ABBREW.Traits.SkillTraining.attackBase", feature: "skillTraining", subFeature: "offensiveSkills", effect: "base", data: "attack", exclude: [] },
+  { key: "finisherBaseTraining", value: "ABBREW.Traits.SkillTraining.finisherBase", feature: "skillTraining", subFeature: "offensiveSkills", effect: "base", data: "finisher", exclude: [] },
+  { key: "feintBaseTraining", value: "ABBREW.Traits.SkillTraining.feintBase", feature: "skillTraining", subFeature: "offensiveSkills", effect: "base", data: "feint", exclude: [] },
+  { key: "parryBaseTraining", value: "ABBREW.Traits.SkillTraining.parryBase", feature: "skillTraining", subFeature: "defensiveSkills", effect: "base", data: "parry", exclude: [] },
+  { key: "overpowerBaseTraining", value: "ABBREW.Traits.SkillTraining.overpowerBase", feature: "skillTraining", subFeature: "offensiveSkills", effect: "base", data: "overpower", exclude: [] },
+  { key: "attackTraining", value: "ABBREW.Traits.SkillTraining.attack", feature: "skillTraining", subFeature: "offensiveSkills", effect: "increase", data: "attack", exclude: [] },
+  { key: "finisherTraining", value: "ABBREW.Traits.SkillTraining.finisher", feature: "skillTraining", subFeature: "offensiveSkills", effect: "increase", data: "finisher", exclude: [] },
+  { key: "overpowerTraining", value: "ABBREW.Traits.SkillTraining.overpower", feature: "skillTraining", subFeature: "offensiveSkills", effect: "increase", data: "overpower", exclude: [] },
+  { key: "feintTraining", value: "ABBREW.Traits.SkillTraining.feint", feature: "skillTraining", subFeature: "offensiveSkills", effect: "increase", data: "feint", exclude: [] },
+  { key: "parryTraining", value: "ABBREW.Traits.SkillTraining.parry", feature: "skillTraining", subFeature: "defensiveSkills", effect: "increase", data: "parry", exclude: [] },
+  { key: "feintCounterTraining", value: "ABBREW.Traits.SkillTraining.feintCounter", feature: "skillTraining", subFeature: "offensiveSkills", effect: "increase", data: "feintCounter", exclude: [] },
+  { key: "parryCounterTraining", value: "ABBREW.Traits.SkillTraining.parryCounter", feature: "skillTraining", subFeature: "defensiveSkills", effect: "increase", data: "parryCounter", exclude: [] }
 ]
 
 const generalTraits = [
-  { key: "detection", value: "ABBREW.Traits.General.detection", feature: "detection", subFeature: "", effect: "", data: "" },
-  { key: "disease", value: "ABBREW.Traits.General.disease", feature: "type", subFeature: "", effect: "", data: "" },
-  { key: "poison", value: "ABBREW.Traits.General.poison", feature: "type", subFeature: "", effect: "", data: "" },
-  { key: "stance", value: "ABBREW.Traits.General.stance", feature: "combat", subFeature: "", effect: "", data: "" }
+  { key: "detection", value: "ABBREW.Traits.General.detection", feature: "detection", subFeature: "", effect: "", data: "", exclude: [] },
+  { key: "disease", value: "ABBREW.Traits.General.disease", feature: "type", subFeature: "", effect: "", data: "", exclude: [] },
+  { key: "poison", value: "ABBREW.Traits.General.poison", feature: "type", subFeature: "", effect: "", data: "", exclude: [] },
+  { key: "stance", value: "ABBREW.Traits.General.stance", feature: "combat", subFeature: "", effect: "", data: "", exclude: [] }
+]
+
+const itemTraits = [
+  { key: "armour", value: "ABBREW.Traits.Item.armour", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "head", value: "ABBREW.Traits.Item.head", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "torso", value: "ABBREW.Traits.Item.torso", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "arm", value: "ABBREW.Traits.Item.arm", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "leg", value: "ABBREW.Traits.Item.leg", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "shield", value: "ABBREW.Traits.Item.shield", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "melee", value: "ABBREW.Traits.Item.melee", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "ranged", value: "ABBREW.Traits.Item.ranged", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "reload", value: "ABBREW.Traits.Item.reload", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: ["draw"] },
+  { key: "draw", value: "ABBREW.Traits.Item.draw", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: ["reload"] },
+  { key: "close", value: "ABBREW.Traits.Item.close", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: ["standard", "long"] },
+  { key: "standard", value: "ABBREW.Traits.Item.standard", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: ["close", "long"] },
+  { key: "long", value: "ABBREW.Traits.Item.long", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: ["standard", "long"] },
+  { key: "heavy", value: "ABBREW.Traits.Item.heavy", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: ["agile"] },
+  { key: "agile", value: "ABBREW.Traits.Item.agile", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: ["heavy"] },
 ]
 
 ABBREW.traits = [
@@ -461,6 +491,7 @@ ABBREW.traits = [
   ...acuteWoundImmunities,
   ...lingeringWoundImmunities,
   ...skillTraining,
+  ...itemTraits
 ]
 
 ABBREW.attackModes = {
@@ -561,7 +592,9 @@ ABBREW.modifierPrefixes = {
   "damagelastReceived": "ABBREW.ModifierPrefixes.damageLastReceived",
   "damageroundReceived": "ABBREW.ModifierPrefixes.damageRoundReceived",
   "skillCount": "ABBREW.ModifierPrefixes.skillCount",
-  "async": "ABBREW.ModifierPrefixes.async"
+  "async": "ABBREW.ModifierPrefixes.async",
+  "string": "ABBREW.ModifierPrefixes.string",
+  "trait": "ABBREW.ModifierPrefixes.trait"
 }
 
 ABBREW.checkTypes = {

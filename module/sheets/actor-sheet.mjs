@@ -293,7 +293,7 @@ export class AbbrewActorSheet extends ActorSheet {
   /* -------------------------------------------- */
 
   _activateTraits(html) {
-    const traits = html[0].querySelector('input[name="system.traits"]');
+    const traits = html[0].querySelector('input[name="system.traits.raw"]');
     const traitsSettings = {
       dropdown: {
         maxItems: 20,               // <- mixumum allowed rendered suggestions

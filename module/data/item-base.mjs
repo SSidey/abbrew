@@ -1,15 +1,32 @@
+import { getSafeJson } from "../helpers/utils.mjs";
+
 export default class AbbrewItemBase extends foundry.abstract.TypeDataModel {
 
   static defineSchema() {
     const schema = {};
-
+    const blankString = { required: true, blank: true };
     const fields = foundry.data.fields;
 
-    schema.description = new fields.StringField({ required: true, blank: true });
-    schema.traits = new fields.StringField({ required: true, blank: true });
+    schema.description = new fields.StringField({ ...blankString });
+    schema.traits = new fields.SchemaField({
+      raw: new fields.StringField({ ...blankString }),
+      value: new fields.ArrayField(
+        new fields.SchemaField({
+          key: new fields.StringField({ ...blankString }),
+          value: new fields.StringField({ ...blankString }),
+          feature: new fields.StringField({ ...blankString }),
+          subFeature: new fields.StringField({ ...blankString }),
+          effect: new fields.StringField({ ...blankString }),
+          data: new fields.StringField({ ...blankString }),
+          exclude: new fields.ArrayField(
+            new fields.StringField({ ...blankString })
+          )
+        })
+      )
+    });
     schema.abbrewId = new fields.SchemaField({
-      value: new fields.StringField({ required: true, blank: true }),
-      uuid: new fields.StringField({ required: true, blank: true })
+      value: new fields.StringField({ ...blankString }),
+      uuid: new fields.StringField({ ...blankString })
     });
 
     return schema;
@@ -20,6 +37,10 @@ export default class AbbrewItemBase extends foundry.abstract.TypeDataModel {
     if (this.abbrewId.value === "") {
       this.abbrewId.value = this.generateAbbrewId();
       this.abbrewId.uuid = this.parent._id;
+    }
+
+    if (this.traits.raw) {
+      this.traits.value = getSafeJson(this.traits.raw, []);
     }
   }
 

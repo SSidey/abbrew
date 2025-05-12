@@ -398,3 +398,23 @@ ol li.damage-reduction {
     }
   }
 }
+
+.enhancement-modification {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.enhancement {
+  .trait-filter {
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.05)
+  }
+}
+
+.item-element-max-input {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  margin-bottom: 5px;
+  grid-gap: 10px;
+  align-items: center;
+}

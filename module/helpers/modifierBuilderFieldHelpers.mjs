@@ -156,6 +156,10 @@ export function parsePathSync(rawValue, actor, source) {
     const entityType = rawValue.split('.').slice(0, 1).shift();
 
     switch (entityType) {
+        case 'string':
+            return rawValue.split('.').slice(1).shift();
+        case 'trait':
+            return CONFIG.ABBREW.traits.filter(t => t.key === rawValue.split('.').slice(1).shift())
         case 'numeric':
             return parseFloat(rawValue.split('.').slice(1).shift()) ?? 0;
         case 'skillCount':

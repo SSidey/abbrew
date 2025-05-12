@@ -20,6 +20,7 @@ export { default as AbbrewCreatureForm } from "./creature-form.mjs"
 export { default as AbbrewArchetype } from "./character-creation/archetype.mjs"
 export { default as AbbrewPath } from "./character-creation/path.mjs"
 export { default as AbbrewAmmunition } from "./ammunition.mjs";
+export { default as AbbrewEnhancement } from "./skill/enhancement.mjs";
 
 // Active Effects
 export { default as AbbrewActiveEffect } from "./active-effect.mjs"

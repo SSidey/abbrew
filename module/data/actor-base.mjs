@@ -4,7 +4,7 @@ import { compareModifierIndices, getSafeJson } from "../helpers/utils.mjs";
 export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
   get traitsData() {
-    return this.traits !== "" ? JSON.parse(this.traits) : [];
+    return this.traits.raw !== "" ? JSON.parse(this.traits.raw) : [];
   }
 
   get heldArmourGuard() {
@@ -21,7 +21,22 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     const blankString = { required: true, blank: true }
     const schema = {};
 
-    schema.traits = new fields.StringField({ required: true, blank: true });
+    schema.traits = new fields.SchemaField({
+      raw: new fields.StringField({ ...blankString }),
+      value: new fields.ArrayField(
+        new fields.SchemaField({
+          key: new fields.StringField({ ...blankString }),
+          value: new fields.StringField({ ...blankString }),
+          feature: new fields.StringField({ ...blankString }),
+          subFeature: new fields.StringField({ ...blankString }),
+          effect: new fields.StringField({ ...blankString }),
+          data: new fields.StringField({ ...blankString }),
+          exclude: new fields.ArrayField(
+            new fields.StringField({ ...blankString })
+          )
+        })
+      )
+    });
     schema.actions = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 5 });
     schema.wounds = new fields.ArrayField(
       new fields.SchemaField({
@@ -270,7 +285,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
     this._prepareResolve();
 
-    const skillTraining = this.parent.items.filter(i => i.type === "skill").filter(s => s.system.skillTraits).flatMap(s => getSafeJson(s.system.skillTraits, []).filter(st => st.feature === "skillTraining").map(st => st.data)).reduce((result, st) => { if (st in result) { result[st] += 1; } else { result[st] = 1; } return result; }, {});
+    const skillTraining = this.parent.items.filter(i => i.type === "skill").filter(s => s.system.skillTraits.raw).flatMap(s => getSafeJson(s.system.skillTraits.raw, []).filter(st => st.feature === "skillTraining").map(st => st.data)).reduce((result, st) => { if (st in result) { result[st] += 1; } else { result[st] = 1; } return result; }, {});
     const mappedTraining = Object.entries(skillTraining).map(e => ({ type: e[0], value: e[1] }));
     this.skillTraining = foundry.utils.mergeObject(this.skillTraining, mappedTraining);
 

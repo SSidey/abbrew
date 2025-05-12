@@ -359,7 +359,7 @@ export default class AbbrewItem extends Item {
     attackProfile.critical = ammoAttackModifier.critical;
     attackProfile.lethal = ammoAttackModifier.lethal;
     attackProfile.finisherLimit = ammoAttackModifier.finisherLimit;
-    const bonusPenetration = attackProfile.rangedPenetration;
+    const bonusPenetration = attackProfile.penetration;
     attackProfile.damage = ammoAttackModifier.damage;
     attackProfile.damage.forEach(d => d.penetration += bonusPenetration);
 
