@@ -453,7 +453,6 @@ Hooks.on("updateItem", async (document, changed, options, userId) => {
 Hooks.on("preUpdateItem", () => { })
 
 Hooks.on("deleteActiveEffect", async (effect, options, userId) => {
-  console.log("deleted");
   const parent = effect.parent;
   if (parent.type === "character") {
     await parent.handleDeleteActiveEffect(effect);

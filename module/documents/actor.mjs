@@ -569,6 +569,14 @@ export default class AbbrewActor extends Actor {
       }
     }
 
+    const enhancementId = effect?.flags?.abbrew?.enhancement?.trackDuration;
+    if (enhancementId) {
+      const item = this.items.find(i => i._id === enhancementId)
+      if (item) {
+        await item.delete();
+      }
+    }
+
     const activeSkillsWithDuration = this.effects.toObject().filter(e => e.flags?.abbrew?.skill?.type === "standalone").map(e => e.flags.abbrew.skill.trackDuration);
     const queuedSkillsWithDuration = this.effects.toObject().filter(e => e.flags?.abbrew?.skill?.type === "synergy").map(e => e.flags.abbrew.skill.trackDuration);
     await this.update({ "system.activeSkills": activeSkillsWithDuration, "system.queuedSkills": queuedSkillsWithDuration });

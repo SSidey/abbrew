@@ -47,7 +47,12 @@ export function getObjectValueByStringPath(entity, path) {
 /* -------------------------------------------- */
 
 export function getNumericParts(value) {
-    return parseInt(value.replace(/\D/g, "")) ?? 0
+    const parsed = parseInt(value.replace(/\D/g, ""));
+    if (isNaN(parsed)) {
+        return 0;
+    }
+
+    return parsed;
 }
 
 /* -------------------------------------------- */
@@ -144,4 +149,8 @@ export function filterKeys(raw, allowedKeys) {
                 [key]: raw[key]
             };
         }, {});
+}
+
+export function isATraitsSupersetOfBTraits(objA, objB) {
+    return new Set(objA.system.traits.value.map(t => t.key)).isSupersetOf(new Set(objB.system.traits.value.map(t => t.key)));
 }

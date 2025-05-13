@@ -25,10 +25,10 @@
   "devDependencies": {
     "chalk": "^3.0.0",
     "fs-extra": "^9.1.0",
-    "gulp": "^4.0.2",
+    "gulp": "^5.0.0",
     "gulp-autoprefixer": "^8.0.0",
     "gulp-sass": "^5.1.0",
-    "gulp-sourcemaps": "^3.0.0",
+    "gulp-sourcemaps": "^2.6.5",
     "sass": "^1.53.0",
     "yargs": "^17.7.2"
   },
@@ -36,7 +36,6 @@
     "@foundryvtt/foundryvtt-cli": "^1.0.4",
     "@yaireo/tagify": "^4.24.0",
     "del": "^8.0.0",
-    "immer": "^10.1.1",
-    "vite": "^5.2.8"
+    "vite": "^6.3.5"
   }
 }

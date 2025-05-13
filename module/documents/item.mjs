@@ -7,6 +7,7 @@ import { getModifiedSkillActionCost, handleSkillActivate } from '../helpers/skil
 import { trackSkillDuration } from '../helpers/skills/skill-duration.mjs';
 import { manualSkillExpiry } from '../helpers/skills/skill-expiry.mjs';
 import { handleGrantedSkills } from '../helpers/skills/skill-grants.mjs';
+import { applyEnhancement } from '../helpers/enhancements/enhancement-application.mjs';
 /**
  * Extend the basic Item with some very simple modifications.
  * @extends {Item}
@@ -334,7 +335,10 @@ export default class AbbrewItem extends Item {
 
   async _preDelete(options, userId) {
     if (this.actor) {
-      const trackedEffects = this.actor.effects.toObject().filter(e => e.flags.abbrew.skill.trackDuration === this._id);
+      const trackedEffects = [
+        ...this.actor.effects.toObject().filter(e => e.flags.abbrew.skill?.trackDuration === this._id),
+        ...this.actor.effects.toObject().filter(e => e.flags.abbrew.enhancement?.trackDuration === this._id)
+      ];
       if (trackedEffects.length > 0) {
         this.actor.deleteEmbeddedDocuments("ActiveEffect", trackedEffects.map(e => e._id));
       }
@@ -351,6 +355,21 @@ export default class AbbrewItem extends Item {
           const update = a.system.skillIds.filter(s => s !== this.system.abbrewId.uuid);
           await a.update({ "system.skillIds": update });
         });
+      }
+
+      if (this.type === "enhancement") {
+        const promises = [];
+        const grants = this.system.grantedIds;
+        const granted = this.actor.items.filter(i => grants.includes(i._id));
+        granted.forEach(o => promises.push(o.delete()));
+        if (this.system.target.id && this.actor) {
+          const enhancedItem = structuredClone(this.actor.items.find(i => i._id === this.system.target.id));
+          if (enhancedItem) {
+            applyEnhancement(this, this.actor, enhancedItem, true);
+            await Item.implementation.updateDocuments([{ _id: this.system.target.id, ...enhancedItem }], { parent: this.actor });
+          }
+        }
+        await Promise.all(promises);
       }
     }
   }

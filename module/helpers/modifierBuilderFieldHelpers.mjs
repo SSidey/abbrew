@@ -159,7 +159,7 @@ export function parsePathSync(rawValue, actor, source) {
         case 'string':
             return rawValue.split('.').slice(1).shift();
         case 'trait':
-            return CONFIG.ABBREW.traits.filter(t => t.key === rawValue.split('.').slice(1).shift())
+            return getTrait(rawValue.split('.').slice(1).shift());
         case 'numeric':
             return parseFloat(rawValue.split('.').slice(1).shift()) ?? 0;
         case 'skillCount':
@@ -200,6 +200,11 @@ export function parsePathSync(rawValue, actor, source) {
     if (getObjectValueByStringPath(entity, path) != null) {
         return getObjectValueByStringPath(entity, path);
     }
+}
+
+function getTrait(value) {
+    const traits = CONFIG.ABBREW.traits.filter(t => t.key === value);
+    return traits.map(t => ({ ...t, value: game.i18n.localize(t.value) ?? t.value }))[0];
 }
 
 function getResourceValue(actor, id) {

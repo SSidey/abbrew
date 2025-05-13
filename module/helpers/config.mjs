@@ -98,7 +98,8 @@ ABBREW.woundOperators = {
 
 ABBREW.enhancementOperators = {
   ...ABBREW.simpleOperators,
-  merge: "ABBREW.Operators.merge"
+  merge: "ABBREW.Operators.merge",
+  split: "ABBREW.Operator.split"
 }
 
 ABBREW.Defense = {

@@ -25,6 +25,17 @@
     {{/each}}
   </ol>
   {{/unless}}
+  {{#unless (empty enhancements)}}
+  <div class='item flexrow items-header enhancements-header' data-skill-section="enhancements">
+    <div class='item-name'>Enhancements</div>
+  </div>
+  <ol class='skill-container' style="display: {{getProperty allSkillSections 'enhancements'}}"
+    data-skill-section="enhancements">
+    {{#each enhancements as |item id|}}
+    {{> "systems/abbrew/templates/actor/parts/actor-skill-card.hbs" item=item}}
+    {{/each}}
+  </ol>
+  {{/unless}}
   <div class='item flexrow items-header archetypes-header' data-skill-section="archetypes">
     <div class='item-name'>Archetypes</div>
   </div>

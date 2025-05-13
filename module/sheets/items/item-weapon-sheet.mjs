@@ -3,8 +3,11 @@ import {
   prepareActiveEffectCategories,
 } from '../../helpers/effects.mjs';
 import Tagify from '@yaireo/tagify'
-import { renderSheetForStoredItem } from '../../helpers/utils.mjs';
+import { isATraitsSupersetOfBTraits, renderSheetForStoredItem } from '../../helpers/utils.mjs';
 import { parsePathSync } from '../../helpers/modifierBuilderFieldHelpers.mjs';
+import { applyOperatorUnbounded } from '../../helpers/operators.mjs';
+import { trackEnhancementDuration } from '../../helpers/enhancements/ehancement-duration.mjs';
+import { applyEnhancement } from '../../helpers/enhancements/enhancement-application.mjs';
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -149,23 +152,47 @@ export class AbbrewWeaponSheet extends ItemSheet {
           const storedSkills = this.item.system.skills.granted;
           const updateSkills = [...storedSkills, { name: item.name, id: item._id, image: item.img, sourceId: item.uuid }];
           await this.item.update({ "system.skills.granted": updateSkills });
-          // TODO: Move the set check to a utility
-        } else if (item.type === "enhancement" && item.system.type === "weapon" && new Set(this.item.system.traits.value.map(t => t.key)).isSupersetOf(new Set(item.system.traits.value.map(t => t.key)))) {
-          const enhancement = item.system;
+        } else if (item.type === "enhancement" && item.system.type === "weapon" && isATraitsSupersetOfBTraits(this.item, item)) {
           let updateObject = structuredClone(this.item);
-          enhancement.modifications.forEach(modification => {
-            const value = parsePathSync(`${modification.type}.${modification.value}`, this.actor, this.item);
-            const indices = modification.filterValue ? foundry.utils.getProperty(updateObject, modification.path).filter(p => p[modification.filterPath] === modification.filterValue) : [];
-            const fullIndices = modification.subPathFilterValue ? indices.map(i => foundry.utils.getProperty(`${modification.path}.${i}.${modification.subPath}`).filter(p => p[modification.subPathFilter] === modification.subPathFilterValue)) : [];
-            const baseValue = foundry.utils.getProperty("");
-            // foundry.utils.setProperty(updateObject,);
-            console.log(value);
-            console.log(fullIndices);
-            console.log(baseValue);
-          });
-        }
+          applyEnhancement(item, this.item.actor, updateObject, false);
+
+          // TODO: Add modifier for names, prefix / suffix so can rename the thing.
+          let enhancement;
+
+          if (!this.item.actor && item.system.duration.precision !== "-1") {
+            return;
+          }
+
+          if (this.item.actor) {
+            enhancement = await Item.create([item], { parent: this.item.actor });
+          }
+
+          const options = this.item.actor ? { parent: this.item.actor } : { pack: "abbrew.equipment" };
+
+          await Item.implementation.updateDocuments([{ _id: this.item._id, ...updateObject }], options);
+
+          if (this.actor) {
+            // TODO: Check for equipped
+            let skillSummaries = item.system.skills.granted;
+            const skillPromises = skillSummaries.map(s => fromUuid(s.sourceId));
+            const skills = structuredClone(await Promise.all(skillPromises));
+            skills.forEach(s => s.system.grantedBy.item = this.item._id);
+            const createdSkills = await Item.create(skills, { parent: this.item.actor });
+
+            const enhancementTarget = ({ name: this.item.name, id: this.item._id, uuid: this.item.uuid });
+            await enhancement[0].update({ "system.grantedIds": createdSkills.map(s => s._id), "system.target": enhancementTarget });
+            await trackEnhancementDuration(this.item.actor, enhancement[0]);
+          } else {
+            // TODO: Should always do this, but should be reversible
+            // TODO: Track enhancements on item sheets, could pull by uuid and run the reverse application
+            const grantedSkills = this.item.system.skills.granted;
+            const updateGrantedSkills = [...grantedSkills, ...item.system.skills.granted];
+            await this.item.update({ "system.skills.granted": updateGrantedSkills });
+          }
+        };
       }
     });
+
 
     this._activateArmourPoints(html);
     this._activateAnatomyParts(html);

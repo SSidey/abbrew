@@ -176,7 +176,8 @@
       "intensify": "Intensify",
       "upgrade": "Upgrade",
       "downgrade": "Downgrade",
-      "merge": "Merge"
+      "merge": "Merge",
+      "split": "Split"
     },
     "AttributeRankIncrease": "Attribute Rank Increase",
     "SkillType": "Skill Type",

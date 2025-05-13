@@ -51,7 +51,10 @@ export default class AbbrewEnhancement extends AbbrewSkillDeck {
             precision: new fields.StringField({ ...blankString }),
             value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
             expireOnStartOfTurn: new fields.BooleanField({ required: true, initial: true })
-        })
+        });
+        schema.grantedIds = new fields.ArrayField(
+            new fields.StringField({ ...blankString })
+        );
 
         return schema;
     }

@@ -142,6 +142,7 @@ export class AbbrewActorSheet extends ActorSheet {
     const archetypeSkills = [];
     const favouriteSkills = [];
     const activeSkills = [];
+    const enhancements = [];
 
     for (let i of context.items) {
       i.img = i.img || Item.DEFAULT_ICON;
@@ -218,6 +219,9 @@ export class AbbrewActorSheet extends ActorSheet {
           equippedWeapons.push(i);
         }
       }
+      else if (i.type === "enhancement") {
+        enhancements.push(i);
+      }
       // Append to spells.
       else if (i.type === 'spell') {
         if (i.system.spellLevel != undefined) {
@@ -236,6 +240,7 @@ export class AbbrewActorSheet extends ActorSheet {
     sections.favourites = favouriteSkills.length > 0 ? "grid" : "none";
     sections.active = activeSkills.length > 0 ? "grid" : "none";
     sections.archetypes = Object.keys(archetypeSkills).length > 0 ? "grid" : "none";
+    sections.enhancements = enhancements.length > 0 ? "grid" : "none";
     const allSkillSections = this.updateObjectValueByKey(sections, this.skillSectionDisplay);
     context.allSkillSections = allSkillSections;
     context.skillSections = filterKeys(allSkillSections, ["background", "basic", "path", "resource", "temporary", "untyped"]);
@@ -249,6 +254,7 @@ export class AbbrewActorSheet extends ActorSheet {
     context.archetypeSkills = archetypeSkills;
     context.favouriteSkills = favouriteSkills;
     context.activeSkills = activeSkills;
+    context.enhancements = enhancements;
   }
 
   skillSectionDisplay = {};
