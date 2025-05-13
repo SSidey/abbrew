@@ -285,7 +285,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
     this._prepareResolve();
 
-    const skillTraining = this.parent.items.filter(i => i.type === "skill").filter(s => s.system.skillTraits.raw).flatMap(s => getSafeJson(s.system.skillTraits.raw, []).filter(st => st.feature === "skillTraining").map(st => st.data)).reduce((result, st) => { if (st in result) { result[st] += 1; } else { result[st] = 1; } return result; }, {});
+    const skillTraining = this.parent.items.filter(i => i.type === "skill").filter(s => s.system.traits.raw).flatMap(s => getSafeJson(s.system.traits.raw, []).filter(st => st.feature === "skillTraining").map(st => st.data)).reduce((result, st) => { if (st in result) { result[st] += 1; } else { result[st] = 1; } return result; }, {});
     const mappedTraining = Object.entries(skillTraining).map(e => ({ type: e[0], value: e[1] }));
     this.skillTraining = foundry.utils.mergeObject(this.skillTraining, mappedTraining);
 

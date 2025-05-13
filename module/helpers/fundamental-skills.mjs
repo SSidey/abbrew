@@ -1,3 +1,4 @@
+// TODO: Merge these down
 export function getAttackSkillWithActions(id, name, actionCost, image, attackProfile, attackMode, handsSupplied, siblingSkillModifiers = [], actorSource, itemSource) {
     const skill = CONFIG.ABBREW.fundamentalAttackSkills[attackMode];
     let critical;
@@ -19,7 +20,7 @@ export function getAttackSkillWithActions(id, name, actionCost, image, attackPro
             },
             siblingSkillModifiers: siblingSkillModifiers,
             isActivatable: true,
-            skillTraits: [],
+            traits: [],
             skillType: "basic",
             attributeIncrease: "",
             attributeIncreaseLong: "",
@@ -123,7 +124,7 @@ export function getParrySkillWithActions(actionCost, siblingSkillModifiers = [])
             },
             siblingSkillModifiers: siblingSkillModifiers,
             isActivatable: true,
-            skillTraits: [],
+            traits: [],
             skillType: "basic",
             attributeIncrease: "",
             attributeIncreaseLong: "",
@@ -224,7 +225,7 @@ export function getFundamentalSkillWithActionCost(fundamental, actionCost, sibli
             },
             siblingSkillModifiers: siblingSkillModifiers,
             isActivatable: true,
-            skillTraits: [],
+            traits: [],
             skillType: "basic",
             attributeIncrease: "",
             attributeIncreaseLong: "",
@@ -324,7 +325,7 @@ export function getFundamentalAttributeSkill(fundamental, siblingSkillModifiers 
             },
             siblingSkillModifiers: siblingSkillModifiers,
             isActivatable: true,
-            skillTraits: [],
+            traits: [],
             skillType: "basic",
             attributeIncrease: "",
             attributeIncreaseLong: "",

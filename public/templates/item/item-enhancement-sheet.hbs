@@ -78,22 +78,36 @@
                         </div>
                         <div>
                             <input type="text" name="system.modifications.{{i}}.path" value="{{modification.path}}"
-                                placeholder="Path e.g. system.wounds" data-dtype="String" />
+                                placeholder="Path e.g. system.attackProfiles" data-dtype="String" />
                         </div>
                         <div>
                             <input type="text" name="system.modifications.{{i}}.filterPath"
-                                placeholder="Filter Path e.g. type" value="{{modification.filterPath}}"
+                                placeholder="Filter Path e.g. attackType" value="{{modification.filterPath}}"
                                 data-dtype="String" />
                         </div>
                         <div>
                             <input type="text" name="system.modifications.{{i}}.filterValue"
-                                placeholder="Filter Value e.g. bleed" value="{{modification.filterValue}}"
+                                placeholder="Filter Value e.g. arc" value="{{modification.filterValue}}"
                                 data-dtype="String" />
                         </div>
                         <div>
                             <input type="text" name="system.modifications.{{i}}.subPath"
-                                placeholder="Sub-Path e.g. value" value="{{modification.subPath}}"
+                                placeholder="Sub-Path e.g. damage" value="{{modification.subPath}}"
                                 data-dtype="String" />
+                        </div>
+                        <div>
+                            <input type="text" name="system.modifications.{{i}}.subPathFilter"
+                                placeholder="Sub-Filter e.g. type" value="{{modification.subPathFilter}}"
+                                data-dtype="String" />
+                        </div>
+                        <div>
+                            <input type="text" name="system.modifications.{{i}}.subPathFilterValue"
+                                placeholder="Sub-Filter Value e.g. slashing" value="{{modification.subPathFilterValue}}"
+                                data-dtype="String" />
+                        </div>
+                        <div>
+                            <input type="text" name="system.modifications.{{i}}.field" placeholder="Field e.g. value"
+                                value="{{modification.field}}" data-dtype="String" />
                         </div>
                         <div>
                             <select name="system.modifications.{{i}}.type">

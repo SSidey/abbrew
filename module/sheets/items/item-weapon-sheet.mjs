@@ -4,6 +4,7 @@ import {
 } from '../../helpers/effects.mjs';
 import Tagify from '@yaireo/tagify'
 import { renderSheetForStoredItem } from '../../helpers/utils.mjs';
+import { parsePathSync } from '../../helpers/modifierBuilderFieldHelpers.mjs';
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -149,8 +150,19 @@ export class AbbrewWeaponSheet extends ItemSheet {
           const updateSkills = [...storedSkills, { name: item.name, id: item._id, image: item.img, sourceId: item.uuid }];
           await this.item.update({ "system.skills.granted": updateSkills });
           // TODO: Move the set check to a utility
-        } else if (item.type === "enhancement" && item.system.type === "weapon" && new Set(this.item.system.traits.value.map(t => t.key)).isSupersetOf(new Set(item.system.traitFilter.value.map(t => t.key)))) {
-          console.log("We're in, apply the enhancements");
+        } else if (item.type === "enhancement" && item.system.type === "weapon" && new Set(this.item.system.traits.value.map(t => t.key)).isSupersetOf(new Set(item.system.traits.value.map(t => t.key)))) {
+          const enhancement = item.system;
+          let updateObject = structuredClone(this.item);
+          enhancement.modifications.forEach(modification => {
+            const value = parsePathSync(`${modification.type}.${modification.value}`, this.actor, this.item);
+            const indices = modification.filterValue ? foundry.utils.getProperty(updateObject, modification.path).filter(p => p[modification.filterPath] === modification.filterValue) : [];
+            const fullIndices = modification.subPathFilterValue ? indices.map(i => foundry.utils.getProperty(`${modification.path}.${i}.${modification.subPath}`).filter(p => p[modification.subPathFilter] === modification.subPathFilterValue)) : [];
+            const baseValue = foundry.utils.getProperty("");
+            // foundry.utils.setProperty(updateObject,);
+            console.log(value);
+            console.log(fullIndices);
+            console.log(baseValue);
+          });
         }
       }
     });
@@ -166,6 +178,7 @@ export class AbbrewWeaponSheet extends ItemSheet {
     return actions;
   }
 
+  // TODO: Equipment points
   _activateArmourPoints(html) {
     const armourPoints = html[0].querySelector('input[name="system.armourPoints"]');
     const armourPointsSettings = {
@@ -185,6 +198,7 @@ export class AbbrewWeaponSheet extends ItemSheet {
     }
   }
 
+  // TODO: Equipment points
   _activateAnatomyParts(html) {
     const anatomyParts = html[0].querySelector('input[name="system.parts"]');
     const anatomyPartsSettings = {

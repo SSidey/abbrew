@@ -255,7 +255,7 @@ export class AbbrewSkillSheet extends ItemSheet {
     }
 
     _activateSkillTraits(html) {
-        const skillTraits = html[0].querySelector('input[name="system.skillTraits.raw"]');
+        const skillTraits = html[0].querySelector('input[name="system.traits.raw"]');
         const skillTraitSettings = {
             dropdown: {
                 maxItems: 20,               // <- mixumum allowed rendered suggestions

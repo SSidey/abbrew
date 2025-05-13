@@ -480,7 +480,7 @@ export default class AbbrewActor extends Actor {
   }
 
   doesActorHaveSkillTrait(feature, subFeature, effect, data) {
-    return this.items.filter(i => i.type === "skill").filter(i => i.system.skillTraits.raw).flatMap(i => JSON.parse(i.system.skillTraits.raw)).some(t => t.feature === feature && t.subFeature === subFeature && t.effect === effect && t.data === data) ?? false;
+    return this.items.filter(i => i.type === "skill").filter(i => i.system.traits.raw).flatMap(i => JSON.parse(i.system.traits.raw)).some(t => t.feature === feature && t.subFeature === subFeature && t.effect === effect && t.data === data) ?? false;
   }
 
   async acceptWound(type, value) {

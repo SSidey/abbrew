@@ -42,7 +42,7 @@
       {{/if}}
       <div class="skill-element-max-input">
         <label class="resource-label">Skill Traits</label>
-        <input type="text" name="system.skillTraits.raw" value="{{system.skillTraits.raw}}" data-dtype="String"
+        <input type="text" name="system.traits.raw" value="{{system.traits.raw}}" data-dtype="String"
           data-dropType="skillTrait" {{#unless (isGM)}}readonly{{/unless}} />
       </div>
       {{editor enrichedDescription target="system.description" engine="prosemirror" rollData=rollData button=true

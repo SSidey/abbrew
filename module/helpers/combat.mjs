@@ -56,7 +56,7 @@ export async function updateActorWounds(actor, updateWounds) {
 }
 
 function getWoundImmunities(actor) {
-    const woundImmunities = actor.items.filter(i => i.type === "skill" && getSafeJson(i.system.skillTraits.raw, false)).map(s => JSON.parse(s.system.skillTraits.raw)).filter(s => s.some(st => st.feature === "wound" && st.effect === "immunity")).flatMap(s => s.data);
+    const woundImmunities = actor.items.filter(i => i.type === "skill" && getSafeJson(i.system.traits.raw, false)).map(s => JSON.parse(s.system.traits.raw)).filter(s => s.some(st => st.feature === "wound" && st.effect === "immunity")).flatMap(s => s.data);
     return woundImmunities ? woundImmunities : [];
 }
 
