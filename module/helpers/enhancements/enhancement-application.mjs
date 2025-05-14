@@ -1,5 +1,6 @@
 import { parsePathSync } from "../modifierBuilderFieldHelpers.mjs";
 import { applyOperatorUnbounded } from "../operators.mjs";
+import { removeItem } from "../utils.mjs";
 
 export function applyEnhancement(enhancement, actor, baseObject, isInverted) {
     enhancement.system.modifications.forEach(modification => {
@@ -12,6 +13,41 @@ export function applyEnhancement(enhancement, actor, baseObject, isInverted) {
             foundry.utils.setProperty(baseObject, p.path, p.value);
         });
     });
+
+    let updateGrantedSkills;
+    if (!isInverted) {
+        const grantedSkills = baseObject.system.skills.granted;
+        updateGrantedSkills = [...grantedSkills, ...enhancement.system.skills.granted];
+        foundry.utils.setProperty(baseObject, "system.skills.granted", updateGrantedSkills);
+    } else {
+        const enhancementSkills = enhancement.system.skills.granted;
+        updateGrantedSkills = baseObject.system.skills.granted;
+        enhancementSkills.forEach(e => {
+            removeItem(updateGrantedSkills, e);
+        });
+    }
+
+    foundry.utils.setProperty(baseObject, "system.skills.granted", updateGrantedSkills);
+
+
+    const itemEnhancement = ({
+        name: enhancement.name,
+        enhancementType: enhancement.system.type,
+        id: enhancement._id,
+        image: enhancement.img,
+        uuid: enhancement.uuid
+    });
+    let enhancements;
+
+    if (!isInverted) {
+        enhancements = [...baseObject.system.enhancements, itemEnhancement];
+    } else {
+        enhancements = removeItem(baseObject.system.enhancements, itemEnhancement);
+    }
+
+    foundry.utils.setProperty(baseObject, "system.enhancements", enhancements);
+
+    delete baseObject.system.equipState;
 }
 
 function getEnhancementOperator(operator, isInverted) {

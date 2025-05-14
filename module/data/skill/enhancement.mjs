@@ -9,7 +9,7 @@ export default class AbbrewEnhancement extends AbbrewSkillDeck {
         const blankString = { required: true, blank: true };
         const schema = super.defineSchema();
 
-        schema.type = new fields.StringField({ ...blankString });
+        schema.targetType = new fields.StringField({ ...blankString });
         schema.target = new fields.SchemaField({
             name: new fields.StringField({ ...blankString }),
             id: new fields.StringField({ ...blankString }),

@@ -1,4 +1,5 @@
 import { getNumericParts } from '../helpers/utils.mjs';
+import { AbbrewEnhancement } from './_module.mjs';
 import AbbrewItemBase from './item-base.mjs'
 
 export default class AbbrewPhysicalItem extends AbbrewItemBase {
@@ -7,36 +8,67 @@ export default class AbbrewPhysicalItem extends AbbrewItemBase {
         const schema = super.defineSchema();
         const fields = foundry.data.fields;
         const requiredInteger = { required: true, nullable: false, integer: true };
+        const blankString = { required: true, blank: true };
 
         schema.quantity = new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 });
-        schema.weight = new fields.NumberField({ required: true, nullable: false, initial: 0, min: 0 });
+
+        schema.heft = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
+        schema.complexity = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
         schema.meta = new fields.SchemaField({
+            // Where to place tier :(
             size: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 9 }),
+            quality: new fields.SchemaField({
+                base: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                value: new fields.NumberField({ ...requiredInteger, initial: 0 })
+            })
         });
-        schema.equipType = new fields.StringField({ required: true, blank: true });
-        schema.armourPoints = new fields.StringField({ required: true, blank: true });
-        schema.handsRequired = new fields.StringField({ required: true, blank: true });
+        schema.equipType = new fields.StringField({ ...blankString });
+        schema.armourPoints = new fields.StringField({ ...blankString });
+        schema.handsRequired = new fields.StringField({ ...blankString });
         schema.equipState = new fields.StringField({ required: true, blank: false, initial: 'stowed' });
         schema.handsSupplied = new fields.NumberField({ ...requiredInteger, initial: 0 });
         schema.actionCost = new fields.NumberField({ ...requiredInteger, initial: 0 });
         schema.exertActionCost = new fields.NumberField({ ...requiredInteger, initial: 0 });
         schema.validEquipStates = new fields.ArrayField(
             new fields.SchemaField({
-                label: new fields.StringField({ required: true, blank: true }),
-                value: new fields.StringField({ required: true, blank: true }),
+                label: new fields.StringField({ ...blankString }),
+                value: new fields.StringField({ ...blankString }),
             })
         );
         schema.skills = new fields.SchemaField({
             granted: new fields.ArrayField(
                 new fields.SchemaField({
-                    name: new fields.StringField({ required: true, blank: true }),
-                    skillType: new fields.StringField({ required: true, blank: true }),
-                    id: new fields.StringField({ required: true, blank: true }),
-                    image: new fields.StringField({ required: true, blank: true }),
-                    sourceId: new fields.StringField({ required: true, blank: true })
+                    name: new fields.StringField({ ...blankString }),
+                    skillType: new fields.StringField({ ...blankString }),
+                    id: new fields.StringField({ ...blankString }),
+                    image: new fields.StringField({ ...blankString }),
+                    sourceId: new fields.StringField({ ...blankString })
                 })
             )
         });
+        // TODO: Would need to set up calculations for everything in a base item type e.g. sword and work from there        
+        schema.material = new fields.SchemaField({
+            id: new fields.StringField({ ...blankString }),
+            name: new fields.StringField({ ...blankString }),
+            img: new fields.StringField({ ...blankString }),
+            modifiers: new fields.SchemaField({
+                heftSizeRatio: new fields.NumberField({ required: true, initial: 0, min: 0 }),
+                heftAdjustment: new fields.NumberField({ required: true, initial: 0, min: 0 }),
+                complexityAdjustment: new fields.NumberField({ required: true, initial: 0, min: 0 }),
+                tier: new fields.NumberField({ ...requiredInteger, initial: 1 }),
+                enhancementsUsed: new fields.NumberField({ ...requiredInteger, initial: 0 })
+            })
+        });
+        schema.availableEnhancements = new fields.NumberField({ ...requiredInteger, initial: 0 });
+        schema.enhancements = new fields.ArrayField(
+            new fields.SchemaField({
+                name: new fields.StringField({ ...blankString }),
+                enhancementType: new fields.StringField({ ...blankString }),
+                id: new fields.StringField({ ...blankString }),
+                image: new fields.StringField({ ...blankString }),
+                uuid: new fields.StringField({ ...blankString })
+            })
+        )
 
         return schema;
     }
@@ -64,6 +96,10 @@ export default class AbbrewPhysicalItem extends AbbrewItemBase {
         this.handsSupplied = this.equipType === "innate" ? 1 : getNumericParts(this.equipState);
         this.actionCost = 0 + this.handsSupplied ?? 1;
         this.exertActionCost = 1 + this.handsSupplied ?? 2;
+
+        // TODO: Craft requirement is material + quality must === tier
+        // TODO: This should be derived from the quality - material.enhancementsUsed
+        this.availableEnhancements = 1 - this.enhancements.length;
 
         super.prepareBaseData();
     }

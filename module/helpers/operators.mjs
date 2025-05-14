@@ -1,4 +1,4 @@
-import { getSafeJson } from "./utils.mjs";
+import { getSafeJson, removeItem } from "./utils.mjs";
 
 export function applyOperator(base, value, operator, min = Number.NEGATIVE_INFINITY, max = Number.POSITIVE_INFINITY) {
     const unboundedValue = applyOperatorUnbounded(base, value, operator);
@@ -26,15 +26,6 @@ export function applyOperatorUnbounded(base, value, operator) {
         default:
             return base;
     }
-}
-
-function removeItem(base, value) {
-    const index = base.findIndex(v => v.key === value.key);
-    if (index > -1) { // only splice array when item is found
-        base.splice(index, 1); // 2nd parameter means remove one item only
-    }
-
-    return base;
 }
 
 export function getOrderForOperator(operator) {

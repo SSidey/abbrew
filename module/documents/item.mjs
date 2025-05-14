@@ -341,6 +341,7 @@ export default class AbbrewItem extends Item {
       ];
       if (trackedEffects.length > 0) {
         this.actor.deleteEmbeddedDocuments("ActiveEffect", trackedEffects.map(e => e._id));
+        return false;
       }
 
       if ((this.system.skills?.granted?.length ?? 0) > 0) {

@@ -417,11 +417,11 @@ ABBREW.hands = {
   }
 }
 
-ABBREW.enhancementTypes = {
-  "weapon": "ABBREW.EnhancementTypes.weapon",
-  "armour": "ABBREW.EnhancementTypes.armour",
-  "skill": "ABBREW.EnhancementTypes.skill",
-  "amp": "ABBREW.EnhancementTypes.amp",
+ABBREW.enhancementTargetTypes = {
+  "weapon": "ABBREW.EnhancementTargetTypes.weapon",
+  "armour": "ABBREW.EnhancementTargetTypes.armour",
+  "skill": "ABBREW.EnhancementTargetTypes.skill",
+  "amp": "ABBREW.EnhancementTargetTypes.amp",
 }
 
 const lingeringWoundImmunities = [

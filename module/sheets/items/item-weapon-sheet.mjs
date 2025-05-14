@@ -135,6 +135,26 @@ export class AbbrewWeaponSheet extends ItemSheet {
       }
     });
 
+    // Delete Enhancement
+    html.on('click', '.enhancement-delete', async (ev) => {
+      const li = $(ev.currentTarget).parents('.skill-deck-skill');
+      if (li.data('id') || li.data('id') === 0) {
+        const enhancements = this.item.system.enhancements;
+        const enhancement = enhancements[li.data('id')];
+        enhancements.splice(li.data('id'), 1);
+        await this.item.update({ "system.enhancements": enhancements });
+        if (enhancement.id && this.item.actor) {
+          await this.item.actor.deleteEmbeddedDocuments("Item", [enhancement.id]);
+        } else if (enhancement.uuid) {
+          let updateObject = structuredClone(this.item);
+          const sourceEnhancement = await fromUuid(enhancement.uuid);
+          applyEnhancement(sourceEnhancement, null, updateObject, true);
+          const options = { pack: this.item.pack };
+          await Item.implementation.updateDocuments([{ _id: this.item._id, ...updateObject }], options);
+        }
+      }
+    });
+
     html.on('click', '.skill-deck-skill .skill-deck-summary .image-container, .skill-deck-skill .skill-deck-summary .name', async (event) => {
       await renderSheetForStoredItem(event, this.actor, "skill-deck-skill");
     });
@@ -152,43 +172,40 @@ export class AbbrewWeaponSheet extends ItemSheet {
           const storedSkills = this.item.system.skills.granted;
           const updateSkills = [...storedSkills, { name: item.name, id: item._id, image: item.img, sourceId: item.uuid }];
           await this.item.update({ "system.skills.granted": updateSkills });
-        } else if (item.type === "enhancement" && item.system.type === "weapon" && isATraitsSupersetOfBTraits(this.item, item)) {
-          let updateObject = structuredClone(this.item);
-          applyEnhancement(item, this.item.actor, updateObject, false);
-
-          // TODO: Add modifier for names, prefix / suffix so can rename the thing.
-          let enhancement;
-
+        } else if (item.type === "enhancement" && item.system.targetType === "weapon" && isATraitsSupersetOfBTraits(this.item, item)) {
           if (!this.item.actor && item.system.duration.precision !== "-1") {
             return;
           }
 
+          let updateObject = structuredClone(this.item);
+
+          // TODO: Add modifier for names, prefix / suffix so can rename the thing.
+          let enhancement;
           if (this.item.actor) {
-            enhancement = await Item.create([item], { parent: this.item.actor });
+            const enhancementTarget = ({ name: this.item.name, id: this.item._id, uuid: this.item.uuid });
+            const createEnhancements = structuredClone(item);
+            foundry.utils.setProperty(createEnhancements, "system.target", enhancementTarget);
+            enhancement = await Item.create([createEnhancements], { parent: this.item.actor });
+            await trackEnhancementDuration(this.item.actor, enhancement[0]);
+
+            if (this._isEquipped()) {
+              let skillSummaries = item.system.skills.granted;
+              const skillPromises = skillSummaries.map(s => fromUuid(s.sourceId));
+              const skills = structuredClone(await Promise.all(skillPromises));
+              skills.forEach(s => s.system.grantedBy.item = this.item._id);
+              const createdSkills = await Item.create(skills, { parent: this.item.actor });
+
+              await enhancement[0].update({ "system.grantedIds": createdSkills.map(s => s._id) });
+            }
+          } else {
+            enhancement = [item];
           }
 
-          const options = this.item.actor ? { parent: this.item.actor } : { pack: "abbrew.equipment" };
+          applyEnhancement(enhancement[0], this.item.actor, updateObject, false);
+
+          const options = this.item.actor ? { parent: this.item.actor } : { pack: this.item.pack };
 
           await Item.implementation.updateDocuments([{ _id: this.item._id, ...updateObject }], options);
-
-          if (this.actor) {
-            // TODO: Check for equipped
-            let skillSummaries = item.system.skills.granted;
-            const skillPromises = skillSummaries.map(s => fromUuid(s.sourceId));
-            const skills = structuredClone(await Promise.all(skillPromises));
-            skills.forEach(s => s.system.grantedBy.item = this.item._id);
-            const createdSkills = await Item.create(skills, { parent: this.item.actor });
-
-            const enhancementTarget = ({ name: this.item.name, id: this.item._id, uuid: this.item.uuid });
-            await enhancement[0].update({ "system.grantedIds": createdSkills.map(s => s._id), "system.target": enhancementTarget });
-            await trackEnhancementDuration(this.item.actor, enhancement[0]);
-          } else {
-            // TODO: Should always do this, but should be reversible
-            // TODO: Track enhancements on item sheets, could pull by uuid and run the reverse application
-            const grantedSkills = this.item.system.skills.granted;
-            const updateGrantedSkills = [...grantedSkills, ...item.system.skills.granted];
-            await this.item.update({ "system.skills.granted": updateGrantedSkills });
-          }
         };
       }
     });
@@ -197,6 +214,21 @@ export class AbbrewWeaponSheet extends ItemSheet {
     this._activateArmourPoints(html);
     this._activateAnatomyParts(html);
     this._activateTraits(html);
+  }
+
+  _isEquipped() {
+    const equipType = this.item.system.equipType;
+    const equipState = this.item.system.equipState;
+    switch (equipType) {
+      case "held":
+        return equipState.startsWith('held');
+      case "innate":
+        return equipState === "active";
+      case "worn":
+        return equipState === "worn";
+      default:
+        return false;
+    }
   }
 
   prepareActions(system) {

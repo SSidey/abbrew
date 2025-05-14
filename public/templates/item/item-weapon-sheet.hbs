@@ -54,11 +54,11 @@
         </div>
         <div class="weapon-size-detail">
           <label class="resource-label">Heft</label>
-          <input type="text" name="system.weapon.heft" value="{{system.weapon.heft}}" data-dtype="Number" />
+          <input type="text" name="system.heft" value="{{system.heft}}" data-dtype="Number" />
         </div>
         <div class="weapon-size-detail">
           <label class="resource-label">Complexity</label>
-          <input type="text" name="system.weapon.complexity" value="{{system.weapon.complexity}}" data-dtype="Number" />
+          <input type="text" name="system.complexity" value="{{system.complexity}}" data-dtype="Number" />
         </div>
       </div>
       {{> "systems/abbrew/templates/item/parts/item-equipstate.hbs"}}
@@ -67,6 +67,26 @@
 
     {{!-- Skills Tab --}}
     <div class="tab skills" data-group="primary" data-tab="skills">
+      <h3>Enhancements</h3>
+      <ol class="skill-deck-skills">
+        {{#each system.enhancements as |enhancement id|}}
+        <li class="skill-deck-skill" data-id="{{id}}" data-item-id="{{enhancement.id}}"
+          data-source-id="{{enhancement.sourceId}}">
+          <div class="skill-deck-summary">
+            <div class="image-container"><img src="{{enhancement.image}}" /></div>
+            <div class="name"><span>{{enhancement.name}}</span></div>
+            <a class='item-control enhancement-delete' title='{{localize "DOCUMENT.Delete" type=' enhancement'}}'>
+              <i class='fas fa-trash'></i>
+            </a>
+          </div>
+        </li>
+        {{/each}}
+        {{#if (gt 0 system.availableEnhancements)}}
+        <li class="empty-drop-list-element">
+          <span>+ Enhancement</span>
+        </li>
+        {{/if}}
+      </ol>
       <h3>Skills</h3>
       <ol class="skill-deck-skills">
         {{#each system.skills.granted as |skill id|}}

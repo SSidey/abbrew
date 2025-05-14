@@ -1,0 +1,246 @@
+{
+  "folder": "CBUrKPnMactDG7PT",
+  "name": "Barbed",
+  "type": "skill",
+  "_id": "YDtBNQugZoQxIlha",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "abbrew.skill.barbed.YDtBNQugZoQxIlha",
+      "uuid": "YDtBNQugZoQxIlha"
+    },
+    "skillTraits": "",
+    "skillModifiers": {
+      "synergy": "[{\"id\":\"abbrewAttack0000\",\"value\":\"Attack\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewAttack0000\"},{\"id\":\"abbrewFinisher00\",\"value\":\"Finisher\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewFinisher00\"},{\"id\":\"abbrewOverpower0\",\"value\":\"Overpower\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewOverpower0\"},{\"id\":\"abbrewRangedAtt0\",\"value\":\"Ranged Attack\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewRangedAtt0\"},{\"id\":\"abbrewAimedShot0\",\"value\":\"Aimed Shot\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewAimedShot0\"},{\"id\":\"abbrewThrown0000\",\"value\":\"Thrown\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewThrown0000\"}]",
+      "discord": "",
+      "isActorGrantTriggerRequired": false,
+      "isItemGrantTriggerRequired": true
+    },
+    "isFavourited": false,
+    "configurable": true,
+    "isActivatable": false,
+    "activateOnCreate": false,
+    "applyTurnStart": false,
+    "applyTurnEnd": false,
+    "applyOnExpiry": false,
+    "activateOnDamageAccept": false,
+    "sources": {
+      "actor": "",
+      "item": ""
+    },
+    "grantedBy": {
+      "actor": "",
+      "item": ""
+    },
+    "skills": {
+      "granted": [],
+      "paired": [],
+      "grantedOnActivation": [],
+      "grantedOnAccept": []
+    },
+    "resource": {
+      "capacity": 0,
+      "operator": "",
+      "relatedResource": null,
+      "fillCapacityOnCreate": false
+    },
+    "action": {
+      "activationType": "synergy",
+      "actionCost": null,
+      "actionImage": "",
+      "duration": {
+        "isConcentration": false,
+        "precision": "-1",
+        "value": 0,
+        "expireOnStartOfTurn": true
+      },
+      "uses": {
+        "hasUses": false,
+        "asStacks": false,
+        "removeStackOnUse": true,
+        "value": 0,
+        "max": 0,
+        "period": "",
+        "stackRemovalActivation": false,
+        "removeWhenNoUsesRemain": false
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "asyncValues": [],
+      "skillCheck": [],
+      "skillRequest": {
+        "isEnabled": false,
+        "isContested": false,
+        "selfCheck": false,
+        "checkType": "",
+        "requirements": {
+          "modifiers": "",
+          "successes": 0,
+          "result": 0
+        },
+        "targetModifiers": "",
+        "results": {
+          "success": {
+            "description": ""
+          },
+          "failure": {
+            "description": ""
+          }
+        }
+      },
+      "attackProfile": {
+        "isEnabled": false,
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": null,
+        "attackMode": "",
+        "finisher": {
+          "type": "",
+          "cost": null,
+          "description": "",
+          "wounds": []
+        },
+        "damage": [],
+        "finisherLimit": 10
+      },
+      "modifiers": {
+        "fortune": 0,
+        "actionCost": {
+          "value": 0,
+          "operator": ""
+        },
+        "attackProfile": {
+          "isEnabled": false,
+          "combineAttacks": {
+            "isEnabled": false,
+            "value": null
+          },
+          "attackType": "",
+          "attackMode": "",
+          "handsSupplied": null,
+          "finisherLimit": {
+            "value": 10,
+            "operator": ""
+          },
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "penetration": {
+            "value": 10,
+            "operator": ""
+          },
+          "finisher": {
+            "type": "",
+            "cost": null,
+            "description": "",
+            "wounds": []
+          },
+          "damage": []
+        },
+        "guard": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": "",
+            "lateParse": false
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": [
+            {
+              "type": "bleed",
+              "operator": "add",
+              "value": [
+                {
+                  "operator": "add",
+                  "type": "numeric",
+                  "path": "1",
+                  "lateParse": true,
+                  "multiplier": 1
+                }
+              ]
+            }
+          ]
+        },
+        "resolve": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": []
+        }
+      }
+    },
+    "skillType": "temporary",
+    "path": {
+      "raw": "",
+      "value": {
+        "id": ""
+      }
+    },
+    "roles": {
+      "raw": "",
+      "parsed": []
+    },
+    "archetype": "",
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": "",
+    "isProxied": false,
+    "siblingSkillModifiers": []
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746969054874,
+    "modifiedTime": 1746978168502,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!YDtBNQugZoQxIlha"
+}

@@ -96,7 +96,7 @@
         "snake": "A style employing the use of two short weapons and relies on rapid speed and dodges."
       }
     },
-    "EnhancementTypes": {
+    "EnhancementTargetTypes": {
       "weapon": "Weapon",
       "armour": "Armour",
       "skill": "Skill",

@@ -424,7 +424,10 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     const armourInflexibility = armour.map(a => a.system.defense.inflexibility).reduce((a, b) => a + b, 0);
     const wornArmourInflexibility = wornArmour.map(a => a.system.defense.inflexibility).reduce((a, b) => a + b, 0);
     const weapons = this.parent.items.filter(i => i.type === 'weapon').filter(a => a.system.equipType === 'held').filter(a => a.system.equipState.startsWith('held'));
-    const otherInflexibility = Math.max(0, weapons.reduce((result, w) => result += (w.system.weapon.heft * 2), 0) - this.attributes['str'].value);
+    const otherInflexibility =
+      Math.max(0, wornArmour.reduce((result, w) => result += (w.system.heft * 2), 0) - this.attributes['str'].value) +
+      Math.max(0, weapons.reduce((result, w) => result += (w.system.heft * 2), 0) - this.attributes['str'].value) +
+      Math.max(0, weapons.reduce((result, w) => result += (w.system.complexity * 2), 0) - this.attributes['dex'].value);
     this.defense.inflexibility.resistance.raw = armourInflexibility;
     this.defense.inflexibility.raw = Math.floor((0 + wornArmourInflexibility + otherInflexibility) / 2); // TODO: - weapon drills as "Shield Training" is handled
     this.defense.inflexibility.resistance.value = Math.floor(armourInflexibility / 10);
