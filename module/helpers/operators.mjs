@@ -20,12 +20,36 @@ export function applyOperatorUnbounded(base, value, operator) {
         case "suppress":
             return 0;
         case "merge":
-            return JSON.stringify([...getSafeJson(base, []), value]);
+            return mergeValues(base, value);
         case "split":
-            return JSON.stringify(removeItem(getSafeJson(base, []), value));
+            return splitValues(base, value);
         default:
             return base;
     }
+}
+
+function mergeValues(base, value) {
+    if(base === undefined || base === null) {
+        return base;
+    }
+
+    if (typeof base === "string") {
+        return JSON.stringify([...getSafeJson(base, []), value]);
+    }
+
+    return [...base, value]
+}
+
+function splitValues(base, value) {
+    if(base === undefined || base === null) {
+        return base;
+    }
+    
+    if (typeof base === "string") {
+        return JSON.stringify(removeItem(getSafeJson(base, []), value));
+    }
+
+    return removeItem(base, value)
 }
 
 export function getOrderForOperator(operator) {

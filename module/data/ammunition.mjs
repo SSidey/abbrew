@@ -30,7 +30,12 @@ export default class AbbrewAmmunition extends AbbrewPhysicalItem {
                     penetration: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
                 })
             )
-        }); 
+        });
+    }
+
+    // Prior to Active Effects
+    prepareBaseData() {
+        super.prepareBaseData();
     }
 
     prepareDerivedData() {
@@ -38,5 +43,6 @@ export default class AbbrewAmmunition extends AbbrewPhysicalItem {
         const roll = this.roll;
 
         // this.formula = `${roll.diceNum}${roll.diceSize}${roll.diceBonus}`
+        super.prepareDerivedData();
     }
 }

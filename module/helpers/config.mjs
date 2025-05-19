@@ -99,7 +99,7 @@ ABBREW.woundOperators = {
 ABBREW.enhancementOperators = {
   ...ABBREW.simpleOperators,
   merge: "ABBREW.Operators.merge",
-  split: "ABBREW.Operator.split"
+  split: "ABBREW.Operators.split"
 }
 
 ABBREW.Defense = {
@@ -122,7 +122,7 @@ ABBREW.concepts = {
   physical: 'ABBREW.Concepts.physical',
   crushing: 'ABBREW.Resistances.crushing',
   piercing: 'ABBREW.Resistances.piercing',
-  slashing: 'ABBREW.Resistances.slashing'
+  slashing: 'ABBREW.Resistances.slashing',
 }
 
 ABBREW.facing = {
@@ -420,9 +420,46 @@ ABBREW.hands = {
 ABBREW.enhancementTargetTypes = {
   "weapon": "ABBREW.EnhancementTargetTypes.weapon",
   "armour": "ABBREW.EnhancementTargetTypes.armour",
+  "ammunition": "ABBREW.EnhancementTargetTypes.ammunition",
+  "physical": "ABBREW.EnhancementTargetTypes.physical",
   "skill": "ABBREW.EnhancementTargetTypes.skill",
   "amp": "ABBREW.EnhancementTargetTypes.amp",
 }
+
+ABBREW.affixTypes = {
+  "pre": -1,
+  "suf": 1
+}
+
+ABBREW.adjectiveTypes = {
+  "opinion": { order: 1, examples: "amazing, fantastic, brilliant, wonderful, horrible, awful, terrible" },
+  "size": { order: 2, examples: "small, big, huge, massive, tall, short, enormous, tiny, large" },
+  "physicalQuality": { order: 3, examples: "thick, thin, smooth, blunt, sharp, rought, soft, hard, squishy, solid" },
+  "age": { order: 4, examples: "young, old, ancient, mature, teenage, immature, modern" },
+  "shape": { order: 5, examples: "square, round, circular, rectangular, oblong, cylindrical, right-angled" },
+  "colour": { order: 6, examples: "black, white, blue, red, greeen, yellow, pink, orange, purple" },
+  "origin": { order: 7, examples: "English, American etc." },
+  "material": { order: 8, examples: "wooden, plastic, metal, cotton, silk, synthetic, gold, leather, glass" },
+  "purpose": { order: 9, examples: "cooking, cleaning, scrubbing, polishing, sewing, washing" }
+}
+
+ABBREW.nameParts = [
+  { key: "barbed", part: "ABBREW.NameParts.barbed", affix: -1, order: 3 },
+  { key: "heavy", part: "ABBREW.NameParts.heavy", affix: -1, order: 3 },
+  { key: "padded", part: "ABBREW.NameParts.padded", affix: -1, order: 8 },
+  { key: "bone", part: "ABBREW.NameParts.bone", affix: -1, order: 8 },
+  { key: "cloth", part: "ABBREW.NameParts.cloth", affix: -1, order: 8 },
+  { key: "hide", part: "ABBREW.NameParts.hide", affix: -1, order: 8 },
+  { key: "iron", part: "ABBREW.NameParts.iron", affix: -1, order: 8 },
+  { key: "leather", part: "ABBREW.NameParts.leather", affix: -1, order: 8 },
+  { key: "steel", part: "ABBREW.NameParts.steel", affix: -1, order: 8 },
+  { key: "chain", part: "ABBREW.NameParts.chain", affix: -1, order: 9 },
+  { key: "jack", part: "ABBREW.NameParts.jack", affix: -1, order: 9 },
+  { key: "lamellar", part: "ABBREW.NameParts.lamellar", affix: -1, order: 9 },
+  { key: "laminar", part: "ABBREW.NameParts.laminar", affix: -1, order: 9 },
+  { key: "plate", part: "ABBREW.NameParts.plate", affix: -1, order: 9 },
+  { key: "splint", part: "ABBREW.NameParts.splint", affix: -1, order: 9 },
+]
 
 const lingeringWoundImmunities = [
   { key: "bleedImmunity", value: "ABBREW.Traits.WoundImmunities.bleedImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "bleed", exclude: [] },
@@ -585,6 +622,7 @@ ABBREW.modifierPrefixes = {
   "actor": "ABBREW.ModifierPrefixes.actor",
   "item": "ABBREW.ModifierPrefixes.item",
   "this": "ABBREW.ModifierPrefixes.this",
+  "target": "ABBREW.ModifierPrefixes.target",
   "wound": "ABBREW.ModifierPrefixes.wound",
   "condition": "ABBREW.ModifierPrefixes.condition",
   "statustype": "ABBREW.ModifierPrefixes.statusType",
@@ -595,7 +633,9 @@ ABBREW.modifierPrefixes = {
   "skillCount": "ABBREW.ModifierPrefixes.skillCount",
   "async": "ABBREW.ModifierPrefixes.async",
   "string": "ABBREW.ModifierPrefixes.string",
-  "trait": "ABBREW.ModifierPrefixes.trait"
+  "trait": "ABBREW.ModifierPrefixes.trait",
+  "json": "ABBREW.ModifierPrefixes.json",
+  "name": "ABBREW.ModifierPrefixes.name"
 }
 
 ABBREW.checkTypes = {

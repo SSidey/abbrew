@@ -1,5 +1,5 @@
 import { applyOperator, getOrderForOperator } from "./operators.mjs";
-import { compareModifierIndices, getObjectValueByStringPath } from "./utils.mjs";
+import { compareModifierIndices, getObjectValueByStringPath, getSafeJson } from "./utils.mjs";
 
 // [{ operator: String, type: String, path: String, multiplier: Number, lateParse: Boolean }], actor
 // [{ operator: String, type: String, path: String, multiplier: Number, lateParse: Boolean }, ...]
@@ -140,7 +140,7 @@ export function reduceParsedModifiers(parsedValues, startingValue = 0) {
     condition.<"offguard">
     skillCount.<AbbrewId.uuid>
  */
-export function parsePathSync(rawValue, actor, source) {
+export function parsePathSync(rawValue, actor, source, target) {
     if (typeof rawValue != "string") {
         return rawValue;
     }
@@ -154,24 +154,29 @@ export function parsePathSync(rawValue, actor, source) {
     }
 
     const entityType = rawValue.split('.').slice(0, 1).shift();
+    const secondPart = rawValue.split('.').slice(1).shift();
 
     switch (entityType) {
         case 'string':
-            return rawValue.split('.').slice(1).shift();
+            return secondPart;
         case 'trait':
-            return getTrait(rawValue.split('.').slice(1).shift());
+            return getTrait(secondPart);
+        case 'name':
+            return getNamePart(secondPart)
+        case 'json':
+            return getObjectFromJson(secondPart);
         case 'numeric':
-            return parseFloat(rawValue.split('.').slice(1).shift()) ?? 0;
+            return parseFloat(secondPart) ?? 0;
         case 'skillCount':
-            return getSkillCount(actor, rawValue.split('.').slice(1).shift());
+            return getSkillCount(actor, secondPart);
         case 'condition':
-            return getConditionValue(actor, rawValue.split('.').slice(1).shift());
+            return getConditionValue(actor, secondPart);
         case 'statustype':
-            return getStatusTypeValue(actor, rawValue.split('.').slice(1).shift());
+            return getStatusTypeValue(actor, secondPart);
         case 'wound':
-            return getWoundValue(actor, rawValue.split('.').slice(1).shift());
+            return getWoundValue(actor, secondPart);
         case 'resource':
-            return getResourceValue(actor, rawValue.split('.').slice(1).shift());
+            return getResourceValue(actor, secondPart);
         case 'damage':
             return getLastDamageValue(actor, rawValue.split('.').slice(1, 2).shift(), rawValue.split('.').slice(2).shift());
     }
@@ -180,6 +185,8 @@ export function parsePathSync(rawValue, actor, source) {
         switch (entityType) {
             case 'this':
                 return source;
+            case 'target':
+                return target;
             case 'actor':
                 return actor;
             case 'item':
@@ -191,6 +198,7 @@ export function parsePathSync(rawValue, actor, source) {
     const path = (function () {
         switch (entityType) {
             case 'this':
+            case 'target':
             case 'actor':
                 return rawValue.split('.').slice(1).join('.');
             case 'item':
@@ -202,9 +210,18 @@ export function parsePathSync(rawValue, actor, source) {
     }
 }
 
+function getObjectFromJson(value) {
+    return getSafeJson(value, {});
+}
+
 function getTrait(value) {
     const traits = CONFIG.ABBREW.traits.filter(t => t.key === value);
     return traits.map(t => ({ ...t, value: game.i18n.localize(t.value) ?? t.value }))[0];
+}
+
+function getNamePart(value) {
+    const nameParts = CONFIG.ABBREW.nameParts.filter(t => t.key === value);
+    return nameParts.map(n => ({ ...n, part: game.i18n.localize(n.part) ?? n.part }))[0];
 }
 
 function getResourceValue(actor, id) {

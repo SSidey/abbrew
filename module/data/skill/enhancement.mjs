@@ -55,6 +55,7 @@ export default class AbbrewEnhancement extends AbbrewSkillDeck {
         schema.grantedIds = new fields.ArrayField(
             new fields.StringField({ ...blankString })
         );
+        schema.cost = new fields.NumberField({ ...requiredInteger, initial: 1 });
 
         return schema;
     }

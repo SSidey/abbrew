@@ -1,20 +1,5 @@
 <form class="{{cssClass}}" autocomplete="off">
-  <header class="sheet-header">
-    <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" />
-    <div class="header-fields">
-      <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name" /></h1>
-      <div class="grid grid-2col">
-        <div class="resource">
-          <label class="resource-label">Quantity</label>
-          <input type="text" name="system.quantity" value="{{system.quantity}}" data-dtype="Number" />
-        </div>
-        <div class="resource">
-          <label class="resource-label">Weight</label>
-          <input type="text" name="system.weight" value="{{system.weight}}" data-dtype="Number" />
-        </div>
-      </div>
-    </div>
-  </header>
+  {{> "systems/abbrew/templates/item/parts/item-physical-header.hbs"}}
 
   {{!-- Sheet Tab Navigation --}}
   <nav class="sheet-tabs tabs" data-group="primary">
@@ -30,12 +15,7 @@
     <div class="tab" data-group="primary" data-tab="description">
       {{!-- To render inline rolls in a TinyMCE editor, you need to pass the parent actor's (if any) roll data to the
       rollData prop. --}}
-      <h3>Traits</h3>
-      <div class="item-element-max-input">
-        <label class="resource-label">Traits</label>
-        <input type="text" name="system.traits.raw" value="{{system.traits.raw}}" data-dtype="String"
-          data-dropType="skillTrait" {{#unless (isGM)}}readonly{{/unless}} />
-      </div>
+      {{> "systems/abbrew/templates/item/parts/item-traits.hbs"}}
       <h3>Description</h3>
       {{editor enrichedDescription target="system.description" engine="prosemirror" rollData=rollData button=true
       owner=owner
@@ -51,14 +31,6 @@
             {{selectOptions config.size selected=system.meta.size valueAttr="value" labelAttr="label"
             localize=true}}
           </select>
-        </div>
-        <div class="weapon-size-detail">
-          <label class="resource-label">Heft</label>
-          <input type="text" name="system.heft" value="{{system.heft}}" data-dtype="Number" />
-        </div>
-        <div class="weapon-size-detail">
-          <label class="resource-label">Complexity</label>
-          <input type="text" name="system.complexity" value="{{system.complexity}}" data-dtype="Number" />
         </div>
       </div>
       {{> "systems/abbrew/templates/item/parts/item-equipstate.hbs"}}
@@ -81,7 +53,7 @@
           </div>
         </li>
         {{/each}}
-        {{#if (gt 0 system.availableEnhancements)}}
+        {{#if (gt system.availableEnhancements 0)}}
         <li class="empty-drop-list-element">
           <span>+ Enhancement</span>
         </li>

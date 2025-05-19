@@ -1,5 +1,4 @@
-import { getNumericParts } from '../helpers/utils.mjs';
-import { AbbrewEnhancement } from './_module.mjs';
+import { getNumericParts, getSafeJson } from '../helpers/utils.mjs';
 import AbbrewItemBase from './item-base.mjs'
 
 export default class AbbrewPhysicalItem extends AbbrewItemBase {
@@ -11,19 +10,23 @@ export default class AbbrewPhysicalItem extends AbbrewItemBase {
         const blankString = { required: true, blank: true };
 
         schema.quantity = new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 });
-
         schema.heft = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
         schema.complexity = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
-        schema.meta = new fields.SchemaField({
-            // Where to place tier :(
-            size: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 9 }),
-            quality: new fields.SchemaField({
-                base: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-                value: new fields.NumberField({ ...requiredInteger, initial: 0 })
-            })
-        });
+        schema.meta = new fields.SchemaField(
+            this.getMetaEntries()
+        );
         schema.equipType = new fields.StringField({ ...blankString });
         schema.armourPoints = new fields.StringField({ ...blankString });
+        schema.equipPoints = new fields.SchemaField({
+            required: new fields.SchemaField({
+                raw: new fields.StringField({ ...blankString }),
+                parsed: new fields.ArrayField(
+                    new fields.SchemaField({
+                        value: new fields.StringField({ ...blankString })
+                    })
+                )
+            })
+        });
         schema.handsRequired = new fields.StringField({ ...blankString });
         schema.equipState = new fields.StringField({ required: true, blank: false, initial: 'stowed' });
         schema.handsSupplied = new fields.NumberField({ ...requiredInteger, initial: 0 });
@@ -46,29 +49,7 @@ export default class AbbrewPhysicalItem extends AbbrewItemBase {
                 })
             )
         });
-        // TODO: Would need to set up calculations for everything in a base item type e.g. sword and work from there        
-        schema.material = new fields.SchemaField({
-            id: new fields.StringField({ ...blankString }),
-            name: new fields.StringField({ ...blankString }),
-            img: new fields.StringField({ ...blankString }),
-            modifiers: new fields.SchemaField({
-                heftSizeRatio: new fields.NumberField({ required: true, initial: 0, min: 0 }),
-                heftAdjustment: new fields.NumberField({ required: true, initial: 0, min: 0 }),
-                complexityAdjustment: new fields.NumberField({ required: true, initial: 0, min: 0 }),
-                tier: new fields.NumberField({ ...requiredInteger, initial: 1 }),
-                enhancementsUsed: new fields.NumberField({ ...requiredInteger, initial: 0 })
-            })
-        });
         schema.availableEnhancements = new fields.NumberField({ ...requiredInteger, initial: 0 });
-        schema.enhancements = new fields.ArrayField(
-            new fields.SchemaField({
-                name: new fields.StringField({ ...blankString }),
-                enhancementType: new fields.StringField({ ...blankString }),
-                id: new fields.StringField({ ...blankString }),
-                image: new fields.StringField({ ...blankString }),
-                uuid: new fields.StringField({ ...blankString })
-            })
-        )
 
         return schema;
     }
@@ -96,10 +77,10 @@ export default class AbbrewPhysicalItem extends AbbrewItemBase {
         this.handsSupplied = this.equipType === "innate" ? 1 : getNumericParts(this.equipState);
         this.actionCost = 0 + this.handsSupplied ?? 1;
         this.exertActionCost = 1 + this.handsSupplied ?? 2;
-
-        // TODO: Craft requirement is material + quality must === tier
-        // TODO: This should be derived from the quality - material.enhancementsUsed
-        this.availableEnhancements = 1 - this.enhancements.length;
+        this.equipPoints.required.raw = this.armourPoints;
+        this.equipPoints.required.parsed = getSafeJson(this.equipPoints.required.raw, []);
+        // 1 (Material) + Bonus from quality
+        this.availableEnhancements = 1 + this.meta.quality - this.meta.tier - this.enhancements.reduce((result, enhancement) => result += enhancement.cost, 0);
 
         super.prepareBaseData();
     }
@@ -123,5 +104,15 @@ export default class AbbrewPhysicalItem extends AbbrewItemBase {
    */
     static migrateData(source) {
         return super.migrateData(source);
+    }
+
+    static getMetaEntries() {
+        const fields = foundry.data.fields;
+        const requiredInteger = { required: true, nullable: false, integer: true };
+        return {
+            ...AbbrewItemBase.getMetaEntries(),
+            size: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 9 }),
+            quality: new fields.NumberField({ ...requiredInteger, initial: 0 })
+        }
     }
 }

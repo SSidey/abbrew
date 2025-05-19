@@ -163,3 +163,12 @@ export function removeItem(base, value) {
 
     return base;
 }
+
+export function removeItemByKeyFunction(base, value, keyFunction) {
+    const index = base.findIndex(v => keyFunction(v) === keyFunction(value));
+    if (index > -1) { // only splice array when item is found
+        base.splice(index, 1); // 2nd parameter means remove one item only
+    }
+
+    return base;
+}

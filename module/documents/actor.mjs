@@ -287,8 +287,7 @@ export default class AbbrewActor extends Actor {
 
     successes += data.totalSuccesses;
     successes += this.system.defense.risk.value;
-    successes -= this.system.defense.inflexibility.resistance.value;
-    successes -= Math.max(0, this.system.defense.protection[finisherType].resistance - (data.damage.find(d => d.damageType === finisherType)?.penetration ?? 0));
+    successes -= Math.max(0, (this.system.defense.inflexibility.resistance.value + this.system.defense.protection[finisherType].resistance) - (data.damage.find(d => d.damageType === finisherType)?.penetration ?? 0));
     successes += this.system.defense.protection[finisherType].weakness;
     successes += (data.actorSize - this.system.meta.size); // TODO Question, do we include this + (data.weaponSize - this.system.meta.size))
     successes += (data.actorTier - this.system.meta.tier.value); // TODO: Material Tier Diff    

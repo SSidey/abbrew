@@ -34,6 +34,12 @@ export default class AbbrewArmour extends AbbrewPhysicalItem {
         });
     }
 
+    prepareBaseData() {
+        super.prepareBaseData();
+
+        this.availableEnhancements = 2 + this.meta.quality - this.meta.tier - this.enhancements.reduce((result, enhancement) => result += enhancement.cost, 0);
+    }
+
     prepareDerivedData() {
         // Build the formula dynamically using string interpolation
         const roll = this.roll;

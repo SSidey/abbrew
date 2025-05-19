@@ -1,10 +1,55 @@
+import { isEquipped } from "../item-physical.mjs";
 import { parsePathSync } from "../modifierBuilderFieldHelpers.mjs";
 import { applyOperatorUnbounded } from "../operators.mjs";
-import { removeItem } from "../utils.mjs";
+import { isATraitsSupersetOfBTraits, removeItem, removeItemByKeyFunction } from "../utils.mjs";
+import { trackEnhancementDuration } from "./ehancement-duration.mjs";
+
+export function shouldHandleEnhancement(targetItem, enhancementItem) {
+    return enhancementItem.type === "enhancement" && ((enhancementItem.system.targetType === targetItem.type) || ["ammunition", "armour", "weapon"].includes(targetItem.type) && enhancementItem.system.targetType === "physical") && isATraitsSupersetOfBTraits(targetItem, enhancementItem)
+}
+
+export async function handleEnhancement(targetItem, actor, enhancementItem) {
+    if (!actor && enhancementItem.system.duration.precision !== "-1") {
+        return;
+    }
+
+    let updateObject = structuredClone(targetItem);
+
+    // TODO: Add modifier for names, prefix / suffix so can rename the thing.
+    let enhancement;
+    if (actor) {
+        const enhancementTarget = ({ name: targetItem.name, id: targetItem._id, uuid: targetItem.uuid });
+        const createEnhancements = structuredClone(enhancementItem);
+        foundry.utils.setProperty(createEnhancements, "system.target", enhancementTarget);
+        enhancement = await Item.create([createEnhancements], { parent: actor });
+        await trackEnhancementDuration(actor, enhancement[0]);
+
+        if (isEquipped(targetItem)) {
+            let skillSummaries = enhancementItem.system.skills.granted;
+            const skillPromises = skillSummaries.map(s => fromUuid(s.sourceId));
+            const skills = structuredClone(await Promise.all(skillPromises));
+            skills.forEach(s => s.system.grantedBy.item = targetItem._id);
+            const createdSkills = await Item.create(skills, { parent: actor });
+
+            await enhancement[0].update({ "system.grantedIds": createdSkills.map(s => s._id) });
+        }
+    } else {
+        enhancement = [enhancementItem];
+    }
+
+    applyEnhancement(enhancement[0], actor, updateObject, false);
+
+    const options = actor ? { parent: actor } : { pack: targetItem.pack };
+
+    await Item.implementation.updateDocuments([{ _id: targetItem._id, ...updateObject }], options);
+}
 
 export function applyEnhancement(enhancement, actor, baseObject, isInverted) {
     enhancement.system.modifications.forEach(modification => {
-        const value = parsePathSync(`${modification.type}.${modification.value}`, actor, enhancement);
+        let value = parsePathSync(`${modification.type}.${modification.value}`, actor, enhancement, baseObject);
+        if (!isNaN(value)) {
+            value = value * (modification.numerator / modification.denominator)
+        }
         const base = foundry.utils.getProperty(baseObject, modification.path);
         const indices = getIndices(base, modification.filterPath, modification.filterValue)
             .map(i => ({ index: i, subIndices: getIndices(foundry.utils.getProperty(base[i], modification.subPath), modification.subPathFilter, modification.subPathFilterValue) }))
@@ -42,12 +87,16 @@ export function applyEnhancement(enhancement, actor, baseObject, isInverted) {
     if (!isInverted) {
         enhancements = [...baseObject.system.enhancements, itemEnhancement];
     } else {
-        enhancements = removeItem(baseObject.system.enhancements, itemEnhancement);
+        enhancements = removeItemByKeyFunction(baseObject.system.enhancements, itemEnhancement, getEnhancementKey);
     }
 
     foundry.utils.setProperty(baseObject, "system.enhancements", enhancements);
 
     delete baseObject.system.equipState;
+}
+
+function getEnhancementKey(enhancement) {
+    return enhancement.id;
 }
 
 function getEnhancementOperator(operator, isInverted) {

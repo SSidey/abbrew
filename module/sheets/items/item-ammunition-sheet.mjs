@@ -4,6 +4,7 @@ import {
 } from '../../helpers/effects.mjs';
 import Tagify from '@yaireo/tagify'
 import { renderSheetForStoredItem } from '../../helpers/utils.mjs';
+import { applyEnhancement, handleEnhancement, shouldHandleEnhancement } from '../../helpers/enhancements/enhancement-application.mjs';
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -161,6 +162,26 @@ export class AbbrewAmmunitionSheet extends ItemSheet {
             }
         });
 
+        // Delete Enhancement
+        html.on('click', '.enhancement-delete', async (ev) => {
+            const li = $(ev.currentTarget).parents('.skill-deck-skill');
+            if (li.data('id') || li.data('id') === 0) {
+                const enhancements = this.item.system.enhancements;
+                const enhancement = enhancements[li.data('id')];
+                enhancements.splice(li.data('id'), 1);
+                await this.item.update({ "system.enhancements": enhancements });
+                if (enhancement.id && this.item.actor) {
+                    await this.item.actor.deleteEmbeddedDocuments("Item", [enhancement.id]);
+                } else if (enhancement.uuid) {
+                    let updateObject = structuredClone(this.item);
+                    const sourceEnhancement = await fromUuid(enhancement.uuid);
+                    applyEnhancement(sourceEnhancement, null, updateObject, true);
+                    const options = { pack: this.item.pack };
+                    await Item.implementation.updateDocuments([{ _id: this.item._id, ...updateObject }], options);
+                }
+            }
+        });
+
         html.on('click', '.skill-deck-skill .skill-deck-summary .image-container, .skill-deck-skill .skill-deck-summary .name', async (event) => {
             await renderSheetForStoredItem(event, this.actor, "skill-deck-skill");
         });
@@ -178,7 +199,9 @@ export class AbbrewAmmunitionSheet extends ItemSheet {
                     const storedSkills = this.item.system.skills.granted;
                     const updateSkills = [...storedSkills, { name: item.name, id: item._id, image: item.img, sourceId: item.uuid }];
                     await this.item.update({ "system.skills.granted": updateSkills });
-                }
+                } else if (shouldHandleEnhancement(this.item, item) && this.item.system.availableEnhancements > 0) {
+                    await handleEnhancement(this.item, this.item.actor, item);
+                };
             }
         })
     }

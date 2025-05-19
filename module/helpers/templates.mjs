@@ -25,6 +25,8 @@ export const preloadHandlebarsTemplates = async function () {
     'systems/abbrew/templates/item/parts/item-defenses.hbs',
     'systems/abbrew/templates/item/parts/item-damage.hbs',
     'systems/abbrew/templates/item/parts/item-equipstate.hbs',
+    'systems/abbrew/templates/item/parts/item-traits.hbs',
+    'systems/abbrew/templates/item/parts/item-physical-header.hbs',
     // Skill partials.
     'systems/abbrew/templates/item/parts/skill-type.hbs',
     'systems/abbrew/templates/item/parts/skill-actions.hbs',

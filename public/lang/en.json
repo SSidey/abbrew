@@ -99,6 +99,8 @@
     "EnhancementTargetTypes": {
       "weapon": "Weapon",
       "armour": "Armour",
+      "ammunition": "Ammunition",
+      "physical": "Physical",
       "skill": "Skill",
       "amp": "Amp"
     },
@@ -213,6 +215,23 @@
       "left": "left",
       "right": "right",
       "back": "back"
+    },
+    "NameParts": {
+      "barbed": "Barbed",
+      "heavy": "Heavy",
+      "padded": "Padded",
+      "bone": "Bone",
+      "cloth": "Cloth",
+      "hide": "Hide",
+      "iron": "Iron",
+      "leather": "Leather",
+      "steel": "Steel",
+      "chain": "Chain",
+      "jack": "Jack",
+      "lamellar": "Lamellar",
+      "laminar": "Laminar",
+      "plate": "Plate",
+      "splint": "Splint"
     },
     "Type": "Type",
     "AttackTypes": {
@@ -417,6 +436,7 @@
       "actor": "Actor",
       "item": "Item",
       "this": "This",
+      "target": "Target",
       "wound": "Wound",
       "condition": "Condition",
       "statusType": "Status Type",
@@ -427,7 +447,9 @@
       "skillCount": "Skill Count",
       "async": "Async Result",
       "string": "String",
-      "trait": "Trait"
+      "trait": "Trait",
+      "json": "JSON",
+      "name": "Name"
     }
   },
   "Speeds": {
