@@ -7,7 +7,16 @@
     "description": "",
     "traits": "",
     "equipType": "held",
-    "armourPoints": "",
+    "equipPoints": {
+      "required": {
+        "raw": "",
+        "parsed": []
+      },
+      "provided": {
+        "raw": "",
+        "parsed": []
+      }
+    },
     "equipState": "stowed",
     "weapon": {
       "size": 0

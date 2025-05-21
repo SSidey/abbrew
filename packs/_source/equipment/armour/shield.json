@@ -15,7 +15,16 @@
       "size": 0
     },
     "equipType": "held",
-    "armourPoints": "",
+    "equipPoints": {
+      "required": {
+        "raw": "",
+        "parsed": []
+      },
+      "provided": {
+        "raw": "",
+        "parsed": []
+      }
+    },
     "handsRequired": "oneHand",
     "equipState": "stowed",
     "handsSupplied": 0,

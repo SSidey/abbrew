@@ -1,0 +1,148 @@
+{
+  "folder": "XDGpBAGshg6fdxmv",
+  "name": "Jack",
+  "type": "enhancement",
+  "_id": "TOn0IzRuknxKtjFQ",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "name": {
+      "base": "",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1
+    },
+    "description": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "enhancements": [],
+    "skills": {
+      "granted": []
+    },
+    "targetType": "armour",
+    "target": {
+      "name": "",
+      "id": "",
+      "uuid": ""
+    },
+    "traitFilter": {
+      "raw": "[{\"key\":\"torso\",\"value\":\"Torso\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"armour\",\"value\":\"Armour\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]",
+      "value": []
+    },
+    "modifications": [
+      {
+        "operator": "merge",
+        "path": "system.defense.protection",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "json",
+        "value": "{     \"type\": \"slashing\",     \"value\": 0,     \"resistance\": 1,     \"weakness\": 0,     \"immunity\": 0,     \"label\": \"\" }",
+        "numerator": 1,
+        "denominator": 1
+      },
+      {
+        "operator": "merge",
+        "path": "system.defense.protection",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "json",
+        "value": "{     \"type\": \"piercing\",     \"value\": 0,     \"resistance\": 1,     \"weakness\": 0,     \"immunity\": 0,     \"label\": \"\" }",
+        "numerator": 1,
+        "denominator": 1
+      },
+      {
+        "operator": "add",
+        "path": "system.meta.tier",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "numeric",
+        "value": "1",
+        "numerator": 1,
+        "denominator": 1
+      },
+      {
+        "operator": "merge",
+        "path": "system.name.parts",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "name",
+        "value": "jack",
+        "numerator": 1,
+        "denominator": 1
+      },
+      {
+        "operator": "add",
+        "path": "system.defense.guard",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "target",
+        "value": "system.equipPoints.required.parsed.length",
+        "numerator": 10,
+        "denominator": 1
+      },
+      {
+        "operator": "add",
+        "path": "system.defense.inflexibility",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "target",
+        "value": "system.equipPoints.required.parsed.length",
+        "numerator": 10,
+        "denominator": 1
+      }
+    ],
+    "duration": {
+      "precision": "-1",
+      "value": 0,
+      "expireOnStartOfTurn": true
+    },
+    "grantedIds": [],
+    "cost": 1
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1747685547117,
+    "modifiedTime": 1747686414167,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!TOn0IzRuknxKtjFQ"
+}

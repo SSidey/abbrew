@@ -7,8 +7,8 @@
     </div>
     {{#if (eq system.equipType "worn")}}
     <div class="item-equip-detail item-equip-armour-points">
-        <label>{{localize "ABBREW.ArmourPoints.label"}}</label>
-        <input type="text" name="system.armourPoints" value="{{system.armourPoints}}" data-dtype="text" />
+        <label>{{localize "ABBREW.EquipPoints.label"}}</label>
+        <input type="text" name="system.equipPoints.required.raw" value="{{system.equipPoints.required.raw}}" data-dtype="text" />
     </div>
     {{/if}}
     {{#if (eq system.equipType "held")}}

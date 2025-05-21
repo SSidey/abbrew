@@ -28,22 +28,20 @@
             "standard",
             "long"
           ]
-        },
-        {
-          "key": "heavy",
-          "value": "Heavy",
-          "feature": "item",
-          "subFeature": "identifiers",
-          "effect": "",
-          "data": "",
-          "exclude": [
-            "agile"
-          ]
         }
       ]
     },
     "equipType": "held",
-    "armourPoints": "[]",
+    "equipPoints": {
+      "required": {
+        "raw": "",
+        "parsed": []
+      },
+      "provided": {
+        "raw": "",
+        "parsed": []
+      }
+    },
     "equipState": "stowed",
     "weapon": {
       "size": 2,
@@ -146,8 +144,17 @@
       "granted": []
     },
     "heft": 2,
-    "availableEnhancements": 1,
-    "enhancements": []
+    "availableEnhancements": 0,
+    "enhancements": [],
+    "name": {
+      "base": "Dagger",
+      "parts": []
+    },
+    "quantity": 1,
+    "meta": {
+      "quality": 1,
+      "tier": 1
+    }
   },
   "effects": [],
   "ownership": {
@@ -160,7 +167,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075360599,
-    "modifiedTime": 1747254938276,
+    "modifiedTime": 1747848551473,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_id": "kQFrvnG9djLFUEVU",

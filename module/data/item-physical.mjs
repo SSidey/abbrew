@@ -16,9 +16,16 @@ export default class AbbrewPhysicalItem extends AbbrewItemBase {
             this.getMetaEntries()
         );
         schema.equipType = new fields.StringField({ ...blankString });
-        schema.armourPoints = new fields.StringField({ ...blankString });
         schema.equipPoints = new fields.SchemaField({
             required: new fields.SchemaField({
+                raw: new fields.StringField({ ...blankString }),
+                parsed: new fields.ArrayField(
+                    new fields.SchemaField({
+                        value: new fields.StringField({ ...blankString })
+                    })
+                )
+            }),
+            provided: new fields.SchemaField({
                 raw: new fields.StringField({ ...blankString }),
                 parsed: new fields.ArrayField(
                     new fields.SchemaField({
@@ -77,7 +84,6 @@ export default class AbbrewPhysicalItem extends AbbrewItemBase {
         this.handsSupplied = this.equipType === "innate" ? 1 : getNumericParts(this.equipState);
         this.actionCost = 0 + this.handsSupplied ?? 1;
         this.exertActionCost = 1 + this.handsSupplied ?? 2;
-        this.equipPoints.required.raw = this.armourPoints;
         this.equipPoints.required.parsed = getSafeJson(this.equipPoints.required.raw, []);
         // 1 (Material) + Bonus from quality
         this.availableEnhancements = 1 + this.meta.quality - this.meta.tier - this.enhancements.reduce((result, enhancement) => result += enhancement.cost, 0);
@@ -90,7 +96,7 @@ export default class AbbrewPhysicalItem extends AbbrewItemBase {
     }
 
     clearWornDetails() {
-        this.armourPoints = "[]";
+        this.equipPoints.required.raw = "[]";
     }
 
     // Post Active Effects

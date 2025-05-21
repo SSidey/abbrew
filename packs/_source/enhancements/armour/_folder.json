@@ -1,0 +1,21 @@
+{
+  "name": "Armour",
+  "sorting": "a",
+  "folder": null,
+  "type": "Item",
+  "_id": "Mw7GeW2m7wPhs64O",
+  "description": "",
+  "sort": 200000,
+  "color": null,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1747584132386,
+    "modifiedTime": 1747591087549,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!Mw7GeW2m7wPhs64O"
+}

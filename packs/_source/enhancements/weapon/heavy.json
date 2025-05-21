@@ -1,0 +1,153 @@
+{
+  "name": "Heavy",
+  "type": "enhancement",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "skills": {
+      "granted": []
+    },
+    "target": {
+      "name": "",
+      "id": "",
+      "uuid": ""
+    },
+    "traitFilter": {
+      "raw": "[{\"key\":\"melee\",\"value\":\"Melee\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]",
+      "value": []
+    },
+    "modifications": [
+      {
+        "operator": "add",
+        "path": "system.heft",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "numeric",
+        "value": "2",
+        "numerator": 1,
+        "denominator": 1
+      },
+      {
+        "operator": "add",
+        "path": "system.attackProfiles",
+        "filterPath": "attackType",
+        "filterValue": "arc",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "finisherLimit",
+        "type": "numeric",
+        "value": "1",
+        "numerator": 1,
+        "denominator": 1
+      },
+      {
+        "operator": "add",
+        "path": "system.attackProfiles",
+        "filterPath": "attackType",
+        "filterValue": "arc",
+        "subPath": "damage",
+        "subPathFilter": "type",
+        "subPathFilterValue": "slashing",
+        "field": "value",
+        "type": "numeric",
+        "value": "1",
+        "numerator": 1,
+        "denominator": 1
+      },
+      {
+        "operator": "merge",
+        "path": "system.traits.raw",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "trait",
+        "value": "heavy",
+        "numerator": 1,
+        "denominator": 1
+      },
+      {
+        "operator": "add",
+        "path": "system.attackProfiles",
+        "filterPath": "attackType",
+        "filterValue": "arc",
+        "subPath": "damage",
+        "subPathFilter": "type",
+        "subPathFilterValue": "piercing",
+        "field": "value",
+        "type": "numeric",
+        "value": "1",
+        "numerator": 1,
+        "denominator": 1
+      },
+      {
+        "operator": "add",
+        "path": "system.attackProfiles",
+        "filterPath": "attackType",
+        "filterValue": "arc",
+        "subPath": "damage",
+        "subPathFilter": "type",
+        "subPathFilterValue": "crushing",
+        "field": "value",
+        "type": "numeric",
+        "value": "1",
+        "numerator": 1,
+        "denominator": 1
+      },
+      {
+        "operator": "merge",
+        "path": "system.name.parts",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "name",
+        "value": "heavy",
+        "numerator": 1,
+        "denominator": 1
+      }
+    ],
+    "duration": {
+      "precision": "-1",
+      "value": 0,
+      "expireOnStartOfTurn": true
+    },
+    "targetType": "weapon",
+    "grantedIds": []
+  },
+  "effects": [],
+  "folder": "V4iWvQxKYERiAanw",
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1747255111829,
+    "modifiedTime": 1747599701617,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_id": "f1kUxARGtt26DEWO",
+  "sort": 100000,
+  "_key": "!items!f1kUxARGtt26DEWO"
+}

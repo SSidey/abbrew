@@ -175,7 +175,7 @@ export class AbbrewArmourSheet extends ItemSheet {
       }
     });
 
-    this._activateArmourPoints(html);
+    this._activateEquipPoints(html);
     this._activateAnatomyParts(html);
     this._activateTraits(html);
   }
@@ -186,9 +186,9 @@ export class AbbrewArmourSheet extends ItemSheet {
     return actions;
   }
 
-  _activateArmourPoints(html) {
-    const armourPoints = html[0].querySelector('input[name="system.armourPoints"]');
-    const armourPointsSettings = {
+  _activateEquipPoints(html) {
+    const equipPoints = html[0].querySelector('input[name="system.equipPoints.required.raw"]');
+    const equipPointsSettings = {
       dropdown: {
         maxItems: 20,               // <- mixumum allowed rendered suggestions
         classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
@@ -198,10 +198,10 @@ export class AbbrewArmourSheet extends ItemSheet {
       },
       userInput: false,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
       duplicates: true,             // <- Should duplicate tags be allowed or not
-      whitelist: [...Object.values(CONFIG.ABBREW.armourPoints.points).map(key => game.i18n.localize(key))]
+      whitelist: [...Object.values(CONFIG.ABBREW.equipPoints.points).map(key => game.i18n.localize(key))]
     };
-    if (armourPoints) {
-      var taggedArmourPoints = new Tagify(armourPoints, armourPointsSettings);
+    if (equipPoints) {
+      var taggedEquipPoints = new Tagify(equipPoints, equipPointsSettings);
     }
   }
 
@@ -217,7 +217,7 @@ export class AbbrewArmourSheet extends ItemSheet {
       },
       userInput: false,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
       duplicates: true,             // <- Should duplicate tags be allowed or not
-      whitelist: [...Object.values(CONFIG.ABBREW.armourPoints.points).map(key => game.i18n.localize(key))]
+      whitelist: [...Object.values(CONFIG.ABBREW.equipPoints.points).map(key => game.i18n.localize(key))]
     };
     if (anatomyParts) {
       var taggedAnatomyParts = new Tagify(anatomyParts, anatomyPartsSettings);

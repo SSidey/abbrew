@@ -106,15 +106,15 @@ ABBREW.Defense = {
   guard: 'ABBREW.Defense.guard'
 }
 
-ABBREW.armourPoints = {
-  label: "ABBREW.ArmourPoints.label",
+ABBREW.equipPoints = {
+  label: "ABBREW.EquipPoints.label",
   points: {
-    head: "ABBREW.ArmourPoints.Points.head",
-    torso: "ABBREW.ArmourPoints.Points.torso",
-    arm: "ABBREW.ArmourPoints.Points.arm",
-    leg: "ABBREW.ArmourPoints.Points.leg",
-    tail: "ABBREW.ArmourPoints.Points.tail",
-    wing: "ABBREW.ArmourPoints.Points.wing"
+    head: "ABBREW.EquipPoints.Points.head",
+    torso: "ABBREW.EquipPoints.Points.torso",
+    arm: "ABBREW.EquipPoints.Points.arm",
+    leg: "ABBREW.EquipPoints.Points.leg",
+    tail: "ABBREW.EquipPoints.Points.tail",
+    wing: "ABBREW.EquipPoints.Points.wing"
   }
 }
 

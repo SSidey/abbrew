@@ -12,7 +12,16 @@
       "uuid": ""
     },
     "equipType": "",
-    "armourPoints": "",
+    "equipPoints": {
+      "required": {
+        "raw": "",
+        "parsed": []
+      },
+      "provided": {
+        "raw": "",
+        "parsed": []
+      }
+    },
     "handsRequired": "",
     "equipState": "stowed",
     "handsSupplied": 0,

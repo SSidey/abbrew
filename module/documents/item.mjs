@@ -134,19 +134,19 @@ export default class AbbrewItem extends Item {
   }
 
   isWornEquipStateChangePossible() {
-    const armourPoints = JSON.parse(this.system.armourPoints).map(ap => ap.value);
-    const usedArmourPoints = this.actor.getActorWornArmour().flatMap(a => JSON.parse(a.system.armourPoints).map(ap => ap.value));
-    const actorArmourPoints = this.actor.getActorAnatomy().parts;
-    const availableArmourPoints = arrayDifference(actorArmourPoints, usedArmourPoints);
-    if (!armourPoints.every(ap => availableArmourPoints.includes(ap))) {
+    const equipPoints = this.system.equipPoints.required.parsed.map(ap => ap.value);
+    const usedEquipPoints = this.actor.getActorWornArmour().flatMap(a => a.system.equipPoints.required.parsed.map(ap => ap.value));
+    const actorEquipPoints = this.actor.getActorAnatomy().parts;
+    const availableEquipPoints = arrayDifference(actorEquipPoints, usedEquipPoints);
+    if (!equipPoints.every(ap => availableEquipPoints.includes(ap))) {
       return false;
     }
-    let requiredArmourPoints = availableArmourPoints.filter(ap => armourPoints.includes(ap));
-    const allRequiredAvailable = armourPoints.reduce((result, a) => {
-      if (requiredArmourPoints.length > 0 && requiredArmourPoints.includes(a)) {
-        const index = requiredArmourPoints.indexOf(a);
+    let requiredEquipPoints = availableEquipPoints.filter(ap => equipPoints.includes(ap));
+    const allRequiredAvailable = equipPoints.reduce((result, a) => {
+      if (requiredEquipPoints.length > 0 && requiredEquipPoints.includes(a)) {
+        const index = requiredEquipPoints.indexOf(a);
         if (index > -1) { // only splice array when item is found
-          requiredArmourPoints.splice(index, 1); // 2nd parameter means remove one item only
+          requiredEquipPoints.splice(index, 1); // 2nd parameter means remove one item only
         } else {
           return false;
         }

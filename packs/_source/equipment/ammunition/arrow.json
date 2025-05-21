@@ -1,0 +1,108 @@
+{
+  "folder": "AccA5CfJH10VFHFT",
+  "name": "Arrow",
+  "type": "ammunition",
+  "_id": "Gh2EE8i0Nfeiq6Ct",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "abbrew.ammunition.arrow.Gh2EE8i0Nfeiq6Ct",
+      "uuid": "Gh2EE8i0Nfeiq6Ct"
+    },
+    "quantity": 1,
+    "heft": 0,
+    "complexity": 0,
+    "meta": {
+      "size": 0,
+      "quality": {
+        "base": 0,
+        "value": 0
+      }
+    },
+    "equipType": "",
+    "equipPoints": {
+      "required": {
+        "raw": "",
+        "parsed": []
+      },
+      "provided": {
+        "raw": "",
+        "parsed": []
+      }
+    },
+    "handsRequired": "",
+    "equipState": "stowed",
+    "handsSupplied": 0,
+    "actionCost": 0,
+    "exertActionCost": 1,
+    "validEquipStates": [
+      {
+        "value": "worn",
+        "label": "ABBREW.EquipState.worn"
+      },
+      {
+        "value": "stowed",
+        "label": "ABBREW.EquipState.stowed"
+      },
+      {
+        "value": "dropped",
+        "label": "ABBREW.EquipState.dropped"
+      }
+    ],
+    "skills": {
+      "granted": []
+    },
+    "material": {
+      "id": "",
+      "name": "",
+      "img": "",
+      "modifiers": {
+        "heftSizeRatio": 0,
+        "heftAdjustment": 0,
+        "complexityAdjustment": 0,
+        "tier": 1,
+        "enhancementsUsed": 0
+      }
+    },
+    "availableEnhancements": 1,
+    "enhancements": [],
+    "type": "arrow",
+    "attackModifier": {
+      "critical": 10,
+      "lethal": 0,
+      "finisherLimit": 8,
+      "damage": [
+        {
+          "type": "piercing",
+          "value": 4,
+          "penetration": 0,
+          "attributeModifier": "",
+          "attributeMultiplier": 1,
+          "damageMultiplier": 1,
+          "overallMultiplier": 1
+        }
+      ]
+    }
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1747590651378,
+    "modifiedTime": 1747591488854,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!Gh2EE8i0Nfeiq6Ct"
+}

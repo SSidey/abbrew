@@ -191,8 +191,8 @@
     "Immunity": "Immunity",
     "Weakness": "Weakness",
     "Guard": "Guard",
-    "ArmourPoints": {
-      "label": "Armour Points",
+    "EquipPoints": {
+      "label": "Equip Points",
       "Points": {
         "head": "Head",
         "torso": "Torso",

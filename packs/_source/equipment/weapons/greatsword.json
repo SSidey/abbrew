@@ -5,9 +5,21 @@
   "img": "icons/svg/item-bag.svg",
   "system": {
     "description": "",
-    "traits": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
     "equipType": "held",
-    "armourPoints": "",
+    "equipPoints": {
+      "required": {
+        "raw": "",
+        "parsed": []
+      },
+      "provided": {
+        "raw": "",
+        "parsed": []
+      }
+    },
     "equipState": "stowed",
     "weapon": {
       "size": 8,
@@ -19,6 +31,17 @@
         "attackType": "arc",
         "lethal": 0,
         "critical": 10,
+        "reach": "",
+        "range": 0,
+        "penetration": 0,
+        "ammunition": {
+          "type": "",
+          "id": "",
+          "value": 0,
+          "max": 0,
+          "reloadType": "",
+          "reloadActionCost": 1
+        },
         "damage": [
           {
             "type": "slashing",
@@ -38,6 +61,17 @@
         "attackType": "thrust",
         "lethal": 0,
         "critical": 10,
+        "reach": "",
+        "range": 0,
+        "penetration": 0,
+        "ammunition": {
+          "type": "",
+          "id": "",
+          "value": 0,
+          "max": 0,
+          "reloadType": "",
+          "reloadActionCost": 1
+        },
         "damage": [
           {
             "type": "piercing",
@@ -54,18 +88,46 @@
       }
     ],
     "handsRequired": "twoHand",
-    "validEquipStates": [],
+    "validEquipStates": [
+      {
+        "value": "held2H",
+        "label": "ABBREW.EquipState.heldTwo"
+      },
+      {
+        "value": "worn",
+        "label": "ABBREW.EquipState.worn"
+      },
+      {
+        "value": "stowed",
+        "label": "ABBREW.EquipState.stowed"
+      },
+      {
+        "value": "dropped",
+        "label": "ABBREW.EquipState.dropped"
+      }
+    ],
     "abbrewId": {
-      "value": "",
-      "uuid": ""
+      "value": "abbrew.weapon.greatsword.daBNLIlM2sYINFMv",
+      "uuid": "daBNLIlM2sYINFMv"
     },
     "handsSupplied": 0,
     "actionCost": 0,
-    "exertActionCost": 0,
+    "exertActionCost": 1,
     "isAttackTrained": false,
     "isFinisherTrained": false,
     "isFeintTrained": false,
-    "isOverpowerTrained": false
+    "isOverpowerTrained": false,
+    "meta": {
+      "quality": 0,
+      "tier": 0
+    },
+    "name": {
+      "parts": [],
+      "base": "Greatsword"
+    },
+    "enhancements": [],
+    "availableEnhancements": 2,
+    "heft": 8
   },
   "effects": [],
   "ownership": {
@@ -78,7 +140,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075324307,
-    "modifiedTime": 1745756113896,
+    "modifiedTime": 1747681176938,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_id": "daBNLIlM2sYINFMv",

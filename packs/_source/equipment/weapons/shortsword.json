@@ -47,7 +47,16 @@
       "size": 4,
       "heft": 4
     },
-    "armourPoints": "",
+    "equipPoints": {
+      "required": {
+        "raw": "",
+        "parsed": []
+      },
+      "provided": {
+        "raw": "",
+        "parsed": []
+      }
+    },
     "equipState": "stowed",
     "abbrewId": {
       "value": "",
@@ -61,7 +70,10 @@
     "isAttackTrained": false,
     "isFinisherTrained": false,
     "isFeintTrained": false,
-    "isOverpowerTrained": false
+    "isOverpowerTrained": false,
+    "meta": {
+      "tier": 0
+    }
   },
   "img": "icons/svg/item-bag.svg",
   "effects": [],
@@ -76,7 +88,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075348244,
-    "modifiedTime": 1746556731357,
+    "modifiedTime": 1747681225607,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_id": "6iQLPlRxcvCEe1YT",

@@ -1,0 +1,91 @@
+{
+  "folder": "WuKHZcB03oz4m9f8",
+  "name": "Bone I",
+  "type": "enhancement",
+  "_id": "P59ahwl7tz33QSWe",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "name": {
+      "base": "",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1
+    },
+    "description": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "enhancements": [],
+    "skills": {
+      "granted": []
+    },
+    "targetType": "physical",
+    "target": {
+      "name": "",
+      "id": "",
+      "uuid": ""
+    },
+    "traitFilter": {
+      "raw": "",
+      "value": []
+    },
+    "modifications": [
+      {
+        "operator": "merge",
+        "path": "system.name.parts",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "name",
+        "value": "bone",
+        "numerator": 1,
+        "denominator": 1
+      },
+      {
+        "operator": "add",
+        "path": "system.meta.tier",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "numeric",
+        "value": "1",
+        "numerator": 1,
+        "denominator": 1
+      }
+    ],
+    "duration": {
+      "precision": "-1",
+      "value": 0,
+      "expireOnStartOfTurn": true
+    },
+    "grantedIds": []
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1747681322706,
+    "modifiedTime": 1747681435031,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!P59ahwl7tz33QSWe"
+}

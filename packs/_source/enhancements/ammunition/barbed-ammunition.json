@@ -1,0 +1,62 @@
+{
+  "folder": "pl5KXjyTRQv4dayq",
+  "name": "Barbed Ammunition",
+  "type": "enhancement",
+  "_id": "7oVZRgDmR6yle9sC",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "skills": {
+      "granted": [
+        {
+          "name": "Barbed",
+          "id": "YDtBNQugZoQxIlha",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.YDtBNQugZoQxIlha",
+          "skillType": ""
+        }
+      ]
+    },
+    "targetType": "ammunition",
+    "target": {
+      "name": "",
+      "id": "",
+      "uuid": ""
+    },
+    "traitFilter": {
+      "raw": "",
+      "value": []
+    },
+    "modifications": [],
+    "duration": {
+      "precision": "-1",
+      "value": 0,
+      "expireOnStartOfTurn": true
+    },
+    "grantedIds": []
+  },
+  "effects": [],
+  "sort": 100000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1747590952364,
+    "modifiedTime": 1747591161944,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!7oVZRgDmR6yle9sC"
+}

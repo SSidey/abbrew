@@ -1,0 +1,21 @@
+{
+  "name": "Weapon",
+  "sorting": "a",
+  "folder": null,
+  "type": "Item",
+  "_id": "V4iWvQxKYERiAanw",
+  "description": "",
+  "sort": 100000,
+  "color": null,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1747584137239,
+    "modifiedTime": 1747591087549,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!V4iWvQxKYERiAanw"
+}
