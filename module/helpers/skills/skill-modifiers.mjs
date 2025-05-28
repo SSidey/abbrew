@@ -1,4 +1,5 @@
-import { applyFullyParsedComplexModifiers, applyFullyParsedModifiers, mergeComplexModifierFields, mergeLateComplexModifiers, mergeModifierFields } from "../modifierBuilderFieldHelpers.mjs";
+import { applyFullyParsedComplexModifiers, applyFullyParsedModifiers, mergeComplexModifierFields, mergeLateComplexModifiers, mergeModifierFields, parsePathSync } from "../modifierBuilderFieldHelpers.mjs";
+import { applyOperator } from "../operators.mjs";
 import { getSafeJson } from "../utils.mjs";
 
 
@@ -10,13 +11,15 @@ export async function handleEarlySelfModifiers(actor, allSkills) {
     const [resolveSelfUpdate, lateResolveSelfUpdate] = mergeResolveSelfModifiers(allSkills, actor);
     const mergedSelfWounds = mergeWoundSelfModifiers(allSkills, actor);
     const mergedSelfResources = mergeResourceSelfModifiers(allSkills, actor);
+    const mergedConceptCosts = mergeConceptCosts(allSkills, actor);
     updates = {
         ...updates,
         ...applyFullyParsedModifiers(guardSelfUpdate, actor, "system.defense.guard.value"),
         ...applyFullyParsedModifiers(riskSelfUpdate, actor, "system.defense.risk.raw"),
         ...applyFullyParsedModifiers(resolveSelfUpdate, actor, "system.defense.resolve.value"),
         ...applyFullyParsedComplexModifiers(mergedSelfWounds, actor, "system.wounds", "type"),
-        ...applyFullyParsedComplexModifiers(mergedSelfResources, actor, "system.resources.values", "id")
+        ...applyFullyParsedComplexModifiers(mergedSelfResources, actor, "system.resources.values", "id"),
+        ...applyConceptCosts(mergedConceptCosts, actor)
     };
 
     await actor.update(updates);
@@ -32,6 +35,16 @@ export async function handleEarlySelfModifiers(actor, allSkills) {
             { path: "system.resources.values", key: "id", update: mergedSelfWounds.filter(m => m.lateModifiers.length > 0) }
         ]
     }
+}
+
+function applyConceptCosts(conceptCosts, actor) {
+    const initialConcepts = structuredClone(actor.system.concepts.available);
+    const modifiedConcepts = Object.keys(initialConcepts).reduce((concepts, key) => {
+        concepts[key] = { ...initialConcepts[key], value: initialConcepts[key].value + (conceptCosts[key] ?? 0) };
+        return concepts;
+    }, {});
+
+    return { "system.concepts.available": modifiedConcepts };
 }
 
 export async function handleLateSelfModifiers(actor, lateModifiers) {
@@ -190,4 +203,22 @@ function noopFilter(fields) {
 export function mergeModifiers(modifiers, value) {
     const sortedModifiers = modifiers.map(m => ({ ...m, order: getOrderForOperator(m.operator) })).sort(compareModifierIndices);
     return sortedModifiers.reduce((result, modifier) => applyOperator(result, modifier.value, modifier.operator), value)
+}
+
+export function mergeConceptCosts(allSkills, actor) {
+    return allSkills.reduce((conceptCosts, skill) => {
+        Object.keys(CONFIG.ABBREW.concepts).forEach(key => {
+            const concept = skill.system.action.modifiers.concepts[key];
+            if (concept.value) {
+                const skillCost = parsePathSync(concept.value, actor, null, null);
+                if (key in conceptCosts) {
+                    conceptCosts[key] = applyOperator(conceptCosts[key], skillCost, concept.operator);
+                } else {
+                    conceptCosts[key] = applyOperator(0, skillCost, concept.operator);
+                }
+            }
+        })
+
+        return conceptCosts;
+    }, {})
 }

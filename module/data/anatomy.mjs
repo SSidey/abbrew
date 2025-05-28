@@ -1,6 +1,6 @@
 import AbbrewPhysicalItem from "./item-physical.mjs";
-import AbbrewArmour from "./armour.mjs";
 import AbbrewRevealedItem from './revealedItem.mjs'
+import AbbrewEquipment from "./item-equipment.mjs";
 
 export default class AbbrewAnatomy extends AbbrewPhysicalItem {
 
@@ -15,7 +15,7 @@ export default class AbbrewAnatomy extends AbbrewPhysicalItem {
     schema.hands = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
     schema.speed = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
     AbbrewRevealedItem.addRevealedItemSchema(schema);
-    AbbrewArmour.addDefenseSchema(schema);
+    AbbrewEquipment.addDefenseSchema(schema);
     schema.naturalWeapons = new fields.ArrayField(
       new fields.SchemaField({
         name: new fields.StringField({ required: true, blank: true }),

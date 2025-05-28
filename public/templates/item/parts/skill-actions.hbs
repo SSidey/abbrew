@@ -275,6 +275,30 @@
                 <div class="value-controls">
                     <a class="value-control" data-action="remove"><i class="fas fa-trash"></i></a>
                 </div>
+                <div class="value-min">
+                    <label>Min</label>
+                    <input type="text" name="system.action.asyncValues.{{i}}.min" value="{{value.min}}" />
+                    <select name="system.action.asyncValues.{{i}}.minOperator">
+                        {{selectOptions ../config.simpleNumericOperators selected=value.minOperator
+                        localize=true}}
+                    </select>
+                    <select name="system.action.asyncValues.{{i}}.minType">
+                        {{selectOptions ../config.modifierPrefixes selected=value.minType
+                        localize=true}}
+                    </select>
+                </div>
+                <div class="value-max">
+                    <label>Max</label>
+                    <input type="text" name="system.action.asyncValues.{{i}}.max" value="{{value.max}}" />
+                    <select name="system.action.asyncValues.{{i}}.maxOperator">
+                        {{selectOptions ../config.simpleNumericOperators selected=value.maxOperator
+                        localize=true}}
+                    </select>
+                    <select name="system.action.asyncValues.{{i}}.maxType">
+                        {{selectOptions ../config.modifierPrefixes selected=value.maxType
+                        localize=true}}
+                    </select>
+                </div>
             </li>
             {{/each}}
             <li class="value add">
@@ -434,8 +458,7 @@
                         </div>
                     </div>
                     {{#if (eq system.action.attackProfile.attackMode "finisher")}}
-                    {{!-- TODO: Fix this I assume? --}}
-                    {{!-- <div>
+                    <div>
                         <div class="attack-profile-row">
                             <div class="attack-profile-element-2">
                                 <label>Finisher Cost</label>
@@ -507,7 +530,7 @@
                                 </li>
                             </ol>
                         </div>
-                    </div> --}}
+                    </div>
                     {{/if}}
                 </div>
                 <ol class="skill-damage-list">
@@ -1100,6 +1123,42 @@
                         </div>
                     </li>
                 </ol>
+            </div>
+        </div>
+        <div>
+            <h3>Concepts</h3>
+            <div class="concepts">
+                {{#each system.action.modifiers.concepts as |concept|}}
+                <div class="concept-row-container">
+                    <div class="concept-row">
+                        <label>{{localize concept.label}}</label>
+                        <div class="concept-operator">
+                            <select name="system.action.modifiers.concepts.{{concept.name}}.operator">
+                                {{selectOptions ../config.simpleNumericOperators selected=concept.operator
+                                localize=true}}
+                            </select>
+                        </div>
+                        <div class="concept-type">
+                            <select name="system.action.modifiers.concepts.{{concept.name}}.type">
+                                {{selectOptions ../config.modifierPrefixes selected=concept.type
+                                localize=true}}
+                            </select>
+                        </div>
+                        <div class="concept-value">
+                            <input type="text" name="system.action.modifiers.concepts.{{concept.name}}.value"
+                                value="{{concept.value}}" data-dtype="string" />
+                        </div>
+                        <div class="numerator">
+                            <input type="number" name="system.action.modifiers.concepts.{{concept.name}}.numerator"
+                                value="{{concept.numerator}}" />
+                        </div>
+                        <div class="denominator">
+                            <input type="number" name="system.action.modifiers.concepts.{{concept.name}}.denominator"
+                                value="{{concept.denominator}}" />
+                        </div>
+                    </div>
+                </div>
+                {{/each}}
             </div>
         </div>
     </div>

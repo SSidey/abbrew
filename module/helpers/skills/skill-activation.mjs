@@ -4,7 +4,7 @@ import { getSafeJson } from "../utils.mjs";
 import { applySkillEffects, getModifierSkills } from "./skill-application.mjs";
 import { addSkillToActiveSkills, addSkillToQueuedSkills, trackSkillDuration } from "./skill-duration.mjs";
 import { handleGrantOnUse } from "./skill-grants.mjs";
-import { mergeResourceSelfModifiers } from "./skill-modifiers.mjs";
+import { mergeConceptCosts, mergeResourceSelfModifiers } from "./skill-modifiers.mjs";
 
 export async function handleSkillActivate(actor, skill, checkActions = true) {
     const isSkillProxied = skill.system.isProxied;
@@ -95,6 +95,17 @@ function doesActorMeetSkillRequirements(actor, skill) {
             type: "conjunction",
         }).format(insufficientResources)
         ui.notifications.info(`You do not have enough ${resourceNames} to use ${skill.name}`);
+        return false;
+    }
+
+    const conceptCosts = mergeConceptCosts([skill, ...modifierSkills], actor);
+    const insufficientConcepts = Object.entries(conceptCosts).filter(c => c[1] < 0).filter(c => actor.system.concepts.available[c[0]].value < Math.abs(c[1])).map(c => game.i18n.localize(CONFIG.ABBREW.concepts[c[0]]))
+    if (insufficientConcepts.length > 0) {
+        const conceptNames = new Intl.ListFormat("en-GB", {
+            style: "long",
+            type: "conjunction",
+        }).format(insufficientConcepts);
+        ui.notifications.info(`You do not have enough ${conceptNames} to use ${skill.name}`);
         return false;
     }
 

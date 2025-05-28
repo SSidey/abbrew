@@ -35,11 +35,18 @@ export default class AbbrewPhysicalItem extends AbbrewItemBase {
             })
         });
         schema.handsRequired = new fields.StringField({ ...blankString });
-        schema.equipState = new fields.StringField({ required: true, blank: false, initial: 'stowed' });
+        schema.equipState = new fields.StringField({ required: true, blank: false, initial: 'readied' });
         schema.handsSupplied = new fields.NumberField({ ...requiredInteger, initial: 0 });
         schema.actionCost = new fields.NumberField({ ...requiredInteger, initial: 0 });
         schema.exertActionCost = new fields.NumberField({ ...requiredInteger, initial: 0 });
         schema.validEquipStates = new fields.ArrayField(
+            new fields.SchemaField({
+                label: new fields.StringField({ ...blankString }),
+                value: new fields.StringField({ ...blankString }),
+                cost: new fields.NumberField({ ...requiredInteger, initial: 0 })
+            })
+        );
+        schema.nextValidEquipStates = new fields.ArrayField(
             new fields.SchemaField({
                 label: new fields.StringField({ ...blankString }),
                 value: new fields.StringField({ ...blankString }),
@@ -57,6 +64,33 @@ export default class AbbrewPhysicalItem extends AbbrewItemBase {
             )
         });
         schema.availableEnhancements = new fields.NumberField({ ...requiredInteger, initial: 0 });
+        schema.storage = new fields.SchemaField({
+            hasStorage: new fields.BooleanField({ required: true, initial: false }),
+            type: new fields.StringField({ ...blankString }),
+            accessible: new fields.BooleanField({ required: true, initial: false }),
+            value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+            max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+            storedItems: new fields.ArrayField(
+                new fields.StringField({ ...blankString })
+            ),
+            traitFilter: new fields.SchemaField({
+                raw: new fields.StringField({ ...blankString }),
+                value: new fields.ArrayField(
+                    new fields.SchemaField({
+                        key: new fields.StringField({ ...blankString }),
+                        value: new fields.StringField({ ...blankString }),
+                        feature: new fields.StringField({ ...blankString }),
+                        subFeature: new fields.StringField({ ...blankString }),
+                        effect: new fields.StringField({ ...blankString }),
+                        data: new fields.StringField({ ...blankString }),
+                        exclude: new fields.ArrayField(
+                            new fields.StringField({ ...blankString })
+                        )
+                    })
+                )
+            })
+        });
+        schema.storeIn = new fields.StringField({ ...blankString });
 
         return schema;
     }
@@ -76,19 +110,72 @@ export default class AbbrewPhysicalItem extends AbbrewItemBase {
                 break;
         }
 
-        const baseEquipStateObject = this.equipType === "innate" ? CONFIG.ABBREW.innateEquipState : CONFIG.ABBREW.wornEquipState;
-        const baseEquipStates = Object.entries(baseEquipStateObject).map(s => ({ value: s[0], label: s[1] }));
-        const validHands = CONFIG.ABBREW.hands[this.handsRequired]?.states ?? [];
-        const additionalEquipStates = this.equipType === "innate" ? [] : validHands.map(s => ({ value: s, label: CONFIG.ABBREW.equipState[s] }))
-        this.validEquipStates = [...additionalEquipStates, ...baseEquipStates];
+
+        this.validEquipStates = this.getValidEquipStates();
         this.handsSupplied = this.equipType === "innate" ? 1 : getNumericParts(this.equipState);
         this.actionCost = 0 + this.handsSupplied ?? 1;
         this.exertActionCost = 1 + this.handsSupplied ?? 2;
         this.equipPoints.required.parsed = getSafeJson(this.equipPoints.required.raw, []);
+        this.equipPoints.provided.parsed = getSafeJson(this.equipPoints.provided.raw, []);
+        if (this.storage.hasStorage && this.storage.traitFilter.raw) {
+            this.storage.traitFilter.value = getSafeJson(this.storage.traitFilter.raw, []);
+        } else {
+            this.storage.traitFilter.value = [];
+        }
         // 1 (Material) + Bonus from quality
-        this.availableEnhancements = 1 + this.meta.quality - this.meta.tier - this.enhancements.reduce((result, enhancement) => result += enhancement.cost, 0);
+        this.availableEnhancements = this.meta.quality - this.enhancements.reduce((result, enhancement) => result += enhancement.cost, 0);
+        this.prepareStorageValue();
 
         super.prepareBaseData();
+    }
+
+    prepareStorageValue() {
+        if (this.storage.hasStorage && this.parent.actor) {
+            const storedItems = this.parent.actor.items.filter(i => this.storage.storedItems.includes(i._id));
+            if (this.storage.type === "count") {
+                this.storage.value = storedItems.filter(i => i.system.equipState === "stowed").map(i => i.system.quantity).reduce((total, count) => total += count, 0);
+            } else if (this.storage.type === "heft") {
+                this.storage.value = storedItems.filter(i => i.system.equipState === "stowed").map(i => i.system.quantity * i.system.heft).reduce((total, heft) => total += heft, 0);
+            }
+        }
+    }
+
+    getValidEquipStates() {
+        if (this.equipType) {
+            if (this.equipState === "worn") {
+                return [{ value: "readied", label: "ABBREW.EquipStateChange.readied", cost: 2 }];
+            }
+
+            const baseEquipStateObject = this.getBaseEquipStates();
+            const validEquipStates = Object.entries(baseEquipStateObject).map(s => ({ value: s[0], label: CONFIG.ABBREW.equipStateChange[s[0]], cost: this.getEquipStateChangeCost(s) }));
+
+            return validEquipStates.filter(e => e.value !== this.equipState);
+        }
+    }
+
+    getBaseEquipStates() {
+        const base = CONFIG.ABBREW.equipState[this.equipType];
+
+        switch (this.equipType) {
+            case "innate":
+            case "worn":
+            case "none":
+                return base;
+            case "held":
+                const validHands = CONFIG.ABBREW.hands[this.handsRequired]?.filterStates ?? [];
+                return Object.keys(base).filter(key => !validHands?.includes(key)).reduce((obj, key) => { obj[key] = base[key]; return obj }, {});
+        }
+    }
+
+    getEquipStateChangeCost(state) {
+        if (state[0] === "dropped" || this.equipType === "innate") {
+            return 0;
+        } else if (state === "readied") {
+            return 2;
+        }
+        else {
+            return 1;
+        }
     }
 
     clearHeldDetails() {

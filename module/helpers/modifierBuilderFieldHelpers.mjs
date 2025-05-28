@@ -278,11 +278,22 @@ export async function getDialogValue(actor, asyncValues) {
     let result = 0;
 
     const fields = foundry.applications.fields;
+    const ranges = {};
     const content = asyncValues.map(a => {
         if (a.type === "single") {
+            const minMultiplier = a.minOperator === "add" ? 1 : -1;
+            const maxMultiplier = a.maxOperator === "add" ? 1 : -1;
+            const minimum = a.min ? minMultiplier * parsePathSync(`${a.minType}.${a.min}`, actor, null, null) : Number.NEGATIVE_INFINITY;
+            const maximum = a.max ? maxMultiplier * parsePathSync(`${a.maxType}.${a.max}`, actor, null, null) : Number.POSITIVE_INFINITY;
+
+            ranges[a.name] = { min: minimum, max: maximum };
+
             const singleInput = fields.createNumberInput({
                 name: a.name,
-                value: 0
+                value: 0,
+                min: minimum,
+                max: maximum,
+                required: true,
             });
 
             const singleGroup = fields.createFormGroup({
@@ -301,7 +312,8 @@ export async function getDialogValue(actor, asyncValues) {
             ok: {
                 label: "Submit",
                 callback: (event, button, dialog) => new FormDataExtended(button.form).object
-            }
+            },
+            rejectClose: true
         });
     } catch (ex) {
         console.log(ex);
@@ -309,7 +321,12 @@ export async function getDialogValue(actor, asyncValues) {
         return;
     }
 
-    return result;
+    const validatedResult = Object.keys(result).reduce((validated, key) => {
+        validated[key] = Math.min(ranges[key].max, Math.max(ranges[key].min, result[key]));
+        return validated;
+    }, {})
+
+    return validatedResult;
 }
 
 export function mergeLateComplexModifiers(modifiers, actor, path, key) {

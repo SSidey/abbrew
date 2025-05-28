@@ -8,7 +8,7 @@ import { getFundamentalAttributeSkill, getFundamentalSkillWithActionCost } from 
 import { cleanTemporarySkill } from '../helpers/skills/skill-uses.mjs';
 import { getModifiedSkillActionCost, handleSkillActivate } from '../helpers/skills/skill-activation.mjs';
 import { manualSkillExpiry } from '../helpers/skills/skill-expiry.mjs';
-import { filterKeys } from '../helpers/utils.mjs';
+import { filterKeys, isASupersetOfB } from '../helpers/utils.mjs';
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -118,7 +118,8 @@ export class AbbrewActorSheet extends ActorSheet {
     // Initialize containers.    
     const gear = [];
     const ammunition = [];
-    const ammunitionChoices = this.actor.items.filter(i => i.type === "ammunition").map(a => ({ label: a.name, type: a.system.type, value: a._id }));
+    // TODO: Exception when blank
+    const ammunitionChoices = this.actor.items.filter(i => i.type === "ammunition").filter(i => i.system.storeIn && this.isContainerAccessible(this.actor.items.find(c => c._id === i.system.storeIn))).map(a => ({ label: a.name, type: a.system.type, value: a._id }));
     const features = [];
     const skills = { background: [], basic: [], path: [], resource: [], temporary: [], untyped: [], archetype: [], tier: [] };
     const spells = {
@@ -134,6 +135,7 @@ export class AbbrewActorSheet extends ActorSheet {
       9: [],
     };
     const anatomy = [];
+    const equipment = [];
     const armour = [];
     const wornArmour = [];
     const weapons = [];
@@ -143,6 +145,7 @@ export class AbbrewActorSheet extends ActorSheet {
     const favouriteSkills = [];
     const activeSkills = [];
     const enhancements = [];
+    const storage = [];
 
     for (let i of context.items) {
       i.img = i.img || Item.DEFAULT_ICON;
@@ -150,6 +153,11 @@ export class AbbrewActorSheet extends ActorSheet {
       if (i.type === 'archetype') {
         archetypes.push(i);
         archetypeSkills[i._id] = context.items.filter(j => i.system.skillIds.includes(j.system.abbrewId.uuid));
+      }
+
+      if (["armour", "equipment"].includes(i.type) && i.system.storage.hasStorage) {
+        const accessible = this.isContainerAccessible(i);
+        storage.push({ container: i, contents: context.items.filter(ci => i.system.storage.storedItems.includes(ci._id)), isAccessible: accessible });
       }
 
       if (i.system.isFavourited) {
@@ -164,6 +172,15 @@ export class AbbrewActorSheet extends ActorSheet {
     // Iterate through items, allocating to containers
     for (let i of context.items) {
       i.img = i.img || Item.DEFAULT_ICON;
+      if (i.system.storeIn) {
+        if (i.type === 'weapon') {
+          if (['held1H', 'held2H', 'active'].includes(i.system.equipState)) {
+            equippedWeapons.push(i);
+          }
+        }
+        continue;
+      }
+
       // Append to gear.
       if (i.type === 'item') {
         gear.push(i);
@@ -175,6 +192,9 @@ export class AbbrewActorSheet extends ActorSheet {
       // Append to features.
       else if (i.type === 'feature') {
         features.push(i);
+      }
+      else if (i.type === 'equipment') {
+        equipment.push(i);
       }
       // Append to skills.
       else if (i.type === 'skill') {
@@ -255,9 +275,15 @@ export class AbbrewActorSheet extends ActorSheet {
     context.favouriteSkills = favouriteSkills;
     context.activeSkills = activeSkills;
     context.enhancements = enhancements;
+    context.equipment = equipment;
+    context.storage = storage;
   }
 
   skillSectionDisplay = {};
+
+  isContainerAccessible(container) {
+    return (container.system.storage.accessible && container.system.equipState === "worn") || container.system.equipState === "readied"
+  }
 
   _prepareDefenses(actorData, context) {
     const activeProtection = Object.keys(actorData.system.defense.protection).reduce((result, key) => {
@@ -511,6 +537,64 @@ export class AbbrewActorSheet extends ActorSheet {
           }
         }
       }
+    })
+
+    html.on('drop', '.container', async (event) => {
+      event.preventDefault();
+      if (!this.actor.testUserPermission(game.user, 'OWNER')) {
+        return;
+      }
+
+      const droppedData = event.originalEvent.dataTransfer.getData("text")
+      const eventJson = JSON.parse(droppedData);
+      if (eventJson && eventJson.type === "Item") {
+        const item = await fromUuid(eventJson.uuid);
+        if (["armour", "equipment", "weapon", "ammunition"].includes(item.type)) {
+          const containerId = event.currentTarget.dataset.itemId;
+          const container = this.actor.items.find(i => i._id === containerId);
+          if (!isASupersetOfB(item.system.traits.value, container.system.storage.traitFilter.parsed)) {
+            return;
+          }
+          const containerValueIncrease = getContainerValueIncrease(container, item);
+          if (container.system.storage.value + containerValueIncrease <= container.system.storage.max) {
+            const storedItems = [...container.system.storage.storedItems, item._id];
+            if (item.system.storeIn) {
+              const oldContainerId = item.system.storeIn;
+              const oldContainer = this.actor.items.find(i => i._id === oldContainerId);
+              const oldContainerStoredItems = oldContainer.system.storage.storedItems.filter(i => i !== item._id);
+              await oldContainer.update({ "system.storage.storedItems": oldContainerStoredItems });
+            }
+            await item.update({ "system.storeIn": containerId });
+            await container.update({ "system.storage.storedItems": storedItems });
+          }
+        }
+      }
+    })
+
+    function getContainerValueIncrease(container, item) {
+      let heftIncrease = item.system.quantity * item.system.heft;
+      if (item.system.storage.hasStorage && item.system.storage.type === "heft") {
+        heftIncrease += item.system.storage.value;
+      }
+
+      container.system.storage.type === "count" ? item.system.quantity : heftIncrease;
+    }
+
+    html.on("click", ".equip-state-button", async (event) => {
+      event.preventDefault();
+      if (!this.actor.testUserPermission(game.user, 'OWNER')) {
+        return;
+      }
+
+      const newEquipState = event.currentTarget.dataset.equipState;
+      const itemId = event.target.closest(".item").dataset.itemId;
+      const item = this.actor.items.find(i => i._id === itemId);
+      const equipState = item.system.validEquipStates.find(e => e.value === newEquipState);
+      if (!await this.actor.canActorUseActions(equipState.cost)) {
+        return;
+      }
+
+      await item.update({ "system.equipState": newEquipState });
     })
 
     this._activateTraits(html);

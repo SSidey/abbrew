@@ -121,7 +121,13 @@ export default class AbbrewSkill extends AbbrewItemBase {
                     title: new fields.StringField({ ...blankString }),
                     numerator: new fields.NumberField({ ...requiredInteger, initial: 1 }),
                     denominator: new fields.NumberField({ ...requiredInteger, initial: 1 }),
-                    value: new fields.NumberField({ ...requiredInteger, initial: 0 })
+                    value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                    minOperator: new fields.StringField({ ...blankString }),
+                    min: new fields.StringField({ ...blankString }),
+                    minType: new fields.StringField({ ...blankString }),
+                    maxOperator: new fields.StringField({ ...blankString }),
+                    max: new fields.StringField({ ...blankString }),
+                    maxType: new fields.StringField({ ...blankString }),
                 })
             ),
             skillCheck: this.getModifierBuilderField(),
@@ -300,24 +306,18 @@ export default class AbbrewSkill extends AbbrewItemBase {
                         })
                     ),
                 }),
-                concepts: new fields.SchemaField({
-                    self: new fields.ArrayField(
-                        new fields.SchemaField({
-                            type: new fields.StringField({ ...blankString }),
-                            value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-                            comparator: new fields.StringField({ ...blankString }),
-                            operator: new fields.StringField({ ...blankString })
-                        })
-                    ),
-                    target: new fields.ArrayField(
-                        new fields.SchemaField({
-                            type: new fields.StringField({ ...blankString }),
-                            value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-                            comparator: new fields.StringField({ ...blankString }),
-                            operator: new fields.StringField({ ...blankString })
-                        })
-                    )
-                })
+                concepts: new fields.SchemaField(Object.keys(CONFIG.ABBREW.concepts).reduce((obj, concept) => {
+                    obj[concept] = new fields.SchemaField({
+                        name: new fields.StringField({ required: true, initial: concept }),
+                        label: new fields.StringField({ required: true, initial: CONFIG.ABBREW.concepts[concept] }),
+                        value: new fields.StringField({ ...blankString }),
+                        operator: new fields.StringField({ ...blankString }),
+                        type: new fields.StringField({ ...blankString }),
+                        numerator: new fields.NumberField({ ...requiredInteger, initial: 1 }),
+                        denominator: new fields.NumberField({ ...requiredInteger, initial: 1 })
+                    });
+                    return obj;
+                }, {}))
             })
         });
         schema.skillType = new fields.StringField({ ...blankString });

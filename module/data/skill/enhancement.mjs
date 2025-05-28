@@ -1,3 +1,4 @@
+import { getSafeJson } from "../../helpers/utils.mjs";
 import AbbrewSkillDeck from "./skill-deck.mjs";
 
 export default class AbbrewEnhancement extends AbbrewSkillDeck {
@@ -14,7 +15,8 @@ export default class AbbrewEnhancement extends AbbrewSkillDeck {
             name: new fields.StringField({ ...blankString }),
             id: new fields.StringField({ ...blankString }),
             uuid: new fields.StringField({ ...blankString })
-        })
+        });
+        schema.enhancementType = new fields.StringField({ ...blankString });
         schema.traitFilter = new fields.SchemaField({
             raw: new fields.StringField({ ...blankString }),
             value: new fields.ArrayField(
@@ -58,6 +60,14 @@ export default class AbbrewEnhancement extends AbbrewSkillDeck {
         schema.cost = new fields.NumberField({ ...requiredInteger, initial: 1 });
 
         return schema;
+    }
+
+    prepareBaseData() {
+        super.prepareBaseData();
+
+        if (this.traitFilter.raw) {
+            this.traitFilter.value = getSafeJson(this.traitFilter.raw, []);
+        }
     }
 
     // Post Active Effects

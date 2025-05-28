@@ -20,6 +20,9 @@ export const preloadHandlebarsTemplates = async function () {
     'systems/abbrew/templates/actor/parts/actor-defenses.hbs',
     'systems/abbrew/templates/actor/parts/actor-resources.hbs',
     'systems/abbrew/templates/actor/parts/actor-skill-card.hbs',
+    'systems/abbrew/templates/actor/parts/actor-equipment.hbs',
+    'systems/abbrew/templates/actor/parts/actor-storage.hbs',
+    'systems/abbrew/templates/actor/parts/actor-concepts.hbs',
     // Item partials.
     'systems/abbrew/templates/item/parts/item-effects.hbs',
     'systems/abbrew/templates/item/parts/item-defenses.hbs',
@@ -27,6 +30,8 @@ export const preloadHandlebarsTemplates = async function () {
     'systems/abbrew/templates/item/parts/item-equipstate.hbs',
     'systems/abbrew/templates/item/parts/item-traits.hbs',
     'systems/abbrew/templates/item/parts/item-physical-header.hbs',
+    'systems/abbrew/templates/item/parts/item-storage.hbs',
+    'systems/abbrew/templates/item/parts/item-equip-state-changes.hbs',
     // Skill partials.
     'systems/abbrew/templates/item/parts/skill-type.hbs',
     'systems/abbrew/templates/item/parts/skill-actions.hbs',

@@ -65,7 +65,7 @@ export async function checkActorFatalWounds(actor) {
     const acuteWounds = CONFIG.ABBREW.acuteWounds;
     const activeFatalWounds = actor.system.wounds.filter(w => acuteWounds.includes(w.type)).filter(w => !woundImmunities.includes(w.type));
     const totalActiveFatalWounds = activeFatalWounds.reduce((result, wound) => result += wound.value, 0)
-    if (totalActiveFatalWounds >= actor.system.defense.resolve.max) {
+    if (totalActiveFatalWounds >= (2 * actor.system.defense.resolve.max)) {
         await setActorToDead(actor);
     }
 }

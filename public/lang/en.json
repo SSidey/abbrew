@@ -99,10 +99,19 @@
     "EnhancementTargetTypes": {
       "weapon": "Weapon",
       "armour": "Armour",
+      "equipment": "Equipment",
       "ammunition": "Ammunition",
       "physical": "Physical",
       "skill": "Skill",
       "amp": "Amp"
+    },
+    "EnhancementTypes": {
+      "material": "Material",
+      "form": "Form"
+    },
+    "StorageTypes": {
+      "count": "Count",
+      "heft": "Heft"
     },
     "SheetLabels": {
       "Actor": "Abbrew Actor Sheet",
@@ -116,7 +125,9 @@
       "ActiveEffect": "Active Effect",
       "Ammunition": "Ammunition",
       "Weapon": "Weapon",
-      "Enhancement": "Enhancement"
+      "Enhancement": "Enhancement",
+      "Armour": "Armour",
+      "Equipment": "Equipment"
     },
     "CheckTypes": {
       "successes": "Successes",
@@ -199,7 +210,8 @@
         "arm": "Arm",
         "leg": "Leg",
         "tail": "Tail",
-        "wing": "Wing"
+        "wing": "Wing",
+        "attachment": "Attachment"
       }
     },
     "Resistances": {
@@ -208,7 +220,28 @@
       "slashing": "Slashing"
     },
     "Concepts": {
-      "physical": "Physical"
+      "physical": "Physical",
+      "crushing": "Crushing",
+      "piercing": "Piercing",
+      "slashing": "Slashing",
+      "fire": "Fire",
+      "cold": "Cold",
+      "water": "Water",
+      "earth": "Earth",
+      "air": "Air",
+      "electricity": "Electricity",
+      "poison": "Poison",
+      "flesh": "Flesh",
+      "blood": "Blood",
+      "metal": "Metal",
+      "light": "Light",
+      "dark": "Dark",
+      "life": "Life",
+      "death": "Death",
+      "war": "War",
+      "famine": "Famine",
+      "pestilence": "Pestilence",
+      "conquest": "Conquest"
     },
     "Facing": {
       "front": "front",
@@ -225,6 +258,7 @@
       "hide": "Hide",
       "iron": "Iron",
       "leather": "Leather",
+      "mithril": "Mithril",
       "steel": "Steel",
       "chain": "Chain",
       "jack": "Jack",
@@ -265,7 +299,18 @@
       "stowed": "Stowed",
       "dropped": "Dropped",
       "active": "Active",
-      "inactive": "Inactive"
+      "inactive": "Inactive",
+      "readied": "Readied"
+    },
+    "EquipStateChange": {
+      "heldOne": "1H",
+      "heldTwo": "2H",
+      "worn": "Wear",
+      "stowed": "Stow",
+      "dropped": "Drop",
+      "active": "Activate",
+      "inactive": "Deactivate",
+      "readied": "Ready"
     },
     "AsyncValueTypes": {
       "singleValue": "Single",
@@ -416,7 +461,10 @@
         "standard": "Standard",
         "long": "Long",
         "heavy": "Heavy",
-        "agile": "Agile"
+        "agile": "Agile",
+        "vial": "Vial",
+        "consumable": "Consumable",
+        "ammunition": "Ammunition"
       },
       "stance": "Stance"
     },
@@ -476,7 +524,8 @@
       "archetype": "Archetype",
       "path": "Path",
       "ammunition": "Ammunition",
-      "enhancement": "Enhancement"
+      "enhancement": "Enhancement",
+      "equipment": "Equipment"
     }
   },
   "SETTINGS.AnnounceTurnStart.Name": "Announce Turn Start",

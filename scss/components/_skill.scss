@@ -351,3 +351,19 @@ div.skill-card.skill-active {
     list-style: none;
     padding-left: 0px;
 }
+
+.concept-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 4fr 4fr 1fr 1fr;
+    margin-bottom: 1em;
+    align-items: center;
+    grid-column-gap: 1em;
+}
+
+.concept-row-container::after {
+    content: '';
+    display: inherit;
+    width: 50%;
+    margin: 10px auto;
+    border-top: 1px solid gray;
+}

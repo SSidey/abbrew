@@ -1,11 +1,18 @@
 import { isEquipped } from "../item-physical.mjs";
 import { parsePathSync } from "../modifierBuilderFieldHelpers.mjs";
 import { applyOperatorUnbounded } from "../operators.mjs";
-import { isATraitsSupersetOfBTraits, removeItem, removeItemByKeyFunction } from "../utils.mjs";
+import { isASupersetOfB, removeItem, removeItemByKeyFunction } from "../utils.mjs";
 import { trackEnhancementDuration } from "./ehancement-duration.mjs";
 
 export function shouldHandleEnhancement(targetItem, enhancementItem) {
-    return enhancementItem.type === "enhancement" && ((enhancementItem.system.targetType === targetItem.type) || ["ammunition", "armour", "weapon"].includes(targetItem.type) && enhancementItem.system.targetType === "physical") && isATraitsSupersetOfBTraits(targetItem, enhancementItem)
+    if ((targetItem.system.availableEnhancements < enhancementItem.system.cost) && !(["material", "form"].includes(enhancementItem.system.enhancementType))) {
+        ui.notifications.info("You need to improve the quality of your item before adding more enhancements.");
+    }
+
+    return enhancementItem.type === "enhancement" &&
+        ((enhancementItem.system.targetType === targetItem.type) || (["ammunition", "armour", "weapon"].includes(targetItem.type) && enhancementItem.system.targetType === "physical")) &&
+        ((targetItem.system.availableEnhancements >= enhancementItem.system.cost) || (["material", "form"].includes(enhancementItem.system.enhancementType))) &&
+        isASupersetOfB(targetItem.system.traits.value.map(t => t.key), enhancementItem.system.traitFilter.value.map(t => t.key))
 }
 
 export async function handleEnhancement(targetItem, actor, enhancementItem) {
@@ -15,7 +22,6 @@ export async function handleEnhancement(targetItem, actor, enhancementItem) {
 
     let updateObject = structuredClone(targetItem);
 
-    // TODO: Add modifier for names, prefix / suffix so can rename the thing.
     let enhancement;
     if (actor) {
         const enhancementTarget = ({ name: targetItem.name, id: targetItem._id, uuid: targetItem.uuid });

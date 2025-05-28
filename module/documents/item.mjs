@@ -26,7 +26,7 @@ export default class AbbrewItem extends Item {
     // TODO: Could have items grant extra slots e.g. "belt" slot, which you could then have "worn" equip on a scabbard (require 1 belt)
     // The scabbard which grants a sword slot so then you can wear your sword (worn items are less cost to draw?)
     if (doesNestedFieldExist(changed, "system.equipState") && this.system.equipType === "worn") {
-      if (changed.system.equipState === 'worn' && this.type === 'armour') {
+      if (changed.system.equipState === 'worn' && ["armour", "equipment"].includes(this.type)) {
         if (!this.isWornEquipStateChangePossible()) {
           ui.notifications.info("You are already wearing too many items, try stowing some");
           this.actor.sheet.render();
@@ -135,7 +135,7 @@ export default class AbbrewItem extends Item {
 
   isWornEquipStateChangePossible() {
     const equipPoints = this.system.equipPoints.required.parsed.map(ap => ap.value);
-    const usedEquipPoints = this.actor.getActorWornArmour().flatMap(a => a.system.equipPoints.required.parsed.map(ap => ap.value));
+    const usedEquipPoints = this.actor.getActorWornItems().flatMap(a => a.system.equipPoints.required.parsed.map(ap => ap.value));
     const actorEquipPoints = this.actor.getActorAnatomy().parts;
     const availableEquipPoints = arrayDifference(actorEquipPoints, usedEquipPoints);
     if (!equipPoints.every(ap => availableEquipPoints.includes(ap))) {
@@ -335,6 +335,14 @@ export default class AbbrewItem extends Item {
 
   async _preDelete(options, userId) {
     if (this.actor) {
+      if (this.system.storeIn) {
+        const container = this.actor.items.find(i => i._id === this.system.storeIn);
+        if (container) {
+          const containerStoredItems = container.system.storage.storedItems.filter(i => i !== this._id);
+          await container.update({ "system.storage.storedItems": containerStoredItems });
+        }
+      }
+
       const trackedEffects = [
         ...this.actor.effects.toObject().filter(e => e.flags.abbrew.skill?.trackDuration === this._id),
         ...this.actor.effects.toObject().filter(e => e.flags.abbrew.enhancement?.trackDuration === this._id)

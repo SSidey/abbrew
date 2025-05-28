@@ -155,6 +155,10 @@ export function isATraitsSupersetOfBTraits(objA, objB) {
     return new Set(objA.system.traits.value.map(t => t.key)).isSupersetOf(new Set(objB.system.traits.value.map(t => t.key)));
 }
 
+export function isASupersetOfB(arrayA, arrayB) {
+    return new Set(arrayA).isSupersetOf(new Set(arrayB));
+}
+
 export function removeItem(base, value) {
     const index = base.findIndex(v => v.key === value.key);
     if (index > -1) { // only splice array when item is found

@@ -23,6 +23,7 @@ import { AbbrewAmmunitionSheet } from './sheets/items/item-ammunition-sheet.mjs'
 import { AbbrewWeaponSheet } from './sheets/items/item-weapon-sheet.mjs';
 import { AbbrewArmourSheet } from './sheets/items/item-armour-sheet.mjs';
 import { AbbrewEnhancementSheet } from './sheets/items/item-enhancement-sheet.mjs';
+import { AbbrewEquipmentSheet } from './sheets/items/item-equipment-sheet.mjs'
 import { onWorldTimeUpdate } from './helpers/time.mjs';
 import { activateSocketListener, emitForAll, SocketMessage } from './socket.mjs';
 import { handleSkillActivate } from './helpers/skills/skill-activation.mjs';
@@ -81,7 +82,8 @@ Hooks.once('init', function () {
     path: models.AbbrewPath,
     archetype: models.AbbrewArchetype,
     ammunition: models.AbbrewAmmunition,
-    enhancement: models.AbbrewEnhancement
+    enhancement: models.AbbrewEnhancement,
+    equipment: models.AbbrewEquipment
   }
 
   CONFIG.Token.documentClass = documents.AbbrewTokenDocument;
@@ -117,6 +119,11 @@ Hooks.once('init', function () {
     types: ["item", "feature", "spell", "wound"],
     makeDefault: true,
     label: 'ABBREW.SheetLabels.Item',
+  });
+  Items.registerSheet('abbrew', AbbrewEquipmentSheet, {
+    types: ["equipment"],
+    makeDefault: true,
+    label: 'ABBREW.SheetLabels.Equipment',
   });
   Items.registerSheet('abbrew', AbbrewArmourSheet, {
     types: ["armour"],
@@ -245,8 +252,15 @@ Handlebars.registerHelper('getPropertyById', function (parent, child) {
 });
 
 Handlebars.registerHelper('hasValue', function (arg1, opts) {
-  return arg1 !== null && arg1 !== undefined ? opts.fn(this) : opts.inverse(this);
+  return arg1 !== null && arg1 !== undefined ? opts.fn(this) : getInverseIfAvailable(opts);
 });
+
+function getInverseIfAvailable(opts) {
+  if (typeof opts.inverse === "function")
+    return opts.inverse(this);
+  else
+    return null;
+}
 
 Handlebars.registerHelper('empty', function (collection) {
   if (!collection) {

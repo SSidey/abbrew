@@ -158,6 +158,24 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         })
       )
     });
+    schema.concepts = new fields.SchemaField({
+      innate: new fields.SchemaField(Object.keys(CONFIG.ABBREW.concepts).reduce((obj, concept) => {
+        obj[concept] = new fields.SchemaField({
+          name: new fields.StringField({ required: true, initial: concept }),
+          label: new fields.StringField({ required: true, initial: CONFIG.ABBREW.concepts[concept] }),
+          value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+        });
+        return obj;
+      }, {})),
+      available: new fields.SchemaField(Object.keys(CONFIG.ABBREW.concepts).reduce((obj, concept) => {
+        obj[concept] = new fields.SchemaField({
+          name: new fields.StringField({ required: true, initial: concept }),
+          label: new fields.StringField({ required: true, initial: CONFIG.ABBREW.concepts[concept] }),
+          value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+        });
+        return obj;
+      }, {}))
+    })
 
     schema.progression = new fields.SchemaField({
       archetypes: new fields.ArrayField(
@@ -354,15 +372,20 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   }
 
   mapAnatomy() {
+    const wornItemsWithEquipPoints = this.mapWornEquipPoints();
     const res = this.parent.items.filter(i => i.type == "anatomy").filter(a => !(a.system.isBroken || a.system.isDismembered)).reduce((result, a) => {
       const values = a.system;
       result.hands += values.hands;
       result.speed += values.speed;
       result.parts = result.parts.concat(JSON.parse(values.parts).map(a => a.value));
       return result;
-    }, { hands: 0, speed: 0, parts: [] });
+    }, { hands: 0, speed: 0, parts: wornItemsWithEquipPoints });
 
     return res;
+  }
+
+  mapWornEquipPoints() {
+    return this.parent.items.filter(i => ["armour", "equipment"].includes(i.type)).filter(i => i.system.equipState === "worn").filter(i => i.system.equipPoints.provided.raw).flatMap(i => i.system.equipPoints.provided.parsed.map(v => v.value));
   }
 
   _prepareMovement(anatomy) {

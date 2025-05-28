@@ -465,9 +465,9 @@ export default class AbbrewActor extends Actor {
     });
   }
 
-  getActorWornArmour() {
-    const armour = this.items.filter(i => i.type === 'armour');
-    return armour.filter(a => a.system.equipState === 'worn')
+  getActorWornItems() {
+    const armour = this.items.filter(i => ["armour", "equipment"].includes(i.type));
+    return armour.filter(a => a.system.equipState === "worn");
   }
 
   getActorHeldItems() {

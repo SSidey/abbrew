@@ -114,6 +114,9 @@ async function handleAsyncModifierTypes(actor, skill, mainModifierSkills, siblin
                     handleAsyncResults(s, y);
                 })
             });
+            Object.entries(s.system.action.modifiers.concepts).filter(x => x[1].type === "async").forEach(([conceptName, values]) => {
+                handleAsyncResultsValue(s, values);
+            })
         });
     });
 
@@ -131,7 +134,12 @@ function handleAsyncResults(skill, field) {
     field.path = skill.system.action.asyncValues.find(a => a.name === field.path)?.value ?? 0;
 }
 
+function handleAsyncResultsValue(skill, field) {
+    field.type = "numeric";
+    field.value = skill.system.action.asyncValues.find(a => a.name === field.value)?.value ?? 0;
+}
 
+// TODO: More graceful handling of closed windows?
 async function preparseDialogs(actor, asyncValues) {
     const result = await getDialogValue(actor, asyncValues);
     asyncValues.forEach(a => a.value = result[a.name])

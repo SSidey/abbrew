@@ -121,7 +121,7 @@
       "private": false,
       "flags": {
         "abbrew": {
-          "types": ["armour", "weapon"]
+          "types": ["armour", "weapon", "equipment"]
         }
       }
     },

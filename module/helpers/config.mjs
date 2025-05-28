@@ -114,15 +114,37 @@ ABBREW.equipPoints = {
     arm: "ABBREW.EquipPoints.Points.arm",
     leg: "ABBREW.EquipPoints.Points.leg",
     tail: "ABBREW.EquipPoints.Points.tail",
-    wing: "ABBREW.EquipPoints.Points.wing"
+    wing: "ABBREW.EquipPoints.Points.wing",
+    attachment: "ABBREW.EquipPoints.Points.attachment"
+    // ,
+    // holster: "ABBREW.EquipPoints.Points.holster",
+    // scabbard: "ABBREW.EquipPoints.Points.scabbard"
   }
 }
 
 ABBREW.concepts = {
-  physical: 'ABBREW.Concepts.physical',
-  crushing: 'ABBREW.Resistances.crushing',
-  piercing: 'ABBREW.Resistances.piercing',
-  slashing: 'ABBREW.Resistances.slashing',
+  physical: "ABBREW.Concepts.physical",
+  crushing: "ABBREW.Concepts.crushing",
+  piercing: "ABBREW.Concepts.piercing",
+  slashing: "ABBREW.Concepts.slashing",
+  fire: "ABBREW.Concepts.fire",
+  cold: "ABBREW.Concepts.cold",
+  water: "ABBREW.Concepts.water",
+  earth: "ABBREW.Concepts.earth",
+  air: "ABBREW.Concepts.air",
+  electricity: "ABBREW.Concepts.electricity",
+  poison: "ABBREW.Concepts.poison",
+  flesh: "ABBREW.Concepts.flesh",
+  blood: "ABBREW.Concepts.blood",
+  metal: "ABBREW.Concepts.metal",
+  light: "ABBREW.Concepts.light",
+  dark: "ABBREW.Concepts.dark",
+  life: "ABBREW.Concepts.life",
+  death: "ABBREW.Concepts.death",
+  war: "ABBREW.Concepts.war",
+  famine: "ABBREW.Concepts.famine",
+  pestilence: "ABBREW.Concepts.pestilence",
+  conquest: "ABBREW.Concepts.conquest",
 }
 
 ABBREW.facing = {
@@ -154,22 +176,35 @@ ABBREW.ammunitionTypes = {
 }
 
 ABBREW.equipState = {
-  held1H: "ABBREW.EquipState.heldOne",
-  held2H: "ABBREW.EquipState.heldTwo",
-  worn: "ABBREW.EquipState.worn",
-  stowed: "ABBREW.EquipState.stowed",
-  dropped: "ABBREW.EquipState.dropped"
+  held: {
+    held1H: "ABBREW.EquipState.heldOne",
+    held2H: "ABBREW.EquipState.heldTwo",
+    stowed: "ABBREW.EquipState.stowed",
+    dropped: "ABBREW.EquipState.dropped"
+  },
+  worn: {
+    worn: "ABBREW.EquipState.worn",
+    stowed: "ABBREW.EquipState.stowed",
+    dropped: "ABBREW.EquipState.dropped"
+  },
+  innate: {
+    active: "ABBREW.EquipState.active",
+    inactive: "ABBREW.EquipState.inactive"
+  },
+  none: {
+
+  }
 }
 
-ABBREW.wornEquipState = {
-  worn: "ABBREW.EquipState.worn",
-  stowed: "ABBREW.EquipState.stowed",
-  dropped: "ABBREW.EquipState.dropped"
-}
-
-ABBREW.innateEquipState = {
-  active: "ABBREW.EquipState.active",
-  inactive: "ABBREW.EquipState.inactive"
+ABBREW.equipStateChange = {
+  held1H: "ABBREW.EquipStateChange.heldOne",
+  held2H: "ABBREW.EquipStateChange.heldTwo",
+  worn: "ABBREW.EquipStateChange.worn",
+  stowed: "ABBREW.EquipStateChange.stowed",
+  dropped: "ABBREW.EquipStateChange.dropped",
+  active: "ABBREW.EquipStateChange.active",
+  inactive: "ABBREW.EquipStateChange.inactive",
+  readied: "ABBREW.EquipStateChange.readied"
 }
 
 ABBREW.skillTypes = {
@@ -401,29 +436,40 @@ ABBREW.equipTypes = {
 ABBREW.hands = {
   none: {
     label: "ABBREW.Hands.none",
-    states: []
+    filterStates: ["held2H", "held1H"]
   },
   oneHand: {
     label: "ABBREW.Hands.oneHand",
-    states: ["held1H"]
+    filterStates: ["held2H"]
   },
   versatile: {
     label: "ABBREW.Hands.versatile",
-    states: ["held2H", "held1H"]
+    filterStates: []
   },
   twoHand: {
     label: "ABBREW.Hands.twoHand",
-    states: ["held2H"]
+    filterStates: ["held1H"]
   }
 }
 
 ABBREW.enhancementTargetTypes = {
   "weapon": "ABBREW.EnhancementTargetTypes.weapon",
   "armour": "ABBREW.EnhancementTargetTypes.armour",
+  "equipment": "ABBREW.EnhancementTargetTypes.equipment",
   "ammunition": "ABBREW.EnhancementTargetTypes.ammunition",
   "physical": "ABBREW.EnhancementTargetTypes.physical",
   "skill": "ABBREW.EnhancementTargetTypes.skill",
   "amp": "ABBREW.EnhancementTargetTypes.amp",
+}
+
+ABBREW.enhancementTypes = {
+  form: "ABBREW.EnhancementTypes.form",
+  material: "ABBREW.EnhancementTypes.material"
+}
+
+ABBREW.storageTypes = {
+  count: "ABBREW.StorageTypes.count",
+  heft: "ABBREW.StorageTypes.heft"
 }
 
 ABBREW.affixTypes = {
@@ -452,6 +498,7 @@ ABBREW.nameParts = [
   { key: "hide", part: "ABBREW.NameParts.hide", affix: -1, order: 8 },
   { key: "iron", part: "ABBREW.NameParts.iron", affix: -1, order: 8 },
   { key: "leather", part: "ABBREW.NameParts.leather", affix: -1, order: 8 },
+  { key: "mithril", part: "ABBREW.NameParts.mithril", affix: -1, order: 8 },
   { key: "steel", part: "ABBREW.NameParts.steel", affix: -1, order: 8 },
   { key: "chain", part: "ABBREW.NameParts.chain", affix: -1, order: 9 },
   { key: "jack", part: "ABBREW.NameParts.jack", affix: -1, order: 9 },
@@ -522,6 +569,9 @@ const itemTraits = [
   { key: "long", value: "ABBREW.Traits.Item.long", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: ["standard", "long"] },
   { key: "heavy", value: "ABBREW.Traits.Item.heavy", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: ["agile"] },
   { key: "agile", value: "ABBREW.Traits.Item.agile", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: ["heavy"] },
+  { key: "vial", value: "ABBREW.Traits.Item.vial", feature: "item", subFeature: "form", effect: "", data: "", exclude: [] },
+  { key: "consumable", value: "ABBREW.Traits.Item.consumable", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "ammunition", value: "ABBREW.Traits.Item.ammunition", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: [] },
 ]
 
 ABBREW.traits = [

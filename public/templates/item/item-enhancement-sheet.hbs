@@ -27,12 +27,21 @@
 
         {{!-- Attributes Tab --}}
         <div class="enhancement" data-group="primary" data-tab="attributes">
-            <div class="enhancement-type">
-                <label>Type</label>
-                <select name="system.targetType">
-                    {{selectOptions config.enhancementTargetTypes selected=system.targetType
-                    localize=true}}
-                </select>
+            <div class="grid-2col">
+                <div class="enhancement-target-type">
+                    <label>Target Type</label>
+                    <select name="system.targetType">
+                        {{selectOptions config.enhancementTargetTypes selected=system.targetType
+                        localize=true}}
+                    </select>
+                </div>
+                <div class="enhancement-type">
+                    <label>Type</label>
+                    <select name="system.enhancementType">
+                        {{selectOptions config.enhancementTypes selected=system.enhancementType blank=""
+                        localize=true}}
+                    </select>
+                </div>
             </div>
             <div class="target">
                 <label>Target</label>

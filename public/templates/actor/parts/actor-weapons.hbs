@@ -44,10 +44,8 @@
       {{/if}}
     </div>
     {{#if ../showEquipState}}
-    <select class="item-select" name="system.equipState">
-      {{selectOptions system.validEquipStates selected=item.system.equipState valueAttr="value" labelAttr="label"
-      localize=true}}
-    </select>
+    {{> "systems/abbrew/templates/item/parts/item-equip-state-changes.hbs" equipStates =
+    item.system.validEquipStates}}
     {{/if}}
     {{#if ../showItemControls}}
     <div class='item-controls'>

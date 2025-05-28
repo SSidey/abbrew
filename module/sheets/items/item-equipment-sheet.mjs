@@ -10,7 +10,7 @@ import { applyEnhancement, handleEnhancement, shouldHandleEnhancement } from '..
  * Extend the basic ItemSheet with some very simple modifications
  * @extends {ItemSheet}
  */
-export class AbbrewWeaponSheet extends ItemSheet {
+export class AbbrewEquipmentSheet extends ItemSheet {
   /** @override */
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
@@ -118,20 +118,6 @@ export class AbbrewWeaponSheet extends ItemSheet {
       if (t.dataset.action) this._onAttackProfileAction(t, t.dataset.action);
     });
 
-    html.on('dragover', (event) => {
-      event.preventDefault();
-    });
-
-    // Delete Skill Summary
-    html.on('click', '.skill-delete', async (ev) => {
-      const li = $(ev.currentTarget).parents('.skill-deck-skill');
-      if (li.data('id') || li.data('id') === 0) {
-        const skills = this.item.system.skills.granted;
-        skills.splice(li.data('id'), 1);
-        await this.item.update({ "system.skills.granted": skills });
-      }
-    });
-
     // Delete Enhancement
     html.on('click', '.enhancement-delete', async (ev) => {
       const li = $(ev.currentTarget).parents('.skill-deck-skill');
@@ -152,6 +138,20 @@ export class AbbrewWeaponSheet extends ItemSheet {
       }
     });
 
+    html.on('dragover', (event) => {
+      event.preventDefault();
+    });
+
+    // Delete Skill Summary
+    html.on('click', '.skill-delete', async (ev) => {
+      const li = $(ev.currentTarget).parents('.skill-deck-skill');
+      if (li.data('id') || li.data('id') === 0) {
+        const skills = this.item.system.skills.granted;
+        skills.splice(li.data('id'), 1);
+        await this.item.update({ "system.skills.granted": skills });
+      }
+    });
+
     html.on('click', '.skill-deck-skill .skill-deck-summary .image-container, .skill-deck-skill .skill-deck-summary .name', async (event) => {
       await renderSheetForStoredItem(event, this.actor, "skill-deck-skill");
     });
@@ -169,16 +169,17 @@ export class AbbrewWeaponSheet extends ItemSheet {
           const storedSkills = this.item.system.skills.granted;
           const updateSkills = [...storedSkills, { name: item.name, id: item._id, image: item.img, sourceId: item.uuid }];
           await this.item.update({ "system.skills.granted": updateSkills });
-        } else if (shouldHandleEnhancement(this.item, item)) {
+        } else if (shouldHandleEnhancement(this.item, item) && this.item.system.availableEnhancements > 0) {
           await handleEnhancement(this.item, this.item.actor, item);
-        };
+        }
       }
     });
 
-
-    this._activateEquipPoints(html);
+    this._activateEquipPoints(html, "required");
+    this._activateEquipPoints(html, "provided");
     this._activateAnatomyParts(html);
     this._activateTraits(html);
+    this._activateStorageTraitFilter(html);
   }
 
   prepareActions(system) {
@@ -187,9 +188,8 @@ export class AbbrewWeaponSheet extends ItemSheet {
     return actions;
   }
 
-  // TODO: Equipment points
-  _activateEquipPoints(html) {
-    const equipPoints = html[0].querySelector('input[name="system.equipPoints.required.raw"]');
+  _activateEquipPoints(html, points) {
+    const equipPoints = html[0].querySelector(`input[name="system.equipPoints.${points}.raw"]`);
     const equipPointsSettings = {
       dropdown: {
         maxItems: 20,               // <- mixumum allowed rendered suggestions
@@ -207,7 +207,6 @@ export class AbbrewWeaponSheet extends ItemSheet {
     }
   }
 
-  // TODO: Equipment points
   _activateAnatomyParts(html) {
     const anatomyParts = html[0].querySelector('input[name="system.parts"]');
     const anatomyPartsSettings = {
@@ -229,6 +228,28 @@ export class AbbrewWeaponSheet extends ItemSheet {
 
   _activateTraits(html) {
     const traitFilter = html[0].querySelector('input[name="system.traits.raw"]');
+    const settings = {
+      dropdown: {
+        maxItems: 20,               // <- mixumum allowed rendered suggestions
+        classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
+        enabled: 0,                 // <- show suggestions on focus
+        closeOnSelect: false,       // <- do not hide the suggestions dropdown once an item has been selected
+        includeSelectedTags: true   // <- Should the suggestions list Include already-selected tags (after filtering)
+      },
+      userInput: false,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+      duplicates: true,             // <- Should duplicate tags be allowed or not
+      whitelist: [...CONFIG.ABBREW.traits.filter(t => t.feature === "item").map(trait => ({
+        ...trait,
+        value: game.i18n.localize(trait.value)
+      }))],
+    };
+    if (traitFilter) {
+      var taggedTraitFilter = new Tagify(traitFilter, settings);
+    }
+  }
+
+  _activateStorageTraitFilter(html) {
+    const traitFilter = html[0].querySelector('input[name="system.storage.traitFilter.raw"]');
     const settings = {
       dropdown: {
         maxItems: 20,               // <- mixumum allowed rendered suggestions

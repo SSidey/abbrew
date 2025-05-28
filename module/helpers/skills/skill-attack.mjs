@@ -1,4 +1,5 @@
 import { parsePathSync } from "../modifierBuilderFieldHelpers.mjs";
+import { applyOperator } from "../operators.mjs";
 import { getResultDice, getRollFormula, getTotalSuccessesForResult } from "./skill-roll.mjs";
 
 export async function applyAttackProfiles(actor, skill, modifierSkills, fortune, templateData, data) {
