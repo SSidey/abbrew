@@ -6,7 +6,7 @@ import { addSkillToActiveSkills, addSkillToQueuedSkills, trackSkillDuration } fr
 import { handleGrantOnUse } from "./skill-grants.mjs";
 import { mergeConceptCosts, mergeResourceSelfModifiers } from "./skill-modifiers.mjs";
 
-export async function handleSkillActivate(actor, skill, checkActions = true) {
+export async function handleSkillActivate(actor, skill, checkActions = true, includeSkillTraits = []) {
     const isSkillProxied = skill.system.isProxied;
     if (!skill.system.isActivatable) {
         ui.notifications.info(`${skill.name} can not be activated`);
@@ -40,7 +40,7 @@ export async function handleSkillActivate(actor, skill, checkActions = true) {
 
     await rechargeSkill(actor, skill);
     skill.system.isProxied = isSkillProxied;
-    return await activateSkill(actor, skill);
+    return await activateSkill(actor, skill, includeSkillTraits);
 }
 
 export function isSkillBlocked(actor, skill) {
@@ -112,7 +112,7 @@ function doesActorMeetSkillRequirements(actor, skill) {
     return true;
 }
 
-async function activateSkill(actor, skill) {
+async function activateSkill(actor, skill, includeSkillTraits = []) {
     await activateSkillEffects(skill);
     if (skill.system.action.activationType === "synergy") {
         await trackSkillDuration(actor, skill);
@@ -145,7 +145,7 @@ async function activateSkill(actor, skill) {
     if (await trackSkillDuration(actor, skill)) {
         await addSkillToActiveSkills(actor, skill);
     }
-    const skillResult = await applySkillEffects(actor, skill);
+    const skillResult = await applySkillEffects(actor, skill, includeSkillTraits);
     await handleGrantOnUse(skill, actor);
     return skillResult;
 }

@@ -102,16 +102,12 @@ export function getAttackSkillWithActions(id, name, actionCost, image, attackPro
                         self: [],
                         target: []
                     },
-                    conceepts: {
-                        self: [],
-                        target: []
-                    }
+                    concepts: null
                 }
             }
         }
     });
 }
-
 export function getParrySkillWithActions(actionCost, siblingSkillModifiers = []) {
     const skill = CONFIG.ABBREW.fundamentalAttackSkills["parry"];
 
@@ -202,10 +198,7 @@ export function getParrySkillWithActions(actionCost, siblingSkillModifiers = [])
                         self: [],
                         target: []
                     },
-                    conceepts: {
-                        self: [],
-                        target: []
-                    }
+                    concepts: null
                 }
             }
         }
@@ -305,10 +298,7 @@ export function getFundamentalSkillWithActionCost(fundamental, actionCost, sibli
                         self: [],
                         target: []
                     },
-                    conceepts: {
-                        self: [],
-                        target: []
-                    }
+                    concepts: null
                 }
             }
         }

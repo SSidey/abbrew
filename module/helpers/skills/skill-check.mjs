@@ -46,7 +46,7 @@ export async function makeSkillCheck(actor, skill, allSkills, fortune, templateD
 export async function makeSkillCheckRequest(actor, skill, modifierSkills, skillResult, templateData, data) {
     if (skill.system.action.skillRequest.isEnabled) {
         const skillRequest = skill.system.action.skillRequest;
-        let requirements = { modifierIds: [], checkType: skillRequest.checkType, isContested: skillRequest.isContested, successes: { total: 0, requiredValue: 0 }, result: { requiredValue: 0 }, contestedResult: { dice: [], modifier: 0 } };
+        let requirements = { modifierIds: [], traits: getSafeJson(skill.system.traits.raw, []), checkType: skillRequest.checkType, isContested: skillRequest.isContested, successes: { total: 0, requiredValue: 0 }, result: { requiredValue: 0 }, contestedResult: { dice: [], modifier: 0 } };
         const targetModifiers = getSafeJson(skillRequest.targetModifiers).map(m => m.id);
         requirements.modifierIds = targetModifiers;
         if (skillRequest.isContested) {
@@ -97,7 +97,7 @@ export async function makeSkillCheckRequest(actor, skill, modifierSkills, skillR
 export async function acceptSkillCheck(actor, requirements) {
     const skill = getSkillById(actor, requirements.modifierIds);
     if (skill && skill.system.action.skillCheck) {
-        const skillResult = await handleSkillActivate(actor, skill);
+        const skillResult = await handleSkillActivate(actor, skill, false, requirements.traits.map(t => t.key));
         if (requirements.isContested) {
             if (requirements.checkType === "successes") {
                 const requiredValues = requirements.contestedResult.dice.slice(0, requirements.contestedResult.baseDicePool).map(d => d.result + requirements.contestedResult.modifier).sort((a, b) => b - a);

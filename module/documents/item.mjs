@@ -119,6 +119,18 @@ export default class AbbrewItem extends Item {
       }
     }
 
+    if (doesNestedFieldExist(changed, "system.isDismembered") && this.actor && this.system.naturalWeapons.length > 0) {
+      if (changed.system.isDismembered) {
+        const weaponPromises = this.actor.items.filter(i => i.type === "weapon").filter(i => i.system.grantedBy === this._id).map(i => i.delete());
+        const skillPromises = this.actor.items.filter(i => i.type === "skill").filter(i => i.system.grantedBy.item === this._id).map(i => i.delete());
+
+        await Promise.all([...weaponPromises, ...skillPromises]);
+      }
+      else {
+        await this.actor.acceptAnatomy(this);
+      }
+    }
+
     return super._preUpdate(changed, options, userId);
   }
 
@@ -128,9 +140,86 @@ export default class AbbrewItem extends Item {
     await handleGrantedSkills(grantedSkills, this.actor, this);
   }
 
-  _onUpdate(changed, options, userId) {
-    // console.log("CHANGE");
+  async _onUpdate(changed, options, userId) {
+    if (doesNestedFieldExist(changed, "system.senses") && this.actor) {
+      await this.handleSenses();
+    }
+    if (doesNestedFieldExist(changed, "system.light") && this.actor) {
+      await this.handleLight();
+    }
+
     super._onUpdate(changed, options, userId);
+  }
+
+  async handleLight() {
+    const light = this.system.light;
+    const update = { "system.light": light };
+
+    if (this.actor) {
+      await this.actor.handleLight();
+    }
+  }
+
+  async handleSenses() {
+    if (this.actor) {
+      const senseSkills = this.actor.items
+        .filter(i => i.type === "skill")
+        .filter(s => s.system.senses.modifiesSenses)
+        .map(s => s.system.senses);
+      const update = senseSkills.reduce((update, senses) => {
+        update.sight.enabled = true;
+        if (senses.sight.range === null) {
+          update.sight.range = null;
+        } else if (senses.sight.range && update.sight.range !== null && senses.sight.range > update.sight.range) {
+          update.sight.range = senses.sight.range;
+        }
+        if (senses.sight.angle < update.sight.angle) {
+          update.sight.angle = senses.sight.angle;
+        }
+        if (update.sight.visionMode !== "basic") {
+          update.sight.visionMode = senses.sight.visionMode;
+        }
+
+        update.detectionModes = senses.detectionModes.reduce((detectionModes, mode) => {
+          const oldMode = detectionModes.find(m => m.id === mode.id);
+          if (oldMode) {
+            if (mode.range === null || (mode.range && oldMode.range < mode.range)) {
+              oldMode.range = mode.range;
+              oldMode.enabled = true;
+            }
+          } else {
+            detectionModes.push({ ...mode, enabled: true });
+          }
+
+          return detectionModes;
+        }, update.detectionModes);
+
+        if (update.detectionModes.some(m => m.id === "basicSight")) {
+          const mode = update.detectionModes.find(m => m.id === "basicSight");
+          update.sight.range = mode.range;
+          update.sight.visionMode = "darkvision";
+          update.sight.saturation = -1;
+        } else if (update.sight.visionMode === "monochromatic") {
+          update.sight.saturation = -1;
+        } else if (update.sight.visionMode === "tremorsense") {
+          update.sight.brightness = 1;
+          update.sight.saturation = -0.3;
+          update.sight.contrast = 0.2;
+        } else if (update.sight.visionMode === "lightAmplification") {
+          update.sight.brightness = 1;
+          update.sight.saturation = -0.5;
+          update.sight.contrast = 0;
+        }
+        else {
+          update.sight.visionMode = "basic";
+          update.sight.saturation = 0;
+        }
+
+        return update;
+      }, { sight: { enabled: true, range: 0, angle: 360, visionMode: "" }, detectionModes: [] });
+
+      await this.actor.update({ "system.senses": update });
+    }
   }
 
   isWornEquipStateChangePossible() {
@@ -230,6 +319,7 @@ export default class AbbrewItem extends Item {
 
     templateData.skillCheck = templateData.skillCheck ? templateData.skillCheck : ({ attempts: [] });
     templateData.skillCheck.attempts = [...templateData.skillCheck.attempts, parsedResult];
+    templateData.skillCheck.checkType = data.skillCheckRequest.checkType;
 
     const html = await renderTemplate("systems/abbrew/templates/chat/skill-card.hbs", templateData);
     // await updateMessageForCheck(messageId, html, templateData);
@@ -306,12 +396,21 @@ export default class AbbrewItem extends Item {
     return super._preCreate(data, options, user);
   }
 
+  async _onDelete(options, userId) {
+    if (this.type === "skill") {
+      await this.handleSenses();
+      await this.handleLight();
+    }
+  }
+
   async _onCreate(data, options, userId) {
     if (game.user.id !== userId) {
       return;
     }
 
     if (data.type === "skill") {
+      await this.handleSenses();
+      await this.handleLight();
       await this.actor?.acceptSkillDeck(data);
       if (this.actor && ((!this.system.isActivatable && this.system.action.duration.value > 0) || (this.system.skillType === "temporary"))) {
         await trackSkillDuration(this.actor, this);
@@ -330,6 +429,8 @@ export default class AbbrewItem extends Item {
         const visible = stacks > 1;
         await effect.update({ "flags.statuscounter.visible": visible, "flags.statuscounter.value": stacks });
       }
+    } else if (data.type === "anatomy") {
+      await this.actor?.acceptAnatomy(this);
     }
   }
 
@@ -379,6 +480,13 @@ export default class AbbrewItem extends Item {
           }
         }
         await Promise.all(promises);
+      }
+
+      if (this.type === "anatomy" && this.actor && this.system.naturalWeapons.length > 0) {
+        const weaponPromises = this.actor.items.filter(i => i.type === "weapon").filter(i => i.system.grantedBy === this._id).map(i => i.delete());
+        const skillPromises = this.actor.items.filter(i => i.type === "skill").filter(i => i.system.grantedBy.item === this._id).map(i => i.delete());
+
+        await Promise.all([...weaponPromises, ...skillPromises]);
       }
     }
   }

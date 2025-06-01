@@ -26,7 +26,7 @@
           <input type="text" value="{{item.container.system.storage.max}}" data-dtype="Number" readonly />
         </div>
       </div>
-      {{#if (hasValue item.container.isSundered)}}
+      {{#if (eq item.container.type "armour")}}
       <label class="icon-label">
         <input type="checkbox" class="armour-sunder" name="system.isSundered" {{ checked item.system.isSundered }}>
         {{#if item.system.isSundered}}
@@ -52,7 +52,7 @@
         {{> "systems/abbrew/templates/item/parts/item-equip-state-changes.hbs" equipStates =
         stored.system.validEquipStates}}
         {{/if}}
-        {{#if (hasValue item.container.isSundered)}}
+        {{#if (eq stored.type "armour")}}
         <label class="icon-label">
           <input type="checkbox" class="armour-sunder" name="system.isSundered" {{ checked stored.system.isSundered }}>
           {{#if stored.system.isSundered}}
@@ -62,7 +62,23 @@
           {{/if}}
         </label>
         {{/if}}
+        {{#gm}}
+        <label>
+          <input type="checkbox" class="anatomy-revealed" name="system.revealed.isRevealed" {{ checked
+            stored.system.revealed.isRevealed }}>
+          {{#if stored.system.revealed.isRevealed}}
+          <span class="icon icon-anatomy-revealed-c" />
+          {{else}}
+          <span class="icon icon-anatomy-revealed-u" />
+          {{/if}}
+        </label>
+        {{/gm}}
         <div class='item-controls'>
+          {{#gm}}
+          <a class='item-control item-study' title='{{localize "DOCUMENT.Study" type=' equipment'}}'>
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </a>
+          {{/gm}}
           <a class='item-control item-edit' title='{{localize "DOCUMENT.Edit" type=' equipment'}}'>
             <i class='fas fa-edit'></i>
           </a>

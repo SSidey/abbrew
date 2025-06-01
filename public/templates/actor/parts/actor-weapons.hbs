@@ -48,6 +48,17 @@
     item.system.validEquipStates}}
     {{/if}}
     {{#if ../showItemControls}}
+    {{#gm}}
+    <label>
+      <input type="checkbox" class="anatomy-revealed" name="system.revealed.isRevealed" {{ checked
+        item.system.revealed.isRevealed }}>
+      {{#if item.system.revealed.isRevealed}}
+      <span class="icon icon-anatomy-revealed-c" />
+      {{else}}
+      <span class="icon icon-anatomy-revealed-u" />
+      {{/if}}
+    </label>
+    {{/gm}}
     <div class='item-controls'>
       <a class='item-control item-edit' title='{{localize "DOCUMENT.Edit" type=' weapon'}}'>
         <i class='fas fa-edit'></i>

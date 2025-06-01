@@ -1,5 +1,6 @@
 import { getNumericParts, getSafeJson } from '../helpers/utils.mjs';
 import AbbrewItemBase from './item-base.mjs'
+import AbbrewRevealedItem from './revealedItem.mjs';
 
 export default class AbbrewPhysicalItem extends AbbrewItemBase {
 
@@ -91,6 +92,8 @@ export default class AbbrewPhysicalItem extends AbbrewItemBase {
             })
         });
         schema.storeIn = new fields.StringField({ ...blankString });
+        AbbrewRevealedItem.addRevealedItemSchema(schema);
+        schema.grantedBy = new fields.StringField({ ...blankString });
 
         return schema;
     }
@@ -125,6 +128,10 @@ export default class AbbrewPhysicalItem extends AbbrewItemBase {
         // 1 (Material) + Bonus from quality
         this.availableEnhancements = this.meta.quality - this.enhancements.reduce((result, enhancement) => result += enhancement.cost, 0);
         this.prepareStorageValue();
+
+        if (this.revealed.revealSkills.raw) {
+            this.revealed.revealSkills.parsed = getSafeJson(this.revealed.revealSkills.raw, []);
+        }
 
         super.prepareBaseData();
     }

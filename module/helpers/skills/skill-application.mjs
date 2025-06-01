@@ -6,8 +6,9 @@ import { handleEarlySelfModifiers, handleLateSelfModifiers, handleTargetUpdates 
 import { applyAttackProfiles } from "./skill-attack.mjs";
 import { renderChatMessage } from "./skill-chat.mjs";
 import { getDialogValue } from "../modifierBuilderFieldHelpers.mjs";
+import { getSafeJson, isASupersetOfB } from "../utils.mjs";
 
-export function getModifierSkills(actor, skill) {
+export function getModifierSkills(actor, skill, includeTraits = []) {
     // Get all queued synergy skills (Only include filter out those with charges but 0 remaining)
     const queuedSkills = actor.items.toObject().filter(i => actor.system.queuedSkills.includes(i._id)).filter(s => skillHasChargesRemaining(s) || skillDoesNotUseCharges(s));
     // Get all synergies that apply to the main skill
@@ -17,7 +18,7 @@ export function getModifierSkills(actor, skill) {
     // Get passives that have synergy with the main skill
     const passiveSynergies = passiveSkills.filter(s => s.system.skillModifiers.synergy).map(s => ({ skill: s, synergy: JSON.parse(s.system.skillModifiers.synergy).flatMap(s => [s.id, foundry.utils.parseUuid(s.sourceId).id]) })).filter(s => s.synergy.includes(skill.system.abbrewId.uuid)).map(s => s.skill)
     // Combine all relevant skills, filtering for those that are out of charges    
-    return [...passiveSynergies, ...queuedSynergies].filter(s => isSynergyValidForTrigger(skill, s));
+    return [...passiveSynergies, ...queuedSynergies].filter(s => isSynergyValidForTrigger(skill, s)).filter(s => isSynergyValidForTraits(includeTraits, s));
 }
 
 function isSynergyValidForTrigger(skill, synergy) {
@@ -40,8 +41,23 @@ function isSynergyValidForTrigger(skill, synergy) {
     return true;
 }
 
-async function getGroupedModifierSkills(actor, skill) {
-    const mainModifierSkills = getModifierSkills(actor, skill);
+function isSynergyValidForTraits(includeTraits, synergy) {
+    const synergyTraits = getSafeJson(synergy.system.skillModifiers.synergyTraitFilter.raw, []);
+    if (synergyTraits.length === 0) {
+        return true;
+    }
+
+    if (includeTraits.length === 0) {
+        return false;
+    }
+
+    const synergyTraitSet = new Set(synergyTraits.map(t => t.key));
+    const includeTraitset = new Set(includeTraits);
+    return includeTraitset.intersection(synergyTraitSet).size > 0;
+}
+
+async function getGroupedModifierSkills(actor, skill, includeTraits = []) {
+    const mainModifierSkills = getModifierSkills(actor, skill, includeTraits);
     const [clonedSkill, clonedModifiers, clonedSiblingModifiers] = await handleAsyncModifierTypes(actor, skill, mainModifierSkills, skill.system.siblingSkillModifiers);
     const modifierSkills = [...clonedModifiers, ...clonedSiblingModifiers];
     const allSkills = [...modifierSkills, ...clonedSkill].filter(s => !s.system.action.charges.hasCharges || (s.system.action.charges.value > 0));
@@ -155,7 +171,7 @@ function mergeFortune(allSkills) {
     return allSkills.reduce((result, s) => result += s.system.action.modifiers.fortune, 0);
 }
 
-export async function applySkillEffects(actor, skill) {
+export async function applySkillEffects(actor, skill, includeTraits = []) {
     if (isSkillBlocked(actor, skill)) {
         ui.notifications.info(`You are blocked from using ${skill.name}`);
         return;
@@ -167,7 +183,7 @@ export async function applySkillEffects(actor, skill) {
     let templateData = { user: game.user, skillCheck: { attempts: [] }, actorSize: actor.system.meta.size, actorTier: actor.system.meta.tier };
     let data = { actorSize: actor.system.meta.size, actorTier: actor.system.meta.tier.value };
 
-    const [asyncParsedSkill, mainModifierSkills, modifierSkills, allSkills] = await getGroupedModifierSkills(actor, skill);
+    const [asyncParsedSkill, mainModifierSkills, modifierSkills, allSkills] = await getGroupedModifierSkills(actor, skill, includeTraits);
     const [mainSummary, modifierSummaries] = getSkillSummaries(skill, modifierSkills);
 
     templateData = {
@@ -184,8 +200,8 @@ export async function applySkillEffects(actor, skill) {
 
     [skillResult, templateData, data] = await makeSkillCheckRequest(actor, asyncParsedSkill, modifierSkills, skillResult, templateData, data);
     modifierSkills.filter(s => s.system.action.skillRequest.isEnabled).forEach(async s => {
-        let modData = deepClone(data);
-        let modTemplate = deepClone(templateData);
+        let modData = foundry.utils.deepClone(data);
+        let modTemplate = foundry.utils.deepClone(templateData);
         let modSkillresult;
         [modSkillresult, modTemplate, modData] = await makeSkillCheckRequest(actor, s, [], modSkillresult, modTemplate, modData);
         await renderChatMessage(true, actor, s, modTemplate, modData);

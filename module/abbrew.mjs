@@ -472,7 +472,7 @@ Hooks.on("preUpdateItem", () => { })
 
 Hooks.on("deleteActiveEffect", async (effect, options, userId) => {
   const parent = effect.parent;
-  if (parent.type === "character") {
+  if (["character", "npc"].includes(parent.type)) {
     await parent.handleDeleteActiveEffect(effect);
   }
 });
@@ -576,9 +576,6 @@ Hooks.on("dropActorSheetData", async (actor, sheet, data) => {
         case "creatureForm":
           await handleActorCreatureFormDrop(actor, item);
           break;
-        case "anatomy":
-          await handleActorAnatomyDrop(actor, item);
-          break;
       }
     }
   }
@@ -621,10 +618,6 @@ async function handleActorSkillDeckDrop(actor, skillDeck) {
 
 async function handleActorCreatureFormDrop(actor, creatureform) {
   await actor.acceptCreatureForm(creatureform);
-}
-
-async function handleActorAnatomyDrop(actor, anatomy) {
-  await actor.acceptAnatomy(anatomy);
 }
 
 /* -------------------------------------------- */
@@ -754,6 +747,39 @@ function getControlledActor() {
     return null;
   }
   return tokens[0].actor;
+}
+
+// skillIds: [AbbrewId.uuid]
+export async function requestSkillCheck(checkName, skillIds, checkType, difficulty, successes) {
+  let requirements = { modifierIds: skillIds, checkType: checkType, isContested: false, successes: { total: 0, requiredValue: 0 }, result: { requiredValue: 0 }, contestedResult: { dice: [], modifier: 0 } };
+  if (checkType === "successes") {
+    requirements.successes.total = successes;
+    requirements.successes.requiredValue = difficulty;
+  } else if (checkType === "result") {
+    requirements.result.requiredValue = difficulty;
+  }
+
+  const data = {};
+  data["skillCheckRequest"] = requirements;
+  const templateData = {
+    mainSummary: { name: checkName },
+    checkType: checkType,
+    showSkillRequest: true
+  };
+
+  const html = await renderTemplate("systems/abbrew/templates/chat/skill-card.hbs", templateData);
+
+  // const speaker = ChatMessage.getSpeaker({ actor: actor });
+  const rollMode = game.settings.get('core', 'rollMode');
+  // const label = `[${skill.system.skillType}] ${skill.name}`;
+
+  ChatMessage.create({
+    // speaker: speaker,
+    rollMode: rollMode,
+    // flavor: label,
+    content: html,
+    flags: { data: data, abbrew: { messasgeData: { /* speaker: speaker, */ rollMode: rollMode, /* flavor: label, */ templateData: templateData } } }
+  });
 }
 
 function applyCustomEffects(actor, change) {

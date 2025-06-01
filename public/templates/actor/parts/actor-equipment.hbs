@@ -30,6 +30,27 @@
       {{/if}}
     </label>
     {{/if}}
+    {{#if (eq item.type "anatomy")}}
+    <div class="icon-label-2">
+      <label>
+        <input type="checkbox" class="anatomy-broken" name="system.isBroken" {{ checked item.system.isBroken }}>
+        {{#if item.system.isBroken}}
+        <span class="icon icon-anatomy-broken-c" />
+        {{else}}
+        <span class="icon icon-anatomy-broken-u" />
+        {{/if}}
+      </label>
+      <label>
+        <input type="checkbox" class="anatomy-severed" name="system.isDismembered" {{ checked item.system.isDismembered
+          }}>
+        {{#if item.system.isDismembered}}
+        <span class="icon icon-anatomy-severed-c" />
+        {{else}}
+        <span class="icon icon-anatomy-severed-u" />
+        {{/if}}
+      </label>
+    </div>
+    {{/if}}
     <div class='item-controls'>
       <a class='item-control item-edit' title='{{localize "DOCUMENT.Edit" type=' equipment'}}'>
         <i class='fas fa-edit'></i>

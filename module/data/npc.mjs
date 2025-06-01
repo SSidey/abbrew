@@ -9,11 +9,16 @@ export default class AbbrewNPC extends AbbrewActorBase {
 
     schema.cr = new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 });
     schema.xp = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
-    
+
     return schema
+  }
+
+  prepareBaseData() {
+    super.prepareBaseData();
   }
 
   prepareDerivedData() {
     this.xp = this.cr * this.cr * 100;
+    super.prepareDerivedData();
   }
 }

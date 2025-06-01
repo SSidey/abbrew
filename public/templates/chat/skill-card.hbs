@@ -71,6 +71,15 @@
                     {{else}}
                     <i class="fa-regular fa-circle-xmark" style="color: #6f0003;"></i>
                     {{/if}}
+                    {{#if (eq ../skillCheck.checkType "successes")}}
+                    <span>{{attempt.totalSuccesses}}</span>
+                    <span>/</span>
+                    <span>{{attempt.requiredSuccesses}}</span>
+                    {{else}}
+                    <span>{{attempt.totalValue}}</span>
+                    <span>/</span>
+                    <span>{{attempt.requiredValue}}</span>
+                    {{/if}}
                 </div>
                 {{/each}}
             </ol>

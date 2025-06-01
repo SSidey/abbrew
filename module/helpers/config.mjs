@@ -574,12 +574,18 @@ const itemTraits = [
   { key: "ammunition", value: "ABBREW.Traits.Item.ammunition", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: [] },
 ]
 
+const skillTraits = [
+  { key: "disease", value: "ABBREW.Traits.Skill.disease", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "poison", value: "ABBREW.Traits.Skill.poison", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+]
+
 ABBREW.traits = [
   ...generalTraits,
   ...acuteWoundImmunities,
   ...lingeringWoundImmunities,
   ...skillTraining,
-  ...itemTraits
+  ...itemTraits,
+  ...skillTraits
 ]
 
 ABBREW.attackModes = {
@@ -764,3 +770,6 @@ ABBREW.activeEffectKeys = [
   { value: "system.modifiers.initiative", label: "ABBREW.ActiveEffectKeys.initiativeBonus" },
   { value: "system.movement.baseSpeed", label: "ABBREW.ActiveEffectKeys.baseSpeed" }
 ]
+
+ABBREW.visionModes = CONFIG.Canvas.visionModes;
+ABBREW.detectionModes = CONFIG.Canvas.detectionModes;

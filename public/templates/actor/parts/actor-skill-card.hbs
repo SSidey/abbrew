@@ -71,6 +71,17 @@
                 {{/if}}
             </div>
             <div class='skill-controls'>
+                {{#gm}}
+                <label>
+                    <input type="checkbox" class="anatomy-revealed" name="system.revealed.isRevealed" {{ checked
+                        item.system.revealed.isRevealed }}>
+                    {{#if item.system.revealed.isRevealed}}
+                    <span class="icon icon-anatomy-revealed-c" />
+                    {{else}}
+                    <span class="icon icon-anatomy-revealed-u" />
+                    {{/if}}
+                </label>
+                {{/gm}}
                 <label class="slide-toggle roboto-upper">
                     <input type="checkbox" class="action-activatable" name="system.isFavourited" {{ checked
                         system.isFavourited }}>

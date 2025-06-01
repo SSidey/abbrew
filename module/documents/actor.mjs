@@ -41,14 +41,68 @@ export default class AbbrewActor extends Actor {
     const flags = actorData.flags.abbrew || {};
   }
 
+  async _preCreate(data, options, user) {
+    if ((await super._preCreate(data, options, user)) === false) return false;
+
+    const prototypeToken = {};
+    if (this.type === "character") {
+      Object.assign(prototypeToken, {
+        sight: { enabled: true }, actorLink: true, disposition: CONST.TOKEN_DISPOSITIONS.FRIENDLY, detectionModes: []
+      });
+    } else {
+      Object.assign(prototypeToken, {
+        sight: { enabled: true }, actorLink: false, disposition: CONST.TOKEN_DISPOSITIONS.HOSTILE, detectionModes: []
+      });
+    }
+    this.updateSource({ prototypeToken });
+  }
+
   async _preUpdate(changed, options, userId) {
     if (doesNestedFieldExist(changed, "system.meta.size")) {
       if (!isNaN(changed.system.meta.size)) {
         const changeSize = parseFloat(changed.system.meta.size);
         const dimension = Object.values(CONFIG.ABBREW.size).find(s => s.value === changeSize).dimension;
-        await this.token?.update({ "height": dimension, "width": dimension });
+        const update = { "height": dimension, "width": dimension };
+        if (this.token) {
+          await this.token?.update(update);
+        } else {
+          const tokenDocuments = game.canvas.tokens.placeables.filter(e => e.document.actorId === this._id);
+          const tokenPromises = tokenDocuments.map(t => t.document.update(update));
+          await Promise.all(tokenPromises);
+          await this.prototypeToken.update(update);
+        }
       }
     }
+
+    if (doesNestedFieldExist(changed, "system.senses")) {
+      const actorSenses = changed.system.senses;
+      if (this.type === "character") {
+        actorSenses.sight.enabled = true;
+      }
+      const sight = foundry.utils.mergeObject(this.prototypeToken.sight, actorSenses.sight, { overwrite: true });
+      const detectionModes = actorSenses.detectionModes;
+      const update = { "sight": sight, "detectionModes": detectionModes };
+
+      if (this.token) {
+        await this.token.update(update);
+      }
+
+      if (this.prototypeToken) {
+        await this.prototypeToken.update(update);
+      }
+
+      const tokenDocuments = game.canvas.tokens.placeables.filter(e => e.document.actorId === this._id);
+      const tokenPromises = tokenDocuments.map(t => t.document.update(update));
+      await Promise.all(tokenPromises);
+    }
+  }
+
+  async _onUpdate(changed, options, user) {
+    if (doesNestedFieldExist(changed, "system.activeSkills")) {
+      await this.handleLight();
+    }
+
+    return super._onUpdate(changed, options, user);
   }
 
   /**
@@ -100,6 +154,28 @@ export default class AbbrewActor extends Actor {
 
   getEffectBySkillId(skillId) {
     return this.effects.find(e => e.flags?.abbrew?.skill?.trackDuration === skillId);
+  }
+
+  async handleLight() {
+    const lightSkill = this.items.find(
+      i => i.type === "skill" &&
+        (i.system.light.dim > 0 || i.system.light.bright > 0) &&
+        (!i.system.isActivatable || (i.system.isActivatable && i.system.action.isActive && this.system.activeSkills.includes(i._id)))
+    );
+
+    const update = lightSkill ? { "light": lightSkill.system.light } : { "light.bright": 0, "light.dim": 0 };
+
+    if (this.token) {
+      await this.token.update(update);
+    }
+
+    if (this.prototypeToken) {
+      await this.prototypeToken.update(update);
+    }
+
+    const tokenDocuments = game.canvas.tokens.placeables.filter(e => e.document.actorId === this._id);
+    const tokenPromises = tokenDocuments.map(t => t.document.update(update));
+    await Promise.all(tokenPromises);
   }
 
   async takeActionUpdates(data) {
@@ -527,9 +603,14 @@ export default class AbbrewActor extends Actor {
   }
 
   async acceptAnatomy(anatomy) {
-    const naturalWeapons = await Promise.all(anatomy.system.naturalWeapons.map(async w => await fromUuid(w.sourceId)));
+    const naturalWeapons = structuredClone(await Promise.all(anatomy.system.naturalWeapons.map(async w => await fromUuid(w.sourceId))));
+    const skills = structuredClone(await Promise.all(anatomy.system.skills.granted.map(async w => await fromUuid(w.sourceId))));
     for (const index in naturalWeapons) {
+      naturalWeapons[index].system.grantedBy = anatomy._id;
       await Item.create(naturalWeapons[index], { parent: this })
+    } for (const index in skills) {
+      skills[index].system.grantedBy.item = anatomy._id;
+      await Item.create(skills[index], { parent: this })
     }
   }
 

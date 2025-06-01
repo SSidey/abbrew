@@ -37,6 +37,20 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         })
       )
     });
+    schema.senses = new fields.SchemaField({
+      sight: new fields.SchemaField({
+        enabled: new fields.BooleanField({ required: true, initial: false }),
+        range: new fields.NumberField({ required: true, nullable: true, integer: true, initial: 0 }),
+        angle: new fields.NumberField({ required: true, integer: true, min: 0, max: 360, initial: 360 }),
+        visionMode: new fields.StringField({ required: true, initial: "basic" })
+      }),
+      detectionModes: new fields.ArrayField(
+        new fields.SchemaField({
+          mode: new fields.StringField({ required: true, blank: true }),
+          range: new fields.NumberField({ required: true, nullable: true, integer: true }),
+        })
+      )
+    });
     schema.actions = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 5 });
     schema.wounds = new fields.ArrayField(
       new fields.SchemaField({

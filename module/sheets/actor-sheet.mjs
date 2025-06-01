@@ -9,6 +9,7 @@ import { cleanTemporarySkill } from '../helpers/skills/skill-uses.mjs';
 import { getModifiedSkillActionCost, handleSkillActivate } from '../helpers/skills/skill-activation.mjs';
 import { manualSkillExpiry } from '../helpers/skills/skill-expiry.mjs';
 import { filterKeys, isASupersetOfB } from '../helpers/utils.mjs';
+import { requestSkillCheck } from '../abbrew.mjs';
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -146,6 +147,7 @@ export class AbbrewActorSheet extends ActorSheet {
     const activeSkills = [];
     const enhancements = [];
     const storage = [];
+    const playerRevealed = { anatomy: [], armour: [], weapons: [], traits: [] }
 
     for (let i of context.items) {
       i.img = i.img || Item.DEFAULT_ICON;
@@ -176,14 +178,17 @@ export class AbbrewActorSheet extends ActorSheet {
         if (i.type === 'weapon') {
           if (['held1H', 'held2H', 'active'].includes(i.system.equipState)) {
             equippedWeapons.push(i);
+            if (i.system.revealed.isRevealed) {
+              playerRevealed.weapons.push(i);
+            }
           }
         }
         continue;
       }
 
-      // Append to gear.
+      // Append to equipment.
       if (i.type === 'item') {
-        gear.push(i);
+        equipment.push(i);
       }
       if (i.type === 'ammunition') {
         ammunition.push(i);
@@ -221,28 +226,41 @@ export class AbbrewActorSheet extends ActorSheet {
       }
       else if (i.type === "anatomy") {
         if (i.system.isDismembered) {
-          gear.push(i);
+          equipment.push(i);
         } else {
           anatomy.push(i);
+          if (i.system.revealed.isRevealed) {
+            playerRevealed.anatomy.push(
+              {
+                item: i,
+                grantedWeapons: context.items.filter(i => i.type === "weapon").filter(w => w.system.revealed.isRevealed && w.system.grantedBy === i._id),
+                grantedSkills: context.items.filter(i => i.type === "skill").filter(w => w.system.revealed.isRevealed && w.system.grantedBy.item === i._id)
+              }
+            );
+          }
         }
       }
       else if (i.type === 'armour') {
         armour.push(i);
         if (['held1H', 'held2H', 'worn'].includes(i.system.equipState)) {
           wornArmour.push(i);
+          if (i.system.revealed.isRevealed) {
+            playerRevealed.armour.push(i);
+          }
         }
       }
       else if (i.type === 'weapon') {
         weapons.push(i);
-        // TODO: Non physical weapons?
         if (['held1H', 'held2H', 'active'].includes(i.system.equipState)) {
           equippedWeapons.push(i);
+          if (i.system.revealed.isRevealed) {
+            playerRevealed.weapons.push(i);
+          }
         }
       }
       else if (i.type === "enhancement") {
         enhancements.push(i);
       }
-      // Append to spells.
       else if (i.type === 'spell') {
         if (i.system.spellLevel != undefined) {
           spells[i.system.spellLevel].push(i);
@@ -277,9 +295,20 @@ export class AbbrewActorSheet extends ActorSheet {
     context.enhancements = enhancements;
     context.equipment = equipment;
     context.storage = storage;
+    context.playerRevealed = playerRevealed;
   }
 
   skillSectionDisplay = {};
+
+  _canUserView(user) {
+    switch (this.object.type) {
+      case "npc":
+        return true;
+      case 'character':
+      default:
+        return super._canUserView(user);
+    }
+  }
 
   isContainerAccessible(container) {
     return (container.system.storage.accessible && container.system.equipState === "worn") || container.system.equipState === "readied"
@@ -352,6 +381,21 @@ export class AbbrewActorSheet extends ActorSheet {
   /** @override */
   activateListeners(html) {
     super.activateListeners(html);
+
+    html.on('click', '.item-study', async (ev) => {
+      const li = $(ev.currentTarget).parents('.item');
+      const item = this.actor.items.get(li.data('itemId'));
+      const reveal = item.system.revealed;
+      const revealSkills = reveal.revealSkills.parsed;
+      if (revealSkills.length === 0) {
+        ui.notifications.warn(`No Reveal Skills are set up for ${item.name} id: ${item._id}`);
+        return;
+      }
+      const difficulty = reveal.difficulty;
+      const tier = this.actor.system.meta.tier.value;
+      const checkName = `Study ${item.name}`;
+      await requestSkillCheck(checkName, revealSkills.map(s => s.id), "successes", difficulty, tier);
+    });
 
     // Render the item sheet for viewing/editing prior to the editable check.
     html.on('click', '.item-edit', (ev) => {
@@ -552,7 +596,7 @@ export class AbbrewActorSheet extends ActorSheet {
         if (["armour", "equipment", "weapon", "ammunition"].includes(item.type)) {
           const containerId = event.currentTarget.dataset.itemId;
           const container = this.actor.items.find(i => i._id === containerId);
-          if (!isASupersetOfB(item.system.traits.value, container.system.storage.traitFilter.parsed)) {
+          if (!isASupersetOfB(item.system.traits.value.map(t => t.key), container.system.storage.traitFilter.value.map(t => t.key))) {
             return;
           }
           const containerValueIncrease = getContainerValueIncrease(container, item);
@@ -577,7 +621,7 @@ export class AbbrewActorSheet extends ActorSheet {
         heftIncrease += item.system.storage.value;
       }
 
-      container.system.storage.type === "count" ? item.system.quantity : heftIncrease;
+      return container.system.storage.type === "count" ? item.system.quantity : heftIncrease;
     }
 
     html.on("click", ".equip-state-button", async (event) => {

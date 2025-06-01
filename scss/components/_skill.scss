@@ -269,6 +269,12 @@ div.skill-card.skill-active {
     box-shadow: 0 0 0 5px inset currentColor;
 }
 
+.skill-span-2 {
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: auto 1fr;
+}
+
 .modifierList {
     list-style-type: none;
     padding-left: 0px;

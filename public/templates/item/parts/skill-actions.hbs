@@ -247,6 +247,90 @@
         <input type="text" name="system.action.charges.max" value="{{system.action.charges.max}}" data-dtype="Number" />
         {{/if}}
     </div>
+    <div>
+        <h3>Senses</h3>
+        <label class="slide-toggle roboto-upper">
+            <input type="checkbox" name="system.senses.modifiesSenses" {{ checked system.senses.modifiesSenses }}>
+            <span>Modifies Senses?</span>
+            {{#if system.senses.modifiesSenses}}
+            <i class="fa fa-toggle-on"></i>
+            {{else}}
+            <i class="fa fa-toggle-off"></i>
+            {{/if}}
+        </label>
+        {{#if system.senses.modifiesSenses}}
+        <div class="skill-senses">
+            <div class="senses-row">
+                <label class="slide-toggle roboto-upper">
+                    <input type="checkbox" name="system.senses.sight.enabled" {{ checked system.senses.sight.enabled }}>
+                    <span>Enabled?</span>
+                    {{#if system.senses.sight.enabled}}
+                    <i class="fa fa-toggle-on"></i>
+                    {{else}}
+                    <i class="fa fa-toggle-off"></i>
+                    {{/if}}
+                </label>
+                <div class="sense-element-2">
+                    <label>Range</label>
+                    <input type="number" name="system.senses.sight.range" value="{{system.senses.sight.range}}"
+                        placeholder="&infin;" data-dtype="Number" />
+                </div>
+                <div class="sense-profile-element-2">
+                    <label>Angle</label>
+                    <input type="number" name="system.senses.sight.angle" value="{{system.senses.sight.angle}}"
+                        data-dtype="Number" />
+                </div>
+                <div class="sense-element-2">
+                    <label>VisionMode</label>
+                    <select name="system.senses.sight.visionMode">
+                        {{selectOptions config.visionModes selected=system.senses.sight.visionMode
+                        blank="basic" localize=true}}
+                    </select>
+                </div>
+            </div>
+            <div>
+                <ol class='items-list'>
+                    {{#each system.senses.detectionModes as |item id|}}
+                    <li data-id='{{id}}'>
+                        <div class="item detection-mode-row detection-mode-container">
+                            <div>
+                                <div class="sense-element-2">
+                                    <label>Mode</label>
+                                    <select name="system.senses.detectionModes.{{id}}.id">
+                                        {{selectOptions ../config.detectionModes selected=item.id
+                                        blank=""
+                                        localize=true}}
+                                    </select>
+                                </div>
+                                <div class="sense-element-2">
+                                    <label>Range</label>
+                                    <input type="number" name="system.senses.detectionModes.{{id}}.range"
+                                        value="{{item.range}}" placeholder="&infin;" data-dtype="Number" />
+                                </div>
+                            </div>
+                            <div class="detection-mode remove">
+                                <a class="detection-mode-control" data-action="remove-detection-mode">
+                                    <i class="fa-solid fa-minus"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    {{/each}}
+                    <li class="detection-mode add">
+                        <div class="form-group">
+                            <label>
+                                <a class="detection-mode-control" data-action="add-detection-mode">
+                                    Add Detection Mode
+                                    <i class="fa-solid fa-plus"></i>
+                                </a>
+                            </label>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+        {{/if}}
+    </div>
     {{#if system.isActivatable}}
     <div>
         <h3>Dialog Prompts</h3>

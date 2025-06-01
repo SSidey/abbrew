@@ -3,7 +3,7 @@ import {
   prepareActiveEffectCategories,
 } from '../../helpers/effects.mjs';
 import Tagify from '@yaireo/tagify'
-import { renderSheetForStoredItem } from '../../helpers/utils.mjs';
+import { getObjectValueByStringPath, getSafeJson, renderSheetForStoredItem } from '../../helpers/utils.mjs';
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -99,6 +99,27 @@ export class AbbrewAnatomySheet extends ItemSheet {
     }
   }
 
+  _activateRevealSkillsFields(html) {
+    const revealSkills = html[0].querySelector('input[name="system.revealed.revealSkills.raw"]');
+    const settings = {
+      whitelist: CONFIG.ABBREW.fundamentalAttributeSkillSummaries,
+      dropdown: {
+        maxItems: 20,               // <- mixumum allowed rendered suggestions
+        classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
+        enabled: 0,                 // <- show suggestions on focus
+        closeOnSelect: false,       // <- do not hide the suggestions dropdown once an item has been selected
+        includeSelectedTags: false   // <- Should the suggestions list Include already-selected tags (after filtering)
+      },
+      userInput: false,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+      duplicates: false,             // <- Should duplicate tags be allowed or not
+      placeholder: "Drop or select an attribute skill"
+    };
+
+    if (revealSkills) {
+      var taggedRevealSkills = new Tagify(revealSkills, settings);
+    }
+  }
+
   /**
    * Handle one of the add or remove damage reduction buttons.
    * @param {Element} target  Button or context menu entry that triggered this action.
@@ -149,6 +170,7 @@ export class AbbrewAnatomySheet extends ItemSheet {
     });
 
     this._activateAnatomyParts(html);
+    this._activateRevealSkillsFields(html);
 
     html.on('dragover', (event) => {
       event.preventDefault();
@@ -169,6 +191,10 @@ export class AbbrewAnatomySheet extends ItemSheet {
       await renderSheetForStoredItem(event, this.actor, "anatomy-weapon");
     });
 
+    html.on('click', '.skill-deck-skill .skill-deck-summary .image-container, .skill-deck-skill .skill-deck-summary .name', async (event) => {
+      await renderSheetForStoredItem(event, this.actor, "skill-deck-skill");
+    });
+
     html.on('drop', async (event) => {
       if (!this.item.testUserPermission(game.user, 'OWNER')) {
         return;
@@ -182,7 +208,63 @@ export class AbbrewAnatomySheet extends ItemSheet {
           const storedWeapons = this.item.system.naturalWeapons;
           const updateWeapons = [...storedWeapons, { name: item.name, id: item.id, image: item.img, sourceId: item.uuid }];
           await this.item.update({ "system.naturalWeapons": updateWeapons });
+        } else if (item.type === "skill") {
+          const storedSkills = this.item.system.skills.granted;
+          const updateSkills = [...storedSkills, { name: item.name, id: item._id, image: item.img, sourceId: item.uuid }];
+          await this.item.update({ "system.skills.granted": updateSkills });
         }
+      }
+    })
+
+    // TODO: Handle dropping skills onto the anatomy reveal field.
+    // TODO: Instead of readonly, can we just if not gm disable input and remove dropdown? Also prevent drops like below?
+    html.on('drop', 'tags.tagify', async (event) => {
+      if (!this.item.testUserPermission(game.user, 'OWNER')) {
+        return;
+      }
+
+      const target = event.target;
+      let inputElement = null;
+      if (Object.values(target.classList).includes("tagify__input")) {
+        inputElement = target.parentElement.nextElementSibling;
+      } else if (Object.values(target.classList).includes("tagify")) {
+        inputElement = target.nextElementSibling;
+      } else {
+        return;
+      }
+
+      if (inputElement.readOnly) {
+        return;
+      }
+
+      const droppedData = event.originalEvent.dataTransfer.getData("text")
+      const eventJson = JSON.parse(droppedData);
+      if (eventJson && eventJson.type === "Item") {
+        const item = await fromUuid(eventJson.uuid);
+        if (inputElement.dataset.droptype !== item.type) {
+          return;
+        }
+        const value = item.name;
+        const path = inputElement.name;
+        const inputValue = getSafeJson(getObjectValueByStringPath(this.item, path), []);
+        if (path.split(".").some(segment => !isNaN(segment))) {
+          const pathSegments = path.split(".");
+          const pathindex = pathSegments.findIndex(s => !isNaN(s));
+          const index = pathSegments.find(s => !isNaN(s));
+          const subPath = pathSegments.splice(pathindex + 1).join(".");
+          const basePath = pathSegments.splice(0, pathindex).join(".");
+          const baseElements = getObjectValueByStringPath(this.item, basePath);
+          const updateValue = [...inputValue, { value: value, id: item.system.abbrewId.uuid, sourceId: eventJson.uuid }];
+          baseElements[index][subPath] = JSON.stringify(updateValue);
+          const update = {};
+          update[basePath] = baseElements;
+          await this.item.update(update);
+          return;
+        }
+        const updateValue = [...inputValue, { value: value, id: item.system.abbrewId.uuid, sourceId: eventJson.uuid }];
+        const update = {};
+        update[path] = JSON.stringify(updateValue);
+        await this.item.update(update);
       }
     })
   }

@@ -1,0 +1,27 @@
+.revealed-item {
+
+    .revealed-details {
+        display: grid;
+        grid-template-columns: 1fr;
+
+        .revealed-name {
+            display: grid;
+            grid-template-columns: 1fr 9fr;
+            align-items: center;
+
+            h4 {
+                margin-bottom: 0px
+            }
+        }
+    }
+}
+
+.anatomy-revealed-weapons {
+    background-color: lightslategray;
+    padding-left: 1em;
+}
+
+.anatomy-revealed-skills {
+    background-color: lightcoral;
+    padding-left: 1em;
+}

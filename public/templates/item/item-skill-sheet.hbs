@@ -57,6 +57,11 @@
         <input type="text" name="system.skillModifiers.synergy" class="drop-with-fundamentals"
           value="{{system.skillModifiers.synergy}}" data-dtype="String" data-dropType="skill" {{#unless
           (isGM)}}readonly{{/unless}}>
+        <div class="skill-span-2">
+          <h3>Trait Filter</h3>
+          <input type="text" class="trait-filter" name="system.skillModifiers.synergyTraitFilter.raw"
+            value="{{system.skillModifiers.synergyTraitFilter.raw}}" data-dtype="String" />
+        </div>
         <label class="resource-label">Discord</label>
         <input type="text" name="system.skillModifiers.discord" class="drop-with-fundamentals"
           value="{{system.skillModifiers.discord}}" data-dtype="String" data-dropType="skill" {{#unless
@@ -184,6 +189,7 @@
     {{!-- Effects Tab --}}
     <div class="tab effects" data-group="primary" data-tab="effects">
       {{> "systems/abbrew/templates/item/parts/item-effects.hbs"}}
+      {{> "systems/abbrew/templates/item/parts/skill-light.hbs"}}
     </div>
   </section>
 

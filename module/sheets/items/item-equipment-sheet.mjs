@@ -169,7 +169,7 @@ export class AbbrewEquipmentSheet extends ItemSheet {
           const storedSkills = this.item.system.skills.granted;
           const updateSkills = [...storedSkills, { name: item.name, id: item._id, image: item.img, sourceId: item.uuid }];
           await this.item.update({ "system.skills.granted": updateSkills });
-        } else if (shouldHandleEnhancement(this.item, item) && this.item.system.availableEnhancements > 0) {
+        } else if (shouldHandleEnhancement(this.item, item)) {
           await handleEnhancement(this.item, this.item.actor, item);
         }
       }

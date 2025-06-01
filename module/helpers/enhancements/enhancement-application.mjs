@@ -23,7 +23,7 @@ export async function handleEnhancement(targetItem, actor, enhancementItem) {
     let updateObject = structuredClone(targetItem);
 
     let enhancement;
-    if (actor) {
+    if (actor && !["material", "form"].includes(enhancementItem.system.enhancementType)) {
         const enhancementTarget = ({ name: targetItem.name, id: targetItem._id, uuid: targetItem.uuid });
         const createEnhancements = structuredClone(enhancementItem);
         foundry.utils.setProperty(createEnhancements, "system.target", enhancementTarget);

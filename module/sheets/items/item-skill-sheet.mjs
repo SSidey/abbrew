@@ -89,7 +89,39 @@ export class AbbrewSkillSheet extends ItemSheet {
             }
         );
 
+        context.lightFields = this.prepareDataModelFields(foundry.data.LightData, ["system.light"]);
+        context.colorationTechniques = AdaptiveLightingShader.SHADER_TECHNIQUES;
+        context.lightAnimations = CONFIG.Canvas.lightAnimations;
+        context.gridUnits = game.canvas.grid.units;
+
         return context;
+    }
+
+    prepareDataModelFields(datamodel, schemaPath) {
+        return this.prepareSchemaFields(datamodel.schema, datamodel.LOCALIZATION_PREFIXES, schemaPath)
+    }
+
+    prepareSchemaFields(schema, localizationPrefixes, schemaPath) {
+        const fields = schema.fields;
+
+        Object.entries(fields).forEach(f => {
+            const prefixes = [...localizationPrefixes, f[0]];
+            const currentSchemaPath = [...schemaPath, f[0]];
+            if (f[1] instanceof foundry.data.fields.SchemaField) {
+                f[1].name = "";
+                f[1].fields = this.prepareSchemaFields(f[1], prefixes, currentSchemaPath);
+            } else {
+                f[1].name = currentSchemaPath.join(".");
+            }
+            const prefix = prefixes.join(".");
+            f[1].label = game.i18n.localize(`${prefix}.label`);
+            const hintPath = `${prefix}.hint`;
+            const hint = game.i18n.localize(hintPath);
+            if (hint !== hintPath) {
+                f[1].hint = hint;
+            }
+        });
+        return fields;
     }
 
     /* -------------------------------------------- */
@@ -107,6 +139,11 @@ export class AbbrewSkillSheet extends ItemSheet {
         html.on('click', '.effect-control', (event) =>
             onManageActiveEffect(event, this.item)
         );
+
+        html.on("click", ".light-tab", (event) => {
+            const target = event.currentTarget;
+            super.changeTab(target.dataset.tab, target.dataset.group, {})
+        })
 
         html.find(".skill-action-resource-control").click(event => {
             const t = event.currentTarget;
@@ -147,6 +184,11 @@ export class AbbrewSkillSheet extends ItemSheet {
         html.find(".modifier-control").click(event => {
             const t = event.currentTarget;
             if (t.dataset.action) this._onModifierControlAction(t, t.dataset.action);
+        });
+
+        html.find(".detection-mode-control").click(event => {
+            const t = event.currentTarget;
+            if (t.dataset.action) this._onDetectionModeControlAction(t, t.dataset.action);
         });
 
         html.find(".value-control").click(event => {
@@ -252,6 +294,7 @@ export class AbbrewSkillSheet extends ItemSheet {
         this._activateSkillCheckRequestFields(html);
         this._activateRoles(html);
         this._activatePath(html);
+        this._activateSynergyTraitFilter(html);
     }
 
     _activateSkillTraits(html) {
@@ -292,6 +335,28 @@ export class AbbrewSkillSheet extends ItemSheet {
         };
         if (skillCheck) {
             var taggedSkillCheck = new Tagify(skillCheck, skillCheckSettings);
+        }
+    }
+
+    _activateSynergyTraitFilter(html) {
+        const traitFilter = html[0].querySelector('input[name="system.skillModifiers.synergyTraitFilter.raw"]');
+        const skillCheckSettings = {
+            dropdown: {
+                maxItems: 20,               // <- mixumum allowed rendered suggestions
+                classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
+                enabled: 0,                 // <- show suggestions on focus
+                closeOnSelect: false,       // <- do not hide the suggestions dropdown once an item has been selected
+                includeSelectedTags: false   // <- Should the suggestions list Include already-selected tags (after filtering)
+            },
+            userInput: false,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+            duplicates: false,             // <- Should duplicate tags be allowed or not
+            whitelist: [...CONFIG.ABBREW.traits.map(trait => ({
+                ...trait,
+                value: game.i18n.localize(trait.value)
+            }))],
+        };
+        if (traitFilter) {
+            var taggedTraitFilter = new Tagify(traitFilter, skillCheckSettings);
         }
     }
 
@@ -455,6 +520,29 @@ export class AbbrewSkillSheet extends ItemSheet {
                     return this.removeModifier(target);
             }
         }
+    }
+
+    _onDetectionModeControlAction(target, action) {
+        if (this.item.system.configurable) {
+            switch (action) {
+                case "add-detection-mode":
+                    return this.addDetectionMode(target);
+                case "remove-detection-mode":
+                    return this.removeDetectionMode(target);
+            }
+        }
+    }
+
+    addDetectionMode(target) {
+        const detectionModes = foundry.utils.deepClone(this.item.system.senses.detectionModes);
+        return this.item.update({ "system.senses.detectionModes": [...detectionModes, {}] });
+    }
+
+    removeDetectionMode(target) {
+        const id = target.closest("li").dataset.id;
+        const detectionModes = foundry.utils.deepClone(this.item.system.senses.detectionModes);
+        detectionModes.splice(Number(id), 1);
+        return this.item.update({ "system.senses.detectionModes": detectionModes });
     }
 
     addModifier(target) {

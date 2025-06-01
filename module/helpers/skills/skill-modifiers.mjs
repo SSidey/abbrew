@@ -207,17 +207,19 @@ export function mergeModifiers(modifiers, value) {
 
 export function mergeConceptCosts(allSkills, actor) {
     return allSkills.reduce((conceptCosts, skill) => {
-        Object.keys(CONFIG.ABBREW.concepts).forEach(key => {
-            const concept = skill.system.action.modifiers.concepts[key];
-            if (concept.value) {
-                const skillCost = parsePathSync(concept.value, actor, null, null);
-                if (key in conceptCosts) {
-                    conceptCosts[key] = applyOperator(conceptCosts[key], skillCost, concept.operator);
-                } else {
-                    conceptCosts[key] = applyOperator(0, skillCost, concept.operator);
+        if (skill.system.action.modifiers.concepts) {
+            Object.keys(CONFIG.ABBREW.concepts).forEach(key => {
+                const concept = skill.system.action.modifiers.concepts[key];
+                if (concept.value) {
+                    const skillCost = parsePathSync(concept.value, actor, null, null);
+                    if (key in conceptCosts) {
+                        conceptCosts[key] = applyOperator(conceptCosts[key], skillCost, concept.operator);
+                    } else {
+                        conceptCosts[key] = applyOperator(0, skillCost, concept.operator);
+                    }
                 }
-            }
-        })
+            })
+        }
 
         return conceptCosts;
     }, {})

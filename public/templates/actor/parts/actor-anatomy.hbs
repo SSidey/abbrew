@@ -30,6 +30,36 @@
       </div>
       <h4 class="item-label">{{item.name}}</h4>
     </div>
+    {{#gm}}
+    <div class="icon-label-3">
+      <label>
+        <input type="checkbox" class="anatomy-broken" name="system.isBroken" {{ checked item.system.isBroken }}>
+        {{#if item.system.isBroken}}
+        <span class="icon icon-anatomy-broken-c" />
+        {{else}}
+        <span class="icon icon-anatomy-broken-u" />
+        {{/if}}
+      </label>
+      <label>
+        <input type="checkbox" class="anatomy-severed" name="system.isDismembered" {{ checked item.system.isDismembered
+          }}>
+        {{#if item.system.isDismembered}}
+        <span class="icon icon-anatomy-severed-c" />
+        {{else}}
+        <span class="icon icon-anatomy-severed-u" />
+        {{/if}}
+      </label>
+      <label>
+        <input type="checkbox" class="anatomy-revealed" name="system.revealed.isRevealed" {{ checked
+          item.system.revealed.isRevealed }}>
+        {{#if item.system.revealed.isRevealed}}
+        <span class="icon icon-anatomy-revealed-c" />
+        {{else}}
+        <span class="icon icon-anatomy-revealed-u" />
+        {{/if}}
+      </label>
+    </div>
+    {{else}}
     <div class="icon-label-2">
       <label>
         <input type="checkbox" class="anatomy-broken" name="system.isBroken" {{ checked item.system.isBroken }}>
@@ -49,10 +79,16 @@
         {{/if}}
       </label>
     </div>
-    <div class={{#if showDeleteControl}}'item-controls'{{else}}'item-controls-1'{{/if}}>
+    {{/gm}}
+    <div class={{#if (or showDeleteControl (isGM))}}'item-controls'{{else}}'item-controls-1'{{/if}}>
       <a class='item-control item-edit' title='{{localize "DOCUMENT.Edit" type=' anatomy'}}'>
         <i class='fas fa-edit'></i>
       </a>
+      {{#gm}}
+      <a class='item-control item-study' title='{{localize "DOCUMENT.Study" type=' equipment'}}'>
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </a>
+      {{/gm}}
       {{#if showDeleteControl}}
       <a class='item-control item-delete' title='{{localize "DOCUMENT.Delete" type=' anatomy'}}'>
         <i class='fas fa-trash'></i>

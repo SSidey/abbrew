@@ -1,10 +1,10 @@
 import { getSafeJson } from "../helpers/utils.mjs";
 import AbbrewItemBase from "./item-base.mjs";
+import AbbrewRevealedItem from "./revealedItem.mjs";
 
 export default class AbbrewSkill extends AbbrewItemBase {
 
-    // TODO: Add Rank for path skills
-    // TODO: Need to enrich skil check results i.e. number of success / fail
+    // TODO: Add Rank for path skills    
     // TODO: Skill improvement item (just a skill that merges in? Would need more than skill schema e.g. increasing duration)
     static defineSchema() {
         const fields = foundry.data.fields;
@@ -15,6 +15,22 @@ export default class AbbrewSkill extends AbbrewItemBase {
 
         schema.skillModifiers = new fields.SchemaField({
             synergy: new fields.StringField({ ...blankString }),
+            synergyTraitFilter: new fields.SchemaField({
+                raw: new fields.StringField({ ...blankString }),
+                value: new fields.ArrayField(
+                    new fields.SchemaField({
+                        key: new fields.StringField({ ...blankString }),
+                        value: new fields.StringField({ ...blankString }),
+                        feature: new fields.StringField({ ...blankString }),
+                        subFeature: new fields.StringField({ ...blankString }),
+                        effect: new fields.StringField({ ...blankString }),
+                        data: new fields.StringField({ ...blankString }),
+                        exclude: new fields.ArrayField(
+                            new fields.StringField({ ...blankString })
+                        )
+                    })
+                )
+            }),
             discord: new fields.StringField({ ...blankString }),
             // Whether or not to apply a skil in synergies, if true then the appropriate grantedBy 
             // id(s) must be present in sources for it to be included
@@ -87,7 +103,23 @@ export default class AbbrewSkill extends AbbrewItemBase {
             // This should be null for base resources.
             relatedResource: new fields.StringField({ nullable: true, initial: null }),
             fillCapacityOnCreate: new fields.BooleanField({ required: true, initial: false })
-        })
+        });
+        schema.senses = new fields.SchemaField({
+            modifiesSenses: new fields.BooleanField({ required: true, initia: false }),
+            sight: new fields.SchemaField({
+                enabled: new fields.BooleanField({ required: true, initial: false }),
+                range: new fields.NumberField({ required: true, nullable: true, integer: true, initial: 0 }),
+                angle: new fields.NumberField({ required: true, integer: true, min: 0, max: 360, initial: 360 }),
+                visionMode: new fields.StringField({ required: true, initial: "basic" })
+            }),
+            detectionModes: new fields.ArrayField(
+                new fields.SchemaField({
+                    id: new fields.StringField({ required: true, blank: true }),
+                    range: new fields.NumberField({ required: true, nullable: true, integer: true }),
+                })
+            )
+        });
+        schema.light = new fields.EmbeddedDataField(foundry.data.LightData);
         schema.action = new fields.SchemaField({
             activationType: new fields.StringField({ ...blankString }),
             actionCost: new fields.StringField({ ...blankString, nullable: true }),
@@ -341,6 +373,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
         schema.siblingSkillModifiers = new fields.ArrayField(
             new fields.ObjectField({ nullable: false })
         );
+        AbbrewRevealedItem.addRevealedItemSchema(schema);
 
         return schema;
     }
@@ -385,6 +418,10 @@ export default class AbbrewSkill extends AbbrewItemBase {
         if (this.roles.raw) {
             this.roles.parsed = getSafeJson(this.roles.raw, []).map(r => r.label);
         }
+
+        if (this.revealed.revealSkills.raw) {
+            this.revealed.revealSkills.parsed = getSafeJson(this.revealed.revealSkills.raw, []).map(s => s.value);
+        }
     }
 
     // Post Active Effects
@@ -402,6 +439,10 @@ export default class AbbrewSkill extends AbbrewItemBase {
             const activeSkills = this.parent?.parent?.system?.activeSkills ?? [];
             const id = this.parent?._id ?? null;
             this.action.isActive = queuedSkills.includes(id) || activeSkills.includes(id);
+        }
+
+        if (this.skillModifiers.synergyTraitFilter.raw) {
+            this.skillModifiers.synergyTraitFilter.parsed = getSafeJson(this.skillModifiers.synergyTraitFilter.raw, []);
         }
     }
 

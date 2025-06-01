@@ -171,9 +171,13 @@ ol li.damage-reduction {
     grid-column: span 2;
   }
 
+  .icon-label-3 {
+    grid-column: span 3;
+  }
+
   .item-controls {
     display: grid;
-    grid-column: 9 / 11;
+    grid-column: 10 / 11;
     grid-template-columns: repeat(2, 1fr);
 
     a {
