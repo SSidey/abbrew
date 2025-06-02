@@ -18,10 +18,27 @@ export async function handleEarlySelfModifiers(actor, allSkills) {
         ...applyFullyParsedModifiers(riskSelfUpdate, actor, "system.defense.risk.raw"),
         ...applyFullyParsedModifiers(resolveSelfUpdate, actor, "system.defense.resolve.value"),
         ...applyFullyParsedComplexModifiers(mergedSelfWounds, actor, "system.wounds", "type"),
-        ...applyFullyParsedComplexModifiers(mergedSelfResources, actor, "system.resources.values", "id"),
         ...applyConceptCosts(mergedConceptCosts, actor)
     };
 
+    const resourceUpdate = applyFullyParsedComplexModifiers(mergedSelfResources, actor, "system.resources.values", "id");
+    if (resourceUpdate["system.resources.values"]?.length > 0) {
+        const actorResources = structuredClone(actor.system.resources.values);
+        actorResources.forEach(r => {
+            if (!resourceUpdate["system.resources.values"].some(u => u.id === r.id)) {
+                resourceUpdate["system.resources.values"].push(r);
+            }
+        });
+    }
+
+    updates = {
+        ...updates,
+        ...resourceUpdate
+    };
+
+    // TODO: Add restored on X to resources / a restore button or something.
+    // TODO: Just filter synergies if not enough resource to use? Remove resource cost check aside from for standalone part.
+    // At getModifierSkills, get all parsed resource costs per skill, iterate through the collection, removing from synergies if cost not met
     await actor.update(updates);
 
     return {

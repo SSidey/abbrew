@@ -672,7 +672,11 @@ export default class AbbrewActor extends Actor {
 
   async handleResourceFill(id, capacity) {
     const resourceValues = this.system.resources.values;
-    resourceValues.find(r => r.id === id).value += capacity;
+    if (resourceValues.some(r => r.id === id)) {
+      resourceValues.find(r => r.id === id).value += capacity;
+    } else {
+      resourceValues.push({ id: id, value: capacity });
+    }
     await this.update({ "system.resources.values": resourceValues });
   }
 }

@@ -419,7 +419,7 @@ export default class AbbrewItem extends Item {
         await handleSkillActivate(this.actor, this, false);
       }
       if (this.actor && this.system.resource.fillCapacityOnCreate) {
-        const id = this.system.resource.relatedResource ? JSON.parse(this.system.resource.relatedResource)[0].id : this._id;
+        const id = this.system.resource.relatedResource ? JSON.parse(this.system.resource.relatedResource)[0].id : this.system.abbrewId.uuid;
         const capacity = this.system.resource.capacity ?? 0;
         await this.actor.handleResourceFill(id, capacity);
       }

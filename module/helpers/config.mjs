@@ -555,6 +555,7 @@ const generalTraits = [
 
 const itemTraits = [
   { key: "armour", value: "ABBREW.Traits.Item.armour", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "weapon", value: "ABBREW.Traits.Item.weapon", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: [] },
   { key: "head", value: "ABBREW.Traits.Item.head", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: [] },
   { key: "torso", value: "ABBREW.Traits.Item.torso", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: [] },
   { key: "arm", value: "ABBREW.Traits.Item.arm", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: [] },

@@ -448,6 +448,7 @@
       },
       "Item": {
         "armour": "Armour",
+        "weapon": "Weapon",
         "head": "Head",
         "torso": "Torso",
         "arm": "Arm",
@@ -465,6 +466,10 @@
         "vial": "Vial",
         "consumable": "Consumable",
         "ammunition": "Ammunition"
+      },
+      "Skill": {
+        "poison": "Poison",
+        "disease": "Disease"
       },
       "stance": "Stance"
     },

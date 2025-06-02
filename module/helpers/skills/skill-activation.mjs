@@ -147,7 +147,28 @@ async function activateSkill(actor, skill, includeSkillTraits = []) {
     }
     const skillResult = await applySkillEffects(actor, skill, includeSkillTraits);
     await handleGrantOnUse(skill, actor);
+    await handleConsumables(skill, actor);
     return skillResult;
+}
+
+// TODO: Split stack option so they could dual wield consumables?
+async function handleConsumables(skill, actor) {
+    const grantingItem = skill.system.grantedBy.item;
+    if (grantingItem) {
+        const item = actor.items.find(i => i._id === grantingItem);
+        if (getSafeJson(item.system.traits.raw, []).some(t => t.key === "consumable")) {
+            if (item.system.quantity > 1) {
+                const update = { "system.quantity": item.system.quantity - 1 };
+                if (item.system.equipState.startsWith('held')) {
+                    const newState = item.system.storeIn ? "stowed" : "dropped";
+                    update["system.equipState"] = newState;
+                }
+                await item.update(update)
+            } else {
+                await item.delete();
+            }
+        }
+    }
 }
 
 async function activateSkillEffects(skill) {

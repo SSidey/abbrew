@@ -29,6 +29,7 @@ export async function makeSkillCheck(actor, skill, allSkills, fortune, templateD
         const resultDice = getResultDice(result);
         skillResult.dice = resultDice;
         skillResult.modifier = combinedSkillModifier;
+        skillResult.fortune = fortune;
         const baseDicePool = getDiceCount(tier, fortune);
         skillResult.baseDicePool = baseDicePool;
         skillResult.simpleResult = baseDicePool === 0 ? combinedSkillModifier : Math.max(...skillResult.dice.map(d => d.result).map(r => r + combinedSkillModifier));
@@ -60,7 +61,6 @@ export async function makeSkillCheckRequest(actor, skill, modifierSkills, skillR
                 skillResult = contestResult;
                 skillResult.isContested = true;
             }
-
         } else {
             requirements.isContested = false;
             if (skillRequest.checkType === "successes") {
@@ -94,18 +94,33 @@ export async function makeSkillCheckRequest(actor, skill, modifierSkills, skillR
     return [skillResult, templateData, data];
 }
 
+function mutateArrayForFortune(array, fortune) {
+    if (fortune === 0) {
+        return array;
+    }
+
+    return array.slice(0, -1 * fortune);
+}
+
 export async function acceptSkillCheck(actor, requirements) {
     const skill = getSkillById(actor, requirements.modifierIds);
     if (skill && skill.system.action.skillCheck) {
         const skillResult = await handleSkillActivate(actor, skill, false, requirements.traits.map(t => t.key));
         if (requirements.isContested) {
             if (requirements.checkType === "successes") {
-                const requiredValues = requirements.contestedResult.dice.slice(0, requirements.contestedResult.baseDicePool).map(d => d.result + requirements.contestedResult.modifier).sort((a, b) => b - a);
-                const resultValues = skillResult.dice.slice(0, skillResult.baseDicePool).map(d => d.result + requirements.contestedResult.modifier).sort((a, b) => b - a);
-                const dicePoolDiff = requirements.contestedResult.dice.length - skillResult.dice.length;
-                const diceToCheck = Math.min(requirements.contestedResult.baseDicePool, skillResult.baseDicePool);
-                let requiredSuccesses = 0;
-                let providedSuccesses = 0;
+                const baseRequiredValues = mutateArrayForFortune(requirements.contestedResult.dice/* .slice(0, requirements.contestedResult.baseDicePool) */, requirements.contestedResult.fortune);
+                const requiredNaturals = baseRequiredValues.filter(d => d.result === 10).length;
+                const requiredValues = baseRequiredValues.filter(d => d.result !== 10).map(d => d.result + requirements.contestedResult.modifier).sort((a, b) => b - a);
+                const baseResultValues = mutateArrayForFortune(skillResult.dice/* .slice(0, skillResult.baseDicePool) */, skillResult.fortune);
+                const resultNaturals = baseResultValues.filter(d => d.result === 10).length;
+                const resultValues = baseResultValues.filter(d => d.result !== 10).map(d => d.result + skillResult.modifier).sort((a, b) => b - a);
+                const dicePoolDiff = requiredValues.length - resultValues.length;
+                const diceToCheck = Math.min(requiredValues.length, resultValues.length);
+                let requiredSuccesses = requiredNaturals;
+                requiredSuccesses = getCritSuccesses(requirements.contestedResult.dice);
+                let providedSuccesses = resultNaturals;
+                providedSuccesses = getCritSuccesses(skillResult.dice);
+
                 if (dicePoolDiff > 0) {
                     requiredSuccesses += dicePoolDiff;
                 } else if (dicePoolDiff < 0) {
@@ -128,20 +143,17 @@ export async function acceptSkillCheck(actor, requirements) {
             }
         } else {
             if (requirements.checkType === "successes") {
-                const diceResults = skillResult.dice.map(d => d.result + skillResult.modifier).reduce((result, value) => {
+                const filteredSkillResult = mutateArrayForFortune(skillResult.dice, skillResult.fortune);
+                const filteredNaturals = filteredSkillResult.filter(d => d.result === 10).length;
+                const diceResults = filteredSkillResult.filter(d => d.result !== 10).map(d => d.result + skillResult.modifier).reduce((result, value) => {
                     if (value >= requirements.successes.requiredValue) {
                         result += 1;
                     }
 
+                    result += filteredNaturals;
                     return result;
                 }, 0);
-                const critSuccesses = skillResult.dice.reduce((result, die) => {
-                    if (die.result === 10) {
-                        result += 1;
-                    }
-
-                    return result;
-                }, 0);
+                const critSuccesses = getCritSuccesses(skillResult.dice);
                 const totalSuccesses = diceResults + critSuccesses;
                 return ({ actor: actor, result: totalSuccesses >= requirements.successes.total, totalSuccesses: totalSuccesses, requiredSuccesses: requirements.successes.total, skillResult: skillResult });
             } else if (requirements.checkType === "result") {
@@ -151,6 +163,16 @@ export async function acceptSkillCheck(actor, requirements) {
             }
         }
     }
+}
+
+function getCritSuccesses(dice) {
+    return dice.reduce((result, die) => {
+        if (die.result === 10) {
+            result += 1;
+        }
+
+        return result;
+    }, 0);
 }
 
 function getSkillById(actor, skillIds) {

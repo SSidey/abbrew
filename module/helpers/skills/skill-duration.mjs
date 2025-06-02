@@ -2,7 +2,26 @@
 
 export async function trackSkillDuration(actor, skill) {
     const duration = getSkillDuration(skill);
-    if (duration && (!(skill.system.action.activationType === "standalone" && skill.system.action.duration.precision === "0") || (skill.system.skillType === "temporary"))) {
+    if (skill.system.action.activationType === "standalone") {
+        return await trackStandaloneSkillDuration(actor, skill, duration);
+    } else if (skill.system.action.activationType === "synergy") {
+        return await trackSynergySkillDuration(actor, skill, duration);
+    }
+
+    return false;
+}
+
+async function trackStandaloneSkillDuration(actor, skill, duration) {
+    if (duration && !(skill.system.action.duration.precision === "0")) {
+        await createDurationActiveEffect(actor, skill, duration);
+        return true;
+    }
+
+    return false;
+}
+
+async function trackSynergySkillDuration(actor, skill, duration) {
+    if (duration) {
         await createDurationActiveEffect(actor, skill, duration);
         return true;
     }
