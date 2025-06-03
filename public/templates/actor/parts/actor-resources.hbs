@@ -3,7 +3,7 @@
     <ol class="resource-list">
         {{#each resources as |resource id|}}
         <li class="resource">
-            <span class="resource-name">{{resource.name}} </span>
+            <span class="resource-name rollable" data-roll-type="resource" data-id="{{resource.id}}">{{resource.name}} </span>
             <input type="text" value="{{resource.value}}" data-dtype="string" readonly />
             <span class="resource-divider">/</span>
             <input type="text" value="{{resource.max}}" data-dtype="string" readonly />
