@@ -1,0 +1,78 @@
+<form class="{{cssClass}}" autocomplete="off">
+  {{> "systems/abbrew/templates/item/parts/item-physical-header.hbs"}}
+
+  {{!-- Sheet Tab Navigation --}}
+  <nav class="sheet-tabs tabs" data-group="primary">
+    <a class="item" data-tab="description">Description</a>
+    <a class="item" data-tab="attributes">Attributes</a>
+    <a class="item" data-tab="skills">Skills</a>
+    <a class="item" data-tab="storage">Storage</a>
+  </nav>
+
+  {{!-- Sheet Body --}}
+  <section class="sheet-body">
+
+    {{!-- Description Tab --}}
+    <div class="tab" data-group="primary" data-tab="description">
+      {{!-- To render inline rolls in a TinyMCE editor, you need to pass the parent actor's (if any) roll data to the
+      rollData prop. --}}
+      {{> "systems/abbrew/templates/item/parts/item-traits.hbs"}}
+      <h3>Description</h3>
+      {{editor enrichedDescription target="system.description" engine="prosemirror" rollData=rollData button=true
+      owner=owner
+      editable=editable}}
+    </div>
+
+    {{!-- Attributes Tab --}}
+    <div class="tab attributes" data-group="primary" data-tab="attributes">
+      {{> "systems/abbrew/templates/item/parts/item-defenses.hbs" showEquipType=true}}
+    </div>
+
+    {{!-- Skills Tab --}}
+    <div class="tab skills" data-group="primary" data-tab="skills">
+      <h3>Enhancements</h3>
+      <ol class="skill-deck-skills">
+        {{#each system.enhancements as |enhancement id|}}
+        <li class="skill-deck-skill" data-id="{{id}}" data-item-id="{{enhancement.id}}"
+          data-source-id="{{enhancement.sourceId}}">
+          <div class="skill-deck-summary">
+            <div class="image-container"><img src="{{enhancement.image}}" /></div>
+            <div class="name"><span>{{enhancement.name}}</span></div>
+            <a class='item-control enhancement-delete' title='{{localize "DOCUMENT.Delete" type=' enhancement'}}'>
+              <i class='fas fa-trash'></i>
+            </a>
+          </div>
+        </li>
+        {{/each}}
+        {{#if (gt system.availableEnhancements 0)}}
+        <li class="empty-drop-list-element">
+          <span>+ Enhancement</span>
+        </li>
+        {{/if}}
+      </ol>
+      <h3>Skills</h3>
+      <ol class="skill-deck-skills">
+        {{#each system.skills.granted as |skill id|}}
+        <li class="skill-deck-skill" data-id="{{id}}" data-item-id="{{skill.id}}" data-source-id="{{skill.sourceId}}">
+          <div class="skill-deck-summary">
+            <div class="image-container"><img src="{{skill.image}}" /></div>
+            <div class="name"><span>{{skill.name}}</span></div>
+            <a class='item-control skill-delete' title='{{localize "DOCUMENT.Delete" type=' skill'}}'>
+              <i class='fas fa-trash'></i>
+            </a>
+          </div>
+        </li>
+        {{/each}}
+        <li class="empty-drop-list-element">
+          <span>+ Skill</span>
+        </li>
+      </ol>
+    </div>
+
+
+    {{!-- Storage Tab --}}
+    <div class="tab skills" data-group="primary" data-tab="storage">
+      {{> "systems/abbrew/templates/item/parts/item-storage.hbs"}}
+    </div>
+  </section>
+</form>

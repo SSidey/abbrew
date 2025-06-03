@@ -17,15 +17,36 @@
 
     {{!-- Description Tab --}}
     <div class="tab" data-group="primary" data-tab="description">
-      {{!-- To render inline rolls in a TinyMCE editor, you need to pass the parent actor's (if any) roll data to the
+      {{!-- To render inline rolls in a TinyMCE editor, you need to pass the parent actor's (if any) roll data to
+      the
       rollData prop. --}}
-      {{editor system.description target="system.description" rollData=rollData button=true owner=owner
+      {{editor enrichedDescription target="system.description" engine="prosemirror" rollData=rollData button=true
+      owner=owner
       editable=editable}}
     </div>
 
     {{!-- Attributes Tab --}}
-    <div class="tab attributes" data-group="primary" data-tab="attributes">
-      <pre>{{{json system}}}</pre>
+    <div class="anatomy-attribute-tab" data-group="primary" data-tab="attributes">
+      <div>
+        <h3>Anatomy</h3>
+        <ol class="creature-form-anatomy-list">
+          {{#each system.anatomy as |anatomy id|}}
+          <li class="creature-form-anatomy" data-id="{{id}}" data-item-id="{{anatomy.id}}"
+            data-source-id="{{anatomy.sourceId}}">
+            <div class="anatomy-summary">
+              <div class="image-container"><img src="{{anatomy.image}}" /></div>
+              <div class="name"><span>{{anatomy.name}}</span></div>
+              <a class='item-control anatomy-delete' title='{{localize "DOCUMENT.Delete" type=' anatomy'}}'>
+                <i class='fas fa-trash'></i>
+              </a>
+            </div>
+          </li>
+          {{/each}}
+          <li class="empty-drop-list-element">
+            <span>+ Anatomy</span>
+          </li>
+        </ol>
+      </div>
     </div>
   </section>
 </form>

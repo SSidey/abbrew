@@ -1,0 +1,267 @@
+{
+  "name": "Fang Combo (Final)",
+  "type": "skill",
+  "system": {
+    "skillType": "path",
+    "description": "<p>Make two melee attacks with different weapons, the damage is combined before applying the target's defenses.</p>",
+    "traits": "",
+    "abbrewId": {
+      "value": "abbrew.skill.newskill.SceVpSwowzfuIuCA",
+      "uuid": "SceVpSwowzfuIuCA"
+    },
+    "skillTraits": "",
+    "skillModifiers": {
+      "synergy": "[{\"id\":\"abbrewAttack0000\",\"value\":\"Attack\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewAttack0000\"}]",
+      "discord": ""
+    },
+    "configurable": true,
+    "isActivatable": true,
+    "skills": {
+      "granted": [],
+      "paired": [],
+      "grantedOnActivation": [],
+      "grantedOnAccept": []
+    },
+    "action": {
+      "activationType": "synergy",
+      "actionCost": null,
+      "actionImage": "",
+      "duration": {
+        "precision": "0",
+        "value": 0,
+        "isConcentration": false,
+        "expireOnStartOfTurn": true
+      },
+      "uses": {
+        "hasUses": false,
+        "value": 0,
+        "max": 0,
+        "period": "",
+        "asStacks": false,
+        "removeStackOnUse": true,
+        "stackRemovalActivation": false,
+        "removeWhenNoUsesRemain": false
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "attackProfile": {
+        "name": "",
+        "attackType": "arc",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": 1,
+        "attackMode": "overpower",
+        "damage": [],
+        "finisherLimit": 10,
+        "isEnabled": false,
+        "finisher": {
+          "type": "",
+          "cost": null,
+          "description": "",
+          "wounds": []
+        }
+      },
+      "modifiers": {
+        "fortune": 0,
+        "actionCost": {
+          "value": 0,
+          "operator": ""
+        },
+        "attackProfile": {
+          "combineAttacks": {
+            "isEnabled": true,
+            "value": 2
+          },
+          "attackType": "",
+          "attackMode": "overpower",
+          "handsSupplied": 0,
+          "finisherLimit": {
+            "value": 10,
+            "operator": ""
+          },
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "damage": [],
+          "penetration": {
+            "value": 10,
+            "operator": ""
+          },
+          "finisher": {
+            "type": "",
+            "cost": null,
+            "description": "",
+            "wounds": []
+          }
+        },
+        "guard": {
+          "self": {
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": false,
+                "multiplier": 1
+              }
+            ],
+            "operator": ""
+          },
+          "target": {
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": true,
+                "multiplier": 1
+              }
+            ],
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": false,
+                "multiplier": 1
+              }
+            ],
+            "operator": ""
+          },
+          "target": {
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": true,
+                "multiplier": 1
+              }
+            ],
+            "operator": "",
+            "lateParse": false
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": false,
+                "multiplier": 1
+              }
+            ],
+            "operator": ""
+          },
+          "target": {
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": true,
+                "multiplier": 1
+              }
+            ],
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": []
+        }
+      },
+      "skillCheck": [],
+      "skillRequest": {
+        "isEnabled": false,
+        "isContested": false,
+        "selfCheck": false,
+        "checkType": "",
+        "requirements": {
+          "modifiers": "",
+          "successes": 0,
+          "result": 0
+        },
+        "targetModifiers": "",
+        "results": {
+          "success": {
+            "description": ""
+          },
+          "failure": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "path": {
+      "value": {
+        "id": ""
+      },
+      "raw": "[{\"label\":\"snake\",\"value\":\"Snake\",\"roles\":[\"martial\",\"melee\",\"ranges\",\"scoundrel\"],\"title\":\"A style employing the use of two short weapons and relies on rapid speed and dodges.\",\"id\":\"abbrewpsnake0000\"}]"
+    },
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": "",
+    "activateOnCreate": false,
+    "applyTurnStart": false,
+    "applyTurnEnd": false,
+    "applyOnExpiry": false,
+    "activateOnDamageAccept": false,
+    "resource": {
+      "capacity": 0,
+      "operator": "",
+      "relatedResource": null,
+      "fillCapacityOnCreate": false
+    },
+    "roles": {
+      "raw": "",
+      "parsed": []
+    },
+    "archetype": "",
+    "isProxied": false,
+    "siblingSkillModifiers": []
+  },
+  "img": "icons/svg/item-bag.svg",
+  "effects": [],
+  "folder": "Iqptljfwm4CqRqKr",
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746274001448,
+    "modifiedTime": 1746300954828,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_id": "BTmjXbVNzVlhRzVl",
+  "sort": 200000,
+  "_key": "!items!BTmjXbVNzVlhRzVl"
+}

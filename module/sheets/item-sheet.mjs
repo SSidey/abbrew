@@ -39,7 +39,7 @@ export class AbbrewItemSheet extends ItemSheet {
   /* -------------------------------------------- */
 
   /** @override */
-  getData() {
+  async getData() {
     // Retrieve base data structure.
     const context = super.getData();
 
@@ -53,6 +53,22 @@ export class AbbrewItemSheet extends ItemSheet {
     context.system = itemData.system;
     context.actions = this.prepareActions(itemData.system);
     context.flags = itemData.flags;
+
+    // Enrich description info for display
+    // Enrichment turns text like `[[/r 1d20]]` into buttons
+    context.enrichedDescription = await TextEditor.enrichHTML(
+      this.item.system.description,
+      {
+        // Whether to show secret blocks in the finished html
+        secrets: this.document.isOwner,
+        // Necessary in v11, can be removed in v12
+        async: true,
+        // Data to fill in for inline rolls
+        rollData: this.item.getRollData(),
+        // Relative UUID resolution
+        relativeTo: this.item,
+      }
+    );
 
     // Prepare active effects for easier access
     context.effects = prepareActiveEffectCategories(this.item.effects);
@@ -93,31 +109,8 @@ export class AbbrewItemSheet extends ItemSheet {
       if (t.dataset.action) this._onAttackProfileAction(t, t.dataset.action);
     });
 
-    html.find(".skill-action-control").click(event => {
-      const t = event.currentTarget;
-      if (t.dataset.action) this._onSkillActionAction(t, t.dataset.action);
-    });
-
-    html.find(".skill-action-resource-control").click(event => {
-      const t = event.currentTarget;
-      if (t.dataset.action) this._onSkillActionResourceRequirementAction(t, t.dataset.action);
-    });
-
-    html.find(".skill-action-modifier-wound-control").click(event => {
-      const t = event.currentTarget;
-      if (t.dataset.action) this._onSkillActionModifierWoundAction(t, t.dataset.action);
-    });
-
-    html.find(".skill-action-modifier-damage-control").click(event => {
-      const t = event.currentTarget;
-      if (t.dataset.action) this._onSkillActionModifierDamageAction(t, t.dataset.action);
-    });
-
-    html.find(".skill-configuration-section :input").prop("disabled", !this.item.system.configurable);
-
-    this._activateArmourPoints(html);
+    this._activateEquipPoints(html);
     this._activateAnatomyParts(html);
-    this._activateSkillFlags(html);
   }
 
   prepareActions(system) {
@@ -126,9 +119,9 @@ export class AbbrewItemSheet extends ItemSheet {
     return actions;
   }
 
-  _activateArmourPoints(html) {
-    const armourPoints = html[0].querySelector('input[name="system.armourPoints"]');
-    const armourPointsSettings = {
+  _activateEquipPoints(html) {
+    const equipPoints = html[0].querySelector('input[name="system.equipPoints.required.raw"]');
+    const equipPointsSettings = {
       dropdown: {
         maxItems: 20,               // <- mixumum allowed rendered suggestions
         classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
@@ -138,10 +131,10 @@ export class AbbrewItemSheet extends ItemSheet {
       },
       userInput: false,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
       duplicates: true,             // <- Should duplicate tags be allowed or not
-      whitelist: [...Object.values(CONFIG.ABBREW.armourPoints.points).map(key => game.i18n.localize(key))]
+      whitelist: [...Object.values(CONFIG.ABBREW.equipPoints.points).map(key => game.i18n.localize(key))]
     };
-    if (armourPoints) {
-      var taggedArmourPoints = new Tagify(armourPoints, armourPointsSettings);
+    if (equipPoints) {
+      var taggedEquipPoints = new Tagify(equipPoints, equipPointsSettings);
     }
   }
 
@@ -157,29 +150,10 @@ export class AbbrewItemSheet extends ItemSheet {
       },
       userInput: false,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
       duplicates: true,             // <- Should duplicate tags be allowed or not
-      whitelist: [...Object.values(CONFIG.ABBREW.armourPoints.points).map(key => game.i18n.localize(key))]
+      whitelist: [...Object.values(CONFIG.ABBREW.equipPoints.points).map(key => game.i18n.localize(key))]
     };
     if (anatomyParts) {
       var taggedAnatomyParts = new Tagify(anatomyParts, anatomyPartsSettings);
-    }
-  }
-
-  _activateSkillFlags(html) {
-    const skillFlags = html[0].querySelector('input[name="system.skillFlags"]');
-    const skillFlagSettings = {
-      dropdown: {
-        maxItems: 20,               // <- mixumum allowed rendered suggestions
-        classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
-        enabled: 0,                 // <- show suggestions on focus
-        closeOnSelect: false,       // <- do not hide the suggestions dropdown once an item has been selected
-        includeSelectedTags: true   // <- Should the suggestions list Include already-selected tags (after filtering)
-      },
-      userInput: false,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
-      duplicates: true,             // <- Should duplicate tags be allowed or not
-      whitelist: [...Object.values(CONFIG.ABBREW.skillFlags).map(key => game.i18n.localize(key))]
-    };
-    if (skillFlags) {
-      var taggedSkillFlags = new Tagify(skillFlags, skillFlagSettings);
     }
   }
 
@@ -265,70 +239,6 @@ export class AbbrewItemSheet extends ItemSheet {
           break;
       }
     }
-  }
-
-  /**
-    * Handle one of the add or remove wound reduction buttons.
-    * @param {Element} target  Button or context menu entry that triggered this action.
-    * @param {string} action   Action being triggered.
-    * @returns {Promise|void}
-    */
-  _onSkillActionModifierWoundAction(target, action) {
-    if (this.item.system.configurable) {
-      switch (action) {
-        case 'add-skill-action-modifier-wound':
-          return this.addSkillActionModifierWound(target);
-        case 'remove-skill-action-modifier-wound':
-          return this.removeSkillActionModifierWound(target);
-      }
-    }
-  }
-
-  addSkillActionModifierWound(target) {
-    let action = foundry.utils.deepClone(this.item.system.action);
-    action.modifiers.wounds.self = [...action.modifiers.wounds.self, {}];
-    return this.item.update({ "system.action": action });
-
-  }
-
-  removeSkillActionModifierWound(target) {
-    const id = target.closest("li").dataset.id;
-    const action = foundry.utils.deepClone(this.item.system.action);
-    action.modifiers.wounds.self.splice(Number(id), 1);
-    return this.item.update({ "system.action": action });
-  }
-
-  /**
-    * Handle one of the add or remove damage reduction buttons.
-    * @param {Element} target  Button or context menu entry that triggered this action.
-    * @param {string} action   Action being triggered.
-    * @returns {Promise|void}
-    */
-  _onSkillActionModifierDamageAction(target, action) {
-    if (this.item.system.configurable) {
-      switch (action) {
-        case 'add-skill-action-modifier-damage':
-          return this.addSkillActionModifierDamage(target);
-        case 'remove-skill-action-modifier-damage':
-          return this.removeSkillActionModifierDamage(target);
-      }
-    }
-  }
-
-  addSkillActionModifierDamage(target) {
-    const actionId = target.closest(".action").dataset.id;
-    let actions = foundry.utils.deepClone(this.item.system.actions);
-    actions[actionId].modifiers.damage = [...actions[actionId].modifiers.damage, {}];
-    return this.item.update({ "system.actions": actions });
-
-  }
-
-  removeSkillActionModifierDamage(target) {
-    const id = target.closest("li").dataset.id;
-    const actionId = target.closest(".action").dataset.id;
-    const actions = foundry.utils.deepClone(this.item.system.actions);
-    actions[actionId].modifiers.damage.splice(Number(id), 1);
-    return this.item.update({ "system.actions": actions });
   }
 
   addSkillActionResourceRequirement(target) {

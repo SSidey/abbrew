@@ -1,4 +1,10 @@
 import { mergeActorWounds } from "../helpers/combat.mjs";
+import { applyFullyParsedModifiers, mergeModifierFields, reduceParsedModifiers } from "../helpers/modifierBuilderFieldHelpers.mjs";
+import { handleSkillActivate, isSkillBlocked } from "../helpers/skills/skill-activation.mjs";
+import { applySkillEffects } from "../helpers/skills/skill-application.mjs";
+import { handleGrantedSkills, handleSkillsGrantedOnAccept } from "../helpers/skills/skill-grants.mjs";
+import { getAttackerAdvantageGuardResult, getAttackerAdvantageRiskResult, getDefenderAdvantageGuardResult, getDefenderAdvantageRiskResult } from "../helpers/trainedSkills.mjs";
+import { compareModifierIndices, doesNestedFieldExist, getObjectValueByStringPath } from "../helpers/utils.mjs";
 import { FINISHERS } from "../static/finishers.mjs";
 
 /**
@@ -12,15 +18,14 @@ export default class AbbrewActor extends Actor {
     // the following, in order: data reset (to clear active effects),
     // prepareBaseData(), prepareEmbeddedDocuments() (including active effects),
     // prepareDerivedData().
-    console.log('documentPrepareData');
     super.prepareData();
   }
 
   /** @override */
   prepareBaseData() {
-    console.log('documentPrepareBaseData');
     // Data modifications in this step occur before processing embedded
     // documents or derived data.
+    super.prepareBaseData();
   }
 
   /**
@@ -31,9 +36,108 @@ export default class AbbrewActor extends Actor {
    * is queried and has a roll executed directly from it).
    */
   prepareDerivedData() {
-    console.log('documentPrepareDerivedData');
+    super.prepareDerivedData();
     const actorData = this;
     const flags = actorData.flags.abbrew || {};
+  }
+
+  async _preCreate(data, options, user) {
+    if ((await super._preCreate(data, options, user)) === false) return false;
+
+    const prototypeToken = {};
+    if (this.type === "character") {
+      Object.assign(prototypeToken, {
+        sight: { enabled: true }, actorLink: true, disposition: CONST.TOKEN_DISPOSITIONS.FRIENDLY, detectionModes: []
+      });
+    } else {
+      Object.assign(prototypeToken, {
+        sight: { enabled: true }, actorLink: false, disposition: CONST.TOKEN_DISPOSITIONS.HOSTILE, detectionModes: []
+      });
+    }
+    this.updateSource({ prototypeToken });
+  }
+
+  async _preUpdate(changed, options, userId) {
+    if (doesNestedFieldExist(changed, "system.meta.size")) {
+      if (!isNaN(changed.system.meta.size)) {
+        const changeSize = parseFloat(changed.system.meta.size);
+        const dimension = Object.values(CONFIG.ABBREW.size).find(s => s.value === changeSize).dimension;
+        const update = { "height": dimension, "width": dimension };
+        if (this.token) {
+          await this.token?.update(update);
+        } else {
+          const tokenDocuments = game.canvas.tokens.placeables.filter(e => e.document.actorId === this._id);
+          const tokenPromises = tokenDocuments.map(t => t.document.update(update));
+          await Promise.all(tokenPromises);
+          await this.prototypeToken.update(update);
+        }
+      }
+    }
+
+    if (doesNestedFieldExist(changed, "system.senses")) {
+      const actorSenses = changed.system.senses;
+      if (this.type === "character") {
+        actorSenses.sight.enabled = true;
+      }
+      const sight = foundry.utils.mergeObject(this.prototypeToken.sight, actorSenses.sight, { overwrite: true });
+      const detectionModes = actorSenses.detectionModes;
+      const update = { "sight": sight, "detectionModes": detectionModes };
+
+      if (this.token) {
+        await this.token.update(update);
+      }
+
+      if (this.prototypeToken) {
+        await this.prototypeToken.update(update);
+      }
+
+      const tokenDocuments = game.canvas.tokens.placeables.filter(e => e.document.actorId === this._id);
+      const tokenPromises = tokenDocuments.map(t => t.document.update(update));
+      await Promise.all(tokenPromises);
+    }
+  }
+
+  async _onUpdate(changed, options, user) {
+    if (doesNestedFieldExist(changed, "system.activeSkills")) {
+      await this.handleLight();
+    }
+
+    return super._onUpdate(changed, options, user);
+  }
+
+  /**
+   * @override
+   **/
+  applyActiveEffects() {
+    const overrides = {};
+    this.statuses.clear();
+
+    // Organize non-disabled effects by their application priority
+    const changes = [];
+    this.allApplicableEffects().forEach(effect => {
+      if (effect.active) {
+        changes.push(...effect.changes.map((change, index) => {
+          const c = foundry.utils.deepClone(change);
+          c.effect = effect;
+          c.priority = c.priority ?? (c.mode * 10);
+          c.index = index;
+          return c;
+        }));
+        for (const statusId of effect.statuses) this.statuses.add(statusId);
+      }
+    });
+    changes.sort((a, b) => a.priority - b.priority);
+
+    // Apply all changes
+    changes.forEach(change => {
+      if (change.key) {
+        const changes = change.effect.apply(this, change);
+        Object.assign(overrides, changes);
+      }
+    });
+
+    // Expand the set of final overrides
+    this.overrides = foundry.utils.expandObject(overrides);
   }
 
   /**
@@ -48,57 +152,226 @@ export default class AbbrewActor extends Actor {
     return { ...super.getRollData(), ...this.system.getRollData?.() ?? null };
   }
 
-  async takeDamage(rolls, data, action) {
+  getEffectBySkillId(skillId) {
+    return this.effects.find(e => e.flags?.abbrew?.skill?.trackDuration === skillId);
+  }
+
+  async handleLight() {
+    const lightSkill = this.items.find(
+      i => i.type === "skill" &&
+        (i.system.light.dim > 0 || i.system.light.bright > 0) &&
+        (!i.system.isActivatable || (i.system.isActivatable && i.system.action.isActive && this.system.activeSkills.includes(i._id)))
+    );
+
+    const update = lightSkill ? { "light": lightSkill.system.light } : { "light.bright": 0, "light.dim": 0 };
+
+    if (this.token) {
+      await this.token.update(update);
+    }
+
+    if (this.prototypeToken) {
+      await this.prototypeToken.update(update);
+    }
+
+    const tokenDocuments = game.canvas.tokens.placeables.filter(e => e.document.actorId === this._id);
+    const tokenPromises = tokenDocuments.map(t => t.document.update(update));
+    await Promise.all(tokenPromises);
+  }
+
+  async takeActionUpdates(data) {
+    if (!data.targetUpdates) {
+      return;
+    }
+
+    let updates = {};
+
+    data.targetUpdates.forEach(update => {
+      const parsedUpdates = update.update;
+      const lateModifiers = update.lateModifiers;
+      const [lateUpdates,] = mergeModifierFields(lateModifiers, this);
+      const fullUpdates = [...parsedUpdates, ...lateUpdates].sort(compareModifierIndices);
+      const updateValue = applyFullyParsedModifiers(fullUpdates, this, update.path);
+
+      updates = { ...updates, ...updateValue };
+    });
+
+    await this.update(updates);
+    return updates;
+  }
+
+  async takeActionWounds(data) {
+    if (!data.targetWounds || data.targetWounds.length === 0) {
+      return;
+    }
+
+    const path = "system.wounds";
+    let updates = {};
+    let updateValues = [];
+
+    data.targetWounds.forEach(w => {
+      const parsedUpdates = w.update;
+      const lateModifiers = w.lateModifiers;
+      const [lateUpdates,] = mergeModifierFields(lateModifiers, this);
+      const fullUpdates = [...parsedUpdates, ...lateUpdates].sort(compareModifierIndices);
+      const updateValue = applyFullyParsedModifiers(fullUpdates, this, path, "type", w.type);
+
+      updateValues = [...updateValues, updateValue[path]];
+    });
+
+    const fieldValue = getObjectValueByStringPath(this, path);
+
+    let fullValue = [...updateValues, ...fieldValue].reduce((result, wound) => {
+      if (!result.find(r => r.type === wound.type) && wound.value > 0) {
+        result.push(wound);
+      }
+
+      return result;
+    }, []);
+
+    updates[path] = fullValue;
+    await this.update(updates);
+    return updates;
+  }
+
+  async takeActionResources(data) {
+    if (!data.targetResources || data.targetResources.length === 0) {
+      return;
+    }
+
+    const path = "system.resources.values";
+    let updates = {};
+    let updateValues = [];
+
+    data.targetResources.forEach(r => {
+      const parsedUpdates = r.update;
+      const lateModifiers = r.lateModifiers;
+      const [lateUpdates,] = mergeModifierFields(lateModifiers, this);
+      const fullUpdates = [...parsedUpdates, ...lateUpdates].sort(compareModifierIndices);
+      const updateValue = applyFullyParsedModifiers(fullUpdates, this, path, "id", r.type);
+
+      updateValues = [...updateValues, updateValue[path]];
+    });
+
+    const fieldValue = getObjectValueByStringPath(this, path);
+
+    let fullValue = [...updateValues, ...fieldValue].reduce((result, resource) => {
+      if (!result.find(r => r.id === resource.id)) {
+        result.push(resource);
+      }
+
+      return result;
+    }, []);
+
+    updates[path] = fullValue;
+    await this.update(updates);
+    return updates;
+  }
+
+  async takeDamage(data, action) {
     Hooks.call('actorTakesDamage', this);
     let guard = this.system.defense.guard.value;
     let risk = this.system.defense.risk.raw;
     const inflexibility = this.system.defense.inflexibility.raw;
 
+    const attackingActorParryCounter = data.attackerSkillTraining.find(st => st.type === "parryCounter")?.value ?? 0;
+    const attackingActorFeint = data.attackerSkillTraining.find(st => st.type === "feint")?.value ?? 0;
+
     //TODO: Tidy this up
-    let damage = this.applyModifiersToDamage(rolls, data, action);
-    const updateRisk = this.calculateRisk(damage, guard, risk, inflexibility, data.isFeint, data.isStrongAttack, action);
+    await this.setFlag("abbrew", "combat.damage.lastReceived", data.damage);
+    await this.setFlag("abbrew", "combat.damage.roundReceived", this.mergeDamageTakenForRound(data.damage));
+    let damage = this.applyModifiersToDamage(data);
+    const updateRisk = this.calculateRisk(damage, guard, risk, inflexibility, data.isFeint, data.isStrongAttack, action, attackingActorParryCounter, attackingActorFeint);
     let overFlow = updateRisk > 100 ? updateRisk - 100 : 0;
 
-    const updates = { "system.defense.guard.value": await this.calculateGuard(damage + overFlow, guard, data.isFeint, data.isStrongAttack, action), "system.defense.risk.raw": updateRisk};
+
+    const updates = { "system.defense.guard.value": await this.calculateGuard(damage + overFlow, guard, data.isFeint, data.isStrongAttack, action, attackingActorParryCounter, attackingActorFeint), "system.defense.risk.raw": updateRisk };
     await this.update(updates);
     await this.renderAttackResultCard(data, action);
+    await this.activateDamageTakenSkill();
     return this;
   }
 
-  async takeFinisher(rolls, data) {
+  async activateDamageTakenSkill(damage) {
+    this.items.filter(i => i.type === "skill").filter(s => s.system.activateOnDamageAccept).forEach(async s => {
+      await handleSkillActivate(this, s, false);
+    })
+  }
+
+  async takeEffect(data) {
+    await this.takeActionUpdates(data);
+    await this.takeActionWounds(data);
+    await this.takeActionResources(data);
+
+    await handleSkillsGrantedOnAccept(data, this);
+  }
+
+  async takeAttack(data, action) {
+    await this.takeEffect(data);
+    await this.takeDamage(data, action);
+  }
+
+  async takeFinisher(rolls, data, finisherType) {
     if (data.totalSuccesses < 1 && !this.statuses.has('offGuard')) {
       await this.sendFinisherToChat();
       return;
     }
 
+    await this.takeEffect(data);
+    await this.takeDamage(data, "finisher");
+
     const risk = this.system.defense.risk.raw;
-    const totalRisk = this.applyModifiersToRisk(rolls, data);
-    const availableFinishers = this.getAvailableFinishersForDamageType(data);
-    const finisherCost = this.getFinisherCost(availableFinishers, totalRisk, data.attackProfile);
-    const finisher = this.getFinisher(availableFinishers, finisherCost);
+    const totalRisk = this.applyModifiersToRisk(rolls, data, finisherType);
+    let finisherCost = 0;
+    let finisher = null;
+    const uniqueFinisher = data.finisher ? Object.values(data.finisher)[0] : null;
+    if (uniqueFinisher?.type && uniqueFinisher?.text) {
+      const finisherConstruct = data.finisher;
+      const availableFinishers = Object.entries(finisherConstruct).filter(e => e[1].type === finisherType).reduce((result, e) => { result[e[0]] = e[1]; return result }, {});
+      finisherCost = this.getFinisherCost(availableFinishers, totalRisk, data.attackProfile);
+      finisher = this.getFinisher(availableFinishers, finisherCost);
+    } else {
+      const availableFinishers = this.getAvailableFinishersForDamageType(finisherType);
+      finisherCost = this.getFinisherCost(availableFinishers, totalRisk, data.attackProfile);
+      finisher = this.getFinisher(availableFinishers, finisherCost);
+    }
     await this.sendFinisherToChat(finisher, finisherCost);
     if (finisher) {
       return await this.applyFinisher(risk, finisher, finisherCost);
     }
   }
 
-  applyModifiersToRisk(rolls, data) {
+  mergeDamageTakenForRound(damage) {
+    const lastRoundReceived = this.flags.abbrew.combat.damage.lastRoundReceived ?? [];
+    const totalRoundReceivedDamage = Object.entries([...lastRoundReceived, ...damage].reduce((result, damage) => {
+      if (damage.damageType in result) {
+        result[damage.damageType] += damage.value;
+      } else {
+        result[damage.damageType] = damage.value;
+      }
+
+      return result;
+    }, {})).map(e => ({ damageType: e[0], value: e[1] }));
+
+    return totalRoundReceivedDamage;
+  }
+
+  applyModifiersToRisk(rolls, data, finisherType) {
     let successes = 0;
+    if (this.system.defense.protection[finisherType].immunity > 0) {
+      return successes;
+    }
+
     successes += data.totalSuccesses;
     successes += this.system.defense.risk.value;
-    successes -= this.system.defense.inflexibility.resistance.value;
-    successes += data.damage.map(d => this.system.defense.protection.find(w => w.type === d.damageType)).reduce((result, p) => result += p?.weakness ?? 0, 0);
-    successes -= data.damage.map(d => this.system.defense.protection.find(w => w.type === d.damageType)).reduce((result, p) => result += p?.resistance ?? 0, 0);
-    // TODO: Size Diff
-    // TODO: Tier Diff
-    // TODO: Lethal Diff
-    // TODO: Material Tier Diff
+    successes -= Math.max(0, (this.system.defense.inflexibility.resistance.value + this.system.defense.protection[finisherType].resistance) - (data.damage.find(d => d.damageType === finisherType)?.penetration ?? 0));
+    successes += this.system.defense.protection[finisherType].weakness;
+    successes += (data.actorSize - this.system.meta.size); // TODO Question, do we include this + (data.weaponSize - this.system.meta.size))
+    successes += (data.actorTier - this.system.meta.tier.value); // TODO: Material Tier Diff    
     return successes;
   }
 
-  getAvailableFinishersForDamageType(data) {
-    // TODO: Only looking at main damage type?
-    return data.damage[0].damageType in FINISHERS ? FINISHERS[data.damage[0].damageType] : FINISHERS['physical'];
+  getAvailableFinishersForDamageType(finisherType) {
+    return finisherType in FINISHERS ? FINISHERS[finisherType] : FINISHERS['untyped'];
   }
 
   getFinisherCost(availableFinishers, risk, attackProfile) {
@@ -150,76 +423,81 @@ export default class AbbrewActor extends Actor {
     return risk - (finisherCost * 10);
   }
 
-  applyModifiersToDamage(rolls, data) {
+  applyModifiersToDamage(data) {
     let rollSuccesses = data.totalSuccesses;
     return data.damage.reduce((result, d) => {
-      // TODO: Enable new DR types
-      const protection = /* this.system.defense.protection.some(dr => dr.type === d.damageType) ? this.system.defense.protection.filter(dr => dr.type === d.damageType)[0] : */ { immunity: 0, resistance: 0, weakness: 0, value: 0 };
-      if (protection.immunity > 0) {
+      const allProtection = this.system.defense.protection["all"];
+      const protection = this.system.defense.protection[d.damageType];
+      if (protection.immunity > 0 || allProtection.immunity > 0) {
         return result;
       }
 
-      const firstRoll = rolls[0].dice[0].results[0].result ?? 0;
-      // const dodge = this.system.defense.dodge.value;
-      const damageTypeSuccesses = /* firstRoll > dodge ? */ rollSuccesses/*  + protection.weakness - protection.resistance : -1 */;
+      const damageTypeSuccesses = rollSuccesses;
 
       if (damageTypeSuccesses < 0) {
         return result;
       }
 
-      const dmg = /* damageTypeSuccesses == 0 ? Math.max(0, d.value - protection.value) : */ d.value;
+      let multiplierSelector = allProtection.resistance + Math.max(0, protection.resistance - d.penetration) - (protection.weakness + allProtection.weakness);
+      let multiplier = 1;
+      if (multiplierSelector > 0) {
+        multiplier = 0.5;
+      } else if (multiplierSelector < 0) {
+        multiplier = 2;
+      }
+
+      const dmg = Math.floor(d.value * multiplier) + (protection.amplification + allProtection.amplification) - (protection.reduction + allProtection.reduction);
 
       return result += dmg;
     }, 0);
   }
 
-  async calculateGuard(damage, guard, isFeint, isStrongAttack, action) {
-    return guard + this.calculateGuardIncrease(damage, guard, isFeint, isStrongAttack, action);
+  async calculateGuard(damage, guard, isFeint, isStrongAttack, action, attackingActorParryCounter, attackingActorFeint) {
+    return guard - this.calculateGuardReduction(damage, guard, isFeint, isStrongAttack, action, attackingActorParryCounter, attackingActorFeint);
   }
 
-  calculateGuardIncrease(damage, guard, isFeint, isStrongAttack, action) {
+  calculateGuardReduction(damage, guard, isFeint, isStrongAttack, action, attackingActorParryCounter, attackingActorFeint) {
     if (this.noneResult(isFeint, action)) {
       return 0;
     }
 
     if (isStrongAttack) {
-      return 0 - damage;
+      return 0 + damage;
     }
 
     if (this.attackerGainsAdvantage(isFeint, action)) {
-      return 0 - damage;
+      return getAttackerAdvantageGuardResult(this.system.skillTraining.find(st => st.type === "feintCounter")?.value ?? 0, attackingActorFeint, damage);
     }
 
     if (this.defenderGainsAdvantage(isFeint, action)) {
-      return 0;
+      return getDefenderAdvantageGuardResult(this.system.skillTraining.find(st => st.type === "parry")?.value ?? 0, attackingActorParryCounter, damage);
     }
 
-    return 0 - damage;
+    return 0 + damage;
   }
 
-  calculateRisk(damage, guard, risk, inflexibility, isFeint, isStrongAttack, action) {
-    return risk + this.calculateRiskIncrease(damage, guard, risk, inflexibility, isFeint, isStrongAttack, action);
+  calculateRisk(damage, guard, risk, inflexibility, isFeint, isStrongAttack, action, attackingActorParryCounter, attackingActorFeint) {
+    return risk + this.calculateRiskIncrease(damage, guard, risk, inflexibility, isFeint, isStrongAttack, action, attackingActorParryCounter, attackingActorFeint);
   }
 
-  calculateRiskIncrease(damage, guard, risk, inflexibility, isFeint, isStrongAttack, action) {
+  calculateRiskIncrease(damage, guard, risk, inflexibility, isFeint, isStrongAttack, action, attackingActorParryCounter, attackingActorFeint) {
     if (this.noneResult(isFeint, action)) {
       return 0;
     }
 
     if (isStrongAttack) {
-      return damage + inflexibility;
+      return guard > 0 ? Math.min(damage, inflexibility) : damage;
     }
 
     if (this.attackerGainsAdvantage(isFeint, action)) {
-      return 2 * (damage + inflexibility);
+      return getAttackerAdvantageRiskResult(this.system.skillTraining.find(st => st.type === "feintCounter")?.value ?? 0, attackingActorFeint, damage, inflexibility, guard);
     }
 
-    // TODO: Parry costs 1 action
     if (this.defenderGainsAdvantage(isFeint, action)) {
-      return 0;
+      return getDefenderAdvantageRiskResult(this.system.skillTraining.find(st => st.type === "parry")?.value ?? 0, attackingActorParryCounter, damage, inflexibility, guard);
     }
 
-    return damage + inflexibility;
+    return guard > 0 ? Math.min(damage, inflexibility) : damage;
   }
 
   defenderGainsAdvantage(isFeint, action) {
@@ -263,9 +541,9 @@ export default class AbbrewActor extends Actor {
     });
   }
 
-  getActorWornArmour() {
-    const armour = this.items.filter(i => i.type === 'armour');
-    return armour.filter(a => a.system.equipState === 'worn')
+  getActorWornItems() {
+    const armour = this.items.filter(i => ["armour", "equipment"].includes(i.type));
+    return armour.filter(a => a.system.equipState === "worn");
   }
 
   getActorHeldItems() {
@@ -273,7 +551,11 @@ export default class AbbrewActor extends Actor {
   }
 
   getActorAnatomy() {
-    return this.items.filter(i => i.type === 'anatomy');
+    return this.system.anatomy
+  }
+
+  doesActorHaveSkillTrait(feature, subFeature, effect, data) {
+    return this.items.filter(i => i.type === "skill").filter(i => i.system.traits.raw).flatMap(i => JSON.parse(i.system.traits.raw)).some(t => t.feature === feature && t.subFeature === subFeature && t.effect === effect && t.data === data) ?? false;
   }
 
   async acceptWound(type, value) {
@@ -304,11 +586,11 @@ export default class AbbrewActor extends Actor {
   }
 
   async acceptCreatureForm(creatureForm) {
-    const anatomy = creatureForm.system.anatomy.map(a => game.items.get(a.id));
+    const anatomy = await Promise.all(creatureForm.system.anatomy.map(async a => await fromUuid(a.sourceId)));
     for (const index in anatomy) {
       await Item.create(anatomy[index], { parent: this });
 
-      const weapons = anatomy[index].system.naturalWeapons.map(w => game.items.get(w.id));
+      const weapons = await Promise.all(anatomy[index].system.naturalWeapons.map(async w => await fromUuid(w.sourceId)));
       for (const weaponIndex in weapons) {
         await Item.create(weapons[weaponIndex], { parent: this });
       }
@@ -316,16 +598,85 @@ export default class AbbrewActor extends Actor {
   }
 
   async acceptSkillDeck(skillDeck) {
-    const skills = skillDeck.system.skills.map(s => game.items.get(s.id));
-    for (const index in skills) {
+    const skills = await Promise.all(skillDeck.system.skills.granted.map(async s => await fromUuid(s.sourceId)));
+    await handleGrantedSkills(skills, this, skillDeck);
+  }
+
+  async acceptAnatomy(anatomy) {
+    const naturalWeapons = structuredClone(await Promise.all(anatomy.system.naturalWeapons.map(async w => await fromUuid(w.sourceId))));
+    const skills = structuredClone(await Promise.all(anatomy.system.skills.granted.map(async w => await fromUuid(w.sourceId))));
+    for (const index in naturalWeapons) {
+      naturalWeapons[index].system.grantedBy = anatomy._id;
+      await Item.create(naturalWeapons[index], { parent: this })
+    } for (const index in skills) {
+      skills[index].system.grantedBy.item = anatomy._id;
       await Item.create(skills[index], { parent: this })
     }
   }
 
-  async acceptAnatomy(anatomy) {
-    const naturalWeapons = anatomy.system.naturalWeapons.map(w => game.items.get(w.id));
-    for (const index in naturalWeapons) {
-      await Item.create(naturalWeapons[index], { parent: this })
+  async canActorUseActions(actions) {
+    if (!game.combat && actions <= 5) {
+      return true;
     }
+
+    let remainingActions = this.system.actions;
+    if (actions > remainingActions) {
+      ui.notifications.info("You do not have enough actions to do that.");
+      return false;
+    }
+
+    await this.update({ "system.actions": remainingActions -= actions });
+    return true;
+  }
+
+  // TODO: Tidy this
+  async handleDeleteActiveEffect(effect) {
+    const itemId = effect?.flags?.abbrew?.skill?.trackDuration;
+    if (itemId) {
+      const item = this.items.find(i => i._id === itemId)
+      if (item) {
+        if (item.system.applyOnExpiry && item.isOwner) {
+          await applySkillEffects(this, item);
+        }
+        await item.update({ "system.action.charges.value": 0 })
+        if (item.system.skillType === "temporary") {
+          await item.delete();
+        }
+        const effects = item.effects;
+        const promises = [];
+        effects.forEach(e => promises.push(e.update({ "disabled": true })));
+        await Promise.all(promises);
+      }
+    }
+
+    const enhancementId = effect?.flags?.abbrew?.enhancement?.trackDuration;
+    if (enhancementId) {
+      const item = this.items.find(i => i._id === enhancementId)
+      if (item) {
+        await item.delete();
+      }
+    }
+
+    const activeSkillsWithDuration = this.effects.toObject().filter(e => e.flags?.abbrew?.skill?.type === "standalone").map(e => e.flags.abbrew.skill.trackDuration);
+    const queuedSkillsWithDuration = this.effects.toObject().filter(e => e.flags?.abbrew?.skill?.type === "synergy").map(e => e.flags.abbrew.skill.trackDuration);
+    await this.update({ "system.activeSkills": activeSkillsWithDuration, "system.queuedSkills": queuedSkillsWithDuration });
+  }
+
+  doesActorHaveSkillDiscord(skill) {
+    if (skill) {
+      return isSkillBlocked(this, skill);
+    }
+
+    return false;
+  }
+
+  async handleResourceFill(id, capacity) {
+    const resourceValues = this.system.resources.values;
+    if (resourceValues.some(r => r.id === id)) {
+      resourceValues.find(r => r.id === id).value += capacity;
+    } else {
+      resourceValues.push({ id: id, value: capacity });
+    }
+    await this.update({ "system.resources.values": resourceValues });
   }
 }

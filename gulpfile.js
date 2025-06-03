@@ -7,6 +7,7 @@ const path = require("path");
 const chalk = require("chalk");
 const argv = require("yargs").argv;
 const cp = require("child_process");
+const del = require("del");
 
 /* ----------------------------------------- */
 /*  Compile Sass
@@ -42,6 +43,10 @@ const css = gulp.series(compileScss);
 /*		BUILDING  		*/
 /********************/
 
+async function cleanDist() {
+  return await del.deleteAsync(["dist/**", "!dist/packs"]);
+}
+
 function build() {
   return cp.spawn("npx", ["vite", "build"], { stdio: "inherit", shell: true });
 }
@@ -49,7 +54,7 @@ function build() {
 function _distWatcher() {
   const publicDirPath = path.resolve(process.cwd(), "public");
   const watcher = gulp.watch(["public/**/*.hbs"], { ignoreInitial: false });
-  watcher.on('change', async function(file, stats) {
+  watcher.on('change', async function (file, stats) {
     console.log(`File ${file} was changed`);
     const partial_file = path.relative(publicDirPath, file)
     await fs.copy(path.join("public", partial_file), path.join("dist", partial_file));
@@ -59,6 +64,10 @@ function _distWatcher() {
 function watch() {
   _distWatcher();
   return cp.spawn("npx", ["vite", "build", "-w"], { stdio: "inherit", shell: true });
+}
+
+async function cleanPublicPacks() {
+  return await del.deleteAsync(["public/packs/**", "public/packs"]);
 }
 
 /* ----------------------------------------- */
@@ -109,7 +118,7 @@ async function linkUserData() {
     } else {
       throw Error("No User Data path defined in foundryconfig.json");
     }
-        
+
     console.log(linkDir);
 
     if (argv.clean || argv.c) {
@@ -138,6 +147,8 @@ exports.default = gulp.series(
 );
 exports.build = gulp.series(
   compileScss,
-  build
+  cleanDist,
+  build,
+  cleanPublicPacks
 );
 exports.css = css;

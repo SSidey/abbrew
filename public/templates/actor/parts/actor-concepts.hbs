@@ -1,0 +1,25 @@
+<div>
+    <h3>Concepts</h3>
+    <h4>Innate</h4>
+    <ol class="resource-list">
+        {{#each system.concepts.innate as |concept key|}}
+        {{#if (gt concept.value 0)}}
+        <li class="concept">
+            <span class="concept-name">{{localize concept.label}} </span>
+            <input type="text" value="{{concept.value}}" data-dtype="string" readonly />
+        </li>
+        {{/if}}
+        {{/each}}
+    </ol>
+    <h4>Available</h4>
+    <ol class="resource-list">
+        {{#each system.concepts.available as |concept key|}}
+        {{#if (gt concept.value 0)}}
+        <li class="concept">
+            <span class="concept-name">{{localize concept.label}} </span>
+            <input type="text" value="{{concept.value}}" data-dtype="string" readonly />
+        </li>
+        {{/if}}
+        {{/each}}
+    </ol>
+</div>

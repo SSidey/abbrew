@@ -142,10 +142,10 @@ ol li.damage-reduction {
 
   .item-name {
     display: grid;
-    grid-column: 1 / 7;
+    grid-column: 1 / 6;
     grid-template-columns: repeat(7, 1fr);
-    
-    .item-image {
+
+    >div.item-image {
       grid-column: 1 / 2;
       height: 30px;
       background-size: 30px;
@@ -153,23 +153,31 @@ ol li.damage-reduction {
       margin-right: 5px;
     }
 
-    h4 {
-      grid-column: 2 / 8;
+    >h4.item-label {
+      grid-column: 2 / 7;
     }
   }
 
   .item-equipState {
-    grid-column: 7 / 8;    
-    
+    grid-column: 6 / 7;
+
   }
 
   .icon-label {
-    grid-column: 8 / 9;    
+    grid-column: 8 / 9;
+  }
+
+  .icon-label-2 {
+    grid-column: span 2;
+  }
+
+  .icon-label-3 {
+    grid-column: span 3;
   }
 
   .item-controls {
     display: grid;
-    grid-column: 9 / 11;
+    grid-column: 10 / 11;
     grid-template-columns: repeat(2, 1fr);
 
     a {
@@ -178,4 +186,245 @@ ol li.damage-reduction {
       margin: 0 6px;
     }
   }
+
+  .item-controls-1 {
+    display: grid;
+    grid-column: 10 / 11;
+    grid-template-columns: repeat(2, 1fr);
+
+    a {
+      font-size: 12px;
+      text-align: center;
+      margin: 0 6px;
+    }
+  }
+}
+
+.weapon-size {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-column-gap: 1em;
+  align-items: center;
+  margin-bottom: 1em;
+
+  .weapon-size-detail {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-column-gap: 1em;
+    align-items: center;
+  }
+}
+
+.item-equip-state {
+
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-column-gap: 2em;
+  margin-bottom: 1em;
+
+  >.item-equip-type {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-column-gap: 1em;
+    align-items: center;
+
+    >label {
+      grid-column: 1 / span 2;
+      display: flex;
+      align-items: center;
+    }
+
+    >select {
+      grid-column: span 2;
+    }
+  }
+
+  .item-equip-detail.item-equip-armour-points {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-column-gap: 1em;
+    align-items: center;
+  }
+
+  .item-equip-detail.item-equip-held {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-column-gap: 1em;
+    align-items: center;
+  }
+
+}
+
+.weapon {
+  ol.attack-profiles {
+    list-style: none;
+    padding-left: 0px;
+
+    li.attack-profile {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      list-style: none;
+      grid-column-gap: 1em;
+
+      button {
+        height: 30px;
+        display: grid;
+        grid-template-columns: 30px 1fr;
+      }
+
+      .attack-profile-detail {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+
+        .attack-profile-name {
+          grid-column: 1 / span 4;
+          display: grid;
+          grid-template-columns: auto 1fr;
+          grid-column-gap: 1em;
+          align-items: center;
+          margin-bottom: 1em;
+
+          input {
+            border-bottom: 0px;
+            border-bottom-left-radius: 0px;
+            border-bottom-right-radius: 0px;
+          }
+        }
+
+        .attack-profile-detail-entries {
+          grid-column: 1 / span 4;
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          grid-column-gap: 1em;
+          border-bottom: 1px gray solid;
+          padding-bottom: 1em;
+          margin-bottom: 1em;
+          align-items: center;
+
+          .attack-profile-detail-entry {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-column-gap: 0.5em;
+            align-items: center;
+
+            .ammo-count {
+              display: grid;
+              grid-template-columns: 1fr auto 1fr;
+              grid-column-gap: 0.25em;
+              align-items: center;
+            }
+          }
+        }
+
+        .attack-profile-damage-list {
+          display: grid;
+          grid-column: 1 / span 4;
+          list-style: none;
+          padding-left: 0px;
+          grid-template-columns: 1fr 1fr 1fr 1fr 1.5em;
+
+          .attack-profile-damage-header {
+            grid-column: 1 / span 5;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            align-items: center;
+            grid-column-gap: 0.5em;
+          }
+
+          .attack-profile-damage {
+            grid-column: 1 / span 5;
+            display: grid;
+            align-items: center;
+            grid-column-gap: 0.5em;
+            padding-top: 1em;
+            padding-bottom: 1em;
+            border-bottom: 1px gray solid;
+            grid-template-columns: 1fr 1fr 1fr 1fr auto;
+          }
+        }
+      }
+    }
+
+    li.attack-profile::after {
+      content: '';
+      display: inherit;
+      width: 50%;
+      margin: 10px auto;
+      border-top: 1px solid gray;
+    }
+  }
+}
+
+.ammunition {
+
+  .attack-profile-detail-entries {
+    grid-column: 1 / span 4;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-column-gap: 1em;
+    border-bottom: 1px gray solid;
+    padding-bottom: 1em;
+    margin-bottom: 1em;
+    align-items: center;
+
+    .attack-profile-detail-entry {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-column-gap: 0.5em;
+      align-items: center
+    }
+  }
+
+  .attack-profile-damage-list {
+    display: grid;
+    grid-column: 1 / span 4;
+    list-style: none;
+    padding-left: 0px;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1.5em;
+
+    .attack-profile-damage-header {
+      grid-column: 1 / span 5;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      align-items: center;
+      grid-column-gap: 0.5em;
+    }
+
+    .attack-profile-damage {
+      grid-column: 1 / span 5;
+      display: grid;
+      align-items: center;
+      grid-column-gap: 0.5em;
+      padding-top: 1em;
+      padding-bottom: 1em;
+      border-bottom: 1px gray solid;
+      grid-template-columns: 1fr 1fr 1fr 1fr auto;
+    }
+  }
+}
+
+.enhancement-modification {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.enhancement {
+  .trait-filter {
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.05)
+  }
+}
+
+.item-element-max-input {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  margin-bottom: 5px;
+  grid-gap: 10px;
+  align-items: center;
+}
+
+.stored-items {
+  margin-left: 5px;
+  margin-right: 5px;
+  background-color: darkgray;
 }

@@ -10,12 +10,128 @@
       "Vis": { "long": "Visualisation", "abbr": "vis" },
       "Wil": { "long": "Will", "abbr": "wil" }
     },
+    "size": {
+      "fine": "Fine",
+      "diminutive": "Diminutive",
+      "tiny": "Tiny",
+      "small": "Small",
+      "standard": "Standard",
+      "large": "Large",
+      "huge": "Huge",
+      "gargantuan": "Gargantuan",
+      "colossal": "Colossal"
+    },
+    "ActiveEffectKeys": {
+      "guardMax": "Guard Max",
+      "allReduction": "All Reduction",
+      "allWeakness": "All Weakness",
+      "crushingReduction": "Crushing Reduction",
+      "crushingWeakness": "Crushing Weakness",
+      "piercingReduction": "Piercing Reduction",
+      "piercingWeakness": "Piercing Weakness",
+      "slashingReduction": "Slashing Reduction",
+      "slashingWeakness": "Slashing Weakness",
+      "initiativeBonus": "Initiative Bonus",
+      "baseSpeed": "Base Speed"
+    },
+    "Roles": {
+      "Name": {
+        "melee": "Melee",
+        "ranged": "Ranged",
+        "martial": "Martial",
+        "magic": "Magic",
+        "face": "Face",
+        "crafter": "Crafter",
+        "vanguard": "Vanguard",
+        "protector": "Protector",
+        "healer": "Healer",
+        "honourbound": "Hounour Bound",
+        "scoundrel": "Scoundrel",
+        "acolyte": "Acolyte",
+        "bound": "Bound",
+        "director": "Director",
+        "innerpower": "Inner Power",
+        "implement": "Implement",
+        "style": "Style",
+        "durable": "Durable",
+        "professional": "Professional"
+      },
+      "Description": {
+        "melee": "You fight primarily in melee with your opponents.",
+        "ranged": "You prefer to fight at a distance from your opponents.",
+        "martial": "Your primary tools in combat are your weapons.",
+        "magic": "You primarily harness magic to combat your foes.",
+        "face": "You weaponise your wits and charm to bring the downfall of your foes.",
+        "crafter": "You create and/or modify equipment to bolster your power as well as that of the party.",
+        "vanguard": "Your main role in combat is to bring down your enemies as quickly as possible.",
+        "protector": "Your main role in combat is in reducing the damage dealt to your allies.",
+        "healer": "You are well acquainted with fixing up the party after a fight.",
+        "honourbound": "You are bound by a code of ethics that you must uphold.",
+        "scoundrel": "You are proficient in illicit skills, engaging in underhanded tactics.",
+        "acolyte": "You derive your abilities from a higher power.",
+        "bound": "You are bound to another being, this fusion provides you with your abilities.",
+        "director": "You have a keen knowledge or sense for the energies around you and can direct them at will.",
+        "innerpower": "Your magic comes from within yourself.",
+        "implement": "You harness magic through implements of power.",
+        "style": "You do your thing with panache, drawing attention to yourself.",
+        "durable": "You are capable of withstanding more abuse than most.",
+        "professional": "You are skilled in a profession."
+      }
+    },
+    "Paths": {
+      "Name": {
+        "universal": "Universal",
+        "fenceroflostbriarith": "Fencer Of Lost Briarith",
+        "divineadherent": "Divine Adherent",
+        "poisoner": "Poisoner",
+        "shieldguardian": "Shield Guardian",
+        "snake": "Snake"
+      },
+      "Description": {
+        "universal": "A universal path, skills with this path can be selected if it has roles matching thosee of your paths",
+        "fenceroflostbriarith": "A fighting style that relies on specialised weapon techniques and swapping between stances.",
+        "divineadherent": "You worship a deity and derive your powers from prayer and devotion to that deity.",
+        "poisoner": "Adept at the production and the usage of poisons.",
+        "shieldguardian": "A selfless fighting style, one where you put yourself in harm's way to shield your allies and prevent your enemies from reaching them.",
+        "snake": "A style employing the use of two short weapons and relies on rapid speed and dodges."
+      }
+    },
+    "EnhancementTargetTypes": {
+      "weapon": "Weapon",
+      "armour": "Armour",
+      "equipment": "Equipment",
+      "ammunition": "Ammunition",
+      "physical": "Physical",
+      "skill": "Skill",
+      "amp": "Amp"
+    },
+    "EnhancementTypes": {
+      "material": "Material",
+      "form": "Form"
+    },
+    "StorageTypes": {
+      "count": "Count",
+      "heft": "Heft"
+    },
     "SheetLabels": {
       "Actor": "Abbrew Actor Sheet",
       "Item": "Abbrew Item Sheet",
       "CreatureForm": "Abbrew Creature Form Sheet",
       "SkillDeck": "Skill Deck",
-      "Anatomy": "Anatomy"
+      "Anatomy": "Anatomy",
+      "Skill": "Skill",
+      "Archetype": "Archetype",
+      "Path": "Path",
+      "ActiveEffect": "Active Effect",
+      "Ammunition": "Ammunition",
+      "Weapon": "Weapon",
+      "Enhancement": "Enhancement",
+      "Armour": "Armour",
+      "Equipment": "Equipment"
+    },
+    "CheckTypes": {
+      "successes": "Successes",
+      "result": "Result"
     },
     "Item": {
       "Spell": {
@@ -37,6 +153,27 @@
     "Defense": {
       "guard": "Guard"
     },
+    "DamageTypes": {
+      "all": "All",
+      "untyped": "Untyped",
+      "physical": "Physical",
+      "crushing": "Crushing",
+      "piercing": "Piercing",
+      "slashing": "Slashing",
+      "life": "Life",
+      "death": "Death",
+      "fire": "Fire",
+      "cold": "Cold",
+      "electric": "Electric",
+      "acid": "Acid",
+      "poison": "Poison",
+      "dark": "Dark",
+      "light": "Light",
+      "pain": "Pain",
+      "emotion": "Emotion",
+      "psychic": "Psychic"
+    },
+    "Favourite": "Favourite",
     "AttributeIncrease": "Attribute Increase",
     "SkillActivationType": "Activation Type",
     "SkillActivationTypes": {
@@ -45,25 +182,36 @@
     },
     "Operator": "Operator",
     "Operators": {
-      "equal": "=",
-      "add": "+="
+      "equal": "Set",
+      "add": "Increase",
+      "minus": "Reduce",
+      "suppress": "Suppress",
+      "intensify": "Intensify",
+      "upgrade": "Upgrade",
+      "downgrade": "Downgrade",
+      "merge": "Merge",
+      "split": "Split"
     },
     "AttributeRankIncrease": "Attribute Rank Increase",
     "SkillType": "Skill Type",
     "Resistance": "Resistance",
+    "Reduction": "Reduction",
+    "Intensification": "Intensification",
+    "Amplification": "Amplification",
     "Damage": "Damage",
     "Immunity": "Immunity",
     "Weakness": "Weakness",
     "Guard": "Guard",
-    "ArmourPoints": {
-      "label": "Armour Points",
+    "EquipPoints": {
+      "label": "Equip Points",
       "Points": {
         "head": "Head",
         "torso": "Torso",
         "arm": "Arm",
         "leg": "Leg",
         "tail": "Tail",
-        "wing": "Wing"
+        "wing": "Wing",
+        "attachment": "Attachment"
       }
     },
     "Resistances": {
@@ -72,7 +220,28 @@
       "slashing": "Slashing"
     },
     "Concepts": {
-      "physical": "Physical"
+      "physical": "Physical",
+      "crushing": "Crushing",
+      "piercing": "Piercing",
+      "slashing": "Slashing",
+      "fire": "Fire",
+      "cold": "Cold",
+      "water": "Water",
+      "earth": "Earth",
+      "air": "Air",
+      "electricity": "Electricity",
+      "poison": "Poison",
+      "flesh": "Flesh",
+      "blood": "Blood",
+      "metal": "Metal",
+      "light": "Light",
+      "dark": "Dark",
+      "life": "Life",
+      "death": "Death",
+      "war": "War",
+      "famine": "Famine",
+      "pestilence": "Pestilence",
+      "conquest": "Conquest"
     },
     "Facing": {
       "front": "front",
@@ -80,26 +249,82 @@
       "right": "right",
       "back": "back"
     },
+    "NameParts": {
+      "barbed": "Barbed",
+      "heavy": "Heavy",
+      "padded": "Padded",
+      "bone": "Bone",
+      "cloth": "Cloth",
+      "hide": "Hide",
+      "iron": "Iron",
+      "leather": "Leather",
+      "mithril": "Mithril",
+      "steel": "Steel",
+      "chain": "Chain",
+      "jack": "Jack",
+      "lamellar": "Lamellar",
+      "laminar": "Laminar",
+      "plate": "Plate",
+      "splint": "Splint"
+    },
     "Type": "Type",
     "AttackTypes": {
       "arc": "Arc",
       "thrust": "Thrust",
-      "static": "Static"
+      "static": "Static",
+      "thrown": "Thrown",
+      "ranged": "Ranged"
+    },
+    "AttackModes": {
+      "attack": "Attack",
+      "feint": "Feint",
+      "overpower": "Overpower",
+      "finisher": "Finisher"
+    },
+    "ReloadType": {
+      "draw": "Draw",
+      "reload": "Reload"
+    },
+    "AmmunitionType": {
+      "shot": "Shot",
+      "arrow": "Arrow",
+      "bolt": "Bolt",
+      "bullet": "Bullet",
+      "cell": "Cell"
     },
     "EquipState": {
       "heldOne": "Held 1H",
       "heldTwo": "Held 2H",
       "worn": "Worn",
       "stowed": "Stowed",
-      "dropped": "Dropped"
+      "dropped": "Dropped",
+      "active": "Active",
+      "inactive": "Inactive",
+      "readied": "Readied"
+    },
+    "EquipStateChange": {
+      "heldOne": "1H",
+      "heldTwo": "2H",
+      "worn": "Wear",
+      "stowed": "Stow",
+      "dropped": "Drop",
+      "active": "Activate",
+      "inactive": "Deactivate",
+      "readied": "Ready"
+    },
+    "AsyncValueTypes": {
+      "singleValue": "Single",
+      "choice": "Choice"
     },
     "SkillTypes": {
       "basic": "Basic",
       "path": "Path",
+      "archetype": "Archetype",
       "resource": "Resource",
       "temporary": "Temporary",
       "untyped": "Untyped",
-      "background": "Background"
+      "background": "Background",
+      "tier": "Tier"
     },
     "ActionCosts": {
       "passive": "Passive",
@@ -109,21 +334,37 @@
       "reaction": "Reaction",
       "other": "Other"
     },
-    "Activatable": "Activatable",
+    "IsActivatable": "Activatable",
     "HasRequirement": "Has Requirement",
     "EquippedWeapon": "Equipped Weapon",
     "Wounds": {
       "physical": "Physical",
       "bleed": "Bleed",
       "vital": "Vital",
+      "burning": "Burning",
+      "burn": "Burn",
       "fatigue": "Fatigue",
-      "terror": "Terror"
+      "exhaustion": "Exhaustion",
+      "dread": "Dread",
+      "terror": "Terror",
+      "enraged": "Enraged",
+      "rage": "Rage",
+      "instability": "Instability",
+      "mutation": "Mutation",
+      "sin": "Sin",
+      "corruption": "Corruption",
+      "suffering": "Suffering",
+      "pain": "Pain",
+      "torment": "Torment",
+      "anguish": "Anguish"
     },
     "EFFECT": {
       "Status": {
         "dead": "Dead",
         "defeated": "Defeated",
+        "disoriented": "Disoriented",
         "guardBreak": "Guard Break",
+        "hidden": "Hidden",
         "offGuard": "Off Guard"
       },
       "Condition": {
@@ -135,9 +376,17 @@
           "name": "Defeated",
           "description": "You resolve buckles as you are unable to continue the fight."
         },
+        "Disoriented": {
+          "name": "Disoriented",
+          "description": "You have been disoriented, you cannot restore guard nor parry while you have this condition."
+        },
         "GuardBreak": {
           "name": "Guard Break",
           "description": "Your guard is broken, your foes can directly capitalise on your weakpoints. You can be targeted by finishers."
+        },
+        "Hidden": {
+          "name": "Hidden",
+          "description": "Your are hidden from your foes, if you were previously detected (or your presence becomes known) they can attempt to locate you with a Scan Check."
         },
         "OffGuard": {
           "name": "Off Guard",
@@ -148,7 +397,8 @@
     "EquipTypes": {
       "none": "None",
       "held": "Held",
-      "worn": "Worn"
+      "worn": "Worn",
+      "innate": "Innate"
     },
     "Hands": {
       "none": "None",
@@ -157,15 +407,108 @@
       "twoHand": "Two Handed"
     },
     "Traits": {
-      "CanBleed": {
-        "name": "Can Bleed"
-      }
+      "General": {
+        "detection": "Detection",
+        "disease": "Disease",
+        "poison": "Poison",
+        "stance": "Stance"
+      },
+      "WoundImmunities": {
+        "physicalImmunity": "Physical Immunity",
+        "vitalImmunity": "Vital Immunity",
+        "burnImmunity": "Burn Immunity",
+        "exhaustionImmunity": "Exhaustion Immunity",
+        "terrorImmunity": "Terror Immunity",
+        "rageImmunity": "Rage Immunity",
+        "mutationImmunity": "Mutation Immunity",
+        "corruptionImmunity": "Corruption Immunity",
+        "bleedImmunity": "Bleed Immunity",
+        "burningImmunity": "Burning Immunity",
+        "fatigueImmunity": "Fatigue Immunity",
+        "dreadImmunity": "Dread Immunity",
+        "enragedImmunity": "Enraged Immunity",
+        "instabilityImmunity": "Instability Immunity",
+        "sinImmunity": "Sin Immunity",
+        "decayImmunity": "Decay Immunity",
+        "necroticImmunity": "Necrotic Immunity"
+      },
+      "SkillTraining": {
+        "attackBase": "Attack Base",
+        "finisherBase": "Finisher Base",
+        "overpowerBase": "Overpower Base",
+        "parryBase": "Parry Base",
+        "feintBase": "Feint Base",
+        "attack": "Attack Training",
+        "finisher": "Finisher Training",
+        "overpower": "Overpower Training",
+        "parry": "Parry Training",
+        "feint": "Feint Training",
+        "parryCounter": "Counter Parry Training",
+        "feintCounter": "Counter Feint Training"
+      },
+      "Item": {
+        "armour": "Armour",
+        "weapon": "Weapon",
+        "head": "Head",
+        "torso": "Torso",
+        "arm": "Arm",
+        "leg": "Leg",
+        "shield": "Shield",
+        "melee": "Melee",
+        "ranged": "Ranged",
+        "reload": "Reload",
+        "draw": "Draw",
+        "close": "Close",
+        "standard": "Standard",
+        "long": "Long",
+        "heavy": "Heavy",
+        "agile": "Agile",
+        "vial": "Vial",
+        "consumable": "Consumable",
+        "ammunition": "Ammunition"
+      },
+      "Skill": {
+        "poison": "Poison",
+        "disease": "Disease"
+      },
+      "stance": "Stance"
     },
-    "SkillFlags": {
-      "shieldTraining": "Shield Training"
+    "Durations": {
+      "instant": "Instant",
+      "second": "Second",
+      "turn": "Turn",
+      "round": "Round",
+      "minute": "Minute",
+      "hour": "Hour",
+      "day": "Day",
+      "combat": "Combat",
+      "permanent": "Permanent"
+    },
+    "ModifierPrefixes": {
+      "numeric": "Numeric",
+      "actor": "Actor",
+      "item": "Item",
+      "this": "This",
+      "target": "Target",
+      "wound": "Wound",
+      "condition": "Condition",
+      "statusType": "Status Type",
+      "resource": "Resource",
+      "damageLastDealt": "Last Damage Dealt",
+      "damageLastReceived": "Last Damage Taken",
+      "damageRoundReceived": "Round Damage Taken",
+      "skillCount": "Skill Count",
+      "async": "Async Result",
+      "string": "String",
+      "trait": "Trait",
+      "json": "JSON",
+      "name": "Name"
     }
   },
-
+  "Speeds": {
+    "walk": "Walk",
+    "dash": "Dash"
+  },
   "TYPES": {
     "Actor": {
       "character": "Character",
@@ -182,10 +525,130 @@
       "wound": "Wound",
       "background": "Background",
       "creatureForm": "Creature Form",
-      "skillDeck": "Skill Deck"
+      "skillDeck": "Skill Deck",
+      "archetype": "Archetype",
+      "path": "Path",
+      "ammunition": "Ammunition",
+      "enhancement": "Enhancement",
+      "equipment": "Equipment"
+    }
+  },
+  "SETTINGS.AnnounceTurnStart.Name": "Announce Turn Start",
+  "SETTINGS.AnnounceTurnStart.Hint": "Announce turn start to chat.",
+  "SETTINGS.hideGmSection.Name": "Hide GM Section From Players",
+  "SETTINGS.hideGmSection.Hint": "Should GM Section (decriptions, checks and damage etc.) be hidden from players? (default true)",
+  "DOCUMENTS.Study": "Study",
+  "LIGHT": {
+    "alpha": {
+      "label": "Color Intensity",
+      "hint": "Modify the intensity of color emitted by this light source."
+    },
+    "animation": {
+      "label": "Light Animation",
+      "type": {
+        "label": "Light Animation Type"
+      },
+      "speed": {
+        "label": "Animation Speed",
+        "hint": "Increases to animation speed make the animation play faster."
+      },
+      "intensity": {
+        "label": "Animation Intensity",
+        "hint": "Increases to animation intensity make the animation more pronounced."
+      },
+      "reverse": {
+        "label": "Reverse Direction"
+      }
+    },
+    "angle": {
+      "label": "Emission Angle",
+      "hint": "Limit the angle of emission for this light source, and configure its rotation."
+    },
+    "attenuation": {
+      "label": "Attenuation",
+      "hint": "Transition illumination gradually between bright, dim, and dark."
+    },
+    "color": {
+      "label": "Light Color",
+      "hint": "Apply coloration to this light source and configure its intensity."
+    },
+    "coloration": {
+      "label": "Coloration Technique",
+      "hint": "The coloration technique applied to the light source contributes additive blending to the resulting appearance."
+    },
+    "contrast": {
+      "label": "Contrast",
+      "hint": "Adjust the contrast of surfaces that are illuminated by this light source. The default value for a standard light source is 0."
+    },
+    "dim": {
+      "label": "Dim"
+    },
+    "bright": {
+      "label": "Bright"
+    },
+    "luminosity": {
+      "label": "Luminosity",
+      "hint": "Adjust the brightness of this light source. More luminous lights are less diminished by darkness. The default value for a standard light source is 0.5."
+    },
+    "negative": {
+      "label": "Is Darkness Source",
+      "hint": "A darkness source blocks light and vision and suppresses lights or vision sources which are inside its area of effect."
+    },
+    "saturation": {
+      "label": "Saturation",
+      "hint": "Adjust the saturation of surfaces that are illuminated by this light source. The default value for a standard light source is 0."
+    },
+    "shadows": {
+      "label": "Shadows",
+      "hint": "Enhance or the intensity of dark colors illuminated by this light source. The default value for a standard light source is 0."
+    },
+    "darkness": {
+      "label": "Darkness Activation Range",
+      "hint": "You may specify a range of darkness levels during which this light source will be visible.",
+      "min": {
+        "label": "Between"
+      },
+      "max": {
+        "label": "and"
+      }
     }
   },
 
-  "SETTINGS.AnnounceTurnStart.Name": "Announce Turn Start",
-  "SETTINGS.AnnounceTurnStart.Hint": "Announce turn start to chat."
+  "LIGHT.LegacyColoration": "Legacy Coloration",
+  "LIGHT.AdaptiveLuminance": "Adaptive Luminance",
+  "LIGHT.InternalHalo": "Internal Halo",
+  "LIGHT.ExternalHalo": "External Halo",
+  "LIGHT.ColorBurn": "Color Burn",
+  "LIGHT.InternalBurn": "Internal Color Burn",
+  "LIGHT.ExternalBurn": "External Color Burn",
+  "LIGHT.LowAbsorption": "Low Absorption",
+  "LIGHT.HighAbsorption": "High Absorption",
+  "LIGHT.InvertAbsorption": "Invert Absorption",
+  "LIGHT.NaturalLight": "Natural Light",
+
+  "LIGHT.AnimationTorch": "Flickering Light",
+  "LIGHT.AnimationPulse": "Pulse",
+  "LIGHT.AnimationChroma": "Chroma",
+  "LIGHT.AnimationWave": "Pulsing Wave",
+  "LIGHT.AnimationFog": "Swirling Fog",
+  "LIGHT.AnimationSunburst": "Sunburst",
+  "LIGHT.AnimationLightDome": "Light Dome",
+  "LIGHT.AnimationEmanation": "Mysterious Emanation",
+  "LIGHT.AnimationEnergyField": "Energy Field",
+  "LIGHT.AnimationHexaDome": "Hexa Dome",
+  "LIGHT.AnimationGhostLight": "Ghostly Light",
+  "LIGHT.AnimationRoilingMass": "Roiling Mass",
+  "LIGHT.AnimationBlackHole": "Black Hole",
+  "LIGHT.AnimationVortex": "Vortex",
+  "LIGHT.AnimationBewitchingWave": "Bewitching Wave",
+  "LIGHT.AnimationSwirlingRainbow": "Swirling Rainbow",
+  "LIGHT.AnimationRadialRainbow": "Radial Rainbow",
+  "LIGHT.AnimationFairyLight": "Fairy Light",
+  "LIGHT.AnimationFlame": "Torch",
+  "LIGHT.AnimationForceGrid": "Force Grid",
+  "LIGHT.AnimationStarLight": "Star Light",
+  "LIGHT.AnimationSmokePatch": "Smoke Patch",
+  "LIGHT.AnimationRevolving": "Revolving Light",
+  "LIGHT.AnimationSiren": "Siren Light",
+  "LIGHT.AnimationMagicalGloom": "Magical Gloom"
 }

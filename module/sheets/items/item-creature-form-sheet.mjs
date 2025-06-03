@@ -2,6 +2,7 @@ import {
     onManageActiveEffect,
     prepareActiveEffectCategories,
 } from '../../helpers/effects.mjs';
+import { renderSheetForStoredItem } from '../../helpers/utils.mjs';
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -38,7 +39,7 @@ export class AbbrewCreatureFormSheet extends ItemSheet {
     /* -------------------------------------------- */
 
     /** @override */
-    getData() {
+    async getData() {
         // Retrieve base data structure.
         const context = super.getData();
 
@@ -51,6 +52,22 @@ export class AbbrewCreatureFormSheet extends ItemSheet {
         // Add the item's data to context.data for easier access, as well as flags.
         context.system = itemData.system;
         context.flags = itemData.flags;
+
+        // Enrich description info for display
+        // Enrichment turns text like `[[/r 1d20]]` into buttons
+        context.enrichedDescription = await TextEditor.enrichHTML(
+            this.item.system.description,
+            {
+                // Whether to show secret blocks in the finished html
+                secrets: this.document.isOwner,
+                // Necessary in v11, can be removed in v12
+                async: true,
+                // Data to fill in for inline rolls
+                rollData: this.item.getRollData(),
+                // Relative UUID resolution
+                relativeTo: this.item,
+            }
+        );
 
         // Prepare active effects for easier access
         context.effects = prepareActiveEffectCategories(this.item.effects);
@@ -80,6 +97,20 @@ export class AbbrewCreatureFormSheet extends ItemSheet {
             event.preventDefault();
         });
 
+        // Delete Anatomy Summary
+        html.on('click', '.anatomy-delete', async (ev) => {
+            const li = $(ev.currentTarget).parents('.creature-form-anatomy');
+            if (li.data('id') || li.data('id') === 0) {
+                const anatomy = this.item.system.anatomy;
+                anatomy.splice(li.data('id'), 1);
+                await this.item.update({ "system.anatomy": anatomy });
+            }
+        });
+
+        html.on('click', '.creature-form-anatomy .anatomy-summary .image-container, .creature-form-anatomy .anatomy-summary .name', async (event) => {
+            await renderSheetForStoredItem(event, this.actor, "creature-form-anatomy");
+        });
+
         html.on('drop', async (event) => {
             if (!this.item.testUserPermission(game.user, 'OWNER')) {
                 return;
@@ -88,11 +119,10 @@ export class AbbrewCreatureFormSheet extends ItemSheet {
             const droppedData = event.originalEvent.dataTransfer.getData("text")
             const eventJson = JSON.parse(droppedData);
             if (eventJson && eventJson.type === "Item") {
-                const itemId = eventJson.uuid.split(".").pop()
-                const item = game.items.get(itemId);
+                const item = await fromUuid(eventJson.uuid);
                 if (item.type === "anatomy") {
                     const storedAnatomy = this.item.system.anatomy;
-                    const newAnatomy = [...storedAnatomy, { name: item.name, id: itemId, image: item.img }];
+                    const newAnatomy = [...storedAnatomy, { name: item.name, id: item._id, image: item.img, sourceId: item.uuid }];
                     await this.item.update({ "system.anatomy": newAnatomy });
                 }
             }

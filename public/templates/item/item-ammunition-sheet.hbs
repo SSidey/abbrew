@@ -1,0 +1,143 @@
+<form class="{{cssClass}}" autocomplete="off">
+  {{> "systems/abbrew/templates/item/parts/item-physical-header.hbs"}}
+
+    {{!-- Sheet Tab Navigation --}}
+    <nav class="sheet-tabs tabs" data-group="primary">
+        <a class="item" data-tab="description">Description</a>
+        <a class="item" data-tab="attributes">Attributes</a>
+        <a class="item" data-tab="skills">Skills</a>
+    </nav>
+
+    {{!-- Sheet Body --}}
+    <section class="sheet-body">
+
+        {{!-- Description Tab --}}
+        <div class="tab" data-group="primary" data-tab="description">
+            {{!-- To render inline rolls in a TinyMCE editor, you need to pass the parent actor's (if any) roll data to
+            the
+            rollData prop. --}}
+            {{> "systems/abbrew/templates/item/parts/item-traits.hbs"}}
+            {{editor enrichedDescription target="system.description" engine="prosemirror" rollData=rollData button=true
+            owner=owner
+            editable=editable}}
+        </div>
+
+        {{!-- Attributes Tab --}}
+        <div class="tab attributes ammunition" data-group="primary" data-tab="attributes">
+            <div>
+                <h3>Ammunition</h3>
+                <div class="attack-profile-detail-entries">
+                    <div class="attack-profile-detail-entry">
+                        <label>Type</label>
+                        <select name="system.type">
+                            {{selectOptions config.ammunitionTypes selected=system.type blank=""
+                            localize=true}}
+                        </select>
+                    </div>
+                    <div class="attack-profile-detail-entry">
+                        <label>Critical</label>
+                        <input type="text" name="system.attackModifier.critical"
+                            value="{{system.attackModifier.critical}}" data-dtype="Number" />
+                    </div>
+                    <div class="attack-profile-detail-entry">
+                        <label>Lethal</label>
+                        <input type="text" name="system.attackModifier.lethal" value="{{system.attackModifier.lethal}}"
+                            data-dtype="Number" />
+                    </div>
+                    <div class="attack-profile-detail-entry">
+                        <label>Finisher Limit</label>
+                        <input type="text" name="system.attackModifier.finisherLimit"
+                            value="{{system.attackModifier.finisherLimit}}" data-dtype="Number" />
+                    </div>
+                </div>
+            </div>
+            <ol class="attack-profile-damage-list" style="list-style: none; padding-left: 0px;">
+                <li class="attack-profile-damage-header">
+                    <label>{{ localize "ABBREW.Type" }}</label>
+                    <label>{{ localize "ABBREW.Damage" }}</label>
+                    <label>Penetration</label>
+                    <label>Attribute</label>
+                </li>
+                {{#each system.attackModifier.damage as |damage j|}}
+                <li class=" item attack-profile-damage" data-id="{{j}}">
+                    <div>
+                        <select name="system.attackModifier.damage.{{j}}.type">
+                            {{selectOptions ../config.damageTypes selected=damage.type blank="" localize=true}}
+                        </select>
+                    </div>
+                    <div>
+                        <input type="text" name="system.attackModifier.damage.{{j}}.value" value="{{damage.value}}"
+                            data-dtype="Number" />
+                    </div>
+                    <div>
+                        <input type="text" name="system.attackModifier.damage.{{j}}.penetration"
+                            value="{{damage.penetration}}" data-dtype="Number" />
+                    </div>
+                    <div>
+                        <select name="system.attackModifier.damage.{{j}}.attributeModifier">
+                            {{selectOptions ../config.attributes selected=damage.attributeModifier blank=""
+                            localize=true}}
+                        </select>
+                    </div>
+                    <a class="damage-control remove-damage" data-action="remove-damage">
+                        <i class="fa-solid fa-minus"></i>
+                    </a>
+                </li>
+                {{/each}}
+                <li class="damage add">
+                    <div class="form-group">
+                        <label>
+                            <a class="damage-control" data-action="add-damage">
+                                Add Damage
+                                <i class="fa-solid fa-plus"></i>
+                            </a>
+                        </label>
+                    </div>
+                </li>
+            </ol>
+        </div>
+
+        {{!-- Skills Tab --}}
+        <div class="tab skills" data-group="primary" data-tab="skills">
+            <h3>Enhancements</h3>
+            <ol class="skill-deck-skills">
+                {{#each system.enhancements as |enhancement id|}}
+                <li class="skill-deck-skill" data-id="{{id}}" data-item-id="{{enhancement.id}}"
+                    data-source-id="{{enhancement.sourceId}}">
+                    <div class="skill-deck-summary">
+                        <div class="image-container"><img src="{{enhancement.image}}" /></div>
+                        <div class="name"><span>{{enhancement.name}}</span></div>
+                        <a class='item-control enhancement-delete' title='{{localize "DOCUMENT.Delete" type='
+                            enhancement'}}'>
+                            <i class='fas fa-trash'></i>
+                        </a>
+                    </div>
+                </li>
+                {{/each}}
+                {{#if (gt system.availableEnhancements 0)}}
+                <li class="empty-drop-list-element">
+                    <span>+ Enhancement</span>
+                </li>
+                {{/if}}
+            </ol>
+            <h3>Skills</h3>
+            <ol class="skill-deck-skills">
+                {{#each system.skills.granted as |skill id|}}
+                <li class="skill-deck-skill" data-id="{{id}}" data-item-id="{{skill.id}}"
+                    data-source-id="{{skill.sourceId}}">
+                    <div class="skill-deck-summary">
+                        <div class="image-container"><img src="{{skill.image}}" /></div>
+                        <div class="name"><span>{{skill.name}}</span></div>
+                        <a class='item-control skill-delete' title='{{localize "DOCUMENT.Delete" type=' skill'}}'>
+                            <i class='fas fa-trash'></i>
+                        </a>
+                    </div>
+                </li>
+                {{/each}}
+                <li class="empty-drop-list-element">
+                    <span>+ Skill</span>
+                </li>
+            </ol>
+        </div>
+    </section>
+</form>

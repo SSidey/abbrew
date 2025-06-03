@@ -1,3 +1,24 @@
 .resource-label {
   font-weight: bold;
 }
+
+.resource-list {
+  list-style: none;
+  padding-left: 0px;
+  text-align: center;
+
+  .resource {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+
+    .resource-name {
+      font-weight: bold;
+    }
+
+    .resource-value {}
+
+    .resource-divider {}
+
+    .resource-max {}
+  }
+}

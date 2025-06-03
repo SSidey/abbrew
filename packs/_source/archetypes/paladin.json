@@ -1,0 +1,99 @@
+{
+  "name": "Paladin",
+  "type": "archetype",
+  "_id": "pxHhJym05vZXz73K",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "roleRequirements": {
+      "1": {
+        "isActive": true,
+        "roles": "[{\"label\":\"melee\",\"value\":\"Melee\",\"title\":\"You fight primarily in melee with your opponents.\"},{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"}]",
+        "parsedRoles": [],
+        "restrictedRoles": "[{\"label\":\"scoundrel\",\"value\":\"Scoundrel\",\"title\":\"You are proficient in illicit skills, engaging in underhanded tactics.\"}]",
+        "parsedRestrictedRoles": [],
+        "isMajor": false,
+        "path": {
+          "raw": "",
+          "name": "",
+          "id": ""
+        }
+      },
+      "2": {
+        "isActive": true,
+        "roles": "[{\"label\":\"acolyte\",\"value\":\"Acolyte\",\"title\":\"You derive your abilities from a higher power.\"},{\"label\":\"magic\",\"value\":\"Magic\",\"title\":\"You primarily harness magic to combat your foes.\"}]",
+        "parsedRoles": [],
+        "restrictedRoles": "[{\"label\":\"scoundrel\",\"value\":\"Scoundrel\",\"title\":\"You are proficient in illicit skills, engaging in underhanded tactics.\"}]",
+        "parsedRestrictedRoles": [],
+        "isMajor": false,
+        "path": {
+          "raw": "",
+          "name": "",
+          "id": ""
+        }
+      },
+      "3": {
+        "isActive": false,
+        "roles": "",
+        "parsedRoles": [],
+        "restrictedRoles": "",
+        "parsedRestrictedRoles": [],
+        "isMajor": false,
+        "path": {
+          "raw": "",
+          "name": "",
+          "id": ""
+        }
+      },
+      "4": {
+        "isActive": false,
+        "roles": "",
+        "parsedRoles": [],
+        "restrictedRoles": "",
+        "parsedRestrictedRoles": [],
+        "isMajor": false,
+        "path": {
+          "raw": "",
+          "name": "",
+          "id": ""
+        }
+      },
+      "5": {
+        "isActive": false,
+        "roles": "",
+        "parsedRoles": [],
+        "restrictedRoles": "",
+        "parsedRestrictedRoles": [],
+        "isMajor": false,
+        "path": {
+          "raw": "",
+          "name": "",
+          "id": ""
+        }
+      }
+    },
+    "skillIds": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746215634144,
+    "modifiedTime": 1746215681558,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!pxHhJym05vZXz73K"
+}

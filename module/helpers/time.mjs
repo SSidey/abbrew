@@ -1,0 +1,42 @@
+export async function onWorldTimeUpdate(worldTime, td, options, userId) {
+    if (game.user !== game.users?.activeGM) {
+        return;
+    }
+
+    const expiredEffects = findExpiredEffects();
+    await processExpiredEffects(expiredEffects);
+}
+
+export async function handleSkillExpiry(turnPhase, actor) {
+    let expiredEffects = findExpiredEffects();
+    if (turnPhase === "end") {
+        expiredEffects = expiredEffects.filter(e => e.flags.abbrew.skill.expiresOn === "end" && foundry.utils.parseUuid(e.origin).id === actor?._id);
+    } else {
+        expiredEffects = expiredEffects.filter(e => e.flags.abbrew.skill.expiresOn !== "end");
+    }
+    await processExpiredEffects(expiredEffects);
+}
+
+async function processExpiredEffects(expiredEffects) {
+    let promises = [];
+    expiredEffects.forEach((x) => promises.push(x.delete()));
+    await Promise.all(promises);
+}
+
+function findExpiredEffects() {
+    return Array.from(game.scenes?.active?.tokens ?? [])
+        .flatMap((x) => {
+            const actor = x.actor;
+            if (actor == null) return [];
+            return actor.appliedEffects;
+        })
+        .filter((x) => isExpired(x));
+}
+
+function isExpired(effect) {
+    return (
+        effect.isTemporary &&
+        effect.duration.remaining != null &&
+        effect.duration.remaining <= 0
+    );
+}

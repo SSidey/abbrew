@@ -13,11 +13,8 @@ export default class AbbrewWeapon extends AbbrewPhysicalItem {
 
   static addWeaponSchema(schema) {
     const fields = foundry.data.fields;
-    const requiredInteger = { required: true, nullable: false, integer: true };
 
-    schema.weapon = new fields.SchemaField({
-      size: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 9 })
-    });
+    schema.isOverpowerTrained = new fields.BooleanField({ required: true, nullable: false, initial: false });
 
     AbbrewAttackBase.addAttackSchema(schema);
   }
@@ -30,8 +27,10 @@ export default class AbbrewWeapon extends AbbrewPhysicalItem {
 
   // Post Active Effects
   prepareDerivedData() {
-    // Build the formula dynamically using string interpolation
+    this.isOverpowerTrained = this.doesParentActorHaveSkillTrait("skillTraining", "offensiveSkills", "base", "overpower") ?? false;
+  }
 
-    this.formula = `1d10x10cs10`;
+  doesParentActorHaveSkillTrait(feature, subFeature, effect, data) {
+    return this?.parent?.actor?.doesActorHaveSkillTrait(feature, subFeature, effect, data) ?? false;
   }
 }

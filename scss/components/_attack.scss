@@ -1,14 +1,35 @@
-li.attack-profile {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    list-style: none;
-}
+// button.attack-damage-button {
+//     display: grid;
+//     grid-template-columns: repeat(2, 1fr);
+// }
 
-ol.attack-profiles {
-    list-style: none;
-}
-
-button.attack-damage-button {
+.weapon-container {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 2fr 6fr;
+    width: 100%;
+
+    .weapon-details {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        justify-items: center;
+        align-items: center;
+
+        .weapon-image {}
+
+        .weapon-name {}
+    }
+
+
+    ol.attack-profiles {
+        list-style: none;
+        padding-left: 0px;
+
+        li.attack-profile {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            list-style: none;
+            grid-column-gap: 1em;
+        }
+    }
+
 }

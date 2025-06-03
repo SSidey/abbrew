@@ -22,7 +22,9 @@
             {{#each system.wounds as |wound|}}
             <li class="wound" data-wound-type="{{wound.type}}" data-wound-value="{{wound.value}}">
               <div class="wound-value">{{wound.value}}</div>
-              <img src="systems/abbrew/assets/icons/wounds/{{wound.type}}.webp" alt="{{wound.type}} {{wound.value}}">
+              <img class="wound-image" src="systems/abbrew/assets/icons/wounds/{{wound.type}}.webp"
+                alt="{{wound.type}} {{wound.value}}">
+              <span class="wound-tooltip">{{wound.type}}</span>
             </li>
             {{/each}}
           </ol>
@@ -32,15 +34,14 @@
           <label for="system.attributes.level.value" class="resource-label">Tier</label>
           <div class="resource-content flexrow flex-center flex-between">
             <input type="text" name="system.meta.tier.value" value="{{system.meta.tier.value}}" data-dtype="Number"
-              readonly />
+              {{#unless (isGM)}}readonly{{/unless}} />
           </div>
         </div>
 
         <div class="resource flex-group-center">
-          <label for="system.movement.baseSpeed" class="resource-label">Speed</label>
+          <label for="system.actions" class="resource-label">Actions</label>
           <div class="resource-content flexrow flex-center flex-between">
-            <input type="text" name="system.movement.baseSpeed" value="{{system.movement.baseSpeed}}"
-              data-dtype="Number" readonly />
+            <input type="text" name="system.actions" value="{{system.actions}}" data-dtype="Number" />
           </div>
         </div>
 
@@ -102,8 +103,8 @@
           <div class="attributes flexcol">
             {{#each system.attributes as |attribute key|}}
             <div class="attribute flexrow flex-group-center">
-              <label for="system.attributes.{{key}}.value" class="resource-label rollable flexlarge align-left"
-                data-roll="d10+@attributes.{{key}}.value" data-label="{{attribute.label}}">{{attribute.label}}</label>
+              <label for="system.attributes.{{key}}.value" class="resource-label attribute-check flexlarge align-left"
+                data-attribute="{{key}}" data-label="{{attribute.label}}">{{attribute.label}}</label>
               <input type="text" name="system.attributes.{{key}}.value" value="{{attribute.value}}" min=0 max=9
                 data-dtype="Number" />
               <input type="text" name="system.attributes.{{key}}.rank" value="{{attribute.rank}}" data-dtype="Number"
@@ -113,16 +114,24 @@
             </div>
             {{/each}}
           </div>
+
+          {{> "systems/abbrew/templates/actor/parts/actor-resources.hbs"}}
+          {{> "systems/abbrew/templates/actor/parts/actor-concepts.hbs"}}
         </aside>
 
         {{!-- For the main skills list, span the right two columns --}}
         <section class="main grid-span-2">
           {{!-- This is a Handlebars partial. They're stored in the `/parts` folder next to this sheet, and defined in
           module/helpers/templates.mjs --}}
-          {{> "systems/abbrew/templates/actor/parts/actor-anatomy.hbs"}}
-          {{> "systems/abbrew/templates/actor/parts/actor-armour.hbs" showEquipState=false}}
-          {{> "systems/abbrew/templates/actor/parts/actor-weapons.hbs" weaponsList=equippedWeapons
-          showAttackProfiles=true showEquipState=false showItemControls=false}}
+          <div class="resource flex-group-center">
+            <label for="system.movement.baseSpeed" class="resource-label">Speed</label>
+            <div class="resource-content flexrow flex-center flex-between">
+              <input type="text" name="system.movement.baseSpeed" value="{{system.movement.baseSpeed}}"
+                data-dtype="Number" readonly />
+            </div>
+          </div>
+          {{> "systems/abbrew/templates/actor/parts/actor-anatomy.hbs" showDeleteControl=false}}
+          {{> "systems/abbrew/templates/actor/parts/actor-armour.hbs" showEquipState=false armour=wornArmour}}
         </section>
 
       </section>
@@ -131,7 +140,6 @@
     {{!-- Owned Skills Tab --}}
     <div class="tab skills" data-group="primary" data-tab="skills">
       <section>
-        {{!-- TODO: 25 total skills for background? Grid of 5--}}
         {{> "systems/abbrew/templates/actor/parts/actor-skills.hbs"}}
       </section>
     </div>
@@ -145,7 +153,8 @@
     <div class="tab biography" data-group="primary" data-tab="description">
       {{!-- If you want TinyMCE editors to output inline rolls when rendered, you need to pass the actor's roll data to
       the rollData property. --}}
-      {{editor system.biography target="system.biography" rollData=rollData button=true owner=owner editable=editable}}
+      {{editor enrichedBiography target="system.biography" engine="prosemirror" button=true owner=owner
+      editable=editable}}
     </div>
 
     {{!-- Owned Items Tab --}}

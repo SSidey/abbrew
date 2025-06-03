@@ -1,0 +1,205 @@
+{
+  "name": "Disoriented",
+  "type": "skill",
+  "_id": "abbrewCDisorient",
+  "img": "systems/abbrew/assets/icons/statuses/disoriented.svg",
+  "system": {
+    "description": "<p>You have been disoriented, you cannot restore guard nor parry while you have this condition.</p>",
+    "traits": "",
+    "abbrewId": {
+      "value": "abbrew.skill.disoriented.abbrewCDisorient",
+      "uuid": "abbrewCDisorient"
+    },
+    "skillTraits": "",
+    "skillModifiers": {
+      "synergy": "",
+      "discord": "[{\"id\":\"abbrewParry00000\",\"value\":\"Parry\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewParry00000\"},{\"value\":\"Restore Guard\",\"id\":\"iUJqYFdrcfZyUr6S\",\"sourceId\":\"Compendium.abbrew.skills.Item.iUJqYFdrcfZyUr6S\"}]"
+    },
+    "configurable": true,
+    "isActivatable": false,
+    "skills": [],
+    "action": {
+      "activationType": "synergy",
+      "actionCost": "1",
+      "actionImage": "",
+      "duration": {
+        "precision": "-1",
+        "value": 0,
+        "expireOnStartOfTurn": true
+      },
+      "uses": {
+        "hasUses": true,
+        "value": 1,
+        "max": 0,
+        "period": "",
+        "asStacks": true,
+        "removeWhenNoUsesRemain": true,
+        "stackRemovalActivation": true
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "attackProfile": {
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": 0,
+        "attackMode": "",
+        "damage": [],
+        "finisherLimit": 10
+      },
+      "modifiers": {
+        "fortune": 0,
+        "actionCost": {
+          "value": 0,
+          "operator": ""
+        },
+        "attackProfile": {
+          "attackType": "",
+          "attackMode": "",
+          "handsSupplied": 0,
+          "finisherLimit": {
+            "value": 0,
+            "operator": ""
+          },
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "damage": []
+        },
+        "guard": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": []
+        }
+      }
+    },
+    "skillType": "temporary",
+    "path": {
+      "value": "",
+      "archetype": ""
+    },
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": "",
+    "applyTurnStart": false,
+    "applyOnExpiry": false,
+    "applyTurnEnd": false
+  },
+  "effects": [
+    {
+      "name": "Disoriented",
+      "img": "systems/abbrew/assets/icons/statuses/disoriented.svg",
+      "origin": "Compendium.abbrew.conditions.Item.abbrewCDisorient",
+      "duration": {
+        "rounds": null,
+        "startTime": null,
+        "seconds": null,
+        "combat": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "disabled": false,
+      "_id": "3mx7LChk26e1LPl0",
+      "type": "base",
+      "system": {},
+      "changes": [],
+      "description": "<p>You have been disoriented, you cannot restore guard nor parry while you have this condition.</p>",
+      "tint": "#ffffff",
+      "transfer": true,
+      "statuses": [
+        "disoriented"
+      ],
+      "sort": 0,
+      "flags": {
+        "statuscounter": {
+          "config": {
+            "dataSource": "flags.abbrew.skill.stacks",
+            "type": "default"
+          },
+          "value": 1,
+          "visible": false
+        },
+        "abbrew": {
+          "skill": {
+            "stacks": 1
+          }
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "coreVersion": "12.331",
+        "systemId": "abbrew",
+        "systemVersion": "0.0.2-prerelease31",
+        "createdTime": 1745177790062,
+        "modifiedTime": 1745691933052,
+        "lastModifiedBy": "abbrewpacks00000"
+      },
+      "_key": "!items.effects!abbrewCDisorient.3mx7LChk26e1LPl0"
+    }
+  ],
+  "folder": null,
+  "sort": 300000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743076241070,
+    "modifiedTime": 1745691933049,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!abbrewCDisorient"
+}

@@ -1,0 +1,90 @@
+{
+  "folder": "Mu36h9V2gwzlYs7A",
+  "name": "Poisoner",
+  "type": "background",
+  "_id": "N3NqEN0ZUi5UUP7E",
+  "img": "systems/abbrew/assets/icons/paths/poisoner.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "skills": {
+      "granted": [
+        {
+          "name": "Apprentice Poisoner",
+          "id": "eXiBX6PlLeJSywAb",
+          "image": "systems/abbrew/assets/icons/paths/poisoner.svg",
+          "sourceId": "Compendium.abbrew.playerskills.Item.eXiBX6PlLeJSywAb",
+          "skillType": ""
+        }
+      ]
+    },
+    "attributes": {
+      "str": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "dex": {
+        "value": 2,
+        "label": "",
+        "isEnabled": true
+      },
+      "agi": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "con": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      },
+      "int": {
+        "value": 2,
+        "label": "",
+        "isEnabled": true
+      },
+      "wit": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "vis": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "wil": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      }
+    },
+    "creatureForm": {
+      "name": "",
+      "id": "",
+      "image": "",
+      "sourceId": ""
+    }
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746270646211,
+    "modifiedTime": 1746271787752,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!N3NqEN0ZUi5UUP7E"
+}

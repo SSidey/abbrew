@@ -1,0 +1,80 @@
+{
+  "folder": "RYW9WG1OWOjwbVfI",
+  "name": "Savanna",
+  "type": "background",
+  "_id": "8BlopgaiIyPELlRN",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "skills": [],
+    "attributes": {
+      "str": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "dex": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      },
+      "agi": {
+        "value": 2,
+        "label": "",
+        "isEnabled": true
+      },
+      "con": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      },
+      "int": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "wit": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "vis": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "wil": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      }
+    },
+    "creatureForm": {
+      "name": "",
+      "id": "",
+      "image": "",
+      "sourceId": ""
+    }
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743077640714,
+    "modifiedTime": 1743077640714,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!8BlopgaiIyPELlRN"
+}

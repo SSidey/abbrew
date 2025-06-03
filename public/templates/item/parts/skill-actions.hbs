@@ -1,52 +1,1005 @@
+{{#if (eq system.skillType "resource")}}
+<div>
+    <div class="skill-element-2">
+        <label>Capacity</label>
+        <input type="text" name="system.resource.capacity" value="{{system.resource.capacity}}" data-dtype="Number" />
+    </div>
+    <div class="skill-element-2">
+        <label>Operator</label>
+        <select name="system.resource.operator">
+            {{selectOptions config.operators selected=system.resource.operator blank=""
+            localize=true}}
+        </select>
+    </div>
+    <div class="skill-element-2">
+        <label class="resource-label">Related Resource</label>
+        <input type="text" name="system.resource.relatedResource" class="resource-drop"
+            value="{{system.resource.relatedResource}}" data-dtype="String" data-dropType="skill"
+            data-dropSkillType="resource" data-dropTarget="relatedResource" {{#unless (isGM)}}readonly{{/unless}} />
+    </div>
+    <label class="slide-toggle roboto-upper">
+        <input type="checkbox" class="action-activatable" name="system.resource.fillCapacityOnCreate" {{ checked
+            system.resource.fillCapacityOnCreate }}>
+        <span>Fill on Create</span>
+        {{#if system.resource.fillCapacityOnCreate}}
+        <i class="fa fa-toggle-on"></i>
+        {{else}}
+        <i class="fa fa-toggle-off"></i>
+        {{/if}}
+    </label>
+</div>
+{{/if}}
+{{#unless (eq system.skillType "resource")}}
 <label class="slide-toggle roboto-upper">
-    <input type="checkbox" class="action-activatable" name="system.activatable" {{ checked system.activatable }}>
-    <span>{{localize "ABBREW.Activatable"}}</span>
-    {{#if system.activatable}}
+    <input type="checkbox" class="action-activatable" name="system.isActivatable" {{ checked system.isActivatable }}>
+    <span>{{localize "ABBREW.IsActivatable"}}</span>
+    {{#if system.isActivatable}}
     <i class="fa fa-toggle-on"></i>
     {{else}}
     <i class="fa fa-toggle-off"></i>
     {{/if}}
 </label>
-{{#if system.activatable}}
+<label class="slide-toggle roboto-upper">
+    <input type="checkbox" class="action-activatable" name="system.activateOnCreate" {{ checked system.activateOnCreate
+        }}>
+    <span>On Create</span>
+    {{#if system.activateOnCreate}}
+    <i class="fa fa-toggle-on"></i>
+    {{else}}
+    <i class="fa fa-toggle-off"></i>
+    {{/if}}
+</label>
+<label class="slide-toggle roboto-upper">
+    <input type="checkbox" class="action-activatable" name="system.applyTurnStart" {{ checked system.applyTurnStart }}>
+    <span>Apply Start of Turn</span>
+    {{#if system.applyTurnStart}}
+    <i class="fa fa-toggle-on"></i>
+    {{else}}
+    <i class="fa fa-toggle-off"></i>
+    {{/if}}
+</label>
+<label class="slide-toggle roboto-upper">
+    <input type="checkbox" class="action-activatable" name="system.applyTurnEnd" {{ checked system.applyTurnEnd }}>
+    <span>Apply End of Turn</span>
+    {{#if system.applyTurnEnd}}
+    <i class="fa fa-toggle-on"></i>
+    {{else}}
+    <i class="fa fa-toggle-off"></i>
+    {{/if}}
+</label>
+<label class="slide-toggle roboto-upper">
+    <input type="checkbox" class="action-activatable" name="system.applyOnExpiry" {{ checked system.applyOnExpiry }}>
+    <span>Apply On Expiry</span>
+    {{#if system.applyOnExpiry}}
+    <i class="fa fa-toggle-on"></i>
+    {{else}}
+    <i class="fa fa-toggle-off"></i>
+    {{/if}}
+</label>
+<label class="slide-toggle roboto-upper">
+    <input type="checkbox" class="action-activatable" name="system.activateOnDamageAccept" {{ checked
+        system.activateOnDamageAccept }}>
+    <span>Activate On Damage Accept</span>
+    {{#if system.activateOnDamageAccept}}
+    <i class="fa fa-toggle-on"></i>
+    {{else}}
+    <i class="fa fa-toggle-off"></i>
+    {{/if}}
+</label>
+<div class="skill-paired-row">
+    <div class="skill-element-2">
+        <label>Action Cost</label>
+        <input type="number" name="system.action.actionCost" value="{{system.action.actionCost}}" data-dtype="Number" />
+    </div>
+    <div></div>
+</div>
+<div class="skill-paired-row">
+    <div class="skill-element-2">
+        <label>Action Cost Modifier</label>
+        <input type="number" name="system.action.modifiers.actionCost.value"
+            value="{{system.action.modifiers.actionCost.value}}" data-dtype="Number" />
+    </div>
+    <div class="skill-element-2">
+        <label>Operator</label>
+        <select name="system.action.modifiers.actionCost.operator">
+            {{selectOptions config.operators selected=system.action.modifiers.actionCost.operator blank=""
+            localize=true}}
+        </select>
+    </div>
+</div>
 <div class="item action">
     <div class="form-group">
         <label>{{ localize "ABBREW.SkillActivationType" }}</label>
         <select name="system.action.activationType">
-            {{selectOptions config.skillActivationTypes selected=system.action.activationType blank="" localize=true}}
+            {{selectOptions config.skillActivationTypes selected=system.action.activationType localize=true}}
         </select>
     </div>
     <div>
-        <label>Action Cost</label>
-        <input type="text" name="system.action.actionCost" value="{{system.action.actionCost}}" data-dtype="String" />
+        <h3>Duration</h3>
+        <label class="slide-toggle roboto-upper">
+            <input type="checkbox" name="system.action.duration.isConcentration" {{ checked
+                system.action.duration.isConcentration }}>
+            <span>Concentration?</span>
+            {{#if system.action.duration.isConcentration}}
+            <i class="fa fa-toggle-on"></i>
+            {{else}}
+            <i class="fa fa-toggle-off"></i>
+            {{/if}}
+        </label>
+        {{#unless system.action.duration.isConcentration}}
+        <select name="system.action.duration.precision">
+            {{selectOptions config.durations selected=system.action.duration.precision localize=true}}
+        </select>
+        <input type="text" name="system.action.duration.value" value="{{system.action.duration.value}}"
+            data-dtype="String" />
+        <label class="slide-toggle roboto-upper">
+            <input type="checkbox" class="action-activatable" name="system.action.duration.expireOnStartOfTurn" {{
+                checked system.action.duration.expireOnStartOfTurn }}>
+            {{#if system.action.duration.expireOnStartOfTurn}}
+            <span>Expires on start of turn</span>
+            {{else}}
+            <span>Expires at end of turn</span>
+            {{/if}}
+            {{#if system.action.duration.expireOnStartOfTurn}}
+            <i class="fa fa-toggle-on"></i>
+            {{else}}
+            <i class="fa fa-toggle-off"></i>
+            {{/if}}
+        </label>
+        {{/unless}}
     </div>
     <div>
+        <h3>Uses</h3>
+        <label class="slide-toggle roboto-upper">
+            <input type="checkbox" name="system.action.uses.hasUses" {{ checked system.action.uses.hasUses }}>
+            <span>Has Uses?</span>
+            {{#if system.action.uses.hasUses}}
+            <i class="fa fa-toggle-on"></i>
+            {{else}}
+            <i class="fa fa-toggle-off"></i>
+            {{/if}}
+        </label>
+        {{#if system.action.uses.hasUses}}
+        <div class="skill-section">
+            <label class="slide-toggle roboto-upper">
+                <input type="checkbox" class="action-activatable" name="system.action.uses.asStacks" {{ checked
+                    system.action.uses.asStacks }}>
+                <span>Display as Stacks</span>
+                {{#if system.action.uses.asStacks}}
+                <i class="fa fa-toggle-on"></i>
+                {{else}}
+                <i class="fa fa-toggle-off"></i>
+                {{/if}}
+            </label>
+            {{#if system.action.uses.asStacks}}
+            <label class="slide-toggle roboto-upper">
+                <input type="checkbox" class="action-activatable" name="system.action.uses.removeStackOnUse" {{ checked
+                    system.action.uses.removeStackOnUse }}>
+                <span>Remove Stack on Use?</span>
+                {{#if system.action.uses.removeStackOnUse}}
+                <i class="fa fa-toggle-on"></i>
+                {{else}}
+                <i class="fa fa-toggle-off"></i>
+                {{/if}}
+            </label>
+            {{/if}}
+            {{#unless system.isActivatable}}
+            <label class="slide-toggle roboto-upper">
+                <input type="checkbox" name="system.action.uses.stackRemovalActivation" {{ checked
+                    system.action.uses.stackRemovalActivation }}>
+                <span>Remove Stacks on Activation?</span>
+                {{#if system.action.uses.stackRemovalActivation}}
+                <i class="fa fa-toggle-on"></i>
+                {{else}}
+                <i class="fa fa-toggle-off"></i>
+                {{/if}}
+            </label>
+            {{/unless}}
+            {{#if (eq system.skillType "temporary")}}
+            <label class="slide-toggle roboto-upper">
+                <input type="checkbox" name="system.action.uses.removeWhenNoUsesRemain" {{ checked
+                    system.action.uses.removeWhenNoUsesRemain }}>
+                <span>Remove When No Uses?</span>
+                {{#if system.action.uses.removeWhenNoUsesRemain}}
+                <i class="fa-solid fa-square-check"></i>
+                {{else}}
+                <i class="fa-regular fa-square"></i>
+                {{/if}}
+            </label>
+            {{/if}}
+            <div class="skill-element-2">
+                <label>Curent Uses</label>
+                <input type="text" name="system.action.uses.value" value="{{system.action.uses.value}}"
+                    data-dtype="Number" />
+            </div>
+            <div class="skill-element-2">
+                <label>Restored Every</label>
+                <select name="system.action.uses.period">
+                    {{selectOptions config.durationsLabels selected=system.action.uses.period blank=""
+                    localize=true}}
+                </select>
+            </div>
+            <div class="skill-element-2">
+                <label>Maximum Uses</label>
+                <input type="text" name="system.action.uses.max" value="{{system.action.uses.max}}"
+                    data-dtype="Number" />
+            </div>
+        </div>
+        {{/if}}
+    </div>
+    <div>
+        <h3>Charges</h3>
+        <label class="slide-toggle roboto-upper">
+            <input type="checkbox" name="system.action.charges.hasCharges" {{ checked system.action.charges.hasCharges
+                }}>
+            <span>Has Charges?</span>
+            {{#if system.action.charges.hasCharges}}
+            <i class="fa fa-toggle-on"></i>
+            {{else}}
+            <i class="fa fa-toggle-off"></i>
+            {{/if}}
+        </label>
+        {{#if system.action.charges.hasCharges}}
+        <label>Curent Charges</label>
+        <input type="text" name="system.action.charges.value" value="{{system.action.charges.value}}"
+            data-dtype="Number" />
+        <label>Maximum Charges</label>
+        <input type="text" name="system.action.charges.max" value="{{system.action.charges.max}}" data-dtype="Number" />
+        {{/if}}
+    </div>
+    <div>
+        <h3>Senses</h3>
+        <label class="slide-toggle roboto-upper">
+            <input type="checkbox" name="system.senses.modifiesSenses" {{ checked system.senses.modifiesSenses }}>
+            <span>Modifies Senses?</span>
+            {{#if system.senses.modifiesSenses}}
+            <i class="fa fa-toggle-on"></i>
+            {{else}}
+            <i class="fa fa-toggle-off"></i>
+            {{/if}}
+        </label>
+        {{#if system.senses.modifiesSenses}}
+        <div class="skill-senses">
+            <div class="senses-row">
+                <label class="slide-toggle roboto-upper">
+                    <input type="checkbox" name="system.senses.sight.enabled" {{ checked system.senses.sight.enabled }}>
+                    <span>Enabled?</span>
+                    {{#if system.senses.sight.enabled}}
+                    <i class="fa fa-toggle-on"></i>
+                    {{else}}
+                    <i class="fa fa-toggle-off"></i>
+                    {{/if}}
+                </label>
+                <div class="sense-element-2">
+                    <label>Range</label>
+                    <input type="number" name="system.senses.sight.range" value="{{system.senses.sight.range}}"
+                        placeholder="&infin;" data-dtype="Number" />
+                </div>
+                <div class="sense-profile-element-2">
+                    <label>Angle</label>
+                    <input type="number" name="system.senses.sight.angle" value="{{system.senses.sight.angle}}"
+                        data-dtype="Number" />
+                </div>
+                <div class="sense-element-2">
+                    <label>VisionMode</label>
+                    <select name="system.senses.sight.visionMode">
+                        {{selectOptions config.visionModes selected=system.senses.sight.visionMode
+                        blank="basic" localize=true}}
+                    </select>
+                </div>
+            </div>
+            <div>
+                <ol class='items-list'>
+                    {{#each system.senses.detectionModes as |item id|}}
+                    <li data-id='{{id}}'>
+                        <div class="item detection-mode-row detection-mode-container">
+                            <div>
+                                <div class="sense-element-2">
+                                    <label>Mode</label>
+                                    <select name="system.senses.detectionModes.{{id}}.id">
+                                        {{selectOptions ../config.detectionModes selected=item.id
+                                        blank=""
+                                        localize=true}}
+                                    </select>
+                                </div>
+                                <div class="sense-element-2">
+                                    <label>Range</label>
+                                    <input type="number" name="system.senses.detectionModes.{{id}}.range"
+                                        value="{{item.range}}" placeholder="&infin;" data-dtype="Number" />
+                                </div>
+                            </div>
+                            <div class="detection-mode remove">
+                                <a class="detection-mode-control" data-action="remove-detection-mode">
+                                    <i class="fa-solid fa-minus"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    {{/each}}
+                    <li class="detection-mode add">
+                        <div class="form-group">
+                            <label>
+                                <a class="detection-mode-control" data-action="add-detection-mode">
+                                    Add Detection Mode
+                                    <i class="fa-solid fa-plus"></i>
+                                </a>
+                            </label>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+        {{/if}}
+    </div>
+    {{#if system.isActivatable}}
+    <div>
+        <h3>Dialog Prompts</h3>
+        <ol class="async-values-list">
+            {{#each system.action.asyncValues as |value i|}}
+            <li class="effect-change flexrow" data-id="{{i}}">
+                <div class="key">
+                    <input type="text" name="system.action.asyncValues.{{i}}.name" value="{{value.name}}" />
+                </div>
+                <div class="type">
+                    <select name="system.action.asyncValues.{{i}}.type">
+                        {{selectOptions ../config.asyncValueTypes selected=value.type
+                        localize=true}}
+                    </select>
+                </div>
+                <div class="title">
+                    <input type="text" name="system.action.asyncValues.{{i}}.title" value="{{value.title}}" />
+                </div>
+                <div class="numerator">
+                    <input type="number" name="system.action.asyncValues.{{i}}.numerator" value="{{value.numerator}}" />
+                </div>
+                <div class="denominator">
+                    <input type="number" name="system.action.asyncValues.{{i}}.denominator"
+                        value="{{value.denominator}}" />
+                </div>
+                <div class="value-controls">
+                    <a class="value-control" data-action="remove"><i class="fas fa-trash"></i></a>
+                </div>
+                <div class="value-min">
+                    <label>Min</label>
+                    <input type="text" name="system.action.asyncValues.{{i}}.min" value="{{value.min}}" />
+                    <select name="system.action.asyncValues.{{i}}.minOperator">
+                        {{selectOptions ../config.simpleNumericOperators selected=value.minOperator
+                        localize=true}}
+                    </select>
+                    <select name="system.action.asyncValues.{{i}}.minType">
+                        {{selectOptions ../config.modifierPrefixes selected=value.minType
+                        localize=true}}
+                    </select>
+                </div>
+                <div class="value-max">
+                    <label>Max</label>
+                    <input type="text" name="system.action.asyncValues.{{i}}.max" value="{{value.max}}" />
+                    <select name="system.action.asyncValues.{{i}}.maxOperator">
+                        {{selectOptions ../config.simpleNumericOperators selected=value.maxOperator
+                        localize=true}}
+                    </select>
+                    <select name="system.action.asyncValues.{{i}}.maxType">
+                        {{selectOptions ../config.modifierPrefixes selected=value.maxType
+                        localize=true}}
+                    </select>
+                </div>
+            </li>
+            {{/each}}
+            <li class="value add">
+                <div class="value-add">
+                    <label>
+                        <a class="value-control" data-action="add">
+                            Add Value
+                            <i class="fa-solid fa-plus"></i>
+                        </a>
+                    </label>
+                </div>
+            </li>
+        </ol>
+    </div>
+    {{/if}}
+    <div>
         <div>
-            <label>Guard</label>
+            <h3>Fortune</h3>
+            <input type="text" name="system.action.modifiers.fortune" value="{{system.action.modifiers.fortune}}"
+                data-dtype="String" />
+        </div>
+        <div>
+            <label>Successes</label>
+            <input type="text" name="system.action.modifiers.successes" value="{{system.action.modifiers.successes}}"
+                data-dtype="string" />
+        </div>
+        <div>
+            <h3>Skill Check</h3>
+            {{> "systems/abbrew/templates/item/parts/modifier-builder-field.hbs"
+            modifierList=system.action.skillCheck
+            modifierListName="system.action.skillCheck" config=config}}
+        </div>
+        <div>
+            <h3>Request Skill Check</h3>
+            <h4>Check Requirement</h4>
+            <label class="slide-toggle roboto-upper">
+                <input type="checkbox" name="system.action.skillRequest.isEnabled" {{ checked
+                    system.action.skillRequest.isEnabled }}>
+                <span>Enable Skill Request?</span>
+                {{#if system.action.skillRequest.isEnabled}}
+                <i class="fa fa-toggle-on"></i>
+                {{else}}
+                <i class="fa fa-toggle-off"></i>
+                {{/if}}
+            </label>
+            {{#if system.action.skillRequest.isEnabled}}
+            <label class="slide-toggle roboto-upper">
+                <input type="checkbox" name="system.action.skillRequest.isContested" {{ checked
+                    system.action.skillRequest.isContested }}>
+                <span>Is Contested?</span>
+                {{#if system.action.skillRequest.isContested}}
+                <i class="fa fa-toggle-on"></i>
+                {{else}}
+                <i class="fa fa-toggle-off"></i>
+                {{/if}}
+            </label>
+            {{#unless system.action.skillRequest.isContested}}
+            <label class="slide-toggle roboto-upper">
+                <input type="checkbox" name="system.action.skillRequest.selfCheck" {{ checked
+                    system.action.skillRequest.selfCheck }}>
+                <span>Self Check?</span>
+                {{#if system.action.skillRequest.selfCheck}}
+                <i class="fa fa-toggle-on"></i>
+                {{else}}
+                <i class="fa fa-toggle-off"></i>
+                {{/if}}
+            </label>
+            {{/unless}}
+            <select name="system.action.skillRequest.checkType">
+                {{selectOptions config.checkTypes selected=system.action.skillRequest.checkType localize=true}}
+            </select>
+            {{#if system.action.skillRequest.isContested}}
+            <div>
+                <div>
+                    <label>Modifiers</label>
+                    <input type="text" name="system.action.skillRequest.requirements.modifiers"
+                        value="{{system.action.skillRequest.requirements.modifiers}}" data-dtype="String" />
+                </div>
+            </div>
+            {{else}}
+            <div>
+                <div>
+                    <label>Successes</label>
+                    <input type="text" name="system.action.skillRequest.requirements.successes"
+                        value="{{system.action.skillRequest.requirements.successes}}" data-dtype="String" />
+                </div>
+                <div>
+                    <label>Result</label>
+                    <input type="text" name="system.action.skillRequest.requirements.result"
+                        value="{{system.action.skillRequest.requirements.result}}" data-dtype="String" />
+                </div>
+            </div>
+            {{/if}}
+            <h4>Target</h4>
+            <div>
+                <label>Target Modifiers</label>
+                <input type="text" name="system.action.skillRequest.targetModifiers"
+                    value="{{system.action.skillRequest.targetModifiers}}" data-dtype="String" data-dropType="skill" />
+            </div>
+            {{/if}}
+        </div>
+        {{#if (eq system.action.activationType "standalone")}}
+        <div>
+            <h3>Attack Profile</h3>
+            <label class="slide-toggle roboto-upper">
+                <input type="checkbox" name="system.action.attackProfile.isEnabled" {{ checked
+                    system.action.attackProfile.isEnabled }}>
+                <span>Enable Attack?</span>
+                {{#if system.action.attackProfile.isEnabled}}
+                <i class="fa fa-toggle-on"></i>
+                {{else}}
+                <i class="fa fa-toggle-off"></i>
+                {{/if}}
+            </label>
+            {{#if system.action.attackProfile.isEnabled}}
+            <div>
+                <div class="skill-attack-profile">
+                    <div class="attack-profile-row">
+                        <div class="attack-profile-element-2">
+                            <label>Attack Type</label>
+                            <select name="system.action.attackProfile.attackType">
+                                {{selectOptions config.attackTypes selected=system.action.attackProfile.attackType
+                                blank="" localize=true}}
+                            </select>
+                        </div>
+                        <div class="attack-profile-element-3">
+                            <label>Finisher Limit</label>
+                            <input type="text" name="system.action.attackProfile.finisherLimit"
+                                value="{{system.action.attackProfile.finisherLimit}}" data-dtype="String" />
+                        </div>
+                    </div>
+                    <div class="attack-profile-row">
+                        <div class="attack-profile-element-2">
+                            <label>Attack Mode</label>
+                            <select name="system.action.attackProfile.attackMode">
+                                {{selectOptions config.attackModes selected=system.action.attackProfile.attackMode
+                                blank=""
+                                localize=true}}
+                            </select>
+                        </div>
+                        <div class="attack-profile-element-3">
+                            <label>Critical</label>
+                            <input type="text" name="system.action.attackProfile.critical"
+                                value="{{system.action.attackProfile.critical}}" data-dtype="String" />
+                        </div>
+                    </div>
+                    <div class="attack-profile-row">
+                        <div class="attack-profile-element-2">
+                            <label>Hands Supplied</label>
+                            <input type="text" name="system.action.attackProfile.handsSupplied"
+                                value="{{system.action.attackProfile.handsSupplied}}" data-dtype="String" />
+                        </div>
+                        <div class="attack-profile-element-3">
+                            <label>Lethal</label>
+                            <input type="text" name="system.action.attackProfile.lethal"
+                                value="{{system.action.attackProfile.lethal}}" data-dtype="String" />
+                        </div>
+                    </div>
+                    {{#if (eq system.action.attackProfile.attackMode "finisher")}}
+                    <div>
+                        <div class="attack-profile-row">
+                            <div class="attack-profile-element-2">
+                                <label>Finisher Cost</label>
+                                <input type="text" name="system.action.attackProfile.finisher.cost"
+                                    value="{{system.action.attackProfile.finisher.cost}}" data-dtype="String" />
+                            </div>
+                            <div class="attack-profile-element-2">
+                                <label>{{ localize "ABBREW.Type" }}</label>
+                                <select name="system.action.attackProfile.finisher.type">
+                                    {{selectOptions config.damageTypes
+                                    selected=system.action.attackProfile.finisher.type
+                                    blank="" localize=true}}
+                                </select>
+                                <div></div>
+                            </div>
+                            <div class="attack-profile-element-max-input">
+                                <label>Finisher Description</label>
+                                {{editor enrichedFinisherDescription
+                                target="system.action.attackProfile.finisher.description"
+                                engine="prosemirror" button=true
+                                owner=owner editable=editable}}
+                            </div>
+                        </div>
+                        <div>
+                            <h4>Wounds</h4>
+                            <ol class="form-list wound-modifier-container">
+                                {{#each system.action.attackProfile.finisher.wounds as |wound k|}}
+                                <li class="item resource wound-row" data-id="{{k}}">
+                                    <div class="wound-element-2 wound-element-value">
+                                        <label>Value</label>
+                                        <input type="text"
+                                            name="system.action.attackProfile.finisher.wounds.{{k}}.value"
+                                            value="{{wound.value}}" data-dtype="Number" />
+                                    </div>
+                                    <div class="wound-element-2 wound-element-type">
+                                        <label>Type</label>
+                                        <select name="system.action.attackProfile.finisher.wounds.{{k}}.type">
+                                            {{selectOptions ../config.wounds selected=wound.type
+                                            blank=""
+                                            localize=true}}
+                                        </select>
+                                    </div>
+                                    <div class="wound-element-2 wound-element-operator">
+                                        <label>{{ localize "ABBREW.Operator" }}</label>
+                                        <select name="system.action.attackProfile.finisher.wounds.{{k}}.operator">
+                                            {{selectOptions ../config.operators selected=wound.operator
+                                            blank=""
+                                            localize=true}}
+                                        </select>
+                                    </div>
+                                    <div class="wound-remove">
+                                        <a class="skill-action-modifier-wound-control"
+                                            data-action="remove-skill-action-attackProfile-wound-finisher-modifier">
+                                            <i class="fa-solid fa-minus"></i>
+                                        </a>
+                                    </div>
+                                </li>
+                                {{/each}}
+                                <li class="skillModifierWound add">
+                                    <div class="form-group">
+                                        <label>
+                                            <a class="skill-action-modifier-wound-control"
+                                                data-action="add-skill-action-attackProfile-wound-finisher-modifier">
+                                                Add Wound Modifier
+                                                <i class="fa-solid fa-plus"></i>
+                                            </a>
+                                        </label>
+                                    </div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                    {{/if}}
+                </div>
+                <ol class="skill-damage-list">
+                    {{#each system.action.attackProfile.damage as |damage j|}}
+                    <li class="item skill-damage-row" data-id="{{j}}">
+                        <div class="skill-damage-profile">
+                            <div class="damage-profile-element-2">
+                                <label>Overall Multiplier</label>
+                                <input type="text" name="system.action.attackProfile.damage.{{j}}.overallMultiplier"
+                                    value="{{damage.overallMultiplier}}" data-dtype="String" />
+                            </div>
+                            <div class="damage-profile-element-2">
+                                <label>{{ localize "ABBREW.Damage" }}</label>
+                                <input type="text" name="system.action.attackProfile.damage.{{j}}.value"
+                                    value="{{damage.value}}" data-dtype="Number" />
+                            </div>
+                            <div class="damage-profile-element-2">
+                                <label>{{ localize "ABBREW.Type" }}</label>
+                                <select name="system.action.attackProfile.damage.{{j}}.type">
+                                    {{selectOptions ../config.damageTypes selected=damage.type blank="" localize=true}}
+                                </select>
+                            </div>
+                            <div class="damage-profile-element-2">
+                                <label>Damage Multiplier</label>
+                                <input type="text" name="system.action.attackProfile.damage.{{j}}.damageMultiplier"
+                                    value="{{damage.damageMultiplier}}" data-dtype="String" />
+                            </div>
+                            <div class="damage-profile-element-2">
+                                <label>Attribute</label>
+                                <select name="system.action.attackProfile.damage.{{j}}.attributeModifier">
+                                    {{selectOptions ../config.attributes selected=damage.attributeModifier blank=""
+                                    localize=true}}
+                                </select>
+                            </div>
+                            <div class="damage-profile-element-2">
+                                <label>Attribute Multiplier</label>
+                                <input type="text" name="system.action.attackProfile.damage.{{j}}.attributeMultiplier"
+                                    value="{{damage.attributeMultiplier}}" data-dtype="String" />
+                            </div>
+                            <div class="damage-profile-element-2">
+                                <label>Penetration</label>
+                                <input type="text" name="system.action.attackProfile.damage.{{j}}.penetration"
+                                    value="{{damage.penetration}}" data-dtype="String" />
+                            </div>
+                        </div>
+                        <div class="skill-damage-control">
+                            <a class="damage-control remove-damage" data-action="remove-damage">
+                                <i class="fa-solid fa-minus"></i>
+                            </a>
+                        </div>
+                    </li>
+                    {{/each}}
+                    <li class="damage add">
+                        <div class="form-group">
+                            <label>
+                                <a class="damage-control" data-action="add-damage">
+                                    Add Damage
+                                    <i class="fa-solid fa-plus"></i>
+                                </a>
+                            </label>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+            {{/if}}
+        </div>
+        {{/if}}
+        {{#if (eq system.action.activationType "synergy")}}
+        <div>
+            <h3>Attack Profile Modifiers</h3>
+            <label class="slide-toggle roboto-upper">
+                <input type="checkbox" name="system.action.modifiers.attackProfile.isEnabled" {{ checked
+                    system.action.modifiers.attackProfile.isEnabled }}>
+                <span>Modify Attacks?</span>
+                {{#if system.action.modifiers.attackProfile.isEnabled}}
+                <i class="fa fa-toggle-on"></i>
+                {{else}}
+                <i class="fa fa-toggle-off"></i>
+                {{/if}}
+            </label>
+            {{#if system.action.modifiers.attackProfile.isEnabled}}
+            <div>
+                <label class="slide-toggle roboto-upper">
+                    <input type="checkbox" name="system.action.modifiers.attackProfile.combineAttacks.isEnabled" {{
+                        checked system.action.modifiers.attackProfile.combineAttacks.isEnabled }}>
+                    <span>Combine Attacks?</span>
+                    {{#if system.action.modifiers.attackProfile.combineAttacks.isEnabled}}
+                    <i class="fa fa-toggle-on"></i>
+                    {{else}}
+                    <i class="fa fa-toggle-off"></i>
+                    {{/if}}
+                </label>
+                {{#if system.action.modifiers.attackProfile.combineAttacks.isEnabled}}
+                <label>Number Combined</label>
+                <input type="number" name="system.action.modifiers.attackProfile.combineAttacks.value"
+                    value="{{system.action.modifiers.attackProfile.combineAttacks.value}}" data-dtype="Number" />
+                {{/if}}
+            </div>
+            <div class="skill-attack-profile">
+                <div class="attack-profile-row">
+                    <div class="attack-profile-element-2">
+                        <label>Attack Type</label>
+                        <select name="system.action.modifiers.attackProfile.attackType">
+                            {{selectOptions config.attackTypes selected=system.action.modifiers.attackProfile.attackType
+                            blank="" localize=true}}
+                        </select>
+                    </div>
+                    <div class="attack-profile-element-3">
+                        <label>Finisher Limit</label>
+                        <input type="text" name="system.action.modifiers.attackProfile.finisherLimit.value"
+                            value="{{system.action.modifiers.attackProfile.finisherLimit.value}}" data-dtype="String" />
+                        <select name="system.action.modifiers.attackProfile.finisherLimit.operator">
+                            {{selectOptions config.operators
+                            selected=system.action.modifiers.attackProfile.finisherLimit.operator
+                            blank=""
+                            localize=true}}
+                        </select>
+                    </div>
+                </div>
+                <div class="attack-profile-row">
+                    <div class="attack-profile-element-2">
+                        <label>Attack Mode</label>
+                        <select name="system.action.modifiers.attackProfile.attackMode">
+                            {{selectOptions config.attackModes selected=system.action.modifiers.attackProfile.attackMode
+                            blank=""
+                            localize=true}}
+                        </select>
+                    </div>
+                    <div class="attack-profile-element-3">
+                        <label>Critical</label>
+                        <input type="text" name="system.action.modifiers.attackProfile.critical.value"
+                            value="{{system.action.modifiers.attackProfile.critical.value}}" data-dtype="String" />
+                        <select name="system.action.modifiers.attackProfile.critical.operator">
+                            {{selectOptions config.operators
+                            selected=system.action.modifiers.attackProfile.critical.operator
+                            blank=""
+                            localize=true}}
+                        </select>
+                    </div>
+                </div>
+                <div class="attack-profile-row">
+                    <div class="attack-profile-element-2">
+                        <label>Hands Supplied</label>
+                        <input type="text" name="system.action.modifiers.attackProfile.handsSupplied"
+                            value="{{system.action.modifiers.attackProfile.handsSupplied}}" data-dtype="String" />
+                    </div>
+                    <div class="attack-profile-element-3">
+                        <label>Lethal</label>
+                        <input type="text" name="system.action.modifiers.attackProfile.lethal.value"
+                            value="{{system.action.modifiers.attackProfile.lethal.value}}" data-dtype="String" />
+                        <select name="system.action.modifiers.attackProfile.lethal.operator">
+                            {{selectOptions config.operators
+                            selected=system.action.modifiers.attackProfile.lethal.operator blank=""
+                            localize=true}}
+                        </select>
+                    </div>
+                </div>
+                {{#if (eq system.action.modifiers.attackProfile.attackMode "finisher")}}
+                <div class="attack-profile-row">
+                    <div class="attack-profile-element-2">
+                        <label>Finisher Cost</label>
+                        <input type="text" name="system.action.modifiers.attackProfile.finisher.cost"
+                            value="{{system.action.modifiers.attackProfile.finisher.cost}}" data-dtype="String" />
+                    </div>
+                    <div class="attack-profile-element-2">
+                        <label>{{ localize "ABBREW.Type" }}</label>
+                        <select name="system.action.modifiers.attackProfile.finisher.type">
+                            {{selectOptions config.damageTypes
+                            selected=system.action.modifiers.attackProfile.finisher.type
+                            blank="" localize=true}}
+                        </select>
+                    </div>
+                    <div class="attack-profile-element-max-input">
+                        <label>Finisher Description</label>
+                        {{editor enrichedFinisherDescription
+                        target="system.action.modifiers.attackProfile.finisher.description"
+                        engine="prosemirror" button=true
+                        owner=owner editable=editable}}
+                    </div>
+                    <div>
+                        <h4>Wounds</h4>
+                        <ol class="form-list wound-modifier-container">
+                            {{#each system.action.modifiers.attackProfile.finisher.wounds as |wound k|}}
+                            <li class="item resource grid-3col" data-id="{{k}}">
+                                <div>
+                                    <label>Value</label>
+                                    <input type="text"
+                                        name="system.action.modifiers.attackProfile.finisher.wounds.{{k}}.value"
+                                        value="{{wound.value}}" data-dtype="Number" />
+                                </div>
+                                <div>
+                                    <label>Type</label>
+                                    <select name="system.action.modifiers.attackProfile.finisher.wounds.{{k}}.type">
+                                        {{selectOptions ../config.wounds selected=wound.type
+                                        blank=""
+                                        localize=true}}
+                                    </select>
+                                </div>
+                                <label>{{ localize "ABBREW.Operator" }}</label>
+                                <select name="system.action.modifiers.attackProfile.finisher.wounds.{{k}}.operator">
+                                    {{selectOptions ../config.operators selected=wound.operator
+                                    blank=""
+                                    localize=true}}
+                                </select>
+                                <div>
+                                    <a class="skill-action-modifier-wound-control"
+                                        data-action="remove-skill-action-modifier-attackProfile-wound-finisher-modifier">
+                                        <i class="fa-solid fa-minus"></i>
+                                    </a>
+                                </div>
+                            </li>
+                            {{/each}}
+                            <li class="skillModifierWound add">
+                                <div class="form-group">
+                                    <label>
+                                        <a class="skill-action-modifier-wound-control"
+                                            data-action="add-skill-action-modifier-attackProfile-wound-finisher-modifier">
+                                            Add Wound Modifier
+                                            <i class="fa-solid fa-plus"></i>
+                                        </a>
+                                    </label>
+                                </div>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+                {{/if}}
+            </div>
+            <ol class="skill-damage-list">
+                {{#each system.action.modifiers.attackProfile.damage as |damage j|}}
+                <li class="item skill-damage-row" data-id="{{j}}">
+                    <div class="skill-damage-profile">
+                        <div class="damage-profile-element-2">
+                            <label>Modify</label>
+                            <select name="system.action.modifiers.attackProfile.damage.{{j}}.modify">
+                                {{selectOptions ../config.modify selected=damage.modify localize=true}}
+                            </select>
+                        </div>
+                        <div class="damage-profile-element-2">
+                            {{#if (or (eq damage.modify "all") (eq damage.modify "one"))}}
+                            <select name="system.action.modifiers.attackProfile.damage.{{j}}.modifyType">
+                                {{selectOptions ../config.damageTypes selected=damage.modifyType blank=""
+                                localize=true}}
+                            </select>
+                            {{/if}}
+                        </div>
+                        {{#unless (eq damage.modify "skip")}}
+                        <div class="damage-profile-element-2">
+                            <label>Overall Multiplier</label>
+                            <input type="text"
+                                name="system.action.modifiers.attackProfile.damage.{{j}}.overallMultiplier"
+                                value="{{damage.overallMultiplier}}" data-dtype="String" />
+                        </div>
+                        <div class="damage-profile-element-2">
+                            <label>{{ localize "ABBREW.Damage" }}</label>
+                            <input type="text" name="system.action.modifiers.attackProfile.damage.{{j}}.value"
+                                value="{{damage.value}}" data-dtype="String" />
+                        </div>
+                        <div class="damage-profile-element-2">
+                            <label>{{ localize "ABBREW.Type" }}</label>
+                            <select name="system.action.modifiers.attackProfile.damage.{{j}}.type">
+                                {{selectOptions ../config.damageTypes selected=damage.type blank="" localize=true}}
+                            </select>
+                        </div>
+                        <div class="damage-profile-element-2">
+                            <label>Damage Multiplier</label>
+                            <input type="text"
+                                name="system.action.modifiers.attackProfile.damage.{{j}}.damageMultiplier"
+                                value="{{damage.damageMultiplier}}" data-dtype="String" />
+                        </div>
+                        <div class="damage-profile-element-2">
+                            <label>Attribute</label>
+                            <select name="system.action.modifiers.attackProfile.damage.{{j}}.attributeModifier">
+                                {{selectOptions ../config.attributes selected=damage.attributeModifier blank=""
+                                localize=true}}
+                            </select>
+                        </div>
+                        <div class="damage-profile-element-2">
+                            <label>Attribute Multiplier</label>
+                            <input type="text"
+                                name="system.action.modifiers.attackProfile.damage.{{j}}.attributeMultiplier"
+                                value="{{damage.attributeMultiplier}}" data-dtype="String" />
+                        </div>
+                        <div class="damage-profile-element-2">
+                            <label>Penetration</label>
+                            <input type="text" name="system.action.modifiers.attackProfile.damage.{{j}}.penetration"
+                                value="{{damage.penetration}}" data-dtype="String" />
+                        </div>
+                        {{/unless}}
+                    </div>
+                    <div class="skill-damage-control">
+                        <a class="damage-control remove-damage" data-action="remove-modifier-damage">
+                            <i class="fa-solid fa-minus"></i>
+                        </a>
+                    </div>
+                </li>
+                {{/each}}
+                <li class="damage add">
+                    <div class="form-group">
+                        <label>
+                            <a class="damage-control" data-action="add-modifier-damage">
+                                Add Damage
+                                <i class="fa-solid fa-plus"></i>
+                            </a>
+                        </label>
+                    </div>
+                </li>
+            </ol>
+            {{/if}}
+        </div>
+        {{/if}}
+        <div>
+            <h3>Guard</h3>
             <div>
                 <label>Self</label>
-                <input type="text" name="system.action.modifiers.guard.self.value"
-                    value="{{system.action.modifiers.guard.self.value}}" data-dtype="String" />
                 <label>{{ localize "ABBREW.Operator" }}</label>
                 <select name="system.action.modifiers.guard.self.operator">
                     {{selectOptions config.operators selected=system.action.modifiers.guard.self.operator blank=""
                     localize=true}}
                 </select>
+                {{> "systems/abbrew/templates/item/parts/modifier-builder-field.hbs"
+                modifierList=system.action.modifiers.guard.self.value
+                modifierListName="system.action.modifiers.guard.self.value" config=config}}
             </div>
             <div>
                 <label>Target</label>
-                <input type="text" name="system.action.modifiers.guard.target.value"
-                    value="{{system.action.modifiers.guard.target.value}}" data-dtype="String" />
                 <label>{{ localize "ABBREW.Operator" }}</label>
                 <select name="system.action.modifiers.guard.target.operator">
                     {{selectOptions config.operators selected=system.action.modifiers.guard.target.operator blank=""
                     localize=true}}
                 </select>
+                {{> "systems/abbrew/templates/item/parts/modifier-builder-field.hbs"
+                modifierList=system.action.modifiers.guard.target.value
+                modifierListName="system.action.modifiers.guard.target.value" allowLateParse=true config=config}}
             </div>
         </div>
         <div>
-            <label>Successes</label>
-            <input type="text" name="system.action.modifiers.successes" value="{{system.action.modifiers.successes}}"
-                data-dtype="Number" />
+            <h3>Risk</h3>
+            <div>
+                <label>Self</label>
+                <label>{{ localize "ABBREW.Operator" }}</label>
+                <select name="system.action.modifiers.risk.self.operator">
+                    {{selectOptions config.operators selected=system.action.modifiers.risk.self.operator blank=""
+                    localize=true}}
+                </select>
+                {{> "systems/abbrew/templates/item/parts/modifier-builder-field.hbs"
+                modifierList=system.action.modifiers.risk.self.value
+                modifierListName="system.action.modifiers.risk.self.value" config=config}}
+            </div>
+            <div>
+                <label>Target</label>
+                <label>{{ localize "ABBREW.Operator" }}</label>
+                <select name="system.action.modifiers.risk.target.operator">
+                    {{selectOptions config.operators selected=system.action.modifiers.risk.target.operator blank=""
+                    localize=true}}
+                </select>
+                {{> "systems/abbrew/templates/item/parts/modifier-builder-field.hbs"
+                modifierList=system.action.modifiers.risk.target.value
+                modifierListName="system.action.modifiers.risk.target.value" allowLateParse=true config=config}}
+            </div>
+        </div>
+        <div>
+            <h3>Resolve</h3>
+            <div>
+                <label>Self</label>
+                <label>{{ localize "ABBREW.Operator" }}</label>
+                <select name="system.action.modifiers.resolve.self.operator">
+                    {{selectOptions config.operators selected=system.action.modifiers.resolve.self.operator blank=""
+                    localize=true}}
+                </select>
+                {{> "systems/abbrew/templates/item/parts/modifier-builder-field.hbs"
+                modifierList=system.action.modifiers.resolve.self.value
+                modifierListName="system.action.modifiers.resolve.self.value" config=config}}
+            </div>
+            <div>
+                <label>Target</label>
+                <label>{{ localize "ABBREW.Operator" }}</label>
+                <select name="system.action.modifiers.resolve.target.operator">
+                    {{selectOptions config.operators selected=system.action.modifiers.resolve.target.operator blank=""
+                    localize=true}}
+                </select>
+                {{> "systems/abbrew/templates/item/parts/modifier-builder-field.hbs"
+                modifierList=system.action.modifiers.resolve.target.value
+                modifierListName="system.action.modifiers.resolve.target.value" allowLateParse=true config=config}}
+            </div>
         </div>
         <div>
             <h3>Wounds</h3>
@@ -54,39 +1007,96 @@
                 <h4>Self</h4>
                 <ol class="form-list wound-modifier-container">
                     {{#each system.action.modifiers.wounds.self as |wound k|}}
-                    <li class="item resource grid-3col" data-id="{{k}}">
-                        <div>
-                            <label>Value</label>
-                            <input type="text" name="system.action.modifiers.wounds.self.{{k}}.value"
-                                value="{{wound.value}}" data-dtype="Number" />
-                        </div>
-                        <div>
+                    <li class="item resource skill-wound-modifier modifier-field-parent wound-modifier" data-id="{{k}}"
+                        data-path="system.action.modifiers.wounds.self">
+                        <div class="wound-modifier-type">
                             <label>Type</label>
                             <select name="system.action.modifiers.wounds.self.{{k}}.type">
                                 {{selectOptions ../config.wounds selected=wound.type
-                                blank="" 
+                                blank=""
                                 localize=true}}
                             </select>
                         </div>
-                        <label>{{ localize "ABBREW.Operator" }}</label>
-                        <select name="system.action.modifiers.wounds.self.{{k}}.operator">
-                            {{selectOptions ../config.operators selected=wound.operator
-                            blank=""
-                            localize=true}}
-                        </select>
-                        <div>
+                        <div class="wound-modifier-operator">
+                            <label>{{ localize "ABBREW.Operator" }}</label>
+                            <select name="system.action.modifiers.wounds.self.{{k}}.operator">
+                                {{selectOptions ../config.woundOperators selected=wound.operator
+                                blank=""
+                                localize=true}}
+                            </select>
+                        </div>
+                        <div class="wound-remove">
                             <a class="skill-action-modifier-wound-control"
-                                data-action="remove-skill-action-modifier-wound">
+                                data-action="remove-skill-action-modifier-wound-self">
                                 <i class="fa-solid fa-minus"></i>
                             </a>
+                        </div>
+                        <div class="wound-modifier-value">
+                            <label>Value</label>
+                            {{> "systems/abbrew/templates/item/parts/modifier-builder-field.hbs"
+                            modifierList=wound.value
+                            modifierListName=(eagerEvaluation "system.action.modifiers.wounds.self.{{k}}.value" k)
+                            config=../config}}
                         </div>
                     </li>
                     {{/each}}
                     <li class="skillModifierWound add">
+                        <div class="form-group wound-add">
+                            <label>
+                                <a class="skill-action-modifier-wound-control"
+                                    data-action="add-skill-action-modifier-wound-self">
+                                    Add Wound Modifier
+                                    <i class="fa-solid fa-plus"></i>
+                                </a>
+                            </label>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+            <br />
+            <div>
+                <h4>Target</h4>
+                <ol class="form-list wound-modifier-container">
+                    {{#each system.action.modifiers.wounds.target as |wound k|}}
+                    <li class="item resource grid-3col modifier-field-parent wound-modifier" data-id="{{k}}"
+                        data-path="system.action.modifiers.wounds.target">
+                        <div class="wound-modifier-type">
+                            <label>Type</label>
+                            <select name="system.action.modifiers.wounds.target.{{k}}.type">
+                                {{selectOptions ../config.wounds selected=wound.type
+                                blank=""
+                                localize=true}}
+                            </select>
+                        </div>
+                        <div class="wound-modifier-operator">
+                            <label>{{ localize "ABBREW.Operator" }}</label>
+                            <select name="system.action.modifiers.wounds.target.{{k}}.operator">
+                                {{selectOptions ../config.operators selected=wound.operator
+                                blank=""
+                                localize=true}}
+                            </select>
+                        </div>
+                        <div class="wound-remove">
+                            <a class="skill-action-modifier-wound-control"
+                                data-action="remove-skill-action-modifier-wound-target">
+                                <i class="fa-solid fa-minus"></i>
+                            </a>
+                        </div>
+                        <div class="wound-modifier-value">
+                            <label>Value</label>
+                            {{> "systems/abbrew/templates/item/parts/modifier-builder-field.hbs"
+                            modifierList=wound.value
+                            modifierListName=(eagerEvaluation "system.action.modifiers.wounds.target.{{k}}.value" k)
+                            allowLateParse=true
+                            config=../config}}
+                        </div>
+                    </li>
+                    {{/each}}
+                    <li class="skillModifierWound add wound-add">
                         <div class="form-group">
                             <label>
                                 <a class="skill-action-modifier-wound-control"
-                                    data-action="add-skill-action-modifier-wound">
+                                    data-action="add-skill-action-modifier-wound-target">
                                     Add Wound Modifier
                                     <i class="fa-solid fa-plus"></i>
                                 </a>
@@ -96,40 +1106,145 @@
                 </ol>
             </div>
         </div>
-        {{!-- <ol class="form-list damage-modifier-container">
-            {{#each action.modifiers.damage as |damageModifier k|}}
-            <li class="item resource grid-3col" data-id="{{k}}">
-                <div>
-                    <label>Value</label>
-                    <input type="text" name="system.actions.{{i}}.modifiers.damage.{{k}}.value"
-                        value="{{damageModifier.value}}" data-dtype="Number" />
+        <div>
+            <h3>Resources</h3>
+            <div>
+                <h4>Self</h4>
+                <ol class="form-list resource-modifier-container">
+                    {{#each system.action.modifiers.resources.self as |resource k|}}
+                    <li class="item resource modifier-field-parent resource-modifier" data-id="{{k}}"
+                        data-path="system.action.modifiers.resources.self">
+                        <div class="resource-modifier-type">
+                            <label class="resource-label">Type</label>
+                            <input type="text" name="system.action.modifiers.resources.self.{{k}}.summary"
+                                class="resource-drop" value="{{resource.summary}}" data-dtype="String"
+                                data-dropType="skill" data-dropSkillType="resource" data-dropTarget="self" {{#unless
+                                (isGM)}}readonly{{/unless}} />
+                        </div>
+                        <div class="resource-modifier-operator">
+                            <label>{{ localize "ABBREW.Operator" }}</label>
+                            <select name="system.action.modifiers.resources.self.{{k}}.operator">
+                                {{selectOptions ../config.operators selected=resource.operator
+                                blank=""
+                                localize=true}}
+                            </select>
+                        </div>
+                        <div class="resource-remove">
+                            <a class="skill-action-modifier-resource-control"
+                                data-action="remove-skill-action-modifier-resource-self">
+                                <i class="fa-solid fa-minus"></i>
+                            </a>
+                        </div>
+                        <div class="resource-modifier-value">
+                            <label>Value</label>
+                            {{> "systems/abbrew/templates/item/parts/modifier-builder-field.hbs"
+                            modifierList=resource.value
+                            modifierListName=(eagerEvaluation "system.action.modifiers.resources.self.{{k}}.value" k)
+                            allowLateParse=false
+                            config=../config}}
+                        </div>
+                    </li>
+                    {{/each}}
+                    <li class="skillModifierResource add">
+                        <div class="form-group resource-add">
+                            <label>
+                                <a class="skill-action-modifier-resource-control"
+                                    data-action="add-skill-action-modifier-resource-self">
+                                    Add Resource Modifier
+                                    <i class="fa-solid fa-plus"></i>
+                                </a>
+                            </label>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+            <div>
+                <h4>Target</h4>
+                <ol class="form-list resource-modifier-container">
+                    {{#each system.action.modifiers.resources.target as |resource k|}}
+                    <li class="item resource modifier-field-parent resource-modifier" data-id="{{k}}"
+                        data-path="system.action.modifiers.resources.target">
+                        <div class="resource-modifier-type">
+                            <label class="resource-label">Type</label>
+                            <input type="text" name="system.action.modifiers.resources.target.{{k}}.summary"
+                                class="resource-drop" value="{{resource.summary}}" data-dtype="String"
+                                data-dropType="skill" data-dropSkillType="resource" data-dropTarget="target" {{#unless
+                                (isGM)}}readonly{{/unless}} />
+                        </div>
+                        <div class="resource-modifier-operator">
+                            <label>{{ localize "ABBREW.Operator" }}</label>
+                            <select name="system.action.modifiers.resources.target.{{k}}.operator">
+                                {{selectOptions ../config.operators selected=resource.operator
+                                blank=""
+                                localize=true}}
+                            </select>
+                        </div>
+                        <div class="resource-remove">
+                            <a class="skill-action-modifier-resource-control"
+                                data-action="remove-skill-action-modifier-resource-target">
+                                <i class="fa-solid fa-minus"></i>
+                            </a>
+                        </div>
+                        <div class="resource-modifier-value">
+                            <label>Value</label>
+                            {{> "systems/abbrew/templates/item/parts/modifier-builder-field.hbs"
+                            modifierList=resource.value
+                            modifierListName=(eagerEvaluation "system.action.modifiers.resources.target.{{k}}.value" k)
+                            allowLateParse=true
+                            config=../config}}
+                        </div>
+                    </li>
+                    {{/each}}
+                    <li class="skillModifierResource add">
+                        <div class="form-group resource-add">
+                            <label>
+                                <a class="skill-action-modifier-resource-control"
+                                    data-action="add-skill-action-modifier-resource-target">
+                                    Add Resource Modifier
+                                    <i class="fa-solid fa-plus"></i>
+                                </a>
+                            </label>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+        <div>
+            <h3>Concepts</h3>
+            <div class="concepts">
+                {{#each system.action.modifiers.concepts as |concept|}}
+                <div class="concept-row-container">
+                    <div class="concept-row">
+                        <label>{{localize concept.label}}</label>
+                        <div class="concept-operator">
+                            <select name="system.action.modifiers.concepts.{{concept.name}}.operator">
+                                {{selectOptions ../config.simpleNumericOperators selected=concept.operator
+                                localize=true}}
+                            </select>
+                        </div>
+                        <div class="concept-type">
+                            <select name="system.action.modifiers.concepts.{{concept.name}}.type">
+                                {{selectOptions ../config.modifierPrefixes selected=concept.type
+                                localize=true}}
+                            </select>
+                        </div>
+                        <div class="concept-value">
+                            <input type="text" name="system.action.modifiers.concepts.{{concept.name}}.value"
+                                value="{{concept.value}}" data-dtype="string" />
+                        </div>
+                        <div class="numerator">
+                            <input type="number" name="system.action.modifiers.concepts.{{concept.name}}.numerator"
+                                value="{{concept.numerator}}" />
+                        </div>
+                        <div class="denominator">
+                            <input type="number" name="system.action.modifiers.concepts.{{concept.name}}.denominator"
+                                value="{{concept.denominator}}" />
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <label>Attack Type</label>
-                    <select name="system.actions.{{i}}.modifiers.damage.{{k}}.type">
-                        {{selectOptions ../../config.concepts selected=damageModifier.type
-                        blank=""
-                        localize=true}}
-                    </select>
-                </div>
-                <div>
-                    <a class="skill-action-modifier-damage-control" data-action="remove-skill-action-modifier-damage">
-                        <i class="fa-solid fa-minus"></i>
-                    </a>
-                </div>
-            </li>
-            {{/each}}
-            <li class="skillModifierDamage add">
-                <div class="form-group">
-                    <label>
-                        <a class="skill-action-modifier-damage-control" data-action="add-skill-action-modifier-damage">
-                            Add Damage Modifier
-                            <i class="fa-solid fa-plus"></i>
-                        </a>
-                    </label>
-                </div>
-            </li>
-        </ol> --}}
+                {{/each}}
+            </div>
+        </div>
     </div>
 </div>
-{{/if}}
+{{/unless}}

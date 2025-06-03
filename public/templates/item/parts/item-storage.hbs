@@ -1,0 +1,41 @@
+<h3>Storage</h3>
+<label class="slide-toggle roboto-upper">
+    <input type="checkbox" class="action-activatable" name="system.storage.hasStorage" {{ checked
+        system.storage.hasStorage }}>
+    <span>Has Storage?</span>
+    {{#if system.storage.hasStorage}}
+    <i class="fa fa-toggle-on"></i>
+    {{else}}
+    <i class="fa fa-toggle-off"></i>
+    {{/if}}
+</label>
+{{#if system.storage.hasStorage}}
+<div class="skill-element-2">
+    <label>Type</label>
+    <select name="system.storage.type">
+        {{selectOptions config.storageTypes selected=system.storage.type
+        localize=true}}
+    </select>
+</div>
+<label class="slide-toggle roboto-upper">
+    <input type="checkbox" class="action-activatable" name="system.storage.accessible" {{ checked
+        system.storage.accessible }}>
+    <span>Accessible?</span>
+    {{#if system.storage.accessible}}
+    <i class="fa fa-toggle-on"></i>
+    {{else}}
+    <i class="fa fa-toggle-off"></i>
+    {{/if}}
+</label>
+<h3>Trait Filter</h3>
+<div class="item-element-max-input">
+    <label class="resource-label">Traits</label>
+    <input type="text" name="system.storage.traitFilter.raw" value="{{system.storage.traitFilter.raw}}"
+        data-dtype="String" />
+</div>
+<div class="skill-element-2">
+    <label class="resource-label">Max</label>
+    <input type="number" name="system.storage.max" class="resource-drop" value="{{system.storage.max}}"
+        data-dtype="Number" />
+</div>
+{{/if}}

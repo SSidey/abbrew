@@ -1,3 +1,9 @@
+# Build Artifcats
+dist/*
+public/packs/*
+packs/*
+!packs/_source/
+
 # IDE
 .idea/
 .vs/

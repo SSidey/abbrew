@@ -1,0 +1,157 @@
+{
+  "folder": "xv4pBYEWqvTp5C2J",
+  "name": "Dodge",
+  "type": "skill",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "<p>Trigger: You are targeted by an attack</p>\n<hr>\n<p>Requirement: You have more than 0 movement</p>\n<hr>\n<p>You dodge out of harms way.</p>\n<p>&nbsp;</p>\n<p>Move up to your size or speed, whichever is lower.</p>\n<p>You must increase your distance from the attacker.</p>\n<p>This movement provokes reactions.</p>\n<p>The attacker can choose to follow up to their size or speed, whichever is lower.</p>\n<p>You suffer [1 Fatigue Wound]</p>",
+    "traits": "",
+    "configurable": true,
+    "action": {
+      "activationType": "standalone",
+      "actionCost": "1",
+      "modifiers": {
+        "guard": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "wounds": {
+          "self": [
+            {
+              "type": "exhaustion",
+              "operator": "add",
+              "value": [
+                {
+                  "operator": "add",
+                  "type": "numeric",
+                  "path": "1",
+                  "multiplier": 1,
+                  "lateParse": false
+                }
+              ]
+            }
+          ],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "resources": [],
+        "concepts": {
+          "self": [],
+          "target": []
+        },
+        "attackProfile": {
+          "finisherLimit": {
+            "value": 0,
+            "operator": ""
+          },
+          "handsSupplied": 0,
+          "attackType": "",
+          "attackMode": "",
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "damage": []
+        },
+        "fortune": 0,
+        "actionCost": {
+          "value": 0,
+          "operator": ""
+        }
+      },
+      "duration": {
+        "precision": "0",
+        "value": 0
+      },
+      "actionImage": "",
+      "uses": {
+        "hasUses": false,
+        "value": 0,
+        "max": 0,
+        "period": ""
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "attackProfile": {
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": 0,
+        "attackMode": "",
+        "damage": [],
+        "finisherLimit": 10,
+        "isEnabled": false
+      }
+    },
+    "skillType": "basic",
+    "path": {
+      "value": "",
+      "archetype": ""
+    },
+    "attributeIncrease": "",
+    "attributeRankIncrease": "",
+    "attributeIncreaseLong": "",
+    "skillModifiers": {
+      "synergy": "",
+      "discord": ""
+    },
+    "abbrewId": {
+      "value": "abbrew.skill.dodge.ocw9C57R2vHbR9gc",
+      "uuid": "ocw9C57R2vHbR9gc"
+    },
+    "skillTraits": "",
+    "isActivatable": true,
+    "skills": []
+  },
+  "effects": [],
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743073039533,
+    "modifiedTime": 1745164649145,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "ownership": {
+    "default": 0
+  },
+  "_id": "ocw9C57R2vHbR9gc",
+  "sort": 200000,
+  "_key": "!items!ocw9C57R2vHbR9gc"
+}

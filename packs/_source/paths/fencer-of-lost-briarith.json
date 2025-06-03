@@ -1,0 +1,32 @@
+{
+  "folder": null,
+  "name": "Fencer of Lost Briarith",
+  "type": "path",
+  "_id": "lxJsjeShsHFv1zP1",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "roles": ""
+  },
+  "effects": [],
+  "sort": 100000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746223314773,
+    "modifiedTime": 1746223946468,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!lxJsjeShsHFv1zP1"
+}

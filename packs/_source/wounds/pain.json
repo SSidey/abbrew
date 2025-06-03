@@ -1,0 +1,35 @@
+{
+  "name": "Pain",
+  "type": "wound",
+  "_id": "j3xdtjzgJ3xV3boJ",
+  "img": "systems/abbrew/assets/icons/wounds/pain.webp",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "wound": {
+      "type": "pain",
+      "value": 1
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1744324374852,
+    "modifiedTime": 1744324587526,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!j3xdtjzgJ3xV3boJ"
+}

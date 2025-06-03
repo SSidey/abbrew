@@ -1,0 +1,21 @@
+{
+  "name": "Martial",
+  "sorting": "a",
+  "folder": "iXCBf4MHtJoUAZxo",
+  "type": "Item",
+  "_id": "GJuyGV0Y6wQ5VN0J",
+  "description": "",
+  "sort": 100000,
+  "color": null,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": null,
+    "modifiedTime": 1743461877141,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!GJuyGV0Y6wQ5VN0J"
+}

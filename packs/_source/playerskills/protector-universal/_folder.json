@@ -1,0 +1,21 @@
+{
+  "name": "Protector Universal",
+  "sorting": "a",
+  "folder": null,
+  "type": "Item",
+  "_id": "9I3MMzLJUZsycEx6",
+  "description": "",
+  "sort": 0,
+  "color": null,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746557931540,
+    "modifiedTime": 1746557931540,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!9I3MMzLJUZsycEx6"
+}

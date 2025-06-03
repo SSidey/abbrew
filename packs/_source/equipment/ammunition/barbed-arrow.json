@@ -1,0 +1,104 @@
+{
+  "name": "Barbed Arrow",
+  "type": "ammunition",
+  "_id": "ZUkiJwrwh662QotF",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "abbrew.ammunition.barbedarrow.ZUkiJwrwh662QotF",
+      "uuid": "ZUkiJwrwh662QotF"
+    },
+    "quantity": 1,
+    "weight": 0,
+    "meta": {
+      "size": 0
+    },
+    "equipType": "",
+    "equipPoints": {
+      "required": {
+        "raw": "",
+        "parsed": []
+      },
+      "provided": {
+        "raw": "",
+        "parsed": []
+      }
+    },
+    "handsRequired": "",
+    "equipState": "stowed",
+    "handsSupplied": 0,
+    "actionCost": 0,
+    "exertActionCost": 1,
+    "validEquipStates": [
+      {
+        "value": "worn",
+        "label": "ABBREW.EquipState.worn"
+      },
+      {
+        "value": "stowed",
+        "label": "ABBREW.EquipState.stowed"
+      },
+      {
+        "value": "dropped",
+        "label": "ABBREW.EquipState.dropped"
+      }
+    ],
+    "type": "arrow",
+    "attackModifier": {
+      "critical": 10,
+      "lethal": 0,
+      "finisherLimit": 8,
+      "damage": [
+        {
+          "type": "piercing",
+          "value": 4,
+          "penetration": 0,
+          "attributeModifier": "",
+          "attributeMultiplier": 1,
+          "damageMultiplier": 1,
+          "overallMultiplier": 1
+        }
+      ]
+    },
+    "skills": {
+      "granted": [
+        {
+          "name": "Barbed",
+          "skillType": "",
+          "id": "YDtBNQugZoQxIlha",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.YDtBNQugZoQxIlha"
+        }
+      ]
+    },
+    "availableEnhancements": 1,
+    "enhancements": [
+      {
+        "name": "Barbed Ammunition",
+        "enhancementType": "",
+        "id": "7oVZRgDmR6yle9sC",
+        "image": "icons/svg/item-bag.svg",
+        "uuid": "Compendium.abbrew.enhancements.Item.7oVZRgDmR6yle9sC"
+      }
+    ]
+  },
+  "effects": [],
+  "folder": "AccA5CfJH10VFHFT",
+  "sort": 100000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746969589588,
+    "modifiedTime": 1747592833006,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!ZUkiJwrwh662QotF"
+}

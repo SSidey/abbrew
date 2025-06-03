@@ -1,0 +1,235 @@
+{
+  "folder": "uqcVv0hiv3PLH98k",
+  "name": "Body Block",
+  "type": "skill",
+  "_id": "LaP1x9w47SoTXI9F",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "<p><span style=\"font-family: Arial,sans-serif\"><strong>Trigger:</strong> An enemy declares an attack on your Charge and you could step into their space.</span></p><hr><p dir=\"ltr\" style=\"line-height: 1.38; margin-top: 0pt; margin-bottom: 0pt\"><span style=\"font-family: Arial,sans-serif\">You become the target of the attack, you may swap places with your charge</span></p><p><span style=\"font-family: Arial,sans-serif\">Gain 1 Duty.</span></p>",
+    "traits": "",
+    "abbrewId": {
+      "value": "abbrew.skill.bodyblock.LaP1x9w47SoTXI9F",
+      "uuid": "LaP1x9w47SoTXI9F"
+    },
+    "skillTraits": "",
+    "skillModifiers": {
+      "synergy": "",
+      "discord": ""
+    },
+    "configurable": true,
+    "isActivatable": true,
+    "activateOnCreate": false,
+    "applyTurnStart": false,
+    "applyTurnEnd": false,
+    "applyOnExpiry": false,
+    "activateOnDamageAccept": false,
+    "skills": {
+      "granted": [],
+      "paired": [],
+      "grantedOnActivation": [],
+      "grantedOnAccept": []
+    },
+    "resource": {
+      "capacity": 0,
+      "operator": "",
+      "relatedResource": null,
+      "fillCapacityOnCreate": false
+    },
+    "action": {
+      "activationType": "standalone",
+      "actionCost": "1",
+      "actionImage": "1a",
+      "duration": {
+        "isConcentration": false,
+        "precision": "0",
+        "value": 0,
+        "expireOnStartOfTurn": true
+      },
+      "uses": {
+        "hasUses": true,
+        "asStacks": false,
+        "removeStackOnUse": true,
+        "value": 1,
+        "max": 1,
+        "period": "round",
+        "stackRemovalActivation": false,
+        "removeWhenNoUsesRemain": false
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "skillCheck": [],
+      "skillRequest": {
+        "isEnabled": false,
+        "isContested": false,
+        "selfCheck": false,
+        "checkType": "",
+        "requirements": {
+          "modifiers": "",
+          "successes": 0,
+          "result": 0
+        },
+        "targetModifiers": "",
+        "results": {
+          "success": {
+            "description": ""
+          },
+          "failure": {
+            "description": ""
+          }
+        }
+      },
+      "attackProfile": {
+        "isEnabled": false,
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": null,
+        "attackMode": "",
+        "finisher": {
+          "type": "",
+          "cost": null,
+          "description": "",
+          "wounds": []
+        },
+        "damage": [],
+        "finisherLimit": 10
+      },
+      "modifiers": {
+        "fortune": 0,
+        "actionCost": {
+          "value": 0,
+          "operator": ""
+        },
+        "attackProfile": {
+          "isEnabled": false,
+          "combineAttacks": {
+            "isEnabled": false,
+            "value": null
+          },
+          "attackType": "",
+          "attackMode": "",
+          "handsSupplied": null,
+          "finisherLimit": {
+            "value": 10,
+            "operator": ""
+          },
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "penetration": {
+            "value": 10,
+            "operator": ""
+          },
+          "finisher": {
+            "type": "",
+            "cost": null,
+            "description": "",
+            "wounds": []
+          },
+          "damage": []
+        },
+        "guard": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": "",
+            "lateParse": false
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [
+            {
+              "summary": "[{\"value\":\"Duty\",\"id\":\"U3lWpCsnZ1FN3n56\",\"sourceId\":\"Compendium.abbrew.playerskills.Item.U3lWpCsnZ1FN3n56\"}]",
+              "operator": "add",
+              "value": [
+                {
+                  "operator": "add",
+                  "type": "numeric",
+                  "path": "1",
+                  "lateParse": false,
+                  "multiplier": 1
+                }
+              ],
+              "type": ""
+            }
+          ],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": []
+        }
+      }
+    },
+    "skillType": "path",
+    "path": {
+      "raw": "[{\"label\":\"shieldguardian\",\"value\":\"Shield Guardian\",\"roles\":[\"martial\",\"melee\",\"protector\",\"durable\"],\"title\":\"A selfless fighting style, one where you put yourself in harm's way to shield your allies and prevent your enemies from reaching them.\",\"id\":\"abbrewpshieldgua\"}]",
+      "value": {
+        "id": ""
+      }
+    },
+    "roles": {
+      "raw": "",
+      "parsed": []
+    },
+    "archetype": "",
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": "",
+    "isProxied": false,
+    "siblingSkillModifiers": []
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746383823444,
+    "modifiedTime": 1746557823270,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!LaP1x9w47SoTXI9F"
+}

@@ -1,0 +1,62 @@
+{
+  "folder": "AsPk8lbhBEAjlH3Q",
+  "name": "Shield",
+  "type": "armour",
+  "_id": "toOjsj0zz3gGkWy7",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "meta": {
+      "size": 0
+    },
+    "equipType": "held",
+    "equipPoints": {
+      "required": {
+        "raw": "",
+        "parsed": []
+      },
+      "provided": {
+        "raw": "",
+        "parsed": []
+      }
+    },
+    "handsRequired": "oneHand",
+    "equipState": "stowed",
+    "handsSupplied": 0,
+    "actionCost": 0,
+    "exertActionCost": 0,
+    "validEquipStates": [],
+    "defense": {
+      "guard": 15,
+      "inflexibility": 10,
+      "protection": []
+    },
+    "revealed": {
+      "isRevealed": false,
+      "difficulty": 0,
+      "tier": 0
+    },
+    "isSundered": false
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746381676997,
+    "modifiedTime": 1746381692008,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!toOjsj0zz3gGkWy7"
+}

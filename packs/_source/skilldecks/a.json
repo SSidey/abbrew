@@ -1,0 +1,56 @@
+{
+  "name": "A",
+  "type": "skillDeck",
+  "_id": "cHxyLOx8m3Wq5gce",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "skills": {
+      "granted": [
+        {
+          "name": "1",
+          "skillType": "",
+          "id": "XizlgwldBT1TvJBh",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.XizlgwldBT1TvJBh"
+        },
+        {
+          "name": "Dual Slice",
+          "skillType": "",
+          "id": "LC65Qtc9wBcWbcVc",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.LC65Qtc9wBcWbcVc"
+        },
+        {
+          "name": "Haste",
+          "skillType": "",
+          "id": "gGwNbDdkafpU6rNm",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.gGwNbDdkafpU6rNm"
+        }
+      ]
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1744242505317,
+    "modifiedTime": 1744242551557,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!cHxyLOx8m3Wq5gce"
+}

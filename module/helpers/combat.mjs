@@ -1,23 +1,46 @@
-import { applyOperator } from "./operators.mjs";
+import { mergeModifierFields, parseModifierFieldValue } from "./modifierBuilderFieldHelpers.mjs";
+import { applyOperator, getOrderForOperator } from "./operators.mjs";
+import { applySkillEffects } from "./skills/skill-application.mjs";
+import { handleSkillExpiry } from "./time.mjs";
+import { getSafeJson } from "./utils.mjs";
 
-export async function handleTurnStart(prior, current, actor) {
+export async function handleCombatStart(actors) {
+    for (const index in actors) {
+        const actor = actors[index];
+        await actor.update({ "system.actions": 5 });
+    }
+}
+
+export async function handleCombatEnd(actors) {
+    actors.forEach(a => {
+        const actorSkills = a.items.filter(i => i.type === "skill");
+        const combatDurationSkills = actorSkills.filter(s => s.system.action.isActive && s.system.action.duration.precision === "-2").map(s => s._id);
+        const effects = a.effects.filter(e => combatDurationSkills.includes(e.flags.abbrew.skill.trackDuration));
+        effects.forEach(async e => await e.delete());
+        const combatFrequencySkills = actorSkills.filter(s => (s.system.action.uses.hasUses) && ["combat", "turn", "round"].includes(s.system.action.uses.period));
+        combatFrequencySkills.forEach(async s => {
+            const update = s.system.action.uses.max;
+            await s.update({ "system.action.uses.value": update });
+        });
+    });
+}
+
+export async function handleTurnChange(prior, current, priorActor, currentActor) {
     if (current.round < prior.round || (prior.round == current.round && current.turn < prior.turn)) {
         return;
     }
-    await turnStart(actor);
+    if (priorActor) {
+        await turnEnd(priorActor);
+    }
+    await turnStart(currentActor);
 }
 
 export function mergeActorWounds(actor, incomingWounds) {
-    // const wounds = actor.system.wounds;
-    // const result = [...wounds, ...incomingWounds].reduce((a, { type, value }) => ({ ...a, [type]: a[type] ? { type, value: a[type].value + value } : { type, value } }), {});
-    // return Object.values(result).filter(v => v.value > 0);
     return mergeActorWoundsWithOperator(actor, incomingWounds, 'add');
 }
 
 export function mergeActorWoundsWithOperator(actor, incomingWounds, operator) {
     const wounds = actor.system.wounds;
-    // const result = [...wounds, ...incomingWounds].reduce((a, { type, value }) => ({ ...a, [type]: a[type] ? { type, value: applyOperator(a[type].value, value, operator) } : { type, value } }), {});
-    // return Object.values(result).filter(v => v.value > 0);
     return mergeWoundsWithOperator(wounds, incomingWounds, operator);
 }
 
@@ -27,22 +50,23 @@ export function mergeWoundsWithOperator(wounds, incomingWounds, operator) {
 }
 
 export async function updateActorWounds(actor, updateWounds) {
-    await actor.update({ "system.wounds": updateWounds });
+    const woundImmunities = getWoundImmunities(actor);
+    const woundsAfterImmunity = updateWounds.filter(w => !woundImmunities.includes(w.type));
+    await actor.update({ "system.wounds": woundsAfterImmunity });
+}
+
+function getWoundImmunities(actor) {
+    const woundImmunities = actor.items.filter(i => i.type === "skill" && getSafeJson(i.system.traits.raw, false)).map(s => JSON.parse(s.system.traits.raw)).filter(s => s.some(st => st.feature === "wound" && st.effect === "immunity")).flatMap(s => s.data);
+    return woundImmunities ? woundImmunities : [];
 }
 
 export async function checkActorFatalWounds(actor) {
-    if (actor.system.defense.fatalWounds) {
-        const fatalWounds = JSON.parse(actor.system.defense.fatalWounds).map(w => w.value.toLowerCase());
-        const activeFatalWounds = actor.system.wounds.filter(w => fatalWounds.includes(w.type));
-        // PLAYTEST: This was the original, if you exceed your max resolve in a specific fatal wound, instead of sum of fatal wounds
-        // const exceededFatalWounds = activeFatalWounds.filter(w => w.value >= actor.system.defense.resolve.max);
-        // if (exceededFatalWounds && exceededFatalWounds.length > 0) {
-        //     await setActorToDead(actor);
-        // }
-        const totalActiveFatalWounds = activeFatalWounds.reduce((result, wound) => result += wound.value, 0)
-        if (totalActiveFatalWounds >= actor.system.defense.resolve.max) {
-            await setActorToDead(actor);
-        }
+    const woundImmunities = getWoundImmunities(actor);
+    const acuteWounds = CONFIG.ABBREW.acuteWounds;
+    const activeFatalWounds = actor.system.wounds.filter(w => acuteWounds.includes(w.type)).filter(w => !woundImmunities.includes(w.type));
+    const totalActiveFatalWounds = activeFatalWounds.reduce((result, wound) => result += wound.value, 0)
+    if (totalActiveFatalWounds >= (2 * actor.system.defense.resolve.max)) {
+        await setActorToDead(actor);
     }
 }
 
@@ -56,7 +80,8 @@ export async function handleActorGuardConditions(actor) {
 }
 
 export async function handleActorWoundConditions(actor) {
-    const updatedWoundTotal = actor.system.wounds.reduce((total, wound) => total += wound.value, 0);
+    const woundImmunities = getWoundImmunities(actor);
+    const updatedWoundTotal = actor.system.wounds.filter(w => !woundImmunities.includes(w.type)).reduce((total, wound) => total += wound.value, 0);
     if (actor.system.defense.resolve.value <= updatedWoundTotal) {
         await renderLostResolveCard(actor);
     }
@@ -127,18 +152,145 @@ async function setActorToOffGuard(actor) {
     setActorCondition(actor, 'offGuard');
 }
 
+async function turnEnd(actor) {
+    // TODO: Conditions could modify this?
+    await actor.unsetFlag("abbrew", "combat.damage.lastRoundReceived")
+    await applyActiveSkills(actor, "end");
+    // TODO: Determine if we can remove this, time should handle it.
+    // await handleSkillExpiry("end", actor);
+    await actor.update({ "system.actions": actor.system.modifiers.actionRecovery });
+}
+
 async function turnStart(actor) {
     if (game.settings.get("abbrew", "announceTurnStart")) {
         ChatMessage.create({ content: `${actor.name} starts their turn`, speaker: ChatMessage.getSpeaker({ actor: actor }) });
     }
 
-    if (actor.system.defense.canBleed) {
-        const filteredWounds = actor.system.wounds.filter(wound => wound.type === 'bleed');
-        const bleedingWounds = filteredWounds.length > 0 ? filteredWounds[0].value : 0;
-        if (bleedingWounds > 0) {
-            const bleedModifier = bleedingWounds > 1 ? -1 : 0;
-            const vitalWounds = [{ type: 'vital', value: bleedingWounds }, { type: 'bleed', value: bleedModifier }];
-            await updateActorWounds(actor, mergeActorWounds(actor, vitalWounds));
+    await handleSkillToRounds(actor);
+    await applyActiveSkills(actor, "start");
+    // TODO: Determine if we can remove this, time should handle it.
+    // await handleSkillExpiry("start", actor);
+    await updateTurnStartWounds(actor);
+
+    await rechargePerRoundSkills(actor);
+}
+
+async function handleSkillToRounds(actor) {
+    const effects = actor.effects;
+    effects.entries().forEach(async e => {
+        const effect = e[1];
+        const preparedDuration = effect._prepareDuration();
+        if (preparedDuration.type === "seconds" && preparedDuration.remaining <= 60) {
+            const duration = { ...effect.duration };
+            const rounds = Math.floor(preparedDuration.remaining / 6);
+            duration["rounds"] = rounds;
+            duration["seconds"] = null;
+            duration["duration"] = rounds;
+            duration["type"] = "turns";
+            duration["startTime"] = game.time.worldTime;
+            duration["startRound"] = game.combat.current.round;
+            const skills = actor.items.filter(i => i.type === "skill" && i._id === effect.flags?.abbrew?.skill?.trackDuration)
+            if (skills.length > 0 && !skills[0].system.action.duration.expireOnStartOfTurn) {
+                duration["turns"] = 1;
+                duration["duration"] += 0.01;
+            }
+
+            await effect.update({ "duration": duration })
+        }
+    });
+}
+
+async function updateTurnStartWounds(actor) {
+    const lingeringWoundTypes = foundry.utils.deepClone(CONFIG.ABBREW.lingeringWoundTypes);
+    const woundToLingeringWounds = foundry.utils.deepClone(CONFIG.ABBREW.woundToLingeringWounds);
+    const woundImmunities = getWoundImmunities(actor);
+    const woundSuppressors = getWoundsWithSuppression(actor);
+    const woundIntensifiers = getWoundsWithIntensify(actor);
+    const activeLingeringWounds = actor.system.wounds.filter(w => lingeringWoundTypes.some(lw => w.type === lw)).filter(w => !woundImmunities.includes(w.type)).filter(w => w.value > 0);
+    if (activeLingeringWounds.length > 0) {
+        const appliedLingeringWounds = {};
+        activeLingeringWounds.flatMap(lw => woundToLingeringWounds[lw.type].map(lwt => ({ type: lwt, value: Math.max(0, (lw.value - (woundSuppressors[lw.type] ?? 0) + (woundIntensifiers[lw.type] ?? 0))) }))).reduce((appliedLingeringWounds, wound) => {
+            if (wound.type in appliedLingeringWounds) {
+                appliedLingeringWounds[wound.type] += wound.value;
+            } else {
+                appliedLingeringWounds[wound.type] = wound.value;
+            }
+
+            return appliedLingeringWounds;
+        }, appliedLingeringWounds);
+        const acuteWoundUpdate = Object.entries(appliedLingeringWounds).map(alw => ({ type: alw[0], value: alw[1] }));
+        const lingeringWoundUpdate = activeLingeringWounds.flatMap(lw => actor.system.wounds.filter(w => w.type === lw.type).map(w => ({ type: w.type, value: getLingeringWoundValueUpdate(actor, w.type) })));
+        const fullWoundUpdate = [...acuteWoundUpdate, ...lingeringWoundUpdate];
+        if (fullWoundUpdate.length > 0) {
+            await updateActorWounds(actor, mergeActorWounds(actor, fullWoundUpdate));
         }
     }
+}
+
+function getWoundsWithOperator(actor, operator) {
+    return actor.items.filter(i => i.type === "skill").filter(s => s.system.action.modifiers.wounds.self.some(w => w.operator === operator)).filter(s => (!s.system.isActivatable && s.system.skillType === "standalone") || (actor.system.activeSkills.includes(s._id))).flatMap(s => s.system.action.modifiers.wounds.self.filter(w => w.operator === operator)).reduce((result, ws) => {
+        if (ws.type in result) {
+            result[ws.type].push({ operator: ws.operator, ...parseModifierFieldValue(ws.value, actor, ws), index: getOrderForOperator(ws.operator) });
+        } else {
+            result[ws.type] = [{ operator: ws.operator, ...parseModifierFieldValue(ws.value, actor, ws), index: getOrderForOperator(ws.operator) }];
+        }
+
+        return result;
+    }, {});
+}
+
+function getWoundsWithSuppression(actor) {
+    const wounds = getWoundsWithOperator(actor, "suppress");
+    return fullyParseWoundModifiers(actor, wounds);
+}
+
+function getWoundsWithIntensify(actor) {
+    const wounds = getWoundsWithOperator(actor, "intensify");
+    return fullyParseWoundModifiers(actor, wounds);
+}
+
+function fullyParseWoundModifiers(actor, wounds) {
+    Object.keys(wounds).forEach(key => {
+        wounds[key] = wounds[key].reduce((result, wound) => {
+            const [fullyParsed,] = mergeModifierFields([wound], actor);
+            const fullWound = fullyParsed[0];
+            result = result + fullWound.value.reduce((innerResult, field) => {
+                const value = Math.floor(field.path * field.multiplier);
+                innerResult = applyOperator(innerResult, value, field.operator, 0);
+                return innerResult;
+            }, 0);
+
+            return result;
+        }, 0);
+    });
+    return wounds;
+}
+
+async function applyActiveSkills(actor, turnPhase) {
+    if (!(turnPhase && ["start", "end"].includes(turnPhase))) {
+        return;
+    }
+
+    let activeSkills = [];
+    if (turnPhase === "start") {
+        activeSkills = actor.system.activeSkills.flatMap(s => actor.items.filter(i => i._id === s)).filter(s => s.system.applyTurnStart);
+    } else if (turnPhase === "end") {
+        activeSkills = actor.system.activeSkills.flatMap(s => actor.items.filter(i => i._id === s)).filter(s => s.system.applyTurnEnd);
+    }
+
+    for (const index in activeSkills) {
+        await applySkillEffects(actor, activeSkills[index]);
+    }
+}
+
+async function rechargePerRoundSkills(actor) {
+    const roundUseSkills = actor.items.filter(i => i.type === "skill" && !i.system.action.uses.asStacks && i.system.action.uses.hasUses && ["turn", "round"].includes(i.system.action.uses.period))
+    for (const index in roundUseSkills) {
+        await roundUseSkills[index].update({ "system.action.uses.value": roundUseSkills[index].system.action.uses.max });
+    }
+}
+
+function getLingeringWoundValueUpdate(actor, woundType) {
+    // To be merged with current stacks
+    return -1 * actor.system.defense.recovery[woundType].value;
 }

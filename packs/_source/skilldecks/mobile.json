@@ -1,0 +1,49 @@
+{
+  "name": "Mobile",
+  "type": "skillDeck",
+  "_id": "OtupdpIVn3KV4DBC",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "skills": {
+      "granted": [
+        {
+          "name": "Move",
+          "skillType": "",
+          "id": "ttDyhN1XtKKSjkXk",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.ttDyhN1XtKKSjkXk"
+        },
+        {
+          "name": "Step",
+          "id": "jv5DDww4KxR8YbQK",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.jv5DDww4KxR8YbQK",
+          "skillType": ""
+        }
+      ]
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743075619060,
+    "modifiedTime": 1745358040078,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!OtupdpIVn3KV4DBC"
+}

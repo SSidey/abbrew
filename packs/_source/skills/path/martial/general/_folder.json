@@ -1,0 +1,21 @@
+{
+  "name": "General",
+  "sorting": "a",
+  "folder": "GJuyGV0Y6wQ5VN0J",
+  "type": "Item",
+  "_id": "HcwcnQewPggKJ2wn",
+  "description": "",
+  "sort": 100000,
+  "color": null,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": null,
+    "modifiedTime": 1745359744416,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!HcwcnQewPggKJ2wn"
+}

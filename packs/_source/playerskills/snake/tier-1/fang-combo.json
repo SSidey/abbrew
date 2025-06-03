@@ -1,0 +1,235 @@
+{
+  "name": "Fang Combo",
+  "type": "skill",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "<p>Requirements: You have a weapon with at most 4 Heft equipped in each hand.</p><hr><p>Make three attacks, the first two are regular attacks, however the last is treated as an Overpower and combines the damage of each weapon before modifiers.</p>",
+    "traits": "",
+    "abbrewId": {
+      "value": "abbrew.skill.1.XizlgwldBT1TvJBh",
+      "uuid": "XizlgwldBT1TvJBh"
+    },
+    "skillTraits": "",
+    "skillModifiers": {
+      "synergy": "[{\"id\":\"abbrewAttack0000\",\"value\":\"Attack\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewAttack0000\"}]",
+      "discord": ""
+    },
+    "configurable": true,
+    "isActivatable": true,
+    "skills": {
+      "granted": [
+        {
+          "name": "Fang Combo (off)",
+          "id": "9IQxYxDbjFg7OFw4",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.playerskills.Item.LJdBM2usYw5TN5Sf",
+          "skillType": ""
+        }
+      ],
+      "paired": [
+        {
+          "name": "Fang Combo (off)",
+          "id": "9IQxYxDbjFg7OFw4",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.playerskills.Item.LJdBM2usYw5TN5Sf",
+          "skillType": ""
+        }
+      ],
+      "grantedOnActivation": [],
+      "grantedOnAccept": []
+    },
+    "action": {
+      "activationType": "synergy",
+      "actionCost": "1",
+      "actionImage": "",
+      "duration": {
+        "precision": "0",
+        "value": 0,
+        "isConcentration": false,
+        "expireOnStartOfTurn": true
+      },
+      "uses": {
+        "hasUses": true,
+        "value": 1,
+        "max": 1,
+        "period": "combat",
+        "asStacks": false,
+        "removeStackOnUse": true,
+        "stackRemovalActivation": false,
+        "removeWhenNoUsesRemain": false
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "attackProfile": {
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": null,
+        "attackMode": "",
+        "damage": [],
+        "finisherLimit": 10,
+        "isEnabled": false,
+        "finisher": {
+          "type": "",
+          "cost": null,
+          "description": "",
+          "wounds": []
+        }
+      },
+      "modifiers": {
+        "fortune": 0,
+        "actionCost": {
+          "value": 0,
+          "operator": ""
+        },
+        "attackProfile": {
+          "attackType": "",
+          "attackMode": "",
+          "handsSupplied": 0,
+          "finisherLimit": {
+            "value": 10,
+            "operator": ""
+          },
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "damage": [],
+          "combineAttacks": {
+            "isEnabled": false,
+            "value": null
+          },
+          "penetration": {
+            "value": 10,
+            "operator": ""
+          },
+          "finisher": {
+            "type": "",
+            "cost": null,
+            "description": "",
+            "wounds": []
+          }
+        },
+        "guard": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": "",
+            "lateParse": false
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": []
+        }
+      },
+      "skillCheck": [],
+      "skillRequest": {
+        "isEnabled": false,
+        "isContested": false,
+        "selfCheck": false,
+        "checkType": "",
+        "requirements": {
+          "modifiers": "",
+          "successes": 0,
+          "result": 0
+        },
+        "targetModifiers": "",
+        "results": {
+          "success": {
+            "description": ""
+          },
+          "failure": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "skillType": "path",
+    "path": {
+      "value": {
+        "id": ""
+      },
+      "raw": "[{\"label\":\"snake\",\"value\":\"Snake\",\"roles\":[\"martial\",\"melee\",\"ranges\",\"scoundrel\"],\"title\":\"A style employing the use of two short weapons and relies on rapid speed and dodges.\",\"id\":\"abbrewpsnake0000\"}]"
+    },
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": "",
+    "activateOnCreate": false,
+    "applyTurnStart": false,
+    "applyTurnEnd": false,
+    "applyOnExpiry": false,
+    "activateOnDamageAccept": false,
+    "resource": {
+      "capacity": 0,
+      "operator": "",
+      "relatedResource": null,
+      "fillCapacityOnCreate": false
+    },
+    "roles": {
+      "raw": "",
+      "parsed": []
+    },
+    "archetype": "",
+    "isProxied": false,
+    "siblingSkillModifiers": []
+  },
+  "effects": [],
+  "folder": "cZD7lKEssL82rfQf",
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746273817316,
+    "modifiedTime": 1746300961768,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_id": "zm2pA8w9oTOb1dkS",
+  "sort": 0,
+  "_key": "!items!zm2pA8w9oTOb1dkS"
+}

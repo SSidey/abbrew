@@ -1,0 +1,220 @@
+{
+  "folder": "cZD7lKEssL82rfQf",
+  "name": "Distract",
+  "type": "skill",
+  "_id": "iPjPOwvOCtZ3ZXlu",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "<p>Requirement: You are in melee with a creature.</p><hr><p><span style=\"font-family: Arial,sans-serif\">You throw something, potentially causing your foe to become distracted.</span></p><p dir=\"ltr\" style=\"line-height: 1.38; margin-top: 0pt; margin-bottom: 0pt\"><span style=\"font-family: Arial,sans-serif\">Make a contested Wits Check against the creature:</span></p><p></p><p dir=\"ltr\" style=\"line-height: 1.38; margin-top: 0pt; margin-bottom: 0pt\"><span style=\"font-family: Arial,sans-serif\">Success: The creature is unaffected.</span></p><p>Failure: The foe becomes @UUID[Compendium.abbrew.conditions.Item.abbrewCOffGuard0]{Off Guard} to your attacks until the start of its next turn.</p><p>Failure (+1): The foe becomes @UUID[Compendium.abbrew.conditions.Item.abbrewCOffGuard0]{Off Guard} to all attacks until the start of its next turn.</p>",
+    "traits": "",
+    "abbrewId": {
+      "value": "abbrew.skill.distract.iPjPOwvOCtZ3ZXlu",
+      "uuid": "iPjPOwvOCtZ3ZXlu"
+    },
+    "skillTraits": "",
+    "skillModifiers": {
+      "synergy": "",
+      "discord": ""
+    },
+    "configurable": true,
+    "isActivatable": true,
+    "activateOnCreate": false,
+    "applyTurnStart": false,
+    "applyTurnEnd": false,
+    "applyOnExpiry": false,
+    "activateOnDamageAccept": false,
+    "skills": {
+      "granted": [],
+      "paired": [],
+      "grantedOnActivation": [],
+      "grantedOnAccept": []
+    },
+    "resource": {
+      "capacity": 0,
+      "operator": "",
+      "relatedResource": null,
+      "fillCapacityOnCreate": false
+    },
+    "action": {
+      "activationType": "standalone",
+      "actionCost": "1",
+      "actionImage": "",
+      "duration": {
+        "isConcentration": false,
+        "precision": "0",
+        "value": 0,
+        "expireOnStartOfTurn": true
+      },
+      "uses": {
+        "hasUses": true,
+        "asStacks": false,
+        "removeStackOnUse": true,
+        "value": 1,
+        "max": 1,
+        "period": "day",
+        "stackRemovalActivation": false,
+        "removeWhenNoUsesRemain": false
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "skillCheck": [],
+      "skillRequest": {
+        "isEnabled": true,
+        "isContested": true,
+        "selfCheck": false,
+        "checkType": "successes",
+        "requirements": {
+          "modifiers": "[{\"id\":\"abbrewWitCheck00\",\"value\":\"Wisdom Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewWitCheck00\"}]",
+          "successes": 0,
+          "result": 0
+        },
+        "targetModifiers": "[{\"id\":\"abbrewWitCheck00\",\"value\":\"Wisdom Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewWitCheck00\"}]",
+        "results": {
+          "success": {
+            "description": ""
+          },
+          "failure": {
+            "description": ""
+          }
+        }
+      },
+      "attackProfile": {
+        "isEnabled": false,
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": null,
+        "attackMode": "",
+        "finisher": {
+          "type": "",
+          "cost": null,
+          "description": "",
+          "wounds": []
+        },
+        "damage": [],
+        "finisherLimit": 10
+      },
+      "modifiers": {
+        "fortune": 0,
+        "actionCost": {
+          "value": 0,
+          "operator": ""
+        },
+        "attackProfile": {
+          "isEnabled": false,
+          "combineAttacks": {
+            "isEnabled": false,
+            "value": null
+          },
+          "attackType": "",
+          "attackMode": "",
+          "handsSupplied": null,
+          "finisherLimit": {
+            "value": 10,
+            "operator": ""
+          },
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "penetration": {
+            "value": 10,
+            "operator": ""
+          },
+          "finisher": {
+            "type": "",
+            "cost": null,
+            "description": "",
+            "wounds": []
+          },
+          "damage": []
+        },
+        "guard": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": "",
+            "lateParse": false
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": []
+        }
+      }
+    },
+    "skillType": "path",
+    "path": {
+      "raw": "[{\"label\":\"snake\",\"value\":\"Snake\",\"roles\":[\"martial\",\"melee\",\"ranges\",\"scoundrel\"],\"title\":\"A style employing the use of two short weapons and relies on rapid speed and dodges.\",\"id\":\"abbrewpsnake0000\"}]",
+      "value": {
+        "id": ""
+      }
+    },
+    "roles": {
+      "raw": "",
+      "parsed": []
+    },
+    "archetype": "",
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": "",
+    "isProxied": false,
+    "siblingSkillModifiers": []
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746297248267,
+    "modifiedTime": 1746297665092,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!iPjPOwvOCtZ3ZXlu"
+}

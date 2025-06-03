@@ -1,0 +1,69 @@
+{
+  "name": "Humanoid",
+  "type": "creatureForm",
+  "_id": "y5I3N1IZtZKr3463",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "anatomy": [
+      {
+        "name": "Humanoid Head",
+        "id": "JgRv4Rs38Od9BYfw",
+        "image": "icons/svg/item-bag.svg",
+        "sourceId": "Compendium.abbrew.anatomy.Item.JgRv4Rs38Od9BYfw"
+      },
+      {
+        "name": "Humanoid Torso",
+        "id": "PSwwLPcvliJ9UHaR",
+        "image": "icons/svg/item-bag.svg",
+        "sourceId": "Compendium.abbrew.anatomy.Item.PSwwLPcvliJ9UHaR"
+      },
+      {
+        "name": "Humanoid Arm",
+        "id": "POvgbGBWEUJJRaIW",
+        "image": "icons/svg/item-bag.svg",
+        "sourceId": "Compendium.abbrew.anatomy.Item.POvgbGBWEUJJRaIW"
+      },
+      {
+        "name": "Humanoid Arm",
+        "id": "POvgbGBWEUJJRaIW",
+        "image": "icons/svg/item-bag.svg",
+        "sourceId": "Compendium.abbrew.anatomy.Item.POvgbGBWEUJJRaIW"
+      },
+      {
+        "name": "Humanoid Leg",
+        "id": "Ksnme3tCyxNpe7ML",
+        "image": "icons/svg/item-bag.svg",
+        "sourceId": "Compendium.abbrew.anatomy.Item.Ksnme3tCyxNpe7ML"
+      },
+      {
+        "name": "Humanoid Leg",
+        "id": "Ksnme3tCyxNpe7ML",
+        "image": "icons/svg/item-bag.svg",
+        "sourceId": "Compendium.abbrew.anatomy.Item.Ksnme3tCyxNpe7ML"
+      }
+    ]
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743075106612,
+    "modifiedTime": 1743075554886,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!y5I3N1IZtZKr3463"
+}

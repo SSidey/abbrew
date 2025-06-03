@@ -1,0 +1,30 @@
+<div>
+    <h3>Light</h3>
+
+    <div class="form-group slim">
+        <label>{{localize "AMBIENT_LIGHT.LABELS.radius"}} <span class="units">({{gridUnits}})</span></label>
+        <div class="form-fields">
+            <label>{{lightFields.dim.label}}</label>
+            {{formInput lightFields.dim value=system.light.dim}}
+            <label>{{lightFields.bright.label}}</label>
+            {{formInput lightFields.bright value=system.light.bright}}
+        </div>
+        <p class="hint">{{ localize 'AMBIENT_LIGHT.LABELS.radiusHint' }}</p>
+    </div>
+
+    {{formGroup lightFields.angle value=system.light.angle step=1 units="Degrees"}}
+    {{formGroup lightFields.color value=system.light.color}}
+    {{formGroup lightFields.alpha value=system.light.alpha step=0.05}}
+    {{formGroup lightFields.animation.fields.type value=system.light.animation.type
+    choices=lightAnimations labelAttr="label" blank="None" sort=true localize=true}}
+    {{formGroup lightFields.animation.fields.speed value=system.light.animation.speed}}
+    {{formGroup lightFields.animation.fields.reverse value=system.light.animation.reverse}}
+    {{formGroup lightFields.animation.fields.intensity value=system.light.animation.intensity}}
+    {{formGroup lightFields.coloration value=system.light.coloration
+    choices=../colorationTechniques valueAttr="id" labelAttr="label" localize=true}}
+    {{formGroup lightFields.luminosity value=system.light.luminosity step=0.05}}
+    {{formGroup lightFields.attenuation value=system.light.attenuation step=0.05}}
+    {{formGroup lightFields.saturation value=system.light.saturation step=0.05}}
+    {{formGroup lightFields.contrast value=system.light.contrast step=0.05}}
+    {{formGroup lightFields.shadows value=system.light.shadows step=0.05}}
+</div>

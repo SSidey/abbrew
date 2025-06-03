@@ -1,0 +1,80 @@
+{
+  "folder": "bfBYLi3m2CWnSvOe",
+  "name": "Shadow Elf",
+  "type": "background",
+  "_id": "1VWGiVWcbVN64ADt",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "skills": [],
+    "attributes": {
+      "str": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "dex": {
+        "value": 2,
+        "label": "",
+        "isEnabled": true
+      },
+      "agi": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      },
+      "con": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "int": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      },
+      "wit": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      },
+      "vis": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      },
+      "wil": {
+        "value": 0,
+        "label": "",
+        "isEnabled": false
+      }
+    },
+    "creatureForm": {
+      "name": "",
+      "id": "",
+      "image": "",
+      "sourceId": ""
+    }
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743077577519,
+    "modifiedTime": 1743077577519,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!1VWGiVWcbVN64ADt"
+}

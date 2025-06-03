@@ -1,0 +1,200 @@
+{
+  "name": "Haste",
+  "type": "skill",
+  "system": {
+    "skillType": "temporary",
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "abbrew.skill.newskill.fwcx4hl848WO4A7U",
+      "uuid": "fwcx4hl848WO4A7U"
+    },
+    "skillTraits": "",
+    "skillModifiers": {
+      "synergy": "[{\"value\":\"Move\",\"id\":\"ttDyhN1XtKKSjkXk\",\"sourceId\":\"Compendium.abbrew.skills.Item.ttDyhN1XtKKSjkXk\"},{\"value\":\"Step\",\"id\":\"jv5DDww4KxR8YbQK\",\"sourceId\":\"Compendium.abbrew.skills.Item.jv5DDww4KxR8YbQK\"},{\"id\":\"abbrewAttack0000\",\"value\":\"Attack\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewAttack0000\"},{\"id\":\"abbrewParry00000\",\"value\":\"Parry\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewParry00000\"},{\"id\":\"abbrewFinisher00\",\"value\":\"Finisher\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewFinisher00\"},{\"id\":\"abbrewFeint00000\",\"value\":\"Feint\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewFeint00000\"},{\"id\":\"abbrewOverpower0\",\"value\":\"Overpower\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewOverpower0\"}]",
+      "discord": ""
+    },
+    "configurable": true,
+    "isActivatable": false,
+    "skills": {
+      "granted": [],
+      "paired": []
+    },
+    "action": {
+      "activationType": "synergy",
+      "actionCost": "0",
+      "actionImage": "",
+      "duration": {
+        "precision": "60",
+        "value": 1
+      },
+      "uses": {
+        "hasUses": true,
+        "value": 1,
+        "max": 1,
+        "period": "round"
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "attackProfile": {
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": 0,
+        "attackMode": "",
+        "damage": [],
+        "finisherLimit": 10
+      },
+      "modifiers": {
+        "fortune": 0,
+        "actionCost": {
+          "value": 1,
+          "operator": "minus"
+        },
+        "attackProfile": {
+          "combineAttacks": {
+            "isEnabled": false,
+            "value": null
+          },
+          "attackType": "",
+          "attackMode": "",
+          "handsSupplied": 0,
+          "finisherLimit": {
+            "value": 0,
+            "operator": ""
+          },
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "damage": []
+        },
+        "guard": {
+          "self": {
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": false,
+                "multiplier": 1
+              }
+            ],
+            "operator": ""
+          },
+          "target": {
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": true,
+                "multiplier": 1
+              }
+            ],
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": false,
+                "multiplier": 1
+              }
+            ],
+            "operator": ""
+          },
+          "target": {
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": true,
+                "multiplier": 1
+              }
+            ],
+            "operator": ""
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": false,
+                "multiplier": 1
+              }
+            ],
+            "operator": ""
+          },
+          "target": {
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "lateParse": true,
+                "multiplier": 1
+              }
+            ],
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": []
+        }
+      }
+    },
+    "path": {
+      "value": "",
+      "archetype": ""
+    },
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": ""
+  },
+  "img": "icons/svg/item-bag.svg",
+  "effects": [],
+  "folder": "mgNTuXhAiV1upRAh",
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743711622026,
+    "modifiedTime": 1745432774046,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_id": "gGwNbDdkafpU6rNm",
+  "sort": 0,
+  "_key": "!items!gGwNbDdkafpU6rNm"
+}

@@ -1,0 +1,99 @@
+{
+  "name": "Warrior",
+  "type": "archetype",
+  "_id": "cWZZqI6WCmKffmwS",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "roleRequirements": {
+      "1": {
+        "isActive": true,
+        "roles": "[{\"label\":\"melee\",\"value\":\"Melee\",\"title\":\"You fight primarily in melee with your opponents.\"},{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"}]",
+        "parsedRoles": [],
+        "restrictedRoles": "[{\"label\":\"magic\",\"value\":\"Magic\",\"title\":\"You primarily harness magic to combat your foes.\"}]",
+        "parsedRestrictedRoles": [],
+        "isMajor": false,
+        "path": {
+          "raw": "",
+          "name": "",
+          "id": ""
+        }
+      },
+      "2": {
+        "isActive": false,
+        "roles": "",
+        "parsedRoles": [],
+        "restrictedRoles": "",
+        "parsedRestrictedRoles": [],
+        "isMajor": false,
+        "path": {
+          "raw": "",
+          "name": "",
+          "id": ""
+        }
+      },
+      "3": {
+        "isActive": false,
+        "roles": "",
+        "parsedRoles": [],
+        "restrictedRoles": "",
+        "parsedRestrictedRoles": [],
+        "isMajor": false,
+        "path": {
+          "raw": "",
+          "name": "",
+          "id": ""
+        }
+      },
+      "4": {
+        "isActive": false,
+        "roles": "",
+        "parsedRoles": [],
+        "restrictedRoles": "",
+        "parsedRestrictedRoles": [],
+        "isMajor": false,
+        "path": {
+          "raw": "",
+          "name": "",
+          "id": ""
+        }
+      },
+      "5": {
+        "isActive": false,
+        "roles": "",
+        "parsedRoles": [],
+        "restrictedRoles": "",
+        "parsedRestrictedRoles": [],
+        "isMajor": false,
+        "path": {
+          "raw": "",
+          "name": "",
+          "id": ""
+        }
+      }
+    },
+    "skillIds": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746215796884,
+    "modifiedTime": 1746215813004,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!cWZZqI6WCmKffmwS"
+}

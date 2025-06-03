@@ -1,0 +1,64 @@
+{
+  "folder": "2bA9aIdDyocqHlce",
+  "name": "Humanoid Leg",
+  "type": "anatomy",
+  "_id": "Ksnme3tCyxNpe7ML",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "equipType": "",
+    "equipPoints": {
+      "required": {
+        "raw": "",
+        "parsed": []
+      },
+      "provided": {
+        "raw": "",
+        "parsed": []
+      }
+    },
+    "handsRequired": "",
+    "equipState": "stowed",
+    "handsSupplied": 0,
+    "actionCost": 0,
+    "exertActionCost": 0,
+    "validEquipStates": [],
+    "parts": "[{\"value\":\"Leg\"}]",
+    "isBroken": false,
+    "isDismembered": false,
+    "hands": 0,
+    "speed": 1,
+    "revealed": {
+      "isRevealed": false,
+      "difficulty": 0,
+      "tier": 0
+    },
+    "defense": {
+      "guard": 0,
+      "inflexibility": 0,
+      "protection": []
+    },
+    "naturalWeapons": []
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743075222255,
+    "modifiedTime": 1743075516545,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!Ksnme3tCyxNpe7ML"
+}

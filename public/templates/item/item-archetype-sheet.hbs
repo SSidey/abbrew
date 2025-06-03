@@ -1,0 +1,94 @@
+<form class="{{cssClass}}" autocomplete="off">
+  <header class="sheet-header">
+    <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" />
+    <div class="header-fields">
+      <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name" /></h1>
+    </div>
+  </header>
+
+  {{!-- Sheet Tab Navigation --}}
+  <nav class="sheet-tabs tabs" data-group="primary">
+    <a class="item" data-tab="description">Description</a>
+    <a class="item" data-tab="requirements">Requirements</a>
+  </nav>
+
+  {{!-- Sheet Body --}}
+  <section class="sheet-body">
+
+    {{!-- Description Tab --}}
+    <div class="tab" data-group="primary" data-tab="description">
+      {{editor enrichedDescription target="system.description" engine="prosemirror" rollData=rollData button=true
+      owner=owner
+      editable=editable}}
+    </div>
+
+    <div class="tab" data-tab="requirements">
+      <ol class="archetype-requirements-list">
+        {{#each system.roleRequirements as |requirement key|}}
+        {{#gm}}
+        <li>
+          <label class="slide-toggle roboto-upper">
+            <input type="checkbox" name="system.roleRequirements.{{key}}.isActive" {{ checked requirement.isActive }}>
+            <span>Active Requirement</span>
+            {{#if requirement.isActive}}
+            <i class="fa fa-toggle-on"></i>
+            {{else}}
+            <i class="fa fa-toggle-off"></i>
+            {{/if}}
+          </label>
+        </li>
+        {{/gm}}
+        {{#if requirement.isActive}}
+        <li class="archetype-requirement" data-requirement-id="{{key}}">
+          <h3>Requirement {{key}}</h3>
+          <div class="requirement-row">
+            <span>Roles</span>
+            <input type="text" name="system.roleRequirements.{{key}}.roles" value="{{requirement.roles}}"
+              data-dtype="string" data-requirement-id="{{key}}" {{#unless (isGM)}}readonly{{/unless}} />
+          </div>
+          <div class="requirement-row">
+            <span>Restrictions</span>
+            <input type="text" name="system.roleRequirements.{{key}}.restrictedRoles"
+              value="{{requirement.restrictedRoles}}" data-dtype="string" data-requirement-id="{{key}}" {{#unless
+              (isGM)}}readonly{{/unless}} />
+          </div>
+          {{#gm}}
+          <div class="requirement-row">
+            <label class="slide-toggle roboto-upper">
+              <input type="checkbox" name="system.roleRequirements.{{key}}.path.isRequired" {{#unless
+                (isGM)}}disabled{{/unless}} {{ checked requirement.path.isRequired }}>
+              <span>Path Required?</span>
+              {{#if requirement.path.isRequired}}
+              <i class="fa fa-toggle-on"></i>
+              {{else}}
+              <i class="fa fa-toggle-off"></i>
+              {{/if}}
+            </label>
+          </div>
+          {{/gm}}
+          {{#if requirement.path.isRequired}}
+          <div class="requirement-row">
+            <span>Path</span>
+            <input type="text" name="system.roleRequirements.{{key}}.path.raw" value="{{requirement.path.raw}}"
+              data-dtype="string" data-requirement-id="{{key}}" />
+          </div>
+          {{#if (lt key 3)}}
+          <label class="slide-toggle roboto-upper">
+            <input type="checkbox" name="system.roleRequirements.{{key}}.isMajor" {{#unless (isGM)}}disabled{{/unless}}
+              {{ checked requirement.isMajor }}>
+            <span>Major Requirement</span>
+            {{#if requirement.isMajor}}
+            <i class="fa fa-toggle-on"></i>
+            {{else}}
+            <i class="fa fa-toggle-off"></i>
+            {{/if}}
+          </label>
+          {{/if}}
+          {{/if}}
+        </li>
+        {{/if}}
+        {{/each}}
+      </ol>
+    </div>
+  </section>
+</form>

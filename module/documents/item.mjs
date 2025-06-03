@@ -1,4 +1,13 @@
-import { doesNestedFieldExist, arrayDifference, getNumericParts } from '../helpers/utils.mjs';
+import { doesNestedFieldExist, arrayDifference, getNumericParts, getSafeJson } from '../helpers/utils.mjs';
+import { getAttackSkillWithActions, getParrySkillWithActions } from '../helpers/fundamental-skills.mjs';
+import { emitForAll, SocketMessage } from '../socket.mjs';
+import { applyOperator } from '../helpers/operators.mjs';
+import { acceptSkillCheck } from '../helpers/skills/skill-check.mjs';
+import { getModifiedSkillActionCost, handleSkillActivate } from '../helpers/skills/skill-activation.mjs';
+import { trackSkillDuration } from '../helpers/skills/skill-duration.mjs';
+import { manualSkillExpiry } from '../helpers/skills/skill-expiry.mjs';
+import { handleGrantedSkills } from '../helpers/skills/skill-grants.mjs';
+import { applyEnhancement } from '../helpers/enhancements/enhancement-application.mjs';
 /**
  * Extend the basic Item with some very simple modifications.
  * @extends {Item}
@@ -13,42 +22,220 @@ export default class AbbrewItem extends Item {
     super.prepareData();
   }
 
-  _preUpdate(changed, options, userId) {
-    if (doesNestedFieldExist(changed, "system.equipState") && changed.system.equipState === 'worn' && this.type === 'armour') {
-      if (!this.isWornEquipStateChangePossible()) {
-        ui.notifications.info("You are already wearing too many items, try stowing some");
-        this.actor.sheet.render();
-        return false;
+  async _preUpdate(changed, options, userId) {
+    // TODO: Could have items grant extra slots e.g. "belt" slot, which you could then have "worn" equip on a scabbard (require 1 belt)
+    // The scabbard which grants a sword slot so then you can wear your sword (worn items are less cost to draw?)
+    if (doesNestedFieldExist(changed, "system.equipState") && this.system.equipType === "worn") {
+      if (changed.system.equipState === 'worn' && ["armour", "equipment"].includes(this.type)) {
+        if (!this.isWornEquipStateChangePossible()) {
+          ui.notifications.info("You are already wearing too many items, try stowing some");
+          this.actor.sheet.render();
+          return false;
+        } else {
+          await this.grantSkills();
+        }
+      } else {
+        if ((this.system.skills?.granted?.length ?? 0) > 0) {
+          const grantedSkills = this.actor.items.filter(i => i.type === "skill").filter(s => s.system.grantedBy.item === this._id);
+          this.actor.deleteEmbeddedDocuments("Item", grantedSkills.map(s => s._id));
+        }
       }
     }
 
-
-    if (doesNestedFieldExist(changed, "system.equipState") && changed.system.equipState.startsWith('held')) {
-      if (!this.isHeldEquipStateChangePossible(changed.system.equipState)) {
-        ui.notifications.info("You are already holding too many items, try stowing some");
-        this.actor.sheet.render();
-        return false;
+    if (doesNestedFieldExist(changed, "system.equipState") && this.system.equipType === "held") {
+      if (changed.system.equipState.startsWith('held')) {
+        if (!this.isHeldEquipStateChangePossible(changed.system.equipState)) {
+          ui.notifications.info("You are already holding too many items, try stowing some");
+          this.actor.sheet.render();
+          return false;
+        } else {
+          await this.grantSkills();
+        }
+      } else if (changed.system.equipState === 'active') {
+        await this.grantSkills();
+      }
+      else {
+        if ((this.system.skills?.granted?.length ?? 0) > 0) {
+          const grantedSkills = this.actor.items.filter(i => i.type === "skill").filter(s => s.system.grantedBy.item === this._id);
+          this.actor.deleteEmbeddedDocuments("Item", grantedSkills.map(s => s._id));
+        }
       }
     }
 
-    super._preUpdate(changed, options, userId);
+    if (doesNestedFieldExist(changed, "system.isDismembered") && changed.system.isDismembered === true) {
+      foundry.utils.setProperty(changed, `system.equipState`, "dropped");
+    }
+
+    // Set appropriate values for concentration duration skill.
+    if (doesNestedFieldExist(changed, "system.action.duration.isConcentration") && changed.system.action.duration.isConcentration === true) {
+      foundry.utils.setProperty(changed, `system.action.duration.precision`, "6");
+      foundry.utils.setProperty(changed, `system.action.duration.expireOnStartOfTurn`, false);
+      foundry.utils.setProperty(changed, `system.action.duration.value`, 1);
+    }
+
+    if (doesNestedFieldExist(changed, "system.attackProfiles") && this.actor) {
+      let newGrantPromises = [];
+      const promises = [];
+      let newAmmunition;
+      this.system.attackProfiles.filter(p => p.attackType === "ranged").forEach((p, i) => {
+        if (this.system.attackProfiles[i].ammunition.id !== changed.system.attackProfiles[i].ammunition.id) {
+          const oldAmmunition = this.actor.items.get(p.ammunition.id);
+          newAmmunition = this.actor.items.get(changed.system.attackProfiles[i].ammunition.id);
+          if (oldAmmunition) {
+            const oldGrants = oldAmmunition.system.skills.granted.map(g => g.id);
+            const oldGranted = this.actor.items.filter(o => oldGrants.includes(o.system.abbrewId.uuid));
+            oldGranted.forEach(o => promises.push(o.delete()));
+          }
+          if (newAmmunition) {
+            const newGrants = newAmmunition.system.skills.granted;
+            newGrants.map(n => fromUuid(n.sourceId));
+            newGrantPromises = newGrants.map(n => fromUuid(n.sourceId));
+          }
+        }
+      })
+
+      const newGranted = await Promise.all(newGrantPromises) ?? [];
+      promises.push(handleGrantedSkills(newGranted, this.actor, newAmmunition));
+      await Promise.all(promises);
+    }
+
+    if (doesNestedFieldExist(changed, "system.isFavourited")) {
+      if (this.actor) {
+        if (changed.system.isFavourited) {
+          const favourites = this.actor.system.favourites;
+          const currentFavourites = favourites[this.type];
+          const updateFavourites = [...currentFavourites, this._id];
+          const update = { system: { favourites: favourites } };
+          update.system.favourites[this.type] = updateFavourites;
+          await this.actor.update(update);
+        } else {
+          const favourites = this.actor.system.favourites;
+          const currentFavourites = favourites[this.type];
+          const updateFavourites = currentFavourites.filter(f => f !== this._id);
+          const update = { system: { favourites: favourites } };
+          update.system.favourites[this.type] = updateFavourites;
+          await this.actor.update(update);
+        }
+      }
+    }
+
+    if (doesNestedFieldExist(changed, "system.isDismembered") && this.actor && this.system.naturalWeapons.length > 0) {
+      if (changed.system.isDismembered) {
+        const weaponPromises = this.actor.items.filter(i => i.type === "weapon").filter(i => i.system.grantedBy === this._id).map(i => i.delete());
+        const skillPromises = this.actor.items.filter(i => i.type === "skill").filter(i => i.system.grantedBy.item === this._id).map(i => i.delete());
+
+        await Promise.all([...weaponPromises, ...skillPromises]);
+      }
+      else {
+        await this.actor.acceptAnatomy(this);
+      }
+    }
+
+    return super._preUpdate(changed, options, userId);
   }
 
-  // TODO: Drop items when not enough hands
+  async grantSkills() {
+    const grantedSkillPromises = this.system.skills.granted.map(n => fromUuid(n.sourceId));
+    const grantedSkills = await Promise.all(grantedSkillPromises);
+    await handleGrantedSkills(grantedSkills, this.actor, this);
+  }
+
+  async _onUpdate(changed, options, userId) {
+    if (doesNestedFieldExist(changed, "system.senses") && this.actor) {
+      await this.handleSenses();
+    }
+    if (doesNestedFieldExist(changed, "system.light") && this.actor) {
+      await this.handleLight();
+    }
+
+    super._onUpdate(changed, options, userId);
+  }
+
+  async handleLight() {
+    const light = this.system.light;
+    const update = { "system.light": light };
+
+    if (this.actor) {
+      await this.actor.handleLight();
+    }
+  }
+
+  async handleSenses() {
+    if (this.actor) {
+      const senseSkills = this.actor.items
+        .filter(i => i.type === "skill")
+        .filter(s => s.system.senses.modifiesSenses)
+        .map(s => s.system.senses);
+      const update = senseSkills.reduce((update, senses) => {
+        update.sight.enabled = true;
+        if (senses.sight.range === null) {
+          update.sight.range = null;
+        } else if (senses.sight.range && update.sight.range !== null && senses.sight.range > update.sight.range) {
+          update.sight.range = senses.sight.range;
+        }
+        if (senses.sight.angle < update.sight.angle) {
+          update.sight.angle = senses.sight.angle;
+        }
+        if (update.sight.visionMode !== "basic") {
+          update.sight.visionMode = senses.sight.visionMode;
+        }
+
+        update.detectionModes = senses.detectionModes.reduce((detectionModes, mode) => {
+          const oldMode = detectionModes.find(m => m.id === mode.id);
+          if (oldMode) {
+            if (mode.range === null || (mode.range && oldMode.range < mode.range)) {
+              oldMode.range = mode.range;
+              oldMode.enabled = true;
+            }
+          } else {
+            detectionModes.push({ ...mode, enabled: true });
+          }
+
+          return detectionModes;
+        }, update.detectionModes);
+
+        if (update.detectionModes.some(m => m.id === "basicSight")) {
+          const mode = update.detectionModes.find(m => m.id === "basicSight");
+          update.sight.range = mode.range;
+          update.sight.visionMode = "darkvision";
+          update.sight.saturation = -1;
+        } else if (update.sight.visionMode === "monochromatic") {
+          update.sight.saturation = -1;
+        } else if (update.sight.visionMode === "tremorsense") {
+          update.sight.brightness = 1;
+          update.sight.saturation = -0.3;
+          update.sight.contrast = 0.2;
+        } else if (update.sight.visionMode === "lightAmplification") {
+          update.sight.brightness = 1;
+          update.sight.saturation = -0.5;
+          update.sight.contrast = 0;
+        }
+        else {
+          update.sight.visionMode = "basic";
+          update.sight.saturation = 0;
+        }
+
+        return update;
+      }, { sight: { enabled: true, range: 0, angle: 360, visionMode: "" }, detectionModes: [] });
+
+      await this.actor.update({ "system.senses": update });
+    }
+  }
+
   isWornEquipStateChangePossible() {
-    const armourPoints = JSON.parse(this.system.armourPoints).map(ap => ap.value);
-    const usedArmourPoints = this.actor.getActorWornArmour().flatMap(a => JSON.parse(a.system.armourPoints).map(ap => ap.value));
-    const actorArmourPoints = this.actor.getActorAnatomy().flatMap(a => JSON.parse(a.system.parts).map(ap => ap.value));
-    const availableArmourPoints = arrayDifference(actorArmourPoints, usedArmourPoints);
-    if (!armourPoints.every(ap => availableArmourPoints.includes(ap))) {
+    const equipPoints = this.system.equipPoints.required.parsed.map(ap => ap.value);
+    const usedEquipPoints = this.actor.getActorWornItems().flatMap(a => a.system.equipPoints.required.parsed.map(ap => ap.value));
+    const actorEquipPoints = this.actor.getActorAnatomy().parts;
+    const availableEquipPoints = arrayDifference(actorEquipPoints, usedEquipPoints);
+    if (!equipPoints.every(ap => availableEquipPoints.includes(ap))) {
       return false;
     }
-    let requiredArmourPoints = availableArmourPoints.filter(ap => armourPoints.includes(ap));
-    const allRequiredAvailable = armourPoints.reduce((result, a) => {
-      if (requiredArmourPoints.length > 0 && requiredArmourPoints.includes(a)) {
-        const index = requiredArmourPoints.indexOf(a);
+    let requiredEquipPoints = availableEquipPoints.filter(ap => equipPoints.includes(ap));
+    const allRequiredAvailable = equipPoints.reduce((result, a) => {
+      if (requiredEquipPoints.length > 0 && requiredEquipPoints.includes(a)) {
+        const index = requiredEquipPoints.indexOf(a);
         if (index > -1) { // only splice array when item is found
-          requiredArmourPoints.splice(index, 1); // 2nd parameter means remove one item only
+          requiredEquipPoints.splice(index, 1); // 2nd parameter means remove one item only
         } else {
           return false;
         }
@@ -63,7 +250,7 @@ export default class AbbrewItem extends Item {
   }
 
   isHeldEquipStateChangePossible(equipState) {
-    const actorHands = this.actor.getActorAnatomy().reduce((result, a) => result += a.system.hands, 0);
+    const actorHands = this.actor.getActorAnatomy().hands;
     const equippedHeldItemHands = this.actor.getActorHeldItems().filter(i => i._id !== this._id).reduce((result, a) => result += getNumericParts(a.system.equipState), 0);
     const requiredHands = equippedHeldItemHands + getNumericParts(equipState);
     return actorHands >= requiredHands;
@@ -103,62 +290,315 @@ export default class AbbrewItem extends Item {
     const messageId = card.closest(".message").dataset.messageId;
     const message = game.messages.get(messageId);
     const action = button.dataset.action;
-    const actor = game.actors.get(card.dataset.actorId);
-    const item = game.items.get(card.dataset.itemId);
 
     switch (action) {
+      case 'check': await this._onAcceptCheckAction(message.rolls, message.flags.data, messageId); break;
+      case 'accept': await this._onAcceptEffectAction(message.rolls, message.flags.data, action); break;
       case 'damage': await this._onAcceptDamageAction(message.rolls, message.flags.data, action); break;
-      case 'strong': await this._onAcceptDamageAction(message.rolls, message.flags.data, action); break;
+      case 'overpower': await this._onAcceptDamageAction(message.rolls, message.flags.data, action); break;
       case 'parry': await this._onAcceptDamageAction(message.rolls, message.flags.data, action); break;
-      case 'finisher': await this._onAcceptFinisherAction(message.rolls, message.flags.data, action); break;
+      case 'finisher': await this._onAcceptFinisherAction(message.rolls, message.flags.data, action, button.dataset.finisherType); break;
     }
+  }
+
+  static async _onAcceptCheckAction(rolls, data, messageId) {
+    const message = game.messages.get(messageId);
+    const tokens = canvas.tokens.controlled.filter((token) => token.actor);
+    if (tokens.length === 0) {
+      ui.notifications.info("Please select a token to accept the effect.");
+      return;
+    }
+
+    const actor = tokens[0].actor;
+
+    const result = await acceptSkillCheck(actor, data.skillCheckRequest);
+
+    const parsedResult = ({ name: result.actor.name, result: result.result, totalValue: result.totalValue, requiredValue: result.requiredValue, totalSuccesses: result.totalSuccesses, requiredSuccesses: result.requiredSuccesses, skillResult: result.skillResult, contestedResult: result.contestedResult })
+
+    let templateData = message.flags.abbrew.messasgeData.templateData;
+
+    templateData.skillCheck = templateData.skillCheck ? templateData.skillCheck : ({ attempts: [] });
+    templateData.skillCheck.attempts = [...templateData.skillCheck.attempts, parsedResult];
+    templateData.skillCheck.checkType = data.skillCheckRequest.checkType;
+
+    const html = await renderTemplate("systems/abbrew/templates/chat/skill-card.hbs", templateData);
+    // await updateMessageForCheck(messageId, html, templateData);
+    emitForAll("system.abbrew", new SocketMessage(game.user.id, "updateMessageForCheck", { messageId, html, templateData }));
+  }
+
+  static async _onAcceptEffectAction(rolls, data, action) {
+    const tokens = canvas.tokens.controlled.filter((token) => token.actor);
+    if (tokens.length === 0) {
+      ui.notifications.info("Please select a token to accept the effect.");
+      return;
+    }
+
+    const actor = tokens[0].actor;
+
+    await actor.takeEffect(data, rolls, action);
   }
 
   static async _onAcceptDamageAction(rolls, data, action) {
     const tokens = canvas.tokens.controlled.filter((token) => token.actor);
     if (tokens.length === 0) {
+      ui.notifications.info("Please select a token to accept the effect.");
       return;
     }
 
-    await tokens[0].actor.takeDamage(rolls, data, action);
+    const actor = tokens[0].actor;
+
+    if (action === "parry" && actor.doesActorHaveSkillDiscord(getParrySkillWithActions(0))) {
+      ui.notifications.info("You are prevented from parrying.");
+      return;
+    }
+
+    if (action === "parry") {
+      const actions = this.getActionCostForAccept(data, action);
+      if (actions > 0 && !await actor.canActorUseActions(getModifiedSkillActionCost(actor, getParrySkillWithActions(actions)))) {
+        return;
+      }
+    }
+
+    await actor.takeAttack(data, action);
   }
 
-  static async _onAcceptFinisherAction(rolls, data, action) {
+  static getActionCostForAccept(data, action) {
+    return action === "parry" ? data.actionCost : 0;
+  }
+
+  static async _onAcceptFinisherAction(rolls, data, action, finisherType) {
     const tokens = canvas.tokens.controlled.filter((token) => token.actor);
     if (tokens.length === 0) {
       return;
     }
 
-    await tokens[0].actor.takeDamage(rolls, data, action);
-    await tokens[0].actor.takeFinisher(rolls, data);
+    await tokens[0].actor.takeFinisher(rolls, data, finisherType);
   }
 
-  /**
-   * Handle clickable rolls.
-   * @param {Event} event   The originating click event
-   * @private
-   */
-  async roll() {
-    const item = this;
-
-    // Initialize chat data.
-    const speaker = ChatMessage.getSpeaker({ actor: this.actor });
-    const rollMode = game.settings.get('core', 'rollMode');
-    const label = `[${item.type}] ${item.name}`;
-
-    // If there's no roll data, send a chat message.
-    if (!this.system.formula) {
-      ChatMessage.create({
-        speaker: speaker,
-        rollMode: rollMode,
-        flavor: label,
-        content: item.system.description ?? '',
-      });
+  async _preCreate(data, options, user) {
+    if (game.user !== user) {
+      return;
     }
-    // Otherwise, create a roll and send a chat message from it.
-    else {
-      // TODO: Replace with old
-      console.log('general roll');
+
+    if (data.type === "skill") {
+      if (this.actor && data.system.abbrewId) {
+        const duplicateItem = this.actor.items.find(i => i.system.abbrewId.uuid === data.system.abbrewId.uuid);
+        if (duplicateItem) {
+          const uses = duplicateItem.system.action.uses;
+          if (uses.hasUses && uses.asStacks) {
+            await duplicateItem.update({ "system.action.uses.value": uses.value + data.system.action.uses.value });
+            return false;
+          }
+        }
+      }
+    }
+
+    return super._preCreate(data, options, user);
+  }
+
+  async _onDelete(options, userId) {
+    if (this.type === "skill") {
+      await this.handleSenses();
+      await this.handleLight();
+    }
+  }
+
+  async _onCreate(data, options, userId) {
+    if (game.user.id !== userId) {
+      return;
+    }
+
+    if (data.type === "skill") {
+      await this.handleSenses();
+      await this.handleLight();
+      await this.actor?.acceptSkillDeck(data);
+      if (this.actor && ((!this.system.isActivatable && this.system.action.duration.value > 0) || (this.system.skillType === "temporary"))) {
+        await trackSkillDuration(this.actor, this);
+      }
+      if (this.actor && this.system.isActivatable && this.system.activateOnCreate) {
+        await handleSkillActivate(this.actor, this, false);
+      }
+      if (this.actor && this.system.resource.fillCapacityOnCreate) {
+        const id = this.system.resource.relatedResource ? JSON.parse(this.system.resource.relatedResource)[0].id : this.system.abbrewId.uuid;
+        const capacity = this.system.resource.capacity ?? 0;
+        await this.actor.handleResourceFill(id, capacity);
+      }
+      if (this.actor && data.effects.find(e => e.flags.abbrew.skill.stacks && data.system.action.uses.hasUses)) {
+        const effect = this.effects.find(e => e.flags.abbrew.skill.stacks)
+        const stacks = data.effects.find(e => e.flags.abbrew.skill.stacks).flags.abbrew.skill.stacks;
+        const visible = stacks > 1;
+        await effect.update({ "flags.statuscounter.visible": visible, "flags.statuscounter.value": stacks });
+      }
+    } else if (data.type === "anatomy") {
+      await this.actor?.acceptAnatomy(this);
+    }
+  }
+
+  async _preDelete(options, userId) {
+    if (this.actor) {
+      if (this.system.storeIn) {
+        const container = this.actor.items.find(i => i._id === this.system.storeIn);
+        if (container) {
+          const containerStoredItems = container.system.storage.storedItems.filter(i => i !== this._id);
+          await container.update({ "system.storage.storedItems": containerStoredItems });
+        }
+      }
+
+      const trackedEffects = [
+        ...this.actor.effects.toObject().filter(e => e.flags.abbrew.skill?.trackDuration === this._id),
+        ...this.actor.effects.toObject().filter(e => e.flags.abbrew.enhancement?.trackDuration === this._id)
+      ];
+      if (trackedEffects.length > 0) {
+        this.actor.deleteEmbeddedDocuments("ActiveEffect", trackedEffects.map(e => e._id));
+        return false;
+      }
+
+      if ((this.system.skills?.granted?.length ?? 0) > 0) {
+        const grantedSkills = this.actor.items.filter(i => i.type === "skill").filter(s => s.system.grantedBy.item === this._id);
+        this.actor.deleteEmbeddedDocuments("Item", grantedSkills.map(s => s._id));
+      }
+
+      // If we have one left then clear it out of archetype lists.
+      if (this.actor.items.filter(i => i.type === "skill").filter(s => s.system.abbrewId.uuid === this.system.abbrewId.uuid).length === 1) {
+        const archetypes = this.actor.items.filter(i => i.type === "archetype").filter(a => a.system.skillIds.includes(this.system.abbrewId.uuid));
+        archetypes.forEach(async a => {
+          const update = a.system.skillIds.filter(s => s !== this.system.abbrewId.uuid);
+          await a.update({ "system.skillIds": update });
+        });
+      }
+
+      if (this.type === "enhancement") {
+        const promises = [];
+        const grants = this.system.grantedIds;
+        const granted = this.actor.items.filter(i => grants.includes(i._id));
+        granted.forEach(o => promises.push(o.delete()));
+        if (this.system.target.id && this.actor) {
+          const enhancedItem = structuredClone(this.actor.items.find(i => i._id === this.system.target.id));
+          if (enhancedItem) {
+            applyEnhancement(this, this.actor, enhancedItem, true);
+            await Item.implementation.updateDocuments([{ _id: this.system.target.id, ...enhancedItem }], { parent: this.actor });
+          }
+        }
+        await Promise.all(promises);
+      }
+
+      if (this.type === "anatomy" && this.actor && this.system.naturalWeapons.length > 0) {
+        const weaponPromises = this.actor.items.filter(i => i.type === "weapon").filter(i => i.system.grantedBy === this._id).map(i => i.delete());
+        const skillPromises = this.actor.items.filter(i => i.type === "skill").filter(i => i.system.grantedBy.item === this._id).map(i => i.delete());
+
+        await Promise.all([...weaponPromises, ...skillPromises]);
+      }
+    }
+  }
+
+  _mergeRangedAttackAndAmmo(attackProfile, ammoAttackModifier) {
+    attackProfile.critical = ammoAttackModifier.critical;
+    attackProfile.lethal = ammoAttackModifier.lethal;
+    attackProfile.finisherLimit = ammoAttackModifier.finisherLimit;
+    const bonusPenetration = attackProfile.penetration;
+    attackProfile.damage = ammoAttackModifier.damage;
+    attackProfile.damage.forEach(d => d.penetration += bonusPenetration);
+
+    return attackProfile;
+  }
+
+  _getActionCost(attackMode) {
+    switch (attackMode) {
+      case "overpower": return this.system.exertActionCost;
+      case "ranged": return 1;
+      case "aimedshot": return 2;
+      default:
+        return this.system.actionCost;
+    }
+  }
+
+  async handleAttackDamageAction(actor, attackProfileId, attackMode) {
+    let attackProfile = structuredClone(this.system.attackProfiles[attackProfileId]);
+    let ammunitionId;
+
+    if (["ranged", "aimedshot"].includes(attackMode)) {
+      if (this.system.attackProfiles[attackProfileId].ammunition.value === 0) {
+        ui.notifications.warn(`${this.name} needs to be reloaded.`)
+        return;
+      }
+
+      ammunitionId = this.system.attackProfiles[attackProfileId].ammunition.id;
+      const ammunition = this.actor.items.find(i => i._id === ammunitionId);
+      if (ammunition) {
+        const ammoAttackModifier = ammunition.system.attackModifier;
+        attackProfile = this._mergeRangedAttackAndAmmo(attackProfile, ammoAttackModifier);
+        const attackProfiles = this.system.attackProfiles;
+        attackProfiles[attackProfileId].ammunition.value -= 1;
+        await this.update({ "system.attackProfiles": attackProfiles });
+      }
+    }
+
+    const actionCost = this._getActionCost(attackMode);
+    const itemTriggerIds = [this._id, ammunitionId].filter(i => i);
+
+    let combineForSkill = actor.items.filter(i => i.type === "skill").find(s => s._id === actor.system.combinedAttacks.combineFor);
+
+    if (!combineForSkill) {
+      const combineAttackSkills = actor.items.filter(i => i.type === "skill" && actor.system.queuedSkills.includes(i._id)).filter(s => s.system.action.modifiers.attackProfile.combineAttacks.isEnabled);
+      if (combineAttackSkills.length > 0) {
+        combineForSkill = combineAttackSkills[0];
+        await actor.update({ "system.combinedAttacks.combineFor": combineForSkill._id });
+      }
+    }
+
+    const combineSkill = combineForSkill ? ({
+      name: combineForSkill.name,
+      image: combineForSkill.img,
+      id: combineForSkill._id,
+      value: combineForSkill.system.action.modifiers.attackProfile.combineAttacks.value,
+      actionCost: combineForSkill.system.action.actionCost,
+      attackMode: combineForSkill.system.action.modifiers.attackProfile.attackMode,
+      handsSupplied: combineForSkill.system.action.modifiers.attackProfile.handsSupplied,
+      durationPrecision: combineForSkill.system.action.duration.precision,
+      skillsGrantedOnAccept: combineForSkill.system.skills.grantedOnAccept
+    }) : undefined;
+
+    if (combineSkill) {
+      const toCombine = combineSkill.value;
+      const combined = actor.system.combinedAttacks.combined;
+      if (actor.system.combinedAttacks.combined === 0 && !actor.system.combinedAttacks.base) {
+        const base = { id: combineSkill.id, name: combineSkill.name, actionCost: combineSkill.actionCost, image: combineSkill.image, attackMode: combineSkill.attackMode, handsSupplied: combineSkill.handsSupplied, attackProfile: attackProfile };
+        await actor.update({ "system.combinedAttacks.itemIds": itemTriggerIds, "system.combinedAttacks.combined": combined + 1, "system.combinedAttacks.base": base });
+        return;
+      }
+
+      const combinedDamage = actor.system.combinedAttacks.additionalDamage;
+      const fullItemIds = [...actor.system.combinedAttacks.itemIds, ...itemTriggerIds];
+      const fullCombinedDamage = [...combinedDamage, ...attackProfile.damage];
+      const totalCombined = combined + 1;
+      if (totalCombined < toCombine) {
+        await actor.update({ "system.combinedAttacks.combined": totalCombined, "system.combinedAttacks.additionalDamage": fullCombinedDamage })
+      }
+
+      let base = actor.system.combinedAttacks.base;
+      base.attackProfile.damage = [...base.attackProfile.damage, ...fullCombinedDamage];
+      let attackSkill = getAttackSkillWithActions(base.id, base.name, base.actionCost, base.image, base.attackProfile, base.attackMode, base.handsSupplied, [], actor._id, fullItemIds);
+      attackSkill.system.action.attackProfile.finisherLimit = applyOperator(attackSkill.system.action.attackProfile.finisherLimit, combineForSkill.system.action.modifiers.attackProfile.finisherLimit.value, combineForSkill.system.action.modifiers.attackProfile.finisherLimit.operator, 0);
+      attackSkill.system.action.attackProfile.critical = applyOperator(attackSkill.system.action.attackProfile.critical, combineForSkill.system.action.modifiers.attackProfile.critical.value, combineForSkill.system.action.modifiers.attackProfile.critical.operator, 5);
+      attackSkill.system.action.attackProfile.lethal = applyOperator(attackSkill.system.action.attackProfile.lethal, combineForSkill.system.action.modifiers.attackProfile.lethal.value, combineForSkill.system.action.modifiers.attackProfile.lethal.operator, 0);
+
+      if (combineSkill.durationPrecision === "0") {
+        const effect = actor.effects.find(e => e.flags?.abbrew?.skill?.trackDuration === combineSkill.id);
+        await manualSkillExpiry(effect);
+      }
+      attackSkill.system.skills.grantedOnAccept = combineSkill.skillsGrantedOnAccept;
+
+      await actor.update({ "system.combinedAttacks.combined": 0, "system.combinedAttacks.combineFor": null, "system.combinedAttacks.base": null, "system.combinedAttacks.additionalDamage": [] })
+      await handleSkillActivate(actor, attackSkill, false);
+      return;
+    }
+
+    const attackSkill = getAttackSkillWithActions(null, this.name, actionCost, this.img, attackProfile, attackMode, this.system.handsSupplied, [], actor._id, itemTriggerIds);
+
+    await handleSkillActivate(actor, attackSkill);
+
+    if (attackMode === "thrown") {
+      await this.update({ "system.equipState": "dropped" });
     }
   }
 }

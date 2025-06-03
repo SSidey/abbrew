@@ -1,0 +1,21 @@
+{
+  "name": "Scoundrel Universal",
+  "sorting": "a",
+  "folder": null,
+  "type": "Item",
+  "_id": "3VSec1nTXEHGGfJj",
+  "description": "",
+  "sort": 0,
+  "color": null,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746347332330,
+    "modifiedTime": 1746347332330,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!3VSec1nTXEHGGfJj"
+}

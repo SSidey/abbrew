@@ -29,13 +29,24 @@
     <div class="tab" data-group="primary" data-tab="description">
       {{!-- To render inline rolls in a TinyMCE editor, you need to pass the parent actor's (if any) roll data to the
       rollData prop. --}}
-      {{editor system.description target="system.description" rollData=rollData button=true owner=owner
+      {{editor enrichedDescription target="system.description" engine="prosemirror" rollData=rollData button=true
+      owner=owner
       editable=editable}}
     </div>
 
     {{!-- Attributes Tab --}}
     <div class="tab attributes" data-group="primary" data-tab="attributes">
-      <pre>{{json system}}</pre>
+      {{#gm}}
+      <h4>Reveal Skills</h4>
+      <div>
+        <label>Skills</label>
+        <input type="text" name="system.revealed.revealSkills.raw" value="{{system.revealed.revealSkills.raw}}"
+          data-dtype="String" data-dropType="skill" />
+        <label>Difficulty</label>
+        <input type="number" name="system.revealed.difficulty" value="{{system.revealed.difficulty}}"
+          data-dtype="Number" />
+      </div>
+      {{/gm}}
       <div class="resource">
         <div class="grid grid-4col">
           <div class="grid-span-2">
@@ -53,6 +64,44 @@
         </div>
       </div>
       {{> "systems/abbrew/templates/item/parts/item-defenses.hbs" showEquipType=false}}
+      <div>
+        <h3>Natural Weapons</h3>
+        <ol class="anatomy-weapon-list">
+          {{#each system.naturalWeapons as |weapon id|}}
+          <li class="anatomy-weapon" data-id="{{id}}" data-item-id="{{weapon.id}}" data-source-id="{{weapon.sourceId}}">
+            <div class="anatomy-weapon-summary">
+              <div class="image-container"><img src="{{weapon.image}}" /></div>
+              <div class="name"><span>{{weapon.name}}</span></div>
+              <a class='item-control anatomy-weapon-delete' title='{{localize "DOCUMENT.Delete" type="weapon"}}'>
+                <i class='fas fa-trash'></i>
+              </a>
+            </div>
+          </li>
+          {{/each}}
+          <li class="empty-drop-list-element">
+            <span>+ Natural Weapon</span>
+          </li>
+        </ol>
+      </div>
+      <div>
+        <h3>Skills</h3>
+        <ol class="skill-deck-skills">
+          {{#each system.skills.granted as |skill id|}}
+          <li class="skill-deck-skill" data-id="{{id}}" data-item-id="{{skill.id}}" data-source-id="{{skill.sourceId}}">
+            <div class="skill-deck-summary">
+              <div class="image-container"><img src="{{skill.image}}" /></div>
+              <div class="name"><span>{{skill.name}}</span></div>
+              <a class='item-control skill-delete' title='{{localize "DOCUMENT.Delete" type=' skill'}}'>
+                <i class='fas fa-trash'></i>
+              </a>
+            </div>
+          </li>
+          {{/each}}
+          <li class="empty-drop-list-element">
+            <span>+ Skill</span>
+          </li>
+        </ol>
+      </div>
     </div>
   </section>
 </form>

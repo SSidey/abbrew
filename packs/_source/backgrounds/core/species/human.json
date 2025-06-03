@@ -1,0 +1,80 @@
+{
+  "folder": "CA370Hk29Aj8IeJ5",
+  "name": "Human",
+  "type": "background",
+  "_id": "kwK5PVJcQR4gUrER",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "skills": [],
+    "attributes": {
+      "str": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      },
+      "dex": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      },
+      "agi": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      },
+      "con": {
+        "value": 2,
+        "label": "",
+        "isEnabled": true
+      },
+      "int": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      },
+      "wil": {
+        "value": 2,
+        "label": "",
+        "isEnabled": true
+      },
+      "wit": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      },
+      "vis": {
+        "value": 1,
+        "label": "",
+        "isEnabled": true
+      }
+    },
+    "creatureForm": {
+      "name": "Humanoid",
+      "id": "y5I3N1IZtZKr3463",
+      "image": "icons/svg/item-bag.svg",
+      "sourceId": "Compendium.abbrew.creatureforms.Item.y5I3N1IZtZKr3463"
+    }
+  },
+  "effects": [],
+  "sort": 400000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743076668411,
+    "modifiedTime": 1743080049958,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!kwK5PVJcQR4gUrER"
+}

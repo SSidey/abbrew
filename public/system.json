@@ -1,52 +1,226 @@
 {
-    "id": "abbrew",
-    "name": "abbrew",
-    "title": "Abbrew",
-    "description": "The Abbrew system for FoundryVTT!",
-    "authors": [
-        {
-            "name": "Abde"
+  "id": "abbrew",
+  "name": "abbrew",
+  "title": "Abbrew",
+  "description": "The Abbrew system for FoundryVTT!",
+  "authors": [
+    {
+      "name": "Abde"
+    }
+  ],
+  "url": "https://github.com/SSidey/abbrew/",
+  "readme": "README.md",
+  "bugs": "Replace this with a link to file issues or tickets",
+  "changelog": "CHANGELOG.md",
+  "media": [
+    {
+      "type": "setup",
+      "url": "systems/abbrew/assets/anvil-impact.png",
+      "thumbnail": "systems/abbrew/assets/anvil-impact.png"
+    }
+  ],
+  "version": "0.0.2-prerelease31",
+  "compatibility": {
+    "minimum": 12,
+    "verified": "12.331"
+  },
+  "esmodules": ["./abbrew.mjs"],
+  "styles": ["css/abbrew.css"],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "packs": [
+    {
+      "name": "anatomy",
+      "label": "Anatomy",
+      "system": "abbrew",
+      "path": "packs/anatomy",
+      "type": "Item",
+      "private": false,
+      "flags": {
+        "abbrew": {
+          "types": ["anatomy"]
         }
-    ],
-    "url": "https://github.com/SSidey/abbrew/",
-    "readme": "README.md",
-    "bugs": "Replace this with a link to file issues or tickets",
-    "changelog": "CHANGELOG.md",
-    "media": [
-        {
-            "type": "setup",
-            "url": "systems/abbrew/assets/anvil-impact.png",
-            "thumbnail": "systems/abbrew/assets/anvil-impact.png"
-        }
-    ],
-    "version": "0.0.2-prerelease31",
-    "compatibility": {
-        "minimum": 12,
-        "verified": "12.331"
+      }
     },
-    "esmodules": [
-        "./abbrew.mjs"
-    ],
-    "styles": [
-        "css/abbrew.css"
-    ],
-    "languages": [
-        {
-            "lang": "en",
-            "name": "English",
-            "path": "lang/en.json"
+    {
+      "name": "archetypes",
+      "label": "Archetypes",
+      "system": "abbrew",
+      "path": "packs/archetypes",
+      "type": "Item",
+      "private": false,
+      "flags": {
+        "abbrew": {
+          "types": ["archetype"]
         }
-    ],
-    "packs": [],
-    "packFolders": [],
-    "socket": false,
-    "manifest": "https://raw.githubusercontent.com/SSidey/abbrew/refs/heads/master/public/system.json",
-    "download": "https://github.com/SSidey/abbrew/releases/download/0.0.2-prerelease31/0.0.2-prerelease31.zip",
-    "background": "systems/abbrew/assets/anvil-impact.png",
-    "grid": {
-        "distance": 1,
-        "units": "m"
+      }
     },
-    "primaryTokenAttribute": "guard",
-    "secondaryTokenAttribute": "risk"
+    {
+      "name": "backgrounds",
+      "label": "Backgrounds",
+      "system": "abbrew",
+      "path": "packs/backgrounds",
+      "type": "Item",
+      "private": false,
+      "flags": {
+        "abbrew": {
+          "types": ["background"]
+        }
+      }
+    },
+    {
+      "name": "conditions",
+      "label": "Conditions",
+      "system": "abbrew",
+      "path": "packs/conditions",
+      "type": "Item",
+      "private": false,
+      "flags": {
+        "abbrew": {
+          "types": ["skill"]
+        }
+      }
+    },
+    {
+      "name": "creatureforms",
+      "label": "Creature Forms",
+      "system": "abbrew",
+      "path": "packs/creatureforms",
+      "type": "Item",
+      "private": false,
+      "flags": {
+        "abbrew": {
+          "types": ["creatureForm"]
+        }
+      }
+    },
+    {
+      "name": "enhancements",
+      "label": "Enhancements",
+      "system": "abbrew",
+      "path": "packs/enhancements",
+      "type": "Item",
+      "private": false,
+      "flags": {
+        "abbrew": {
+          "types": ["enhancement"]
+        }
+      }
+    },
+    {
+      "name": "equipment",
+      "label": "Equipment",
+      "system": "abbrew",
+      "path": "packs/equipment",
+      "type": "Item",
+      "private": false,
+      "flags": {
+        "abbrew": {
+          "types": ["armour", "weapon", "equipment"]
+        }
+      }
+    },
+    {
+      "name": "paths",
+      "label": "Paths",
+      "system": "abbrew",
+      "path": "packs/paths",
+      "type": "Item",
+      "private": false,
+      "flags": {
+        "abbrew": {
+          "types": ["skill"]
+        }
+      }
+    },
+    {
+      "name": "playerskills",
+      "label": "Skills",
+      "system": "abbrew",
+      "path": "packs/playerskills",
+      "type": "Item",
+      "private": false,
+      "flags": {
+        "abbrew": {
+          "types": ["skill"]
+        }
+      }
+    },
+    {
+      "name": "skilldecks",
+      "label": "Skill Decks",
+      "system": "abbrew",
+      "path": "packs/skilldecks",
+      "type": "Item",
+      "private": false,
+      "flags": {
+        "abbrew": {
+          "types": ["skillDeck"]
+        }
+      }
+    },
+    {
+      "name": "skills",
+      "label": "Skills",
+      "system": "abbrew",
+      "path": "packs/skills",
+      "type": "Item",
+      "private": false,
+      "flags": {
+        "abbrew": {
+          "types": ["skill"]
+        }
+      }
+    },
+    {
+      "name": "wounds",
+      "label": "Wounds",
+      "system": "abbrew",
+      "path": "packs/wounds",
+      "type": "Item",
+      "private": false,
+      "flags": {
+        "abbrew": {
+          "types": ["wound"]
+        }
+      }
+    }
+  ],
+  "packFolders": [
+    {
+      "name": "Character Creation",
+      "sorting": "m",
+      "color": "#cd2c1e",
+      "packs": [],
+      "folders": [
+        {
+          "name": "Character Background",
+          "sorting": "m",
+          "color": "#b72c1f",
+          "packs": ["backgrounds"]
+        },
+        {
+          "name": "Progression",
+          "sorting": "m",
+          "color": "#941919 ",
+          "packs": ["archetypes", "paths", "playerskills"]
+        }
+      ]
+    }
+  ],
+  "socket": true,
+  "manifest": "https://raw.githubusercontent.com/SSidey/abbrew/refs/heads/master/public/system.json",
+  "download": "https://github.com/SSidey/abbrew/releases/download/0.0.2-prerelease31/0.0.2-prerelease31.zip",
+  "background": "systems/abbrew/assets/anvil-impact.png",
+  "grid": {
+    "distance": 1,
+    "units": "m"
+  },
+  "primaryTokenAttribute": "guard",
+  "secondaryTokenAttribute": "risk"
 }

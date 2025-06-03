@@ -1,0 +1,69 @@
+{
+  "folder": "Mw7GeW2m7wPhs64O",
+  "name": "Slash Resistant I",
+  "type": "enhancement",
+  "_id": "rSC4NRRKu39BPKRW",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "skills": {
+      "granted": []
+    },
+    "targetType": "armour",
+    "target": {
+      "name": "",
+      "id": "",
+      "uuid": ""
+    },
+    "traitFilter": {
+      "raw": "",
+      "value": []
+    },
+    "modifications": [
+      {
+        "operator": "merge",
+        "path": "system.defense.protection",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "json",
+        "value": "{     \"type\": \"slashing\",     \"value\": 0,     \"resistance\": 1,     \"weakness\": 0,     \"immunity\": 0,     \"label\": \"\" }",
+        "numerator": 1,
+        "denominator": 1
+      }
+    ],
+    "duration": {
+      "precision": "-1",
+      "value": 0,
+      "expireOnStartOfTurn": true
+    },
+    "grantedIds": []
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1747584183858,
+    "modifiedTime": 1747589049549,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!rSC4NRRKu39BPKRW"
+}

@@ -1,0 +1,21 @@
+{
+  "name": "Basic",
+  "sorting": "a",
+  "folder": null,
+  "type": "Item",
+  "_id": "xv4pBYEWqvTp5C2J",
+  "description": "",
+  "sort": 0,
+  "color": null,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743075703410,
+    "modifiedTime": 1743075703410,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!xv4pBYEWqvTp5C2J"
+}

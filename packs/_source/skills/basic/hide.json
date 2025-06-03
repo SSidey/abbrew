@@ -1,0 +1,229 @@
+{
+  "folder": "xv4pBYEWqvTp5C2J",
+  "name": "Hide",
+  "type": "skill",
+  "_id": "dSFJ7IWr2RsGF288",
+  "img": "systems/abbrew/assets/icons/actions/1a.webp",
+  "system": {
+    "description": "<p>You attempt to hide from enemy detection.</p><hr><p>Make a contested Check, your Agility against their Scan.</p><hr><p>Success: You do not become Hidden from the creature.</p><p>Failure: You become @UUID[Compendium.abbrew.conditions.Item.kykHiaVaxVodd8E2]{Hidden}</p>",
+    "traits": "",
+    "abbrewId": {
+      "value": "abbrew.skill.hide.dSFJ7IWr2RsGF288",
+      "uuid": "dSFJ7IWr2RsGF288"
+    },
+    "skillTraits": "",
+    "skillModifiers": {
+      "synergy": "",
+      "discord": ""
+    },
+    "configurable": true,
+    "isActivatable": true,
+    "activateOnCreate": false,
+    "applyTurnStart": false,
+    "applyTurnEnd": false,
+    "applyOnExpiry": false,
+    "activateOnDamageAccept": false,
+    "skills": {
+      "granted": [],
+      "paired": [],
+      "grantedOnActivation": [],
+      "grantedOnAccept": [
+        {
+          "name": "Hidden",
+          "id": "kykHiaVaxVodd8E2",
+          "image": "systems/abbrew/assets/icons/statuses/hidden.svg",
+          "sourceId": "Compendium.abbrew.conditions.Item.kykHiaVaxVodd8E2",
+          "skillType": "",
+          "grantTimes": 0
+        }
+      ]
+    },
+    "resource": {
+      "capacity": 0,
+      "operator": "",
+      "relatedResource": null,
+      "fillCapacityOnCreate": false
+    },
+    "action": {
+      "activationType": "standalone",
+      "actionCost": "1",
+      "actionImage": "",
+      "duration": {
+        "isConcentration": false,
+        "precision": "0",
+        "value": 0,
+        "expireOnStartOfTurn": true
+      },
+      "uses": {
+        "hasUses": false,
+        "asStacks": false,
+        "removeStackOnUse": true,
+        "value": 0,
+        "max": 0,
+        "period": "",
+        "stackRemovalActivation": false,
+        "removeWhenNoUsesRemain": false
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "skillCheck": [],
+      "skillRequest": {
+        "isEnabled": true,
+        "isContested": true,
+        "selfCheck": false,
+        "checkType": "successes",
+        "requirements": {
+          "modifiers": "[{\"id\":\"abbrewAgiCheck00\",\"value\":\"Agility Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewAgiCheck00\"}]",
+          "successes": 0,
+          "result": 0
+        },
+        "targetModifiers": "[{\"value\":\"Scan\",\"id\":\"LRCKYIXnirM5L3mD\",\"sourceId\":\"Compendium.abbrew.skills.Item.LRCKYIXnirM5L3mD\"},{\"id\":\"abbrewWitCheck00\",\"value\":\"Wits Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewWitCheck00\"}]",
+        "results": {
+          "success": {
+            "description": ""
+          },
+          "failure": {
+            "description": ""
+          }
+        }
+      },
+      "attackProfile": {
+        "isEnabled": false,
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": null,
+        "attackMode": "",
+        "finisher": {
+          "type": "",
+          "cost": null,
+          "description": "",
+          "wounds": []
+        },
+        "damage": [],
+        "finisherLimit": 10
+      },
+      "modifiers": {
+        "fortune": 0,
+        "actionCost": {
+          "value": 0,
+          "operator": ""
+        },
+        "attackProfile": {
+          "isEnabled": false,
+          "combineAttacks": {
+            "isEnabled": false,
+            "value": null
+          },
+          "attackType": "",
+          "attackMode": "",
+          "handsSupplied": null,
+          "finisherLimit": {
+            "value": 10,
+            "operator": ""
+          },
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "penetration": {
+            "value": 10,
+            "operator": ""
+          },
+          "finisher": {
+            "type": "",
+            "cost": null,
+            "description": "",
+            "wounds": []
+          },
+          "damage": []
+        },
+        "guard": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": "",
+            "lateParse": false
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": []
+        }
+      }
+    },
+    "skillType": "basic",
+    "path": {
+      "raw": "",
+      "value": {
+        "id": ""
+      }
+    },
+    "roles": {
+      "raw": "",
+      "parsed": []
+    },
+    "archetype": "",
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": "",
+    "isProxied": false,
+    "siblingSkillModifiers": []
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746372346708,
+    "modifiedTime": 1746375303623,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!dSFJ7IWr2RsGF288"
+}

@@ -1,6 +1,14 @@
 {
-    "files.exclude": {
-        "": true,
-        "**/dist/**": true
-    }
+  "files.exclude": {
+    "": true,
+    "**/dist/**": true,
+    "node_modules": true
+  },
+"eslint.options": {
+    "configFile": ".eslintrc.json"
+},
+"eslint.lintTask.enable": true,
+"github-actions.workflows.pinned.workflows": [
+  ".github/workflows/release.yml"
+]
 }

@@ -18,17 +18,159 @@
 
     {{!-- Description Tab --}}
     <div class="tab" data-group="primary" data-tab="description">
-      {{editor system.description target="system.description" rollData=rollData button=true owner=owner
+      {{#if (eq system.skillType "path")}}
+      {{!-- Path --}}
+      <div class="skill-element-max-input">
+        <label>Path</label>
+        <input type="text" name="system.path.raw" value="{{system.path.raw}}" data-dtype="string" {{#unless
+          (isGM)}}readonly{{/unless}} />
+      </div>
+      {{#if (eq system.path.value.id "abbrewpuniversal")}}
+      <div class="skill-element-max-input">
+        <span>Roles</span>
+        <input type="text" name="system.roles.raw" value="{{system.roles.raw}}" data-dtype="string" {{#unless
+          (isGM)}}readonly{{/unless}} />
+      </div>
+      {{/if}}
+      {{!-- Ability Rank --}}
+      <div class="skill-element-max-input">
+        <label>{{ localize "ABBREW.AttributeRankIncrease" }}</label>
+        <select name="system.attributeRankIncrease">
+          {{selectOptions config.attributes selected=system.attributeRankIncrease blank="" localize=true}}
+        </select>
+      </div>
+      {{/if}}
+      <div class="skill-element-max-input">
+        <label class="resource-label">Skill Traits</label>
+        <input type="text" name="system.traits.raw" value="{{system.traits.raw}}" data-dtype="String"
+          data-dropType="skillTrait" {{#unless (isGM)}}readonly{{/unless}} />
+      </div>
+      {{editor enrichedDescription target="system.description" engine="prosemirror" rollData=rollData button=true
+      owner=owner
       editable=editable}}
     </div>
 
     {{!-- Attributes Tab --}}
     <div class="tab attributes" data-group="primary" data-tab="attributes">
-      <div class="grid-span-2">
-        <label class="resource-label">Skill Flags</label>
-        <input type="text" name="system.skillFlags" value="{{system.skillFlags}}" data-dtype="String" />
+      <div class="skill-element-max-input">
+        <label class="resource-label">Synergy</label>
+        <input type="text" name="system.skillModifiers.synergy" class="drop-with-fundamentals"
+          value="{{system.skillModifiers.synergy}}" data-dtype="String" data-dropType="skill" {{#unless
+          (isGM)}}readonly{{/unless}}>
+        <div class="skill-span-2">
+          <h3>Trait Filter</h3>
+          <input type="text" class="trait-filter" name="system.skillModifiers.synergyTraitFilter.raw"
+            value="{{system.skillModifiers.synergyTraitFilter.raw}}" data-dtype="String" />
+        </div>
+        <label class="resource-label">Discord</label>
+        <input type="text" name="system.skillModifiers.discord" class="drop-with-fundamentals"
+          value="{{system.skillModifiers.discord}}" data-dtype="String" data-dropType="skill" {{#unless
+          (isGM)}}readonly{{/unless}}>
+        <label>Granted By Actor</label>
+        <input type="text" name="system.grantedBy.actor" value="{{system.grantedBy.actor}}" data-dtype="String" />
+        <label>Granted By Item</label>
+        <input type="text" name="system.grantedBy.item" value="{{system.grantedBy.item}}" data-dtype="String" />
+        <label class="slide-toggle roboto-upper">
+          <input type="checkbox" class="action-activatable" name="system.skillModifiers.isActorGrantTriggerRequired" {{
+            checked system.skillModifiers.isActorGrantTriggerRequired }}>
+          <span>Is Actor Trigger Required</span>
+          {{#if system.skillModifiers.isActorGrantTriggerRequired}}
+          <i class="fa fa-toggle-on"></i>
+          {{else}}
+          <i class="fa fa-toggle-off"></i>
+          {{/if}}
+        </label>
+        <label class="slide-toggle roboto-upper">
+          <input type="checkbox" class="action-activatable" name="system.skillModifiers.isItemGrantTriggerRequired" {{
+            checked system.skillModifiers.isItemGrantTriggerRequired }}>
+          <span>Is Item Trigger Required</span>
+          {{#if system.skillModifiers.isItemGrantTriggerRequired}}
+          <i class="fa fa-toggle-on"></i>
+          {{else}}
+          <i class="fa fa-toggle-off"></i>
+          {{/if}}
+        </label>
       </div>
-      {{!-- As you add new fields, add them in here! --}}
+      <div>
+        <h3>Granted Skills</h3>
+        <ol class="skill-deck-skills" data-collection-name="granted">
+          {{#each system.skills.granted as |skill id|}}
+          <li class="skill-deck-skill" data-id="{{id}}" data-item-id="{{{skill.id}}}"
+            data-source-id="{{skill.sourceId}}">
+            <div class="skill-deck-summary">
+              <div class="image-container"><img src="{{skill.image}}" /></div>
+              <div class="name"><span>{{skill.name}}</span></div>
+              <a class='item-control skill-delete' title='{{localize "DOCUMENT.Delete" type=' skill'}}'>
+                <i class='fas fa-trash'></i>
+              </a>
+            </div>
+          </li>
+          {{/each}}
+          <li class="empty-drop-list-element">
+            <span>+ Skill</span>
+          </li>
+        </ol>
+      </div>
+      <div>
+        <h3>Paired Skills</h3>
+        <ol class="skill-deck-skills" data-collection-name="paired">
+          {{#each system.skills.paired as |skill id|}}
+          <li class="skill-deck-skill" data-id="{{id}}" data-item-id="{{{skill.id}}}"
+            data-source-id="{{skill.sourceId}}">
+            <div class="skill-deck-summary">
+              <div class="image-container"><img src="{{skill.image}}" /></div>
+              <div class="name"><span>{{skill.name}}</span></div>
+              <a class='item-control skill-delete' title='{{localize "DOCUMENT.Delete" type=' skill'}}'>
+                <i class='fas fa-trash'></i>
+              </a>
+            </div>
+          </li>
+          {{/each}}
+          <li class="empty-drop-list-element">
+            <span>+ Skill</span>
+          </li>
+        </ol>
+      </div>
+      <div>
+        <h3>Grant on Use</h3>
+        <ol class="skill-deck-skills" data-collection-name="grantedOnActivation">
+          {{#each system.skills.grantedOnActivation as |skill id|}}
+          <li class="skill-deck-skill" data-id="{{id}}" data-item-id="{{{skill.id}}}"
+            data-source-id="{{skill.sourceId}}">
+            <div class="skill-deck-summary">
+              <div class="image-container"><img src="{{skill.image}}" /></div>
+              <div class="name"><span>{{skill.name}}</span></div>
+              <a class='item-control skill-delete' title='{{localize "DOCUMENT.Delete" type=' skill'}}'>
+                <i class='fas fa-trash'></i>
+              </a>
+            </div>
+          </li>
+          {{/each}}
+          <li class="empty-drop-list-element">
+            <span>+ Skill</span>
+          </li>
+        </ol>
+      </div>
+      <div>
+        <h3>Grant on Accept</h3>
+        <ol class="skill-deck-skills" data-collection-name="grantedOnAccept">
+          {{#each system.skills.grantedOnAccept as |skill id|}}
+          <li class="skill-deck-skill" data-id="{{id}}" data-item-id="{{{skill.id}}}"
+            data-source-id="{{skill.sourceId}}">
+            <div class="skill-deck-summary">
+              <div class="image-container"><img src="{{skill.image}}" /></div>
+              <div class="name"><span>{{skill.name}}</span></div>
+              <a class='item-control skill-delete' title='{{localize "DOCUMENT.Delete" type=' skill'}}'>
+                <i class='fas fa-trash'></i>
+              </a>
+            </div>
+          </li>
+          {{/each}}
+          <li class="empty-drop-list-element">
+            <span>+ Skill</span>
+          </li>
+        </ol>
+      </div>
       <label class="slide-toggle roboto-upper">
         <input type="checkbox" id="configurable" name="system.configurable" {{ checked system.configurable }}>
         {{#if system.configurable}}
@@ -47,6 +189,7 @@
     {{!-- Effects Tab --}}
     <div class="tab effects" data-group="primary" data-tab="effects">
       {{> "systems/abbrew/templates/item/parts/item-effects.hbs"}}
+      {{> "systems/abbrew/templates/item/parts/skill-light.hbs"}}
     </div>
   </section>
 

@@ -1,0 +1,49 @@
+{
+  "name": "Basic",
+  "type": "skillDeck",
+  "_id": "G5YE4JNGGEfq0d5Z",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "skills": {
+      "granted": [
+        {
+          "name": "Restore Guard",
+          "skillType": "",
+          "id": "iUJqYFdrcfZyUr6S",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.iUJqYFdrcfZyUr6S"
+        },
+        {
+          "name": "Dodge",
+          "id": "ocw9C57R2vHbR9gc",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.ocw9C57R2vHbR9gc",
+          "skillType": ""
+        }
+      ]
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743075611467,
+    "modifiedTime": 1745358047879,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!G5YE4JNGGEfq0d5Z"
+}

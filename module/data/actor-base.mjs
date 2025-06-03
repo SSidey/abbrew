@@ -1,19 +1,113 @@
+import { applyOperator, getOrderForOperator } from "../helpers/operators.mjs";
+import { compareModifierIndices, getSafeJson } from "../helpers/utils.mjs";
+
 export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
+
+  get traitsData() {
+    return this.traits.raw !== "" ? JSON.parse(this.traits.raw) : [];
+  }
+
+  get heldArmourGuard() {
+    return this.parent.getActorHeldItems().filter(i => i.type === 'armour').reduce((result, a) => result += a.system.defense.guard, 0);
+  }
+
+  get anatomy() {
+    return this.mapAnatomy();
+  }
 
   static defineSchema() {
     const fields = foundry.data.fields;
     const requiredInteger = { required: true, nullable: false, integer: true };
+    const blankString = { required: true, blank: true }
     const schema = {};
 
-    schema.traits = new fields.StringField({ required: true, blank: true });
-
+    schema.traits = new fields.SchemaField({
+      raw: new fields.StringField({ ...blankString }),
+      value: new fields.ArrayField(
+        new fields.SchemaField({
+          key: new fields.StringField({ ...blankString }),
+          value: new fields.StringField({ ...blankString }),
+          feature: new fields.StringField({ ...blankString }),
+          subFeature: new fields.StringField({ ...blankString }),
+          effect: new fields.StringField({ ...blankString }),
+          data: new fields.StringField({ ...blankString }),
+          exclude: new fields.ArrayField(
+            new fields.StringField({ ...blankString })
+          )
+        })
+      )
+    });
+    schema.senses = new fields.SchemaField({
+      sight: new fields.SchemaField({
+        enabled: new fields.BooleanField({ required: true, initial: false }),
+        range: new fields.NumberField({ required: true, nullable: true, integer: true, initial: 0 }),
+        angle: new fields.NumberField({ required: true, integer: true, min: 0, max: 360, initial: 360 }),
+        visionMode: new fields.StringField({ required: true, initial: "basic" })
+      }),
+      detectionModes: new fields.ArrayField(
+        new fields.SchemaField({
+          mode: new fields.StringField({ required: true, blank: true }),
+          range: new fields.NumberField({ required: true, nullable: true, integer: true }),
+        })
+      )
+    });
+    schema.actions = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 5 });
     schema.wounds = new fields.ArrayField(
       new fields.SchemaField({
         type: new fields.StringField({ required: true }),
         value: new fields.NumberField({ ...requiredInteger, initial: 0, max: 100 })
       })
     );
-
+    schema.activeSkills = new fields.ArrayField(
+      new fields.StringField({ required: true, blank: true })
+    );
+    schema.queuedSkills = new fields.ArrayField(
+      new fields.StringField({ required: true, blank: true })
+    );
+    schema.combinedAttacks = new fields.SchemaField({
+      combineFor: new fields.StringField({ required: true, blank: true, nullable: true }),
+      combined: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+      itemIds: new fields.ArrayField(
+        new fields.NumberField({ ...requiredInteger })
+      ),
+      base: new fields.SchemaField({
+        id: new fields.StringField({ required: true, blank: true }),
+        name: new fields.StringField({ required: true, blank: true }),
+        actionCost: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+        image: new fields.StringField({ required: true, blank: true }),
+        attackMode: new fields.StringField({ required: true, blank: true }),
+        handsSupplied: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+        attackProfile: new fields.SchemaField({
+          name: new fields.StringField({ required: true, blank: true }),
+          attackType: new fields.StringField({ required: true, blank: true }),
+          lethal: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+          critical: new fields.NumberField({ ...requiredInteger, initial: 10, min: 5 }),
+          damage: new fields.ArrayField(
+            new fields.SchemaField({
+              type: new fields.StringField({ required: true, blank: true }),
+              value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+              attributeModifier: new fields.StringField({ required: true, blank: true }),
+              attributeMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 }),
+              damageMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 }),
+              overallMultiplier: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0 })
+            })
+          ),
+          finisherLimit: new fields.NumberField({ ...requiredInteger, initial: 10, min: 1 }),
+          hasStrongAttack: new fields.BooleanField({ required: true, nullable: false, initial: true })
+        })
+      },
+        { nullable: true, initial: null }),
+      additionalDamage: new fields.ArrayField(
+        new fields.SchemaField({
+          type: new fields.StringField({ ...blankString }),
+          value: new fields.NumberField({ ...requiredInteger }),
+          attributeModifier: new fields.StringField({ ...blankString }),
+          attributeMultiplier: new fields.NumberField({ ...requiredInteger }),
+          damageMultiplier: new fields.NumberField({ ...requiredInteger }),
+          overallMultiplier: new fields.NumberField({ ...requiredInteger }),
+        })
+      )
+    })
     schema.defense = new fields.SchemaField({
       guard: new fields.SchemaField({
         value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
@@ -22,16 +116,18 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         label: new fields.StringField({ required: true, blank: true }),
 
       }),
-      protection: new fields.ArrayField(
-        new fields.SchemaField({
+      protection: new fields.SchemaField([...Object.keys(CONFIG.ABBREW.allDamage), ...Object.keys(CONFIG.ABBREW.damageTypes)].reduce((obj, damageType) => {
+        obj[damageType] = new fields.SchemaField({
+          label: new fields.StringField({ required: true, blank: true }),
           type: new fields.StringField({ required: true, blank: true }),
-          value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+          reduction: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+          amplification: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
           resistance: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
           weakness: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-          immunity: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-          label: new fields.StringField({ required: true, blank: true })
-        })
-      ),
+          immunity: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 })
+        });
+        return obj;
+      }, {})),
       inflexibility: new fields.SchemaField({
         raw: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
         max: new fields.NumberField({ ...requiredInteger, initial: 10, min: 10, max: 10 }),
@@ -51,11 +147,74 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 20 }),
         label: new fields.StringField({ required: true, blank: true })
       }),
-      canBleed: new fields.BooleanField({ required: true, nullable: false, initial: false }),
-      fatalWounds: new fields.StringField({ required: true, blank: true })
+      recovery: new fields.SchemaField(Object.keys(CONFIG.ABBREW.lingeringWounds).reduce((obj, wound) => {
+        const type = CONFIG.ABBREW.lingeringWounds[wound];
+        obj[type] = new fields.SchemaField({
+          label: new fields.StringField({ required: true, blank: true }),
+          type: new fields.StringField({ required: true, blank: true }),
+          value: new fields.NumberField({ ...requiredInteger, initial: 1 })
+        });
+        return obj;
+      }, {}))
+    });
+    schema.resources = new fields.SchemaField({
+      owned: new fields.ArrayField(
+        new fields.SchemaField({
+          id: new fields.StringField({ required: true, blank: true }),
+          name: new fields.StringField({ required: true, blank: true }),
+          max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 })
+        })
+      ),
+      values: new fields.ArrayField(
+        new fields.SchemaField({
+          id: new fields.StringField({ required: true, blank: true }),
+          value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+        })
+      )
+    });
+    schema.concepts = new fields.SchemaField({
+      innate: new fields.SchemaField(Object.keys(CONFIG.ABBREW.concepts).reduce((obj, concept) => {
+        obj[concept] = new fields.SchemaField({
+          name: new fields.StringField({ required: true, initial: concept }),
+          label: new fields.StringField({ required: true, initial: CONFIG.ABBREW.concepts[concept] }),
+          value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+        });
+        return obj;
+      }, {})),
+      available: new fields.SchemaField(Object.keys(CONFIG.ABBREW.concepts).reduce((obj, concept) => {
+        obj[concept] = new fields.SchemaField({
+          name: new fields.StringField({ required: true, initial: concept }),
+          label: new fields.StringField({ required: true, initial: CONFIG.ABBREW.concepts[concept] }),
+          value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+        });
+        return obj;
+      }, {}))
+    })
+
+    schema.progression = new fields.SchemaField({
+      archetypes: new fields.ArrayField(
+        new fields.SchemaField({
+          name: new fields.StringField({ ...blankString }),
+          roles: new fields.ArrayField(
+            new fields.SchemaField({
+              role: new fields.StringField({ ...blankString }),
+              path: new fields.SchemaField({
+                id: new fields.StringField({ ...blankString }),
+                name: new fields.StringField({ ...blankString }),
+              })
+            })
+          ),
+          skills: new fields.SchemaField({
+            total: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+            ranks: new fields.NumberField({ ...requiredInteger, initial: 1 })
+          }),
+          specialised: new fields.BooleanField({ required: true, initial: false }),
+          mastery: new fields.BooleanField({ required: true, initial: false }),
+        }),
+      )
     });
 
-    schema.biography = new fields.StringField({ required: true, blank: true }); // equivalent to passing ({initial: ""}) for StringFields
+    schema.biography = new fields.StringField({ required: true, blank: true });
 
     schema.movement = new fields.SchemaField({
       baseSpeed: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
@@ -63,9 +222,17 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
     schema.meta = new fields.SchemaField({
       tier: new fields.SchemaField({
-        value: new fields.NumberField({ ...requiredInteger, initial: 1, min: 1, max: 10 })
+        value: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0, max: 10 })
       }),
+      size: new fields.NumberField({ ...requiredInteger, initial: 0 })
     });
+
+    schema.skillTraining = new fields.ArrayField(
+      new fields.SchemaField({
+        type: new fields.StringField({ ...blankString }),
+        value: new fields.NumberField({ ...requiredInteger })
+      })
+    )
 
     // Iterate over attribute names and create a new SchemaField for each.
     schema.attributes = new fields.SchemaField(Object.keys(CONFIG.ABBREW.attributes).reduce((obj, attribute) => {
@@ -80,37 +247,48 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
     schema.momentum = new fields.NumberField({ ...requiredInteger, initial: 0 });
 
+    schema.modifiers = new fields.SchemaField({
+      actionRecovery: new fields.NumberField({ ...requiredInteger, initial: 5, min: 0, max: 5 }),
+      initiative: new fields.NumberField({ ...requiredInteger, initial: 0 })
+    })
+
+    schema.favourites = new fields.SchemaField({
+      skill: new fields.ArrayField(
+        new fields.StringField({ ...blankString })
+      )
+    });
+
     return schema;
   }
 
-
   // Prior to Active Effects
   prepareBaseData() {
-    console.log('base');
     // Loop through attribute scores, and determine their base rank.
     for (const key in this.attributes) {
-      this.attributes[key].value = 0 + this.parent.items.filter(i => i.type === 'skill' && i.system.skillType === 'background' && i.system.attributeIncrease === key).length;
-      this.attributes[key].rank = this.attributes[key].value;
+      const totalIncrease = 0 + this.parent.items.filter(i => i.type === 'skill' && i.system.skillType === 'background' && i.system.attributeIncrease === key).length;
+      this.attributes[key].value = Math.min(9, totalIncrease);
+      this.attributes[key].rank = totalIncrease;
     }
 
     this.defense.risk.value = Math.floor(this.defense.risk.raw / 10);
 
-    this.defense.canBleed = this.traits ? JSON.parse(this.traits).filter(t => t.value === 'Can Bleed').length : false;
-
-    // PLAYTEST: Does this feel good?
     this.defense.resolve.max = 2 + Math.floor((this._getMaxFromPhysicalAttributes() + this._getMaxFromMentalAttributes()) / 2);
-  }
 
-  _getMaxFromPhysicalAttributes() {
-    return this._getMaxFromAttributes(['str', 'con', 'dex', 'agi']);
-  }
+    this.skillTraining = ([
+      { type: "attack", value: 0 },
+      { type: "overpower", value: 0 },
+      { type: "parry", value: 0 },
+      { type: "feint", value: 0 },
+      { type: "finisher", value: 0 },
+      { type: "parryCounter", value: 0 },
+      { type: "feintCounter", value: 0 }
+    ])
 
-  _getMaxFromMentalAttributes() {
-    return this._getMaxFromAttributes(['int', 'wil', 'vis', 'wit']);
-  }
-
-  _getMaxFromAttributes(attributes) {
-    return Object.keys(this.attributes).filter(a => attributes.includes(a)).reduce((result, attribute) => Math.max(result, this.attributes[attribute].value), 0);
+    this.resources.owned = this._getOwnedResources();
+    this._limitResourceValues();
+    this._prepareDefenses();
+    const anatomy = this._prepareAnatomy();
+    this._prepareMovement(anatomy);
   }
 
   // Post Active Effects
@@ -126,39 +304,111 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       this.attributes[key].tier = 1 + Math.floor(this.attributes[key].rank / 10);
     }
 
-    for (const key in this.defense.damageTypes) {
-      // Handle damage type label localization.
-      // this.defense.damageTypes[key].label = game.i18n.localize(CONFIG.ABBREW.damageTypes[key]) ?? key;
+    const allDamageTypes = { ...CONFIG.ABBREW.allDamage, ...CONFIG.ABBREW.damageTypes }
+    for (const key in this.defense.protection) {
+      this.defense.protection[key].label = game.i18n.localize(allDamageTypes[key].label) ?? key;
+      this.defense.protection[key].type = key;
     }
 
-    const anatomy = this._prepareAnatomy();
-
-    this._prepareMovement(anatomy);
-
-    this._prepareDefenses();
+    for (const key in this.defense.recovery) {
+      this.defense.recovery[key].type = key;
+      this.defense.recovery[key].label = game.i18n.localize(CONFIG.ABBREW.wounds[key].name) ?? type;
+    }
 
     this._prepareResolve();
+
+    const skillTraining = this.parent.items.filter(i => i.type === "skill").filter(s => s.system.traits.raw).flatMap(s => getSafeJson(s.system.traits.raw, []).filter(st => st.feature === "skillTraining").map(st => st.data)).reduce((result, st) => { if (st in result) { result[st] += 1; } else { result[st] = 1; } return result; }, {});
+    const mappedTraining = Object.entries(skillTraining).map(e => ({ type: e[0], value: e[1] }));
+    this.skillTraining = foundry.utils.mergeObject(this.skillTraining, mappedTraining);
+
+    this._limitResourceValues();
+  }
+
+  _getOwnedResources() {
+    const baseResources = this.parent.items
+      .filter(i => i.type === "skill" && i.system.skillType === "resource" && i.system.resource.capacity != null && !i.system.resource.relatedResource)
+      .reduce((result, resource) => {
+        result[resource.system.abbrewId.uuid] = ({ name: resource.name, max: resource.system.resource.capacity });
+        return result;
+      }, {});
+
+    const modifierResources = this.parent.items
+      .filter(i => i.type === "skill" && i.system.skillType === "resource" && i.system.resource.operator && i.system.resource.relatedResource)
+      .map(r => ({ ...r, id: JSON.parse(r.system.resource.relatedResource)[0].id, index: getOrderForOperator(r.operator) }))
+      .sort(compareModifierIndices)
+
+    const resources = modifierResources
+      .reduce((result, resource) => {
+        if (resource.id in result) {
+          const initialCapacity = result[resource.id].max;
+          result[resource.id].max = applyOperator(initialCapacity, resource.system.resource.capacity, resource.system.resource.operator);
+        }
+
+        return result;
+      }, baseResources);
+
+    return Object.entries(resources).map(e => ({ id: e[0], name: e[1].name, max: Math.max(0, e[1].max) }));
+  }
+
+  _limitResourceValues() {
+    for (const index in this.resources.owned) {
+      const ownedResource = this.resources.owned[index];
+      const id = ownedResource.id;
+      const max = ownedResource.max;
+      const valueIndex = this.resources.values.findIndex(r => r.id === id);
+      if (valueIndex != null && valueIndex > -1) {
+        const valueResource = this.resources.values[valueIndex];
+        this.resources.values[valueIndex] = ({ id: valueResource.id, value: Math.min(max, valueResource.value) });
+      }
+    }
+  }
+
+  _getMaxFromPhysicalAttributes() {
+    return this._getMaxFromAttributes(['str', 'con', 'dex', 'agi']);
+  }
+
+  _getMaxFromMentalAttributes() {
+    return this._getMaxFromAttributes(['int', 'wil', 'vis', 'wit']);
+  }
+
+  _getMaxFromAttributes(attributes) {
+    return Object.keys(this.attributes).filter(a => attributes.includes(a)).reduce((result, attribute) => Math.max(result, this.attributes[attribute].value), 0);
   }
 
   _prepareAnatomy() {
-    const res = this.parent.items.filter(i => i.type == 'anatomy').reduce((result, a) => {
+    const res = this.mapAnatomy();
+    const occupiedHands = this.parent.getActorHeldItems().reduce((result, item) => result += item.system.handsSupplied, 0);
+    if (occupiedHands > res.hands) {
+      Hooks.call("actorMustDropItem", this.parent);
+    }
+
+    return res;
+  }
+
+  mapAnatomy() {
+    const wornItemsWithEquipPoints = this.mapWornEquipPoints();
+    const res = this.parent.items.filter(i => i.type == "anatomy").filter(a => !(a.system.isBroken || a.system.isDismembered)).reduce((result, a) => {
       const values = a.system;
       result.hands += values.hands;
       result.speed += values.speed;
       result.parts = result.parts.concat(JSON.parse(values.parts).map(a => a.value));
       return result;
-    }, { hands: 0, speed: 0, parts: [] });
+    }, { hands: 0, speed: 0, parts: wornItemsWithEquipPoints });
+
     return res;
   }
 
+  mapWornEquipPoints() {
+    return this.parent.items.filter(i => ["armour", "equipment"].includes(i.type)).filter(i => i.system.equipState === "worn").filter(i => i.system.equipPoints.provided.raw).flatMap(i => i.system.equipPoints.provided.parsed.map(v => v.value));
+  }
+
   _prepareMovement(anatomy) {
-    console.log('movement');
     this.movement.baseSpeed = this.attributes.agi.value * anatomy.speed;
   }
 
   _prepareDefenses() {
     const armour = this.parent.items.filter(i => i.type === 'armour');
-    const anatomy = this.parent.items.filter(i => i.type === 'anatomy');
+    const anatomy = this.parent.items.filter(i => i.type === "anatomy");
     const wornArmour = this._getAppliedArmour(armour);
     this._prepareDamageReduction(wornArmour, anatomy);
     this._prepareGuard(wornArmour, anatomy);
@@ -184,23 +434,12 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     const anatomyProtection = anatomy.map(a => a.system.defense.protection).flat(1);
     const protection = [...armourProtection, ...anatomyProtection];
 
-    const flatDR = protection.reduce((result, dr) => {
+    protection.filter(p => p.type !== "").forEach(dr => {
       const drType = dr.type;
-      if (Object.keys(result).includes(drType)) {
-        result[drType].value += dr.value;
-        result[drType].resistance += dr.resistance;
-        result[drType].immunity += dr.immunity;
-        result[drType].weakness += dr.weakness;
-      }
-      else {
-        result[drType] = { type: dr.type, value: dr.value, resistance: dr.resistance, immunity: dr.immunity, weakness: dr.weakness, label: dr.label };
-      }
-      return result;
-    }, {}
-    );
-
-    this.defense.protection.length = 0;
-    Object.values(flatDR).map(v => this.defense.protection.push(v));
+      this.defense.protection[drType].resistance += dr.resistance;
+      this.defense.protection[drType].immunity += dr.immunity;
+      this.defense.protection[drType].weakness += dr.weakness;
+    });
   }
 
   _prepareGuard(wornArmour, anatomy) {
@@ -217,12 +456,17 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     }
   }
 
-  _prepareInflexibility(armour) {
+  _prepareInflexibility(wornArmour) {
+    const armour = wornArmour.filter(a => !a.system.isSundered);
     const armourInflexibility = armour.map(a => a.system.defense.inflexibility).reduce((a, b) => a + b, 0);
+    const wornArmourInflexibility = wornArmour.map(a => a.system.defense.inflexibility).reduce((a, b) => a + b, 0);
     const weapons = this.parent.items.filter(i => i.type === 'weapon').filter(a => a.system.equipType === 'held').filter(a => a.system.equipState.startsWith('held'));
-    const otherInflexibility = Math.max(0, weapons.reduce((result, w) => result += w.system.weapon.size, 0) - this.attributes['str'].value);
+    const otherInflexibility =
+      Math.max(0, wornArmour.reduce((result, w) => result += (w.system.heft * 2), 0) - this.attributes['str'].value) +
+      Math.max(0, weapons.reduce((result, w) => result += (w.system.heft * 2), 0) - this.attributes['str'].value) +
+      Math.max(0, weapons.reduce((result, w) => result += (w.system.complexity * 2), 0) - this.attributes['dex'].value);
     this.defense.inflexibility.resistance.raw = armourInflexibility;
-    this.defense.inflexibility.raw = Math.floor((0 + armourInflexibility + otherInflexibility)/2); // TODO: - weapon drills as "Shield Training" is handled
+    this.defense.inflexibility.raw = Math.floor((0 + wornArmourInflexibility + otherInflexibility) / 2); // TODO: - weapon drills as "Shield Training" is handled
     this.defense.inflexibility.resistance.value = Math.floor(armourInflexibility / 10);
   }
 

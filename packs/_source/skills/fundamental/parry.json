@@ -1,0 +1,193 @@
+{
+  "folder": "CVutUV6p568BxZd4",
+  "name": "Parry",
+  "type": "skill",
+  "img": "systems/abbrew/assets/icons/skills/parry.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "skillTraits": "[{\"key\":\"parryBaseTraining\",\"value\":\"Parry Base\",\"feature\":\"skillTraining\",\"subFeature\":\"defensiveSkills\",\"effect\":\"base\",\"data\":\"parry\"}]",
+    "skillModifiers": {
+      "synergy": "",
+      "discord": ""
+    },
+    "configurable": true,
+    "action": {
+      "activationType": "standalone",
+      "actionCost": null,
+      "actionImage": "",
+      "duration": {
+        "precision": "0",
+        "value": 0
+      },
+      "uses": {
+        "hasUses": false,
+        "value": 0,
+        "max": 0,
+        "period": ""
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "modifiers": {
+        "fortune": 0,
+        "attackProfile": {
+          "attackType": "",
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "damage": [],
+          "finisherLimit": {
+            "value": 0,
+            "operator": ""
+          },
+          "attackMode": "",
+          "handsSupplied": 0
+        },
+        "guard": {
+          "self": {
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "multiplier": 1,
+                "lateParse": false
+              }
+            ],
+            "operator": ""
+          },
+          "target": {
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "multiplier": 1,
+                "lateParse": true
+              }
+            ],
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "multiplier": 1,
+                "lateParse": false
+              }
+            ],
+            "operator": ""
+          },
+          "target": {
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "multiplier": 1,
+                "lateParse": true
+              }
+            ],
+            "operator": ""
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "multiplier": 1,
+                "lateParse": false
+              }
+            ],
+            "operator": ""
+          },
+          "target": {
+            "value": [
+              {
+                "operator": "add",
+                "type": "numeric",
+                "path": "",
+                "multiplier": 1,
+                "lateParse": true
+              }
+            ],
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": []
+        },
+        "actionCost": {
+          "value": 0,
+          "operator": ""
+        }
+      },
+      "attackProfile": {
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": 0,
+        "attackMode": "",
+        "damage": [],
+        "finisherLimit": 10
+      }
+    },
+    "skillType": "basic",
+    "path": {
+      "value": "",
+      "archetype": ""
+    },
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": "",
+    "abbrewId": {
+      "value": "abbrew.skill.parry.abbrewParry00000",
+      "uuid": "abbrewParry00000"
+    },
+    "isActivatable": false,
+    "skills": []
+  },
+  "effects": [],
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743073032404,
+    "modifiedTime": 1745175636184,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "ownership": {
+    "default": 0
+  },
+  "_id": "abbrewParry00000",
+  "sort": -100000,
+  "_key": "!items!abbrewParry00000"
+}

@@ -1,0 +1,35 @@
+{
+  "folder": null,
+  "name": "Instability",
+  "type": "wound",
+  "img": "systems/abbrew/assets/icons/wounds/instability.webp",
+  "system": {
+    "description": "",
+    "traits": "",
+    "wound": {
+      "type": "instability",
+      "value": 1
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    }
+  },
+  "effects": [],
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743072500237,
+    "modifiedTime": 1743072505105,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "ownership": {
+    "default": 0
+  },
+  "_id": "fL2jpSBF9Pc3hl3F",
+  "sort": 800000,
+  "_key": "!items!fL2jpSBF9Pc3hl3F"
+}

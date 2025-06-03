@@ -1,0 +1,273 @@
+{
+  "name": "Hidden",
+  "type": "skill",
+  "_id": "kykHiaVaxVodd8E2",
+  "img": "systems/abbrew/assets/icons/statuses/hidden.svg",
+  "system": {
+    "description": "<p>You are hidden from your foes and can not be targeted directly, treat any creature hidden from you as @UUID[Compendium.abbrew.conditions.Item.abbrewCOffGuard0]{Off Guard}.</p><p>If this condition relies on you having cover and you break it, you immediately become detected.</p><p>If you were previously detected (or your presence becomes known) they can attempt to locate you with a @UUID[Compendium.abbrew.skills.Item.LRCKYIXnirM5L3mD]{Scan} Check.</p>",
+    "traits": "",
+    "abbrewId": {
+      "value": "abbrew.skill.hidden.kykHiaVaxVodd8E2",
+      "uuid": "kykHiaVaxVodd8E2"
+    },
+    "skillTraits": "",
+    "skillModifiers": {
+      "synergy": "",
+      "discord": ""
+    },
+    "configurable": false,
+    "isActivatable": false,
+    "activateOnCreate": false,
+    "applyTurnStart": false,
+    "applyTurnEnd": false,
+    "applyOnExpiry": false,
+    "activateOnDamageAccept": false,
+    "skills": {
+      "granted": [],
+      "paired": [],
+      "grantedOnActivation": [],
+      "grantedOnAccept": []
+    },
+    "resource": {
+      "capacity": 0,
+      "operator": "",
+      "relatedResource": null,
+      "fillCapacityOnCreate": false
+    },
+    "action": {
+      "activationType": "",
+      "actionCost": "",
+      "actionImage": "",
+      "duration": {
+        "isConcentration": false,
+        "precision": "",
+        "value": 0,
+        "expireOnStartOfTurn": true
+      },
+      "uses": {
+        "hasUses": false,
+        "asStacks": false,
+        "removeStackOnUse": true,
+        "value": 0,
+        "max": 0,
+        "period": "",
+        "stackRemovalActivation": false,
+        "removeWhenNoUsesRemain": false
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "skillCheck": [],
+      "skillRequest": {
+        "isEnabled": false,
+        "isContested": false,
+        "selfCheck": false,
+        "checkType": "",
+        "requirements": {
+          "modifiers": "",
+          "successes": 0,
+          "result": 0
+        },
+        "targetModifiers": "",
+        "results": {
+          "success": {
+            "description": ""
+          },
+          "failure": {
+            "description": ""
+          }
+        }
+      },
+      "attackProfile": {
+        "isEnabled": false,
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": null,
+        "attackMode": "",
+        "finisher": {
+          "type": "",
+          "cost": null,
+          "description": "",
+          "wounds": []
+        },
+        "damage": [],
+        "finisherLimit": 10
+      },
+      "modifiers": {
+        "fortune": 0,
+        "actionCost": {
+          "value": 0,
+          "operator": ""
+        },
+        "attackProfile": {
+          "isEnabled": false,
+          "combineAttacks": {
+            "isEnabled": false,
+            "value": null
+          },
+          "attackType": "",
+          "attackMode": "",
+          "handsSupplied": null,
+          "finisherLimit": {
+            "value": 10,
+            "operator": ""
+          },
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "penetration": {
+            "value": 10,
+            "operator": ""
+          },
+          "finisher": {
+            "type": "",
+            "cost": null,
+            "description": "",
+            "wounds": []
+          },
+          "damage": []
+        },
+        "guard": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": "",
+            "lateParse": false
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": []
+        }
+      }
+    },
+    "skillType": "",
+    "path": {
+      "raw": "",
+      "value": {
+        "id": ""
+      }
+    },
+    "roles": {
+      "raw": "",
+      "parsed": []
+    },
+    "archetype": "",
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": "",
+    "isProxied": false,
+    "siblingSkillModifiers": []
+  },
+  "effects": [
+    {
+      "name": "Hidden",
+      "img": "systems/abbrew/assets/icons/statuses/hidden.svg",
+      "origin": "Compendium.abbrew.conditions.Item.kykHiaVaxVodd8E2",
+      "duration": {
+        "rounds": null,
+        "startTime": null,
+        "seconds": null,
+        "combat": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "disabled": false,
+      "_id": "cBrOZy7xWahkSYMN",
+      "type": "base",
+      "system": {},
+      "changes": [],
+      "description": "<p>You are hidden from your foes and can not be targeted directly, treat any creature hidden from you as @UUID[Compendium.abbrew.conditions.Item.abbrewCOffGuard0]{Off Guard}.</p><p>If this condition relies on you having cover and you break it, you immediately become detected.</p><p>If you were previously detected (or your presence becomes known) they can attempt to locate you with a @UUID[Compendium.abbrew.skills.Item.LRCKYIXnirM5L3mD]{Scan} Check.</p>",
+      "tint": "#ffffff",
+      "transfer": true,
+      "statuses": [
+        "hidden"
+      ],
+      "sort": 0,
+      "flags": {
+        "statuscounter": {
+          "config": {
+            "dataSource": "flags.abbrew.skill.stacks",
+            "type": "default"
+          },
+          "visible": false,
+          "value": 1
+        },
+        "abbrew": {
+          "skill": {
+            "stacks": 1
+          }
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "coreVersion": "12.331",
+        "systemId": "abbrew",
+        "systemVersion": "0.0.2-prerelease31",
+        "createdTime": 1746375385390,
+        "modifiedTime": 1746375598651,
+        "lastModifiedBy": "abbrewpacks00000"
+      },
+      "_key": "!items.effects!kykHiaVaxVodd8E2.cBrOZy7xWahkSYMN"
+    }
+  ],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746374127626,
+    "modifiedTime": 1746375586189,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!kykHiaVaxVodd8E2"
+}

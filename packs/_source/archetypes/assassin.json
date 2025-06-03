@@ -1,0 +1,99 @@
+{
+  "name": "Assassin",
+  "type": "archetype",
+  "_id": "zBI5P3szC9gKb6KV",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "roleRequirements": {
+      "1": {
+        "isActive": true,
+        "roles": "[{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"},{\"label\":\"scoundrel\",\"value\":\"Scoundrel\",\"title\":\"You are proficient in illicit skills, engaging in underhanded tactics.\"}]",
+        "parsedRoles": [],
+        "restrictedRoles": "[{\"label\":\"honourbound\",\"value\":\"Hounour Bound\",\"title\":\"You are bound by a code of ethics that you must uphold.\"}]",
+        "parsedRestrictedRoles": [],
+        "isMajor": true,
+        "path": {
+          "raw": "",
+          "name": "",
+          "id": ""
+        }
+      },
+      "2": {
+        "isActive": true,
+        "roles": "[{\"label\":\"professional\",\"value\":\"Professional\",\"title\":\"You are skilled in a profession.\"},{\"label\":\"scoundrel\",\"value\":\"Scoundrel\",\"title\":\"You are proficient in illicit skills, engaging in underhanded tactics.\"}]",
+        "parsedRoles": [],
+        "restrictedRoles": "[{\"label\":\"honourbound\",\"value\":\"Hounour Bound\",\"title\":\"You are bound by a code of ethics that you must uphold.\"}]",
+        "parsedRestrictedRoles": [],
+        "isMajor": false,
+        "path": {
+          "raw": "",
+          "name": "",
+          "id": ""
+        }
+      },
+      "3": {
+        "isActive": true,
+        "roles": "[{\"label\":\"professional\",\"value\":\"Professional\",\"title\":\"You are skilled in a profession.\"}]",
+        "parsedRoles": [],
+        "restrictedRoles": "",
+        "parsedRestrictedRoles": [],
+        "isMajor": false,
+        "path": {
+          "raw": "",
+          "name": "",
+          "id": ""
+        }
+      },
+      "4": {
+        "isActive": false,
+        "roles": "",
+        "parsedRoles": [],
+        "restrictedRoles": "",
+        "parsedRestrictedRoles": [],
+        "isMajor": false,
+        "path": {
+          "raw": "",
+          "name": "",
+          "id": ""
+        }
+      },
+      "5": {
+        "isActive": false,
+        "roles": "",
+        "parsedRoles": [],
+        "restrictedRoles": "",
+        "parsedRestrictedRoles": [],
+        "isMajor": false,
+        "path": {
+          "raw": "",
+          "name": "",
+          "id": ""
+        }
+      }
+    },
+    "skillIds": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746269521567,
+    "modifiedTime": 1746270029376,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!zBI5P3szC9gKb6KV"
+}

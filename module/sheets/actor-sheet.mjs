@@ -3,8 +3,13 @@ import {
   onManageActiveEffect,
   prepareActiveEffectCategories,
 } from '../helpers/effects.mjs';
-import { activateSkill } from '../helpers/skill.mjs';
 import Tagify from '@yaireo/tagify'
+import { getFundamentalAttributeSkill, getFundamentalSkillWithActionCost } from '../helpers/fundamental-skills.mjs';
+import { cleanTemporarySkill } from '../helpers/skills/skill-uses.mjs';
+import { getModifiedSkillActionCost, handleSkillActivate } from '../helpers/skills/skill-activation.mjs';
+import { manualSkillExpiry } from '../helpers/skills/skill-expiry.mjs';
+import { filterKeys, isASupersetOfB } from '../helpers/utils.mjs';
+import { requestSkillCheck } from '../abbrew.mjs';
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -21,7 +26,7 @@ export class AbbrewActorSheet extends ActorSheet {
         {
           navSelector: '.sheet-tabs',
           contentSelector: '.sheet-body',
-          initial: 'skills',
+          initial: 'overview',
         },
       ],
     });
@@ -35,7 +40,7 @@ export class AbbrewActorSheet extends ActorSheet {
   /* -------------------------------------------- */
 
   /** @override */
-  getData() {
+  async getData() {
     // Retrieve the data structure from the base sheet. You can inspect or log
     // the context variable to see the structure, but some key properties for
     // sheets are the actor object, the data object, whether or not it's
@@ -52,16 +57,32 @@ export class AbbrewActorSheet extends ActorSheet {
     // Prepare character data and items.
     if (actorData.type == 'character') {
       this._prepareItems(context);
-      this._prepareCharacterData(context);
+      this._prepareDefenses(actorData, context);
+      this._prepareCharacterData(actorData, context);
     }
 
     // Prepare NPC data and items.
     if (actorData.type == 'npc') {
       this._prepareItems(context);
+      this._prepareDefenses(actorData, context);
+      this._prepareCharacterData(actorData, context);
     }
 
-    // Add roll data for TinyMCE editors.
-    context.rollData = context.actor.getRollData();
+    // Enrich biography info for display
+    // Enrichment turns text like `[[/r 1d20]]` into buttons
+    context.enrichedBiography = await TextEditor.enrichHTML(
+      this.actor.system.biography,
+      {
+        // Whether to show secret blocks in the finished html
+        secrets: this.document.isOwner,
+        // Necessary in v11, can be removed in v12
+        async: true,
+        // Data to fill in for inline rolls
+        rollData: this.actor.getRollData(),
+        // Relative UUID resolution
+        relativeTo: this.actor,
+      }
+    );
 
     // Prepare active effects
     context.effects = prepareActiveEffectCategories(
@@ -82,11 +103,9 @@ export class AbbrewActorSheet extends ActorSheet {
    *
    * @return {undefined}
    */
-  _prepareCharacterData(context) {
-    // Handle attribute scores.
-    // for (let [k, v] of Object.entries(context.system.abilities)) {
-    //   v.label = game.i18n.localize(CONFIG.ABBREW.abilities[k]) ?? k;
-    // }
+  _prepareCharacterData(actorData, context) {
+    const resources = actorData.system.resources.owned.map(r => ({ id: r.id, name: r.name, value: actorData.system.resources.values.find(v => v.id === r.id)?.value ?? 0, max: r.max }));
+    context.resources = resources;
   }
 
   /**
@@ -99,8 +118,11 @@ export class AbbrewActorSheet extends ActorSheet {
   _prepareItems(context) {
     // Initialize containers.    
     const gear = [];
+    const ammunition = [];
+    // TODO: Exception when blank
+    const ammunitionChoices = this.actor.items.filter(i => i.type === "ammunition").filter(i => i.system.storeIn && this.isContainerAccessible(this.actor.items.find(c => c._id === i.system.storeIn))).map(a => ({ label: a.name, type: a.system.type, value: a._id }));
     const features = [];
-    const skills = { background: [], basic: [], path: [], resource: [], temporary: [], untyped: [] };
+    const skills = { background: [], basic: [], path: [], resource: [], temporary: [], untyped: [], archetype: [], tier: [] };
     const spells = {
       0: [],
       1: [],
@@ -114,20 +136,70 @@ export class AbbrewActorSheet extends ActorSheet {
       9: [],
     };
     const anatomy = [];
+    const equipment = [];
     const armour = [];
+    const wornArmour = [];
     const weapons = [];
     const equippedWeapons = [];
+    const archetypes = [];
+    const archetypeSkills = [];
+    const favouriteSkills = [];
+    const activeSkills = [];
+    const enhancements = [];
+    const storage = [];
+    const playerRevealed = { anatomy: [], armour: [], weapons: [], traits: [] }
+
+    for (let i of context.items) {
+      i.img = i.img || Item.DEFAULT_ICON;
+
+      if (i.type === 'archetype') {
+        archetypes.push(i);
+        archetypeSkills[i._id] = context.items.filter(j => i.system.skillIds.includes(j.system.abbrewId.uuid));
+      }
+
+      if (["armour", "equipment"].includes(i.type) && i.system.storage.hasStorage) {
+        const accessible = this.isContainerAccessible(i);
+        storage.push({ container: i, contents: context.items.filter(ci => i.system.storage.storedItems.includes(ci._id)), isAccessible: accessible });
+      }
+
+      if (i.system.isFavourited) {
+        favouriteSkills.push(i);
+      }
+
+      if (i.type === "skill" && i.system.action.isActive) {
+        activeSkills.push(i);
+      }
+    }
 
     // Iterate through items, allocating to containers
     for (let i of context.items) {
       i.img = i.img || Item.DEFAULT_ICON;
-      // Append to gear.
+      if (i.system.storeIn) {
+        if (i.type === 'weapon') {
+          if (['held1H', 'held2H', 'active'].includes(i.system.equipState)) {
+            equippedWeapons.push(i);
+            if (i.system.revealed.isRevealed) {
+              playerRevealed.weapons.push(i);
+            }
+          }
+        }
+        continue;
+      }
+
+      // Append to equipment.
       if (i.type === 'item') {
-        gear.push(i);
+        equipment.push(i);
+      }
+      if (i.type === 'ammunition') {
+        ammunition.push(i);
+        ammunitionChoices.push({ name: i.name, type: i.system.type, id: i._id });
       }
       // Append to features.
       else if (i.type === 'feature') {
         features.push(i);
+      }
+      else if (i.type === 'equipment') {
+        equipment.push(i);
       }
       // Append to skills.
       else if (i.type === 'skill') {
@@ -139,7 +211,8 @@ export class AbbrewActorSheet extends ActorSheet {
             skills.basic.push(i);
             break;
           case 'path':
-            skills.path.push(i)
+            skills.path.push(i);
+            // archetypeSkills[i.archetypeId].push(i);
             break;
           case 'resource':
             skills.resource.push(i)
@@ -151,22 +224,43 @@ export class AbbrewActorSheet extends ActorSheet {
             skills.untyped.push(i);
         }
       }
-      else if (i.type === 'anatomy') {
-        anatomy.push(i);
+      else if (i.type === "anatomy") {
+        if (i.system.isDismembered) {
+          equipment.push(i);
+        } else {
+          anatomy.push(i);
+          if (i.system.revealed.isRevealed) {
+            playerRevealed.anatomy.push(
+              {
+                item: i,
+                grantedWeapons: context.items.filter(i => i.type === "weapon").filter(w => w.system.revealed.isRevealed && w.system.grantedBy === i._id),
+                grantedSkills: context.items.filter(i => i.type === "skill").filter(w => w.system.revealed.isRevealed && w.system.grantedBy.item === i._id)
+              }
+            );
+          }
+        }
       }
       else if (i.type === 'armour') {
         armour.push(i);
+        if (['held1H', 'held2H', 'worn'].includes(i.system.equipState)) {
+          wornArmour.push(i);
+          if (i.system.revealed.isRevealed) {
+            playerRevealed.armour.push(i);
+          }
+        }
       }
       else if (i.type === 'weapon') {
         weapons.push(i);
-        // TODO: May want to handle unarmed etc. differently i.e. worn weapons with no hands required.
-        // TODO: Non physical weapons?
-        // Unarmed technically should take 1h but stowed / dropped seem a little funny
-        if (['held1H', 'held2H'].includes(i.system.equipState)) {
+        if (['held1H', 'held2H', 'active'].includes(i.system.equipState)) {
           equippedWeapons.push(i);
+          if (i.system.revealed.isRevealed) {
+            playerRevealed.weapons.push(i);
+          }
         }
       }
-      // Append to spells.
+      else if (i.type === "enhancement") {
+        enhancements.push(i);
+      }
       else if (i.type === 'spell') {
         if (i.system.spellLevel != undefined) {
           spells[i.system.spellLevel].push(i);
@@ -177,16 +271,61 @@ export class AbbrewActorSheet extends ActorSheet {
     // Assign and return
     context.gear = gear;
     context.features = features;
+    context.ammunition = ammunition;
+    context.ammunitionChoices = ammunitionChoices;
     context.spells = spells;
-    context.skillSections = this.updateObjectValueByKey(this.getSkillSectionDisplays(CONFIG.ABBREW.skillTypes, skills), this.skillSectionDisplay);
+    const sections = this.getSkillSectionDisplays(CONFIG.ABBREW.skillTypes, skills);
+    sections.favourites = favouriteSkills.length > 0 ? "grid" : "none";
+    sections.active = activeSkills.length > 0 ? "grid" : "none";
+    sections.archetypes = Object.keys(archetypeSkills).length > 0 ? "grid" : "none";
+    sections.enhancements = enhancements.length > 0 ? "grid" : "none";
+    const allSkillSections = this.updateObjectValueByKey(sections, this.skillSectionDisplay);
+    context.allSkillSections = allSkillSections;
+    context.skillSections = filterKeys(allSkillSections, ["background", "basic", "path", "resource", "temporary", "untyped"]);
     context.skills = skills;
     context.anatomy = anatomy;
     context.armour = armour;
+    context.wornArmour = wornArmour;
     context.weapons = weapons;
     context.equippedWeapons = equippedWeapons;
+    context.archetypes = archetypes;
+    context.archetypeSkills = archetypeSkills;
+    context.favouriteSkills = favouriteSkills;
+    context.activeSkills = activeSkills;
+    context.enhancements = enhancements;
+    context.equipment = equipment;
+    context.storage = storage;
+    context.playerRevealed = playerRevealed;
   }
 
   skillSectionDisplay = {};
+
+  _canUserView(user) {
+    switch (this.object.type) {
+      case "npc":
+        return true;
+      case 'character':
+      default:
+        return super._canUserView(user);
+    }
+  }
+
+  isContainerAccessible(container) {
+    return (container.system.storage.accessible && container.system.equipState === "worn") || container.system.equipState === "readied"
+  }
+
+  _prepareDefenses(actorData, context) {
+    const activeProtection = Object.keys(actorData.system.defense.protection).reduce((result, key) => {
+      const protection = actorData.system.defense.protection[key];
+      if (protection.reduction !== 0 || protection.amplification !== 0 || protection.resistance !== 0 || protection.immunity !== 0 || protection.weakness !== 0) {
+        result.push(protection);
+      }
+
+      return result;
+    }, []);
+
+    context.activeProtection = activeProtection;
+  }
 
   /* -------------------------------------------- */
 
@@ -215,7 +354,7 @@ export class AbbrewActorSheet extends ActorSheet {
   /* -------------------------------------------- */
 
   _activateTraits(html) {
-    const traits = html[0].querySelector('input[name="system.traits"]');
+    const traits = html[0].querySelector('input[name="system.traits.raw"]');
     const traitsSettings = {
       dropdown: {
         maxItems: 20,               // <- mixumum allowed rendered suggestions
@@ -226,7 +365,11 @@ export class AbbrewActorSheet extends ActorSheet {
       },
       userInput: false,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
       duplicates: false,             // <- Should duplicate tags be allowed or not
-      whitelist: [...Object.values(CONFIG.ABBREW.traits).map(trait => game.i18n.localize(trait.name))]
+      // whitelist: [.../* Object.values( */CONFIG.ABBREW.traits/* ) */.map(trait => game.i18n.localize(trait.name))]
+      whitelist: [.../* Object.values( */CONFIG.ABBREW.traits/* ) */.map(trait => ({
+        ...trait,
+        value: game.i18n.localize(trait.value)
+      }))],
     };
     if (traits) {
       var taggedTraits = new Tagify(traits, traitsSettings);
@@ -235,30 +378,24 @@ export class AbbrewActorSheet extends ActorSheet {
 
   /* -------------------------------------------- */
 
-  _activateFatalWounds(html) {
-    const fatalWounds = html[0].querySelector('input[name="system.defense.fatalWounds"]');
-    const fatalWoundsSettings = {
-      dropdown: {
-        maxItems: 20,               // <- mixumum allowed rendered suggestions
-        classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
-        enabled: 0,                 // <- show suggestions on focus
-        closeOnSelect: false,       // <- do not hide the suggestions dropdown once an item has been selected
-        includeSelectedTags: true   // <- Should the suggestions list Include already-selected tags (after filtering)
-      },
-      userInput: false,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
-      duplicates: false,             // <- Should duplicate tags be allowed or not
-      whitelist: [...Object.values(CONFIG.ABBREW.wounds).map(wound => game.i18n.localize(wound.name))]
-    };
-    if (fatalWounds) {
-      var taggedFatalWounds = new Tagify(fatalWounds, fatalWoundsSettings);
-    }
-  }
-
-  /* -------------------------------------------- */
-
   /** @override */
   activateListeners(html) {
     super.activateListeners(html);
+
+    html.on('click', '.item-study', async (ev) => {
+      const li = $(ev.currentTarget).parents('.item');
+      const item = this.actor.items.get(li.data('itemId'));
+      const reveal = item.system.revealed;
+      const revealSkills = reveal.revealSkills.parsed;
+      if (revealSkills.length === 0) {
+        ui.notifications.warn(`No Reveal Skills are set up for ${item.name} id: ${item._id}`);
+        return;
+      }
+      const difficulty = reveal.difficulty;
+      const tier = this.actor.system.meta.tier.value;
+      const checkName = `Study ${item.name}`;
+      await requestSkillCheck(checkName, revealSkills.map(s => s.id), "successes", difficulty, tier);
+    });
 
     // Render the item sheet for viewing/editing prior to the editable check.
     html.on('click', '.item-edit', (ev) => {
@@ -270,11 +407,17 @@ export class AbbrewActorSheet extends ActorSheet {
     // Render the skill sheet for viewing/editing prior to the editable check.
     html.on('click', '.skill-edit', (ev) => {
       const li = $(ev.currentTarget).parents('.skill');
-      const skill = this.actor.items.get(li.data('skillId'));
+      const skill = this.actor.items.get(li.data('itemId'));
       skill.sheet.render(true);
     });
 
-    html.on('click', '.skill-activate', this._onSkillActivate.bind(this))
+    html.on('click', '.skill-activate', this._onSkillActivate.bind(this));
+
+    html.on('click', '.skill-deactivate', this._onSkillDeactivate.bind(this));
+
+    html.on('click', '.skill-stack', this._onSkillStackRemove.bind(this));
+
+    html.on('click', '.skill-concentrate', this._onSkillConcentrate.bind(this));
 
     // -------------------------------------------------------------
     // Everything below here is only needed if the sheet is editable
@@ -294,7 +437,22 @@ export class AbbrewActorSheet extends ActorSheet {
     // Delete Skill Item
     html.on('click', '.skill-delete', (ev) => {
       const li = $(ev.currentTarget).parents('.skill');
-      const skill = this.actor.items.get(li.data('skillId'));
+      const skill = this.actor.items.get(li.data('itemId'));
+      skill.delete();
+      li.slideUp(200, () => this.render(false));
+    });
+
+    // Edit Archetype Item
+    html.on('click', '.archetype-edit', (ev) => {
+      const li = $(ev.currentTarget).parents('.archetype');
+      const skill = this.actor.items.get(li.data('itemId'));
+      skill.sheet.render(true);
+    });
+
+    // Delete Archetype Item
+    html.on('click', '.archetype-delete', (ev) => {
+      const li = $(ev.currentTarget).parents('.archetype');
+      const skill = this.actor.items.get(li.data('itemId'));
       skill.delete();
       li.slideUp(200, () => this.render(false));
     });
@@ -311,10 +469,12 @@ export class AbbrewActorSheet extends ActorSheet {
 
     html.on('change', '.item-select', this._onItemChange.bind(this));
 
-    html.on('change', '.item input[type="checkbox"]', this._onItemChange.bind(this));
+    html.on('change', '.item input', this._onItemChange.bind(this));
 
     // Rollable abilities.
     html.on('click', '.rollable', this._onRoll.bind(this));
+
+    html.on('click', '.attribute-check', this._onAttributeSkill.bind(this));
 
     html.on('click', '.attack-damage-button', async (event) => {
       const t = event.currentTarget;
@@ -326,9 +486,9 @@ export class AbbrewActorSheet extends ActorSheet {
       await this._onAttackDamageAction(t, 'feint');
     });
 
-    html.on('click', '.attack-strong-button', async (event) => {
+    html.on('click', '.attack-overpower-button', async (event) => {
       const t = event.currentTarget;
-      await this._onAttackDamageAction(t, 'strong');
+      await this._onAttackDamageAction(t, 'overpower');
     });
 
     html.on('click', '.attack-finisher-button', async (event) => {
@@ -336,13 +496,151 @@ export class AbbrewActorSheet extends ActorSheet {
       await this._onAttackDamageAction(t, 'finisher');
     });
 
+    html.on('click', '.attack-ranged-button', async (event) => {
+      const t = event.currentTarget;
+      await this._onAttackDamageAction(t, 'ranged');
+    });
+
+    html.on('click', '.attack-aimedshot-button', async (event) => {
+      const t = event.currentTarget;
+      await this._onAttackDamageAction(t, 'aimedshot');
+    });
+
+    html.on('click', '.attack-reload-button', async (event) => {
+      const t = event.currentTarget;
+      await this._onAttackReloadAction(t, 'reload');
+    });
+
+    html.on('click', '.attack-throw-button', async (event) => {
+      const t = event.currentTarget;
+      await this._onAttackDamageAction(t, 'thrown');
+    });
+
+    html.on('click', '.attack-pickup-button', async (event) => {
+      const t = event.currentTarget;
+      await this._onAttackPickUpAction(t, 'pickup');
+    });
+
+
+    html.on('change', '.attack-reload', async (event) => {
+      const t = event.currentTarget;
+      const attackProfile = t.closest(".attack-profile");
+      const weaponContainer = t.closest(".weapon-container");
+      const profileId = attackProfile.dataset.attackProfileId;
+      const weaponId = weaponContainer.dataset.itemId;
+      const weapon = this.actor.items.find(i => i._id === weaponId);
+      if (!weapon) {
+        return;
+      }
+      const attackProfiles = structuredClone(weapon.system.attackProfiles);
+      const profile = attackProfiles[profileId];
+      const ammunition = this.actor.items.get(profile.ammunition.id);
+      if (ammunition) {
+        const ammunitionAmount = ammunition.system.quantity + profile.ammunition.value;
+        await ammunition.update({ "system.quantity": ammunitionAmount });
+      }
+      attackProfiles[profileId].ammunition.id = event.currentTarget.value;
+      attackProfiles[profileId].ammunition.value = 0;
+      await weapon.update({ "system.attackProfiles": attackProfiles });
+    })
+
     html.on('click', '.skill-header', this._onToggleSkillHeader.bind(this));
+    html.on('click', '.archetypes-header', this._onToggleSkillHeader.bind(this));
+    html.on('click', '.favourites-header', this._onToggleSkillHeader.bind(this));
+    html.on('click', '.active-header', this._onToggleSkillHeader.bind(this));
 
     html.on('click', '.wound', this._onWoundClick.bind(this));
 
     html.on('contextmenu', '.wound', this._onWoundRightClick.bind(this));
 
-    this._activateFatalWounds(html);
+    html.on('drop', '.archetype', async (event) => {
+      event.preventDefault();
+      if (!this.actor.testUserPermission(game.user, 'OWNER')) {
+        return;
+      }
+
+      const droppedData = event.originalEvent.dataTransfer.getData("text")
+      const eventJson = JSON.parse(droppedData);
+      if (eventJson && eventJson.type === "Item") {
+        const item = await fromUuid(eventJson.uuid);
+        if (item.type === "skill") {
+          const archetype = this.actor.items.find(i => i._id === event.currentTarget.dataset.itemId);
+          const archetypeRequirements = Object.values(archetype.system.roleRequirements);
+          const archetypePaths = archetypeRequirements.map(r => r.path.id).filter(id => id !== "");
+          const validPaths = new Set(archetypePaths);
+          const validRoles = new Set(archetypePaths.flatMap(vp => CONFIG.ABBREW.paths.find(p => p.id === vp).roles));
+          const itemPath = new Set([item.system.path.value.id]);
+          const itemRoles = new Set(item.system.path.value.id === "abbrewpuniversal" ? item.system.roles.parsed : []);
+          if ((validPaths.intersection(itemPath).size > 0) || (validRoles.intersection(itemRoles).size > 0)) {
+            const skillIds = archetype.system.skillIds;
+            const update = [...skillIds, item.system.abbrewId.uuid];
+            await archetype.update({ "system.skillIds": update });
+          } else {
+            // TODO: Stop the item from creating?
+            ui.notifications.warn(`That skill isn't valid for the archetype ${archetype.name}`);
+          }
+        }
+      }
+    })
+
+    html.on('drop', '.container', async (event) => {
+      event.preventDefault();
+      if (!this.actor.testUserPermission(game.user, 'OWNER')) {
+        return;
+      }
+
+      const droppedData = event.originalEvent.dataTransfer.getData("text")
+      const eventJson = JSON.parse(droppedData);
+      if (eventJson && eventJson.type === "Item") {
+        const item = await fromUuid(eventJson.uuid);
+        if (["armour", "equipment", "weapon", "ammunition"].includes(item.type)) {
+          const containerId = event.currentTarget.dataset.itemId;
+          const container = this.actor.items.find(i => i._id === containerId);
+          if (!isASupersetOfB(item.system.traits.value.map(t => t.key), container.system.storage.traitFilter.value.map(t => t.key))) {
+            return;
+          }
+          const containerValueIncrease = getContainerValueIncrease(container, item);
+          if (container.system.storage.value + containerValueIncrease <= container.system.storage.max) {
+            const storedItems = [...container.system.storage.storedItems, item._id];
+            if (item.system.storeIn) {
+              const oldContainerId = item.system.storeIn;
+              const oldContainer = this.actor.items.find(i => i._id === oldContainerId);
+              const oldContainerStoredItems = oldContainer.system.storage.storedItems.filter(i => i !== item._id);
+              await oldContainer.update({ "system.storage.storedItems": oldContainerStoredItems });
+            }
+            await item.update({ "system.storeIn": containerId });
+            await container.update({ "system.storage.storedItems": storedItems });
+          }
+        }
+      }
+    })
+
+    function getContainerValueIncrease(container, item) {
+      let heftIncrease = item.system.quantity * item.system.heft;
+      if (item.system.storage.hasStorage && item.system.storage.type === "heft") {
+        heftIncrease += item.system.storage.value;
+      }
+
+      return container.system.storage.type === "count" ? item.system.quantity : heftIncrease;
+    }
+
+    html.on("click", ".equip-state-button", async (event) => {
+      event.preventDefault();
+      if (!this.actor.testUserPermission(game.user, 'OWNER')) {
+        return;
+      }
+
+      const newEquipState = event.currentTarget.dataset.equipState;
+      const itemId = event.target.closest(".item").dataset.itemId;
+      const item = this.actor.items.find(i => i._id === itemId);
+      const equipState = item.system.validEquipStates.find(e => e.value === newEquipState);
+      if (!await this.actor.canActorUseActions(equipState.cost)) {
+        return;
+      }
+
+      await item.update({ "system.equipState": newEquipState });
+    })
+
     this._activateTraits(html);
 
     // Drag events for macros.
@@ -376,17 +674,6 @@ export class AbbrewActorSheet extends ActorSheet {
     }
   }
 
-
-  async _onSkillActivate(event) {
-    event.preventDefault();
-    const target = event.target.closest('.skill');
-    const id = target.dataset.skillId;
-    const skill = this.actor.items.get(id).system;
-    if (skill.activatable && skill.action.activationType === 'standalone') {
-      await activateSkill(this.actor, skill);
-    }
-  }
-
   _onToggleSkillHeader(event) {
     event.preventDefault();
     const target = event.currentTarget;
@@ -413,85 +700,107 @@ export class AbbrewActorSheet extends ActorSheet {
     updateActorWounds(this.actor, mergeActorWounds(this.actor, [{ type: woundType, value: modification }]));
   }
 
+  async _onSkillActivate(event) {
+    event.preventDefault();
+    const target = event.target.closest('.skill');
+    const id = target.dataset.itemId;
+    const skill = this.actor.items.get(id);
+
+    await handleSkillActivate(this.actor, skill);
+  }
+
+  async _onSkillDeactivate(event) {
+    event.preventDefault();
+    const target = event.target.closest('.skill');
+    const id = target.dataset.itemId;
+    const skill = this.actor.items.get(id);
+    const effect = this.actor.getEffectBySkillId(skill._id);
+    if (effect) {
+      await manualSkillExpiry(effect);
+    }
+  }
+
+  async _onSkillStackRemove(event) {
+    event.preventDefault();
+    const target = event.target.closest('.skill');
+    const id = target.dataset.itemId;
+    const skill = this.actor.items.get(id);
+    if (skill) {
+      const stackUpdate = skill.system.action.uses.value - 1;
+      await skill.update({ "system.action.uses.value": stackUpdate });
+      if (stackUpdate === 0) {
+        await cleanTemporarySkill(skill, this.actor);
+      }
+    }
+  }
+
+  async _onSkillConcentrate(event) {
+    event.preventDefault();
+    const actionCost = event.target.closest("button").dataset.actionCost
+    const target = event.target.closest('.skill');
+    const id = target.dataset.itemId;
+    const skill = this.actor.items.get(id);
+    if (skill && game.combats.combats.length > 0) {
+      const effect = skill.actor.effects.find(e => e.flags.abbrew.skill.trackDuration === skill._id);
+      const updates = ({ duration: { rounds: 1, duration: 1, startTime: game.time.worldTime, startRound: game.combat.current.round } })
+      await skill.actor.update({ "system.actions": skill.actor.system.actions - parseInt(actionCost) });
+      await effect.update(updates);
+    }
+  }
+
   async _onAttackDamageAction(target, attackMode) {
+    const itemId = target.closest('li.item').dataset.itemId;
+    const attackProfileId = target.closest('li .attack-profile').dataset.attackProfileId;
+    const item = this.actor.items.get(itemId);
+    await item.handleAttackDamageAction(this.actor, attackProfileId, attackMode);
+  }
+
+  async _onAttackPickUpAction(target, attackMode) {
+    if (!await this.actor.canActorUseActions(1)) {
+      return false;
+    }
+
+    if (!item.isHeldEquipStateChangePossible("held1H")) {
+      ui.notifications.warn("You don't have free hands to pick that up");
+      return false;
+    }
 
     const itemId = target.closest('li.item').dataset.itemId;
     const attackProfileId = target.closest('li .attack-profile').dataset.attackProfileId;
     const item = this.actor.items.get(itemId);
-    const attackProfile = item.system.attackProfiles[attackProfileId];
+    await item.update({ "system.equipState": "held1H" })
+  }
 
-    // Invoke the roll and submit it to chat.
-    const roll = new Roll(item.system.formula, item.actor);
-    // If you need to store the value first, uncomment the next line.
-    const result = await roll.evaluate();
-    const token = this.actor.token;
-    const attributeMultiplier = attackMode === 'strong' ? Math.max(1, item.system.handsSupplied) : 1;
-    const damage = attackProfile.damage.map(d => {
-      let attributeModifier = 0;
-      if (d.attributeModifier) {
-        attributeModifier = attributeMultiplier * this.actor.system.attributes[d.attributeModifier].value;
-      }
+  async _onAttackReloadAction(target, attackMode) {
+    const itemId = target.closest('li.item').dataset.itemId;
+    const attackProfileId = target.closest('li .attack-profile').dataset.attackProfileId;
+    const item = this.actor.items.get(itemId);
+    const attackProfiles = item.system.attackProfiles;
+    const attackProfile = attackProfiles[attackProfileId];
 
-      const finalDamage = attributeModifier + d.value;
+    if (attackProfile.ammunition.value === attackProfile.ammunition.max) {
+      ui.notifications.warn(`${item.name} is already fully loaded.`)
+      return false;
+    }
 
-      return { damageType: d.type, value: finalDamage };
-    });
-    //this.actor.system.attributes[item.system.attributeModifier].value + item.system.damage[0].value;
-    const resultDice = result.dice[0].results.map(die => {
-      let baseClasses = "roll die d10";
-      if (die.success) {
-        baseClasses = baseClasses.concat(' ', 'success')
-      }
+    const skill = getFundamentalSkillWithActionCost(attackMode, attackProfile.ammunition.reloadActionCost)
+    if (!await this.actor.canActorUseActions(getModifiedSkillActionCost(this.actor, skill))) {
+      return false;
+    }
 
-      if (die.exploded) {
-        baseClasses = baseClasses.concat(' ', 'exploded');
-      }
+    const ammunitionId = attackProfile.ammunition.id;
+    const ammunition = this.actor.items.get(ammunitionId);
 
-      return { result: die.result, classes: baseClasses };
-    });
+    if (ammunition.system.quantity === 0) {
+      ui.notifications.warn(`You have no ${ammunition.name} remaining.`)
+      return false;
+    }
 
-    const totalSuccesses = result.dice[0].results.reduce((total, r) => {
-      if (r.success) {
-        total += 1;
-      }
-      return total;
-    }, 0);
-
-
-    const showAttack = ['attack', 'feint', 'finisher'].includes(attackMode);
-    const isFeint = attackMode === 'feint';
-    const isStrongAttack = attackMode === 'strong';
-    const showFinisher = attackMode === 'finisher' || totalSuccesses > 0;
-    const isFinisher = attackMode === 'finisher';
-    const templateData = {
-      attackProfile,
-      totalSuccesses,
-      resultDice,
-      damage,
-      actor: this.actor,
-      item: this.item,
-      tokenId: token?.uuid || null,
-      showAttack,
-      showFinisher,
-      isStrongAttack,
-      isFinisher
-    };
-
-    // TODO: Move this out of item and into a weapon.mjs / attack-card.mjs
-    const html = await renderTemplate("systems/abbrew/templates/chat/attack-card.hbs", templateData);
-
-    // Initialize chat data.
-    const speaker = ChatMessage.getSpeaker({ actor: this.actor });
-    const rollMode = game.settings.get('core', 'rollMode');
-    const label = `[${item.type}] ${item.name}`;
-    result.toMessage({
-      speaker: speaker,
-      rollMode: rollMode,
-      flavor: label,
-      content: html,
-      flags: { data: { totalSuccesses, damage, isFeint, isStrongAttack, attackProfile, attackingActor: this.actor } }
-    });
-    return result;
+    const reloadedAmount = Math.min(ammunition.system.quantity, (attackProfile.ammunition.max - attackProfile.ammunition.value));
+    const updateAmmunitionAmount = ammunition.system.quantity -= reloadedAmount;
+    attackProfiles[attackProfileId].ammunition.value = attackProfile.ammunition.value + reloadedAmount;
+    await ammunition.update({ "system.quantity": updateAmmunitionAmount });
+    await item.update({ "system.attackProfiles": attackProfiles });
   }
 
   /**
@@ -506,7 +815,7 @@ export class AbbrewActorSheet extends ActorSheet {
     // Get the type of item to create.
     const type = header.dataset.type;
     // Grab any data associated with this control.
-    const data = duplicate(header.dataset);
+    const data = foundry.utils.duplicate(header.dataset);
     // Initialize a default name.
     const name = `New ${type.capitalize()}`;
     // Prepare the item object.
@@ -527,8 +836,7 @@ export class AbbrewActorSheet extends ActorSheet {
    * @param {Event} event   The originating click event
    * @private
    */
-  _onRoll(event) {
-    console.log('actor roll');
+  async _onRoll(event) {
     event.preventDefault();
     const element = event.currentTarget;
     const dataset = element.dataset;
@@ -539,6 +847,49 @@ export class AbbrewActorSheet extends ActorSheet {
         const itemId = element.closest('.item').dataset.itemId;
         const item = this.actor.items.get(itemId);
         if (item) return item.roll();
+      } else if (dataset.rollType === "resource") {
+        const resource = this.actor.system.resources.owned.find(r => r.id === dataset.id);
+        const resourceValue = this.actor.system.resources.values.find(r => r.id === dataset.id);
+        if (resource) {
+          let result = 0;
+          const fields = foundry.applications.fields;
+          const input = fields.createNumberInput({
+            name: resource.name,
+            value: 0,
+            min: 0,
+            max: resource.max,
+            required: true
+          });
+
+          const singleGroup = fields.createFormGroup({
+            input: input,
+            label: resource.name
+          });
+
+          const content = singleGroup.outerHTML;
+
+          try {
+            result = await foundry.applications.api.DialogV2.prompt({
+              window: { title: "Restore Resource" },
+              content: content,
+              ok: {
+                label: "Submit",
+                callback: (event, button, dialog) => new FormDataExtended(button.form).object
+              },
+              rejectClose: true
+            })
+          } catch (ex) {
+            console.log(ex);
+            console.log(`${this.actor.name} did not enter a value.`);
+            return;
+          }
+
+          const validatedResult = Math.min(resource.max, Math.max(0, Object.values(result)[0] + resourceValue.value));
+
+          const resources = this.actor.system.resources.values;
+          resources.find(r => r.id === dataset.id).value = validatedResult;
+          await this.actor.update({ "system.resources.values": resources });
+        }
       }
     }
 
@@ -553,5 +904,13 @@ export class AbbrewActorSheet extends ActorSheet {
       });
       return roll;
     }
+  }
+
+  async _onAttributeSkill(event) {
+    const element = event.currentTarget;
+    const dataset = element.dataset;
+    const fundamental = CONFIG.ABBREW.fundamentalAttributeSkillMap[dataset.attribute];
+    const skill = getFundamentalAttributeSkill(fundamental)
+    await handleSkillActivate(this.actor, skill);
   }
 }

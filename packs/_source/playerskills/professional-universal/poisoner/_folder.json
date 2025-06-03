@@ -1,0 +1,21 @@
+{
+  "name": "Poisoner",
+  "sorting": "a",
+  "folder": "YwpO1EM3rMti0EpQ",
+  "type": "Item",
+  "_id": "PDxSelazuZlOTaCp",
+  "description": "",
+  "sort": 100000,
+  "color": null,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746270680276,
+    "modifiedTime": 1746271434465,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!PDxSelazuZlOTaCp"
+}

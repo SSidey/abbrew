@@ -35,11 +35,144 @@ export function arrayDifference(a, b) {
 /* -------------------------------------------- */
 
 export function getObjectValueByStringPath(entity, path) {
+    if (!entity || !path) {
+        return 0;
+    }
+
     return path.split('.').reduce(function (o, k) {
         return o && o[k];
     }, entity);
 }
 
+/* -------------------------------------------- */
+
 export function getNumericParts(value) {
-    return parseInt(value.replace(/\D/g, "")) ?? 0
+    const parsed = parseInt(value.replace(/\D/g, ""));
+    if (isNaN(parsed)) {
+        return 0;
+    }
+
+    return parsed;
+}
+
+/* -------------------------------------------- */
+
+export function getSafeJson(json, defaultValue) {
+    if (!json || json === "") {
+        return defaultValue;
+    }
+
+    return JSON.parse(json);
+}
+
+/* -------------------------------------------- */
+
+export function intersection(a, b) {
+    const setA = new Set(a);
+    const foo = b.filter(value => setA.has(value));
+    return foo;
+}
+
+/* -------------------------------------------- */
+
+export async function renderSheetForTaggedData(event, actor) {
+    const inspectionClass = "tagify__tag";
+    const element = _checkThroughParentsForClass(event.target, inspectionClass, 2);
+    const itemId = element.__tagifyTagData.id;
+    const sourceId = element.__tagifyTagData.sourceId;
+    if (itemId) {
+        const item = actor?.items.find(i => i._id === itemId);
+        if (item) {
+            item.sheet.render(true);
+            return;
+        }
+    }
+
+    if (sourceId) {
+        const source = await fromUuid(sourceId);
+        source.sheet.render(true);
+    }
+}
+
+export async function renderSheetForStoredItem(event, actor, inspectionClass) {
+    const element = _checkThroughParentsForClass(event.target, inspectionClass, 3);
+    const itemId = element.dataset.itemId;
+    const sourceId = element.dataset.sourceId
+    if (itemId && !sourceId) {
+        const item = actor.items.find(i => i._id === itemId);
+        if (item) {
+            item.sheet.render(true);
+        }
+    } else if (sourceId) {
+        const source = await fromUuid(sourceId);
+        if (source) {
+            source.sheet.render(true);
+        } else {
+            ui.notifications.warn("The item is not on your sheet, have you deleted it?");
+        }
+    }
+}
+
+function _checkThroughParentsForClass(element, inspectionClass, depth) {
+    let returnElement = _elementClassListContainsClass(element, inspectionClass);
+    if (!returnElement && depth > 0) {
+        returnElement = _checkThroughParentsForClass(element.parentElement, inspectionClass, depth - 1);
+    }
+
+    if (returnElement) {
+        return returnElement;
+    }
+
+    return null;
+}
+
+function _elementClassListContainsClass(element, inspectionClass) {
+    return Object.values(element.classList).includes(inspectionClass) ? element : null;
+}
+
+export function compareModifierIndices(modifier1, modifier2) {
+    if (modifier1.order < modifier2.order) {
+        return -1;
+    } else if (modifier1.order > modifier2.order) {
+        return 1;
+    }
+
+    return 0;
+}
+
+export function filterKeys(raw, allowedKeys) {
+    return Object.keys(raw)
+        .filter(key => allowedKeys.includes(key))
+        .reduce((obj, key) => {
+            return {
+                ...obj,
+                [key]: raw[key]
+            };
+        }, {});
+}
+
+export function isATraitsSupersetOfBTraits(objA, objB) {
+    return new Set(objA.system.traits.value.map(t => t.key)).isSupersetOf(new Set(objB.system.traits.value.map(t => t.key)));
+}
+
+export function isASupersetOfB(arrayA, arrayB) {
+    return new Set(arrayA).isSupersetOf(new Set(arrayB));
+}
+
+export function removeItem(base, value) {
+    const index = base.findIndex(v => v.key === value.key);
+    if (index > -1) { // only splice array when item is found
+        base.splice(index, 1); // 2nd parameter means remove one item only
+    }
+
+    return base;
+}
+
+export function removeItemByKeyFunction(base, value, keyFunction) {
+    const index = base.findIndex(v => keyFunction(v) === keyFunction(value));
+    if (index > -1) { // only splice array when item is found
+        base.splice(index, 1); // 2nd parameter means remove one item only
+    }
+
+    return base;
 }

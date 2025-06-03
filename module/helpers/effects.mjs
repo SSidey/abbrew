@@ -27,6 +27,7 @@ export function onManageActiveEffect(event, owner) {
     case 'edit':
       return effect.sheet.render(true);
     case 'delete':
+      // Active Effect on an Effect, not a duration tracking one.
       return effect.delete();
     case 'toggle':
       return effect.update({ disabled: !effect.disabled });

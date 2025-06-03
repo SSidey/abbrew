@@ -1,0 +1,21 @@
+{
+  "name": "Heritage",
+  "sorting": "a",
+  "folder": "TgtpWNw5xMdACKvB",
+  "type": "Item",
+  "_id": "pJogyIRWP6qLcDEn",
+  "description": "",
+  "sort": 100000,
+  "color": null,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": null,
+    "modifiedTime": 1743076876371,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!pJogyIRWP6qLcDEn"
+}

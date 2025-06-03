@@ -1,0 +1,257 @@
+{
+  "name": "Grappling Disadvantage",
+  "type": "skill",
+  "_id": "Xxtpste8muvmSWNQ",
+  "img": "systems/abbrew/assets/icons/statuses/offGuard.svg",
+  "system": {
+    "description": "<p>Grappling Disadvantage causes you to become Off Guard and gain 10 risk.</p><p>All stacks of Grappling Disadvantage are removed upon succeeding at a grab check against the creature grappling you with @UUID[Compendium.abbrew.conditions.Item.kzr36Ru92tr41DA2]{Grappling Advantage}.</p>",
+    "traits": "",
+    "abbrewId": {
+      "value": "abbrew.skill.grapplingdisadvantage.Xxtpste8muvmSWNQ",
+      "uuid": "Xxtpste8muvmSWNQ"
+    },
+    "skillTraits": "",
+    "skillModifiers": {
+      "synergy": "[{\"value\":\"Grab\",\"id\":\"nU042uDuvcVY0Bnm\",\"sourceId\":\"Compendium.abbrew.skills.Item.nU042uDuvcVY0Bnm\"}]",
+      "discord": ""
+    },
+    "configurable": true,
+    "isActivatable": false,
+    "activateOnCreate": false,
+    "applyTurnStart": false,
+    "applyTurnEnd": false,
+    "applyOnExpiry": false,
+    "activateOnDamageAccept": false,
+    "skills": {
+      "granted": [
+        {
+          "name": "Grappling Risk",
+          "id": "Fi5AqqmwxsM9G1Xr",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.conditions.Item.Fi5AqqmwxsM9G1Xr",
+          "skillType": ""
+        }
+      ],
+      "paired": [],
+      "grantedOnActivation": [],
+      "grantedOnAccept": []
+    },
+    "resource": {
+      "capacity": 0,
+      "operator": "",
+      "relatedResource": null,
+      "fillCapacityOnCreate": false
+    },
+    "action": {
+      "activationType": "synergy",
+      "actionCost": null,
+      "actionImage": "",
+      "duration": {
+        "precision": "-1",
+        "value": 0,
+        "expireOnStartOfTurn": true
+      },
+      "uses": {
+        "hasUses": true,
+        "asStacks": true,
+        "value": 1,
+        "max": 0,
+        "period": "",
+        "removeWhenNoUsesRemain": false,
+        "removeStackOnUse": false
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "skillCheck": [],
+      "skillRequest": {
+        "isEnabled": false,
+        "isContested": false,
+        "selfCheck": false,
+        "checkType": "",
+        "requirements": {
+          "modifiers": "",
+          "successes": 0,
+          "result": 0
+        },
+        "targetModifiers": "",
+        "results": {
+          "success": {
+            "description": ""
+          },
+          "failure": {
+            "description": ""
+          }
+        }
+      },
+      "attackProfile": {
+        "isEnabled": true,
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": 0,
+        "attackMode": "",
+        "finisher": {
+          "type": "",
+          "cost": null,
+          "description": "",
+          "wounds": []
+        },
+        "damage": [],
+        "finisherLimit": 10
+      },
+      "modifiers": {
+        "fortune": 0,
+        "actionCost": {
+          "value": 0,
+          "operator": ""
+        },
+        "attackProfile": {
+          "combineAttacks": {
+            "isEnabled": false,
+            "value": null
+          },
+          "attackType": "",
+          "attackMode": "",
+          "handsSupplied": 0,
+          "finisherLimit": {
+            "value": 10,
+            "operator": ""
+          },
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "finisher": {
+            "cost": null,
+            "wounds": []
+          },
+          "damage": []
+        },
+        "guard": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": "",
+            "lateParse": false
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": []
+        }
+      }
+    },
+    "skillType": "temporary",
+    "path": {
+      "value": "",
+      "archetype": ""
+    },
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": ""
+  },
+  "effects": [
+    {
+      "name": "Off Guard",
+      "img": "systems/abbrew/assets/icons/statuses/offGuard.svg",
+      "origin": "Compendium.abbrew.conditions.Item.Xxtpste8muvmSWNQ",
+      "duration": {
+        "rounds": 1,
+        "startTime": null,
+        "seconds": null,
+        "combat": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "disabled": false,
+      "_id": "fOV1ltlcePQX8M6I",
+      "type": "base",
+      "system": {},
+      "changes": [],
+      "description": "",
+      "tint": "#ffffff",
+      "transfer": true,
+      "statuses": [
+        "offGuard"
+      ],
+      "sort": 0,
+      "flags": {
+        "statuscounter": {
+          "value": 1,
+          "config": {
+            "type": "default"
+          },
+          "visible": false
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "coreVersion": "12.331",
+        "systemId": "abbrew",
+        "systemVersion": "0.0.2-prerelease31",
+        "createdTime": 1744992347266,
+        "modifiedTime": 1744992383478,
+        "lastModifiedBy": "abbrewpacks00000"
+      },
+      "_key": "!items.effects!Xxtpste8muvmSWNQ.fOV1ltlcePQX8M6I"
+    }
+  ],
+  "folder": null,
+  "sort": 200000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1744980411755,
+    "modifiedTime": 1745068571431,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!Xxtpste8muvmSWNQ"
+}

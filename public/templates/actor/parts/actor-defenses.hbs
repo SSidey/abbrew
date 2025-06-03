@@ -38,22 +38,25 @@
                 </div>
             </div>
         </div>
-        <div class="fatal-wounds">
-            <label class="fatal-wounds-label">Fatal Wounds</label>
-            <div class="flex-group-center">
-                <input type="text" name="system.defense.fatalWounds" value="{{system.defense.fatalWounds}}"
-                    data-dtype="String" />
-            </div>
-        </div>
     </div>
     <div class="protection-container">
         <h4>Protection</h4>
-        {{#each system.defense.protection as |protection key|}}
+        {{#each activeProtection as |protection key|}}
         <li class="item effect flexrow" data-id="{{key}}">
             <div>
                 <label>{{ localize "ABBREW.Type" }}</label>
-                <input type="text" name="system.defense.protection.{{key}}.type" value="{{protection.type}}"
+                <input type="text" name="system.defense.protection.{{key}}.type" value="{{protection.label}}"
                     data-dtype="Number" readonly />
+            </div>
+            <div>
+                <label>{{ localize "ABBREW.Reduction" }}</label>
+                <input type="text" name="system.defense.protection.{{key}}.reduction" value="{{protection.reduction}}"
+                    data-dtype="Number" readonly />
+            </div>
+            <div>
+                <label>{{ localize "ABBREW.Amplification" }}</label>
+                <input type="text" name="system.defense.protection.{{key}}.amplification"
+                    value="{{protection.amplification}}" data-dtype="Number" readonly />
             </div>
             <div>
                 <label>{{ localize "ABBREW.Resistance" }}</label>

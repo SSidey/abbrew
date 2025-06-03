@@ -1,0 +1,120 @@
+{
+  "folder": "UzIsSCZKpy0ZWSIm",
+  "name": "Leather",
+  "type": "enhancement",
+  "_id": "JLMMRfnpKndwjCgE",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "name": {
+      "base": "",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1
+    },
+    "description": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "enhancements": [],
+    "skills": {
+      "granted": []
+    },
+    "targetType": "armour",
+    "target": {
+      "name": "",
+      "id": "",
+      "uuid": ""
+    },
+    "traitFilter": {
+      "raw": "",
+      "value": []
+    },
+    "modifications": [
+      {
+        "operator": "merge",
+        "path": "system.name.parts",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "name",
+        "value": "leather",
+        "numerator": 1,
+        "denominator": 1
+      },
+      {
+        "operator": "add",
+        "path": "system.meta.tier",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "numeric",
+        "value": "1",
+        "numerator": 1,
+        "denominator": 1
+      },
+      {
+        "operator": "add",
+        "path": "system.defense.guard",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "target",
+        "value": "system.equipPoints.required.parsed.length",
+        "numerator": 10,
+        "denominator": 1
+      },
+      {
+        "operator": "add",
+        "path": "system.defense.inflexibility",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "target",
+        "value": "system.equipPoints.required.parsed.length",
+        "numerator": 3,
+        "denominator": 1
+      }
+    ],
+    "duration": {
+      "precision": "-1",
+      "value": 0,
+      "expireOnStartOfTurn": true
+    },
+    "grantedIds": [],
+    "cost": 2
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1747684061934,
+    "modifiedTime": 1747685038217,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!JLMMRfnpKndwjCgE"
+}

@@ -1,0 +1,176 @@
+{
+  "folder": "Phat68gueYIk67lc",
+  "name": "Dagger",
+  "type": "weapon",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": {
+      "raw": "[{\"key\":\"melee\",\"value\":\"Melee\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"close\",\"value\":\"Close\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[\"standard\",\"long\"]}]",
+      "value": [
+        {
+          "key": "melee",
+          "value": "Melee",
+          "feature": "item",
+          "subFeature": "identifiers",
+          "effect": "",
+          "data": "",
+          "exclude": []
+        },
+        {
+          "key": "close",
+          "value": "Close",
+          "feature": "item",
+          "subFeature": "identifiers",
+          "effect": "",
+          "data": "",
+          "exclude": [
+            "standard",
+            "long"
+          ]
+        }
+      ]
+    },
+    "equipType": "held",
+    "equipPoints": {
+      "required": {
+        "raw": "",
+        "parsed": []
+      },
+      "provided": {
+        "raw": "",
+        "parsed": []
+      }
+    },
+    "equipState": "stowed",
+    "weapon": {
+      "size": 2,
+      "heft": 4
+    },
+    "attackProfiles": [
+      {
+        "name": "Slash",
+        "attackType": "arc",
+        "lethal": 0,
+        "critical": 10,
+        "reach": "",
+        "range": 0,
+        "penetration": 0,
+        "ammunition": {
+          "type": "",
+          "id": "",
+          "value": 0,
+          "max": 0,
+          "reloadType": "",
+          "reloadActionCost": 1
+        },
+        "damage": [
+          {
+            "type": "slashing",
+            "value": 2,
+            "attributeModifier": "str",
+            "attributeMultiplier": 1,
+            "damageMultiplier": 1,
+            "overallMultiplier": 1,
+            "penetration": 0
+          }
+        ],
+        "finisherLimit": 2,
+        "hasStrongAttack": true
+      },
+      {
+        "name": "Stab",
+        "attackType": "thrust",
+        "lethal": 0,
+        "critical": 10,
+        "reach": "",
+        "range": 0,
+        "penetration": 0,
+        "ammunition": {
+          "type": "",
+          "id": "",
+          "value": 0,
+          "max": 0,
+          "reloadType": "",
+          "reloadActionCost": 1
+        },
+        "damage": [
+          {
+            "type": "piercing",
+            "value": 3,
+            "attributeModifier": "str",
+            "attributeMultiplier": 1,
+            "damageMultiplier": 1,
+            "overallMultiplier": 1,
+            "penetration": 0
+          }
+        ],
+        "finisherLimit": 10,
+        "hasStrongAttack": false
+      }
+    ],
+    "abbrewId": {
+      "value": "abbrew.weapon.dagger.kQFrvnG9djLFUEVU",
+      "uuid": "kQFrvnG9djLFUEVU"
+    },
+    "handsRequired": "oneHand",
+    "handsSupplied": 0,
+    "actionCost": 0,
+    "exertActionCost": 1,
+    "validEquipStates": [
+      {
+        "value": "held1H",
+        "label": "ABBREW.EquipState.heldOne"
+      },
+      {
+        "value": "worn",
+        "label": "ABBREW.EquipState.worn"
+      },
+      {
+        "value": "stowed",
+        "label": "ABBREW.EquipState.stowed"
+      },
+      {
+        "value": "dropped",
+        "label": "ABBREW.EquipState.dropped"
+      }
+    ],
+    "isAttackTrained": false,
+    "isFinisherTrained": false,
+    "isFeintTrained": false,
+    "isOverpowerTrained": false,
+    "weight": 1,
+    "skills": {
+      "granted": []
+    },
+    "heft": 2,
+    "availableEnhancements": 0,
+    "enhancements": [],
+    "name": {
+      "base": "Dagger",
+      "parts": []
+    },
+    "quantity": 1,
+    "meta": {
+      "quality": 1,
+      "tier": 1
+    }
+  },
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1743075360599,
+    "modifiedTime": 1747848551473,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_id": "kQFrvnG9djLFUEVU",
+  "sort": 100000,
+  "_key": "!items!kQFrvnG9djLFUEVU"
+}

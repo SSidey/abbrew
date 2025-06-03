@@ -1,0 +1,21 @@
+{
+  "name": "Elf",
+  "sorting": "a",
+  "folder": "pJogyIRWP6qLcDEn",
+  "type": "Item",
+  "_id": "bfBYLi3m2CWnSvOe",
+  "description": "",
+  "sort": 0,
+  "color": null,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": null,
+    "modifiedTime": 1743076921965,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!bfBYLi3m2CWnSvOe"
+}

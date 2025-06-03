@@ -1,0 +1,52 @@
+<div>
+    <ol class="modifierList">
+        {{#each modifierList as |modifier i|}}
+        <li class="modifier" data-id="{{i}}" data-path="{{../modifierListName}}">
+            <div class="modifier-operator">
+                <select name="{{../modifierListName}}.{{i}}.operator">
+                    {{selectOptions ../config.simpleNumericOperators selected=modifier.operator
+                    localize=true}}
+                </select>
+            </div>
+            <div class="modifier-type">
+                <select name="{{../modifierListName}}.{{i}}.type">
+                    {{selectOptions ../config.modifierPrefixes selected=modifier.type
+                    localize=true}}
+                </select>
+            </div>
+            <div class="modifier-path">
+                <input type="text" name="{{../modifierListName}}.{{i}}.path" value="{{modifier.path}}"
+                    data-dtype="string" />
+            </div>
+            <label class="slide-toggle roboto-upper modifier-parse">
+                <input type="checkbox" class="action-activatable" name="{{../modifierListName}}.{{i}}.lateParse" {{
+                    checked modifier.lateParse }}>
+                {{#if modifier.lateParse}}
+                <i class="fa fa-toggle-on"></i>
+                {{else}}
+                <i class="fa fa-toggle-off"></i>
+                {{/if}}
+            </label>
+            <div class="modifier-multiplier">
+                <input type="text" name="{{../modifierListName}}.{{i}}.multiplier" value="{{modifier.multiplier}}"
+                    data-dtype="number" />
+            </div>
+            <div class="modifier-remove">
+                <a class="modifier-control" data-action="remove-modifier">
+                    <i class="fa-solid fa-minus"></i>
+                </a>
+            </div>
+        </li>
+        {{/each}}
+        <li class="modifier add" data-path="{{modifierListName}}">
+            <div class="modifier-add">
+                <label>
+                    <a class="modifier-control" data-action="add-modifier">
+                        Add Modifier
+                        <i class="fa-solid fa-plus"></i>
+                    </a>
+                </label>
+            </div>
+        </li>
+    </ol>
+</div>

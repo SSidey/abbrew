@@ -1,0 +1,161 @@
+<div class="abbrew chat-message chat-card flexcol " data-actor-id="{{actor._id}}" data-item-id="{{item._id}}"
+    data-token-id="{{tokenId}}" data-message-id="{{messageId}}">
+    <header>
+        <h3 class="item-name">{{item.name}}</h3>
+    </header>
+
+    <div class="message-content">
+        <div>
+            <ol class="skill-card-descriptions">
+                {{#each modifierSummaries as |summary| }}
+                <li {{#unless (showGmSection ../user)}}data-visibility="gm" {{/unless}}>
+                    <h3>{{summary.name}}</h3>
+                    <span>
+                        {{{summary.description}}}
+                    </span>
+                </li>
+                {{/each}}
+                <li>
+                    <h3>{{mainSummary.name}}</h3>
+                    <span>
+                        {{{mainSummary.description}}}
+                    </span>
+                </li>
+            </ol>
+        </div>
+        {{#if showSkillResult}}
+        <div class="dice-roll">
+            <h3>Skill Check</h3>
+            <div class="dice-result">
+                {{#if skillResult.baseDicePool}}
+                <div class="dice-tooltip" {{#unless (showGmSection user)}}data-visibility="gm" {{/unless}}>
+                    <section class="tooltip-part">
+                        <div class="dice">
+                            <ol class="dice-rolls">
+                                {{#each skillResult.dice as |die id|}}
+                                <li class="{{die.classes}}">
+                                    {{die.result}}
+                                </li>
+                                {{/each}}
+                            </ol>
+                        </div>
+                    </section>
+                </div>
+                {{/if}}
+                {{#if skillResult.simpleResult}}
+                <h4 class="dice-total">
+                    <span {{#unless (showGmSection user)}}data-visibility="gm" {{/unless}}>
+                        {{skillResult.simpleResult}}
+                        {{#unless skillResult.isContested}}
+                        {{#if skillResult.result}}
+                        <i class="fa-regular fa-circle-check" style="color: #176951;"></i>
+                        {{else}}
+                        <i class="fa-regular fa-circle-xmark" style="color: #6f0003;"></i>
+                        {{/if}}
+                        {{/unless}}
+                    </span>
+                    <label {{#unless (showGmSection user)}}data-visibility="player" {{/unless}}>??</label>
+                </h4>
+                {{/if}}
+            </div>
+        </div>
+        {{/if}}
+        {{#if skillCheck.attempts.length}}
+        <h4>
+            <ol class="skill-check-results">
+                {{#each skillCheck.attempts as |attempt id|}}
+                <div class="skill-check-result">
+                    <label class="skill-check-actor-name">{{attempt.name}}</label>
+                    {{#if attempt.result}}
+                    <i class="fa-regular fa-circle-check" style="color: #176951;"></i>
+                    {{else}}
+                    <i class="fa-regular fa-circle-xmark" style="color: #6f0003;"></i>
+                    {{/if}}
+                    {{#if (eq ../skillCheck.checkType "successes")}}
+                    <span>{{attempt.totalSuccesses}}</span>
+                    <span>/</span>
+                    <span>{{attempt.requiredSuccesses}}</span>
+                    {{else}}
+                    <span>{{attempt.totalValue}}</span>
+                    <span>/</span>
+                    <span>{{attempt.requiredValue}}</span>
+                    {{/if}}
+                </div>
+                {{/each}}
+            </ol>
+        </h4>
+        {{/if}}
+        {{#if showAttackResult}}
+        <div class="dice-roll">
+            <h3>Damage</h3>
+            <div class="dice-result">
+                <div class="dice-formula" {{#unless (showGmSection user)}}data-visibility="gm" {{/unless}}>
+                    {{totalSuccesses}}</div>
+                <div class="dice-formula" {{#unless (showGmSection user)}}data-visibility="player" {{/unless}}>??</div>
+                <div class="dice-tooltip" {{#unless (showGmSection user)}}data-visibility="gm" {{/unless}}>
+                    <section class="tooltip-part">
+                        <div class="dice">
+                            <ol class="dice-rolls">
+                                {{#each resultDice as |die id|}}
+                                <li class="{{die.classes}}">
+                                    {{die.result}}
+                                </li>
+                                {{/each}}
+                            </ol>
+                        </div>
+                    </section>
+                </div>
+                <h4 class="dice-total">
+                    <ol class="skill-damage">
+                        {{#each damage as |dmg id|}}
+                        <div {{#unless (showGmSection ../user)}}data-visibility="gm" {{/unless}}>
+                            <label>{{dmg.value}} {{dmg.damageType}}</label>
+                        </div>
+                        {{/each}}
+                        <div {{#unless (showGmSection user)}}data-visibility="player" {{/unless}}>
+                            <label>??</label>
+                        </div>
+                    </ol>
+                </h4>
+            </div>
+        </div>
+        {{/if}}
+    </div>
+
+    <div class="card-buttons">
+        {{#if showSkillRequest}}
+        <button data-action="check">Attempt Check</button>
+        {{/if}}
+        {{#unless isStrongAttack}}
+        {{#unless isFinisher}}
+        {{#if showAttack}}
+        <button data-action="damage">Damage</button>
+        {{else}}
+        {{#if showAcceptButton}}
+        <button data-action="accept">Accept Effect</button>
+        {{/if}}
+        {{/if}}
+        {{/unless}}
+        {{/unless}}
+        {{#unless showAttack}}
+        {{#if isStrongAttack}}
+        <button data-action="overpower">Overpower</button>
+        {{/if}}
+        {{/unless}}
+        {{#unless isStrongAttack}}
+        {{#unless showFinisher}}
+        {{#if showAttack}}
+        <button data-action="parry"><span class="actions-icon action-{{actionCost}}a">Parry</span></button>
+        {{/if}}
+        {{/unless}}
+        {{/unless}}
+        {{#if showFinisher}}
+        <ol class="finisher-buttons">
+            {{#each finisherDamageTypes as |type|}}
+            <button data-action="finisher" data-finisher-type="{{type}}" data-key="{{type}}">Finisher
+                ({{type}})</button>
+            {{/each}}
+        </ol>
+        {{/if}}
+    </div>
+</div>
