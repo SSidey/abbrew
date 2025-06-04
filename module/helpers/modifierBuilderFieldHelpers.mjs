@@ -67,12 +67,12 @@ export function mergeComplexModifierFields(modifierFields, actor, typeSpecificFi
     const groupedModifiers = modifierFields
         .filter(m => m.length > 0)
         .flatMap(m => typeSpecificFiltering(m.filter(v => v.type && v.value != null && v.operator)))
-        .reduce((result, woundModifier) => {
-            if (woundModifier.type in result) {
-                result[woundModifier.type].push({ ...woundModifier, index: getOrderForOperator(woundModifier.operator) })
-                result[woundModifier.type].sort(compareModifierIndices);
+        .reduce((result, modifier) => {
+            if (modifier.type in result) {
+                result[modifier.type].push({ ...modifier, index: getOrderForOperator(modifier.operator) })
+                result[modifier.type].sort(compareModifierIndices);
             } else {
-                result[woundModifier.type] = [{ ...woundModifier, index: getOrderForOperator(woundModifier.operator) }]
+                result[modifier.type] = [{ ...modifier, index: getOrderForOperator(modifier.operator) }]
             }
 
             return result;

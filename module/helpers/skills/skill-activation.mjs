@@ -86,7 +86,19 @@ export async function rechargeSkill(actor, skill) {
 
 function doesActorMeetSkillRequirements(actor, skill) {
     const modifierSkills = getModifierSkills(actor, skill);
-    const mergedSelfResources = mergeResourceSelfModifiers([...modifierSkills, skill], actor);
+    if (!doesActorMeetResourceRequirements(actor, skill)) {
+        return false;
+    }
+
+    if (!doesActorMeetConceptRequirements(actor, skill, modifierSkills)) {
+        return false;
+    }
+
+    return true;
+}
+
+function doesActorMeetResourceRequirements(actor, skill) {
+    const mergedSelfResources = mergeResourceSelfModifiers([skill], actor);
     const appliedSelfResource = applyFullyParsedComplexModifiers(mergedSelfResources, actor, "system.resources.values", "id");
     const insufficientResources = Object.entries(appliedSelfResource).flatMap(e => e[1].filter(v => v.value < 0)).map(v => actor.system.resources.owned.find(r => r.id === v.id).name);
     if (insufficientResources.length > 0) {
@@ -98,6 +110,10 @@ function doesActorMeetSkillRequirements(actor, skill) {
         return false;
     }
 
+    return true;
+}
+
+function doesActorMeetConceptRequirements(actor, skill, modifierSkills) {
     const conceptCosts = mergeConceptCosts([skill, ...modifierSkills], actor);
     const insufficientConcepts = Object.entries(conceptCosts).filter(c => c[1] < 0).filter(c => actor.system.concepts.available[c[0]].value < Math.abs(c[1])).map(c => game.i18n.localize(CONFIG.ABBREW.concepts[c[0]]))
     if (insufficientConcepts.length > 0) {

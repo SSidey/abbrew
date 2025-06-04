@@ -1,5 +1,5 @@
 import { applyFullyParsedComplexModifiers, applyFullyParsedModifiers, mergeComplexModifierFields, mergeLateComplexModifiers, mergeModifierFields, parsePathSync } from "../modifierBuilderFieldHelpers.mjs";
-import { applyOperator } from "../operators.mjs";
+import { applyOperator, getOrderForOperator } from "../operators.mjs";
 import { getSafeJson } from "../utils.mjs";
 
 
@@ -240,4 +240,55 @@ export function mergeConceptCosts(allSkills, actor) {
 
         return conceptCosts;
     }, {})
+}
+
+export function filterSynergiesWithInsufficientResources(skill, modifierSkills, actor) {
+    const allSkills = [skill, ...modifierSkills];
+    const modifierGroups = allSkills.map(s => ({ skill: s, costs: s.system.action.modifiers.resources.self })).filter(s => s.costs.length > 0);
+    modifierGroups.forEach(g => {
+        g.costs.forEach(
+            f => f.type = getSafeJson(f.summary, [{ id: "" }])[0].id
+        )
+    });
+    const applicableSynergies = modifierGroups.reduce((applicableSkills, group) => {
+        const groupedModifiers = group.costs.filter(m => m.type && m.value != null && m.operator)
+            .reduce((result, modifier) => {
+                if (modifier.type in result) {
+                    result[modifier.type].push({ ...modifier, index: getOrderForOperator(modifier.operator) })
+                    result[modifier.type].sort(compareModifierIndices);
+                } else {
+                    result[modifier.type] = [{ ...modifier, index: getOrderForOperator(modifier.operator) }]
+                }
+
+                return result;
+            }, {});
+
+        const parsedModifiers = Object.entries(groupedModifiers)
+            .map(([k, v], i) => {
+                const [update, lateModifiers] = mergeModifierFields(v, actor);
+                return ({ type: k, update: update, lateModifiers: lateModifiers });
+            });
+
+        applicableSkills.totalCosts = parsedModifiers.reduce((totalCosts, parsedModifier) => {
+            if (totalCosts.find(c => c.type === parsedModifier.type)) {
+                const currentCost = totalCosts.find(c => c.type === parsedModifier.type);
+                currentCost.update = [...currentCost.update, ...parsedModifier.update];
+            } else {
+                totalCosts.push(parsedModifier);
+            }
+
+            return totalCosts;
+        }, applicableSkills.totalCosts);
+
+        const resourceUpdate = applyFullyParsedComplexModifiers(applicableSkills.totalCosts, actor, "system.resources.values", "id");
+
+        if (!Object.values(resourceUpdate["system.resources.values"]).some(v => v.value < 0)) {
+            applicableSkills.skills.push(group.skill);
+        }
+
+        return applicableSkills;
+
+    }, { skills: [], totalCosts: [] });
+
+    return applicableSynergies.skills.filter(s => s._id !== skill._id);
 }

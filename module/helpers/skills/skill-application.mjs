@@ -2,7 +2,7 @@ import { makeSkillCheck, makeSkillCheckRequest } from "./skill-check.mjs";
 import { handleInstantModifierExpiry } from "./skill-expiry.mjs";
 import { checkForTemporarySkillOutOfUses, handleSkillUsesAndCharges, skillDoesNotUseCharges, skillHasChargesRemaining, skillHasInfiniteUses, skillHasUsesRemaining } from "./skill-uses.mjs";
 import { handlePairedSkills, isSkillBlocked } from "./skill-activation.mjs";
-import { handleEarlySelfModifiers, handleLateSelfModifiers, handleTargetUpdates } from "./skill-modifiers.mjs";
+import { filterSynergiesWithInsufficientResources, handleEarlySelfModifiers, handleLateSelfModifiers, handleTargetUpdates } from "./skill-modifiers.mjs";
 import { applyAttackProfiles } from "./skill-attack.mjs";
 import { renderChatMessage } from "./skill-chat.mjs";
 import { getDialogValue } from "../modifierBuilderFieldHelpers.mjs";
@@ -18,7 +18,8 @@ export function getModifierSkills(actor, skill, includeTraits = []) {
     // Get passives that have synergy with the main skill
     const passiveSynergies = passiveSkills.filter(s => s.system.skillModifiers.synergy).map(s => ({ skill: s, synergy: JSON.parse(s.system.skillModifiers.synergy).flatMap(s => [s.id, foundry.utils.parseUuid(s.sourceId).id]) })).filter(s => s.synergy.includes(skill.system.abbrewId.uuid)).map(s => s.skill)
     // Combine all relevant skills, filtering for those that are out of charges    
-    return [...passiveSynergies, ...queuedSynergies].filter(s => isSynergyValidForTrigger(skill, s)).filter(s => isSynergyValidForTraits(includeTraits, s));
+    const baseSynergies = [...passiveSynergies, ...queuedSynergies].filter(s => isSynergyValidForTrigger(skill, s)).filter(s => isSynergyValidForTraits(includeTraits, s));
+    return filterSynergiesWithInsufficientResources(skill, baseSynergies, actor);
 }
 
 function isSynergyValidForTrigger(skill, synergy) {
