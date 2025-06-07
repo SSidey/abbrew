@@ -99,7 +99,8 @@
       "expireOnStartOfTurn": true
     },
     "grantedIds": [],
-    "cost": 2
+    "cost": 0,
+    "enhancementType": "material"
   },
   "effects": [],
   "sort": 0,
@@ -113,7 +114,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1747684061934,
-    "modifiedTime": 1747685038217,
+    "modifiedTime": 1748280759773,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!JLMMRfnpKndwjCgE"

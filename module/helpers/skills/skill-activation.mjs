@@ -3,8 +3,11 @@ import { applyOperator } from "../operators.mjs";
 import { getSafeJson } from "../utils.mjs";
 import { applySkillEffects, getModifierSkills } from "./skill-application.mjs";
 import { addSkillToActiveSkills, addSkillToQueuedSkills, trackSkillDuration } from "./skill-duration.mjs";
+import { checkAndExpire } from "./skill-expiry.mjs";
+import { applySystemFundamentalSkill } from "./skill-fundamental-system-application.mjs";
 import { handleGrantOnUse } from "./skill-grants.mjs";
 import { mergeConceptCosts, mergeResourceSelfModifiers } from "./skill-modifiers.mjs";
+import { removeSkillStack } from "./skill-uses.mjs";
 
 export async function handleSkillActivate(actor, skill, checkActions = true, includeSkillTraits = []) {
     const isSkillProxied = skill.system.isProxied;
@@ -57,8 +60,13 @@ export function getModifiedSkillActionCost(actor, skill) {
 export async function handlePairedSkills(skill, actor) {
     if (skill.system.skills.paired.length > 0) {
         skill.system.skills.paired.forEach(async ps => {
-            const pairedSkill = actor.items.filter(i => i.type === "skill" && i.system.isActivatable).find(s => s.system.abbrewId.uuid === ps.id);
-            await handleSkillActivate(actor, pairedSkill);
+            const pairedSkill = actor.items.find(s => s.system.abbrewId.uuid === ps.id);
+            if (pairedSkill && pairedSkill.system.isActivatable) {
+                await handleSkillActivate(actor, pairedSkill);
+            } else if (pairedSkill && pairedSkill.system.action.removeOnPairedApply) {
+                await pairedSkill.update({ "system.handleExpiryEffects": pairedSkill.system.action.handleRemovedSkillExpiry });
+                await checkAndExpire(actor, pairedSkill);
+            }
         });
     }
 }
@@ -128,7 +136,7 @@ function doesActorMeetConceptRequirements(actor, skill, modifierSkills) {
     return true;
 }
 
-async function activateSkill(actor, skill, includeSkillTraits = []) {
+export async function activateSkill(actor, skill, includeSkillTraits = []) {
     await activateSkillEffects(skill);
     if (skill.system.action.activationType === "synergy") {
         await trackSkillDuration(actor, skill);
@@ -161,7 +169,13 @@ async function activateSkill(actor, skill, includeSkillTraits = []) {
     if (await trackSkillDuration(actor, skill)) {
         await addSkillToActiveSkills(actor, skill);
     }
-    const skillResult = await applySkillEffects(actor, skill, includeSkillTraits);
+
+    let skillResult = {};
+    if (CONFIG.ABBREW.fundamentalSystemSkillIds.includes(skill.system.abbrewId.uuid)) {
+        await applySystemFundamentalSkill(actor, skill);
+    } else {
+        skillResult = await applySkillEffects(actor, skill, includeSkillTraits);
+    }
     await handleGrantOnUse(skill, actor);
     await handleConsumables(skill, actor);
     return skillResult;

@@ -218,6 +218,14 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
     schema.movement = new fields.SchemaField({
       baseSpeed: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+      speed: new fields.SchemaField(Object.keys(CONFIG.ABBREW.speeds).reduce((obj, speed) => {
+        obj[speed] = new fields.SchemaField({
+          label: new fields.StringField({ ...blankString }),
+          enabled: new fields.BooleanField,
+          value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+        });
+        return obj;
+      }, {}))
     });
 
     schema.meta = new fields.SchemaField({
@@ -302,6 +310,10 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       this.attributes[key].rank = rankBonus + this.parent.items.filter(i => i.type === 'skill' && i.system.skillType === 'path' && i.system.attributeRankIncrease === key).length;
       // Tier of the attribute
       this.attributes[key].tier = 1 + Math.floor(this.attributes[key].rank / 10);
+    }
+
+    for (const key in this.movement.speed) {
+      this.movement.speed[key].enabled = this.movement.speed[key].value > 0;
     }
 
     const allDamageTypes = { ...CONFIG.ABBREW.allDamage, ...CONFIG.ABBREW.damageTypes }
@@ -390,10 +402,18 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     const res = this.parent.items.filter(i => i.type == "anatomy").filter(a => !(a.system.isBroken || a.system.isDismembered)).reduce((result, a) => {
       const values = a.system;
       result.hands += values.hands;
-      result.speed += values.speed;
-      result.parts = result.parts.concat(JSON.parse(values.parts).map(a => a.value));
+      result.speed = Object.entries(values.speed).reduce((speedResult, [key, value]) => {
+        if (key in speedResult) {
+          speedResult[key] += value.value ?? 0;
+        } else {
+          speedResult[key] = value.value ?? 0;
+        }
+
+        return speedResult;
+      }, result.speed);
+      result.parts = result.parts.concat(getSafeJson(values.parts, []).map(a => a.value));
       return result;
-    }, { hands: 0, speed: 0, parts: wornItemsWithEquipPoints });
+    }, { hands: 0, speed: {}, parts: wornItemsWithEquipPoints });
 
     return res;
   }
@@ -403,7 +423,13 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   }
 
   _prepareMovement(anatomy) {
-    this.movement.baseSpeed = this.attributes.agi.value * anatomy.speed;
+    this.movement.baseSpeed = this.attributes.agi.value;
+
+    for (const key in this.movement.speed) {
+      const rawLabel = CONFIG.ABBREW.speeds[key].label;
+      this.movement.speed[key].label = game.i18n.localize(rawLabel) ?? rawLabel;
+      this.movement.speed[key].value = (anatomy.speed[key] ?? 0) * this.movement.baseSpeed;
+    }
   }
 
   _prepareDefenses() {

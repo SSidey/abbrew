@@ -1,0 +1,21 @@
+{
+  "name": "Granted",
+  "sorting": "a",
+  "folder": "89F38UbNtWA8WdJs",
+  "type": "Item",
+  "_id": "BXdn3ig0lwyvhaFA",
+  "description": "",
+  "sort": 0,
+  "color": null,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null
+  },
+  "_key": "!folders!BXdn3ig0lwyvhaFA"
+}

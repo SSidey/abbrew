@@ -25,3 +25,43 @@
     background-color: lightcoral;
     padding-left: 1em;
 }
+
+.actor-speed-collection {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-column-gap: 1em;
+}
+
+.actor-speed {
+    display: grid;
+    grid-template-rows: 1fr 2fr;
+    background-color: lightgrey;
+    text-align: center;
+    border: black;
+    border-width: 1px;
+    border-radius: 3px;
+    border-style: solid;
+
+    input {
+        margin-left: 1em;
+        margin-right: 1em;
+    }
+}
+
+.hidden-speed {
+    visibility: hidden;
+}
+
+.empty-drop-list-element {
+    background: rgba(0, 0, 0, 0.05);
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    list-style: none;
+
+    span {
+        display: inline-block;
+        vertical-align: middle;
+        line-height: normal;
+    }
+}

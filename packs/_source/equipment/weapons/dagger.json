@@ -6,7 +6,7 @@
   "system": {
     "description": "",
     "traits": {
-      "raw": "[{\"key\":\"melee\",\"value\":\"Melee\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"close\",\"value\":\"Close\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[\"standard\",\"long\"]}]",
+      "raw": "[{\"key\":\"melee\",\"value\":\"Melee\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"close\",\"value\":\"Close\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[\"standard\",\"long\"]},{\"key\":\"weapon\",\"value\":\"Weapon\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]",
       "value": [
         {
           "key": "melee",
@@ -34,7 +34,7 @@
     "equipType": "held",
     "equipPoints": {
       "required": {
-        "raw": "",
+        "raw": "[]",
         "parsed": []
       },
       "provided": {
@@ -152,8 +152,8 @@
     },
     "quantity": 1,
     "meta": {
-      "quality": 1,
-      "tier": 1
+      "quality": 0,
+      "tier": 0
     }
   },
   "effects": [],
@@ -167,7 +167,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075360599,
-    "modifiedTime": 1747848551473,
+    "modifiedTime": 1748899093520,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_id": "kQFrvnG9djLFUEVU",

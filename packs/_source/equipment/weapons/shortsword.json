@@ -3,7 +3,9 @@
   "type": "weapon",
   "system": {
     "description": "",
-    "traits": "",
+    "traits": {
+      "raw": "[{\"key\":\"weapon\",\"value\":\"Weapon\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"melee\",\"value\":\"Melee\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"close\",\"value\":\"Close\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[\"standard\",\"long\"]}]"
+    },
     "equipType": "held",
     "attackProfiles": [
       {
@@ -73,7 +75,8 @@
     "isOverpowerTrained": false,
     "meta": {
       "tier": 0
-    }
+    },
+    "heft": 4
   },
   "img": "icons/svg/item-bag.svg",
   "effects": [],
@@ -88,7 +91,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075348244,
-    "modifiedTime": 1747681225607,
+    "modifiedTime": 1748899128896,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_id": "6iQLPlRxcvCEe1YT",

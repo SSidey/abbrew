@@ -1,0 +1,97 @@
+{
+  "folder": "kyKiwT5wM3bF3OZh",
+  "name": "Large Potion Pouch",
+  "type": "equipment",
+  "_id": "qodZfVsYPQZHQMbF",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "name": {
+      "base": "",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1,
+      "size": 0,
+      "quality": 0
+    },
+    "description": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "enhancements": [],
+    "quantity": 1,
+    "heft": 1,
+    "complexity": 0,
+    "equipType": "worn",
+    "equipPoints": {
+      "required": {
+        "raw": "[{\"value\":\"Attachment\"},{\"value\":\"Attachment\"},{\"value\":\"Attachment\"}]",
+        "parsed": []
+      },
+      "provided": {
+        "raw": "",
+        "parsed": []
+      }
+    },
+    "handsRequired": "",
+    "equipState": "readied",
+    "handsSupplied": 0,
+    "actionCost": 0,
+    "exertActionCost": 0,
+    "validEquipStates": [],
+    "nextValidEquipStates": [],
+    "skills": {
+      "granted": []
+    },
+    "availableEnhancements": 0,
+    "storage": {
+      "hasStorage": true,
+      "type": "count",
+      "accessible": true,
+      "value": 0,
+      "max": 3,
+      "storedItems": [],
+      "traitFilter": {
+        "raw": "[{\"key\":\"vial\",\"value\":\"Vial\",\"feature\":\"item\",\"subFeature\":\"form\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]",
+        "value": []
+      }
+    },
+    "storeIn": "",
+    "revealed": {
+      "isRevealed": false,
+      "revealSkills": {
+        "raw": "",
+        "parsed": []
+      },
+      "difficulty": 0,
+      "tier": 0
+    },
+    "grantedBy": "",
+    "defense": {
+      "guard": 0,
+      "inflexibility": 0,
+      "protection": []
+    }
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1748898794046,
+    "modifiedTime": 1748898822256,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!qodZfVsYPQZHQMbF"
+}

@@ -1,0 +1,107 @@
+{
+  "folder": "RYrBakqIBlYtVzmH",
+  "name": "Mithril",
+  "type": "enhancement",
+  "_id": "FEABydVpc226eCic",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "name": {
+      "base": "",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1
+    },
+    "description": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "enhancements": [],
+    "skills": {
+      "granted": []
+    },
+    "targetType": "weapon",
+    "target": {
+      "name": "",
+      "id": "",
+      "uuid": ""
+    },
+    "traitFilter": {
+      "raw": "",
+      "value": []
+    },
+    "modifications": [
+      {
+        "operator": "minus",
+        "path": "system.heft",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "target",
+        "value": "system.heft",
+        "numerator": 1,
+        "denominator": 2
+      },
+      {
+        "operator": "add",
+        "path": "system.meta.tier",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "numeric",
+        "value": "3",
+        "numerator": 1,
+        "denominator": 1
+      },
+      {
+        "operator": "merge",
+        "path": "system.name.parts",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "name",
+        "value": "mithril",
+        "numerator": 1,
+        "denominator": 1
+      }
+    ],
+    "duration": {
+      "precision": "-1",
+      "value": 0,
+      "expireOnStartOfTurn": true
+    },
+    "grantedIds": [],
+    "cost": 0,
+    "enhancementType": "material"
+  },
+  "effects": [],
+  "sort": 100000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1748277793271,
+    "modifiedTime": 1748898613272,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!FEABydVpc226eCic"
+}

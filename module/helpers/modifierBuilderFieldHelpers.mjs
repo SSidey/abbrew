@@ -1,5 +1,6 @@
 import { applyOperator, getOrderForOperator } from "./operators.mjs";
 import { compareModifierIndices, getObjectValueByStringPath, getSafeJson } from "./utils.mjs";
+const { FormDataExtended } = foundry.applications.ux;
 
 // [{ operator: String, type: String, path: String, multiplier: Number, lateParse: Boolean }], actor
 // [{ operator: String, type: String, path: String, multiplier: Number, lateParse: Boolean }, ...]

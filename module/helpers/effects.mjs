@@ -5,12 +5,12 @@
  */
 export function onManageActiveEffect(event, owner) {
   event.preventDefault();
-  const a = event.currentTarget;
-  const li = a.closest('li');
+  const a = event.target.closest("a");
+  const li = event.target.closest('li')
   const effect = li.dataset.effectId
     ? owner.effects.get(li.dataset.effectId)
     : null;
-  switch (a.dataset.action) {
+  switch (a.dataset.effectAction) {
     case 'create':
       return owner.createEmbeddedDocuments('ActiveEffect', [
         {

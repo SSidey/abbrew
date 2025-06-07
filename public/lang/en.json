@@ -32,7 +32,12 @@
       "slashingReduction": "Slashing Reduction",
       "slashingWeakness": "Slashing Weakness",
       "initiativeBonus": "Initiative Bonus",
-      "baseSpeed": "Base Speed"
+      "baseSpeed": "Base Speed",
+      "landSpeed": "Land Speed",
+      "burrowSpeed": "Burrow Speed",
+      "swimSpeed": "Swim Speed",
+      "climbSpeed": "Climb Speed",
+      "flySpeed": "Fly Speed"
     },
     "Roles": {
       "Name": {
@@ -482,7 +487,16 @@
       "hour": "Hour",
       "day": "Day",
       "combat": "Combat",
-      "permanent": "Permanent"
+      "permanent": "Permanent",
+      "rest": "Rest",
+      "recover": "Recover"
+    },
+    "Speeds": {
+      "land": "Land",
+      "burrow": "Burrow",
+      "swim": "Swim",
+      "climb": "Climb",
+      "fly": "Fly"
     },
     "ModifierPrefixes": {
       "numeric": "Numeric",
@@ -650,5 +664,18 @@
   "LIGHT.AnimationSmokePatch": "Smoke Patch",
   "LIGHT.AnimationRevolving": "Revolving Light",
   "LIGHT.AnimationSiren": "Siren Light",
-  "LIGHT.AnimationMagicalGloom": "Magical Gloom"
+  "LIGHT.AnimationMagicalGloom": "Magical Gloom",
+
+  "SHEET": {
+    "ACTOR": {
+      "TABS": {
+        "overview": "Overview",
+        "defenses": "Defenses",
+        "skills": "Skills",
+        "items": "Items",
+        "description": "Description",
+        "effects": "Effects"
+      }
+    }
+  }
 }

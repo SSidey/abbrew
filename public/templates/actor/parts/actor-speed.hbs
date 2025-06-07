@@ -1,0 +1,12 @@
+<h3>Speed</h3>
+<div class="actor-speed-collection">
+    {{#each system.movement.speed as |speed key|}}
+    <div class="actor-speed {{#unless speed.enabled}}hidden-speed{{/unless}}">
+        <label>{{speed.label}}</label>
+        <div class="resource-content flexrow flex-center flex-between">
+            <input type="text" name="system.movement.speed.{{key}}.value" value="{{speed.value}}" data-dtype="Number"
+                readonly />
+        </div>
+    </div>
+    {{/each}}
+</div>

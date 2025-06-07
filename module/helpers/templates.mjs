@@ -4,7 +4,7 @@
  * @return {Promise}
  */
 export const preloadHandlebarsTemplates = async function () {
-  return loadTemplates([
+  return foundry.applications.handlebars.loadTemplates([
     // Actor partials.
     'systems/abbrew/templates/actor/parts/actor-features.hbs',
     'systems/abbrew/templates/actor/parts/actor-items.hbs',
@@ -23,6 +23,7 @@ export const preloadHandlebarsTemplates = async function () {
     'systems/abbrew/templates/actor/parts/actor-equipment.hbs',
     'systems/abbrew/templates/actor/parts/actor-storage.hbs',
     'systems/abbrew/templates/actor/parts/actor-concepts.hbs',
+    'systems/abbrew/templates/actor/parts/actor-speed.hbs',
     // Item partials.
     'systems/abbrew/templates/item/parts/item-effects.hbs',
     'systems/abbrew/templates/item/parts/item-defenses.hbs',
@@ -45,6 +46,8 @@ export const preloadHandlebarsTemplates = async function () {
     'systems/abbrew/templates/chat/attack-result-card.hbs',
     'systems/abbrew/templates/chat/notification-card.hbs',
     // Effect Template
-    'systems/abbrew/templates/effect/active-effect.hbs'
+    'systems/abbrew/templates/effect/active-effect.hbs',
+    // Browser Template
+    'systems/abbrew/templates/browser/browser.hbs'
   ]);
 };

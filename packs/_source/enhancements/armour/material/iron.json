@@ -77,6 +77,20 @@
         "value": "system.equipPoints.required.parsed.length",
         "numerator": 5,
         "denominator": 1
+      },
+      {
+        "operator": "add",
+        "path": "system.heft",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "numeric",
+        "value": "0",
+        "numerator": 1,
+        "denominator": 1
       }
     ],
     "duration": {
@@ -84,7 +98,9 @@
       "value": 0,
       "expireOnStartOfTurn": true
     },
-    "grantedIds": []
+    "grantedIds": [],
+    "enhancementType": "material",
+    "cost": 0
   },
   "effects": [],
   "sort": 100000,
@@ -98,7 +114,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1747680755358,
-    "modifiedTime": 1747686371157,
+    "modifiedTime": 1748281732224,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!Aqv0NQ0cmD9z7DtM"

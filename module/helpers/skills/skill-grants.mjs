@@ -14,8 +14,8 @@ export async function handleGrantOnUse(skill, actor, source) {
         skill.system.skills.grantedOnActivation.forEach(async s => {
             const grantedSkill = await fromUuid(s.sourceId);
             if (grantedSkill) {
-                skill.system.skillModifiers.grantedBy.actor = actor?._id;
-                skill.system.skillModifiers.grantedBy.item = source?._id;
+                skill.system.grantedBy.actor = actor?._id;
+                skill.system.grantedBy.item = source?._id;
                 await Item.create(grantedSkill, { parent: actor });
             }
         });
@@ -31,3 +31,16 @@ export async function handleGrantedSkills(skills, actor, source) {
 
     await Item.implementation.createDocuments(createSkills, { parent: actor })
 } 
+
+export async function handleGrantOnExpiry(skill, actor, source) {
+    if (skill.system.skills.grantedOnExpiry.length > 0) {
+        skill.system.skills.grantedOnExpiry.forEach(async s => {
+            const grantedSkill = await fromUuid(s.sourceId);
+            if (grantedSkill) {
+                skill.system.grantedBy.actor = actor?._id;
+                skill.system.grantedBy.item = source?._id;
+                await Item.create(grantedSkill, { parent: actor });
+            }
+        });
+    }
+}

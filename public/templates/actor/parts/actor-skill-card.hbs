@@ -2,34 +2,35 @@
     <div class="skill-card {{#if item.system.action.isActive}}skill-active{{/if}}">
         <h4 class="skill-name">{{item.name}}</h4>
         <div class='skill-image'>
-            <a class='rollable' data-roll-type='item'>
+            <a class='rollable' data-action="rollable" data-roll-type='item'>
                 <img src='{{item.img}}' title='{{item.name}}' />
             </a>
         </div>
         {{#if item.system.isActivatable}}
         {{#if item.system.action.isActive}}
         {{#if item.system.action.charges.hasCharges}}
-        <button class="skill-activate" type="button"><span
+        <button class="skill-activate" data-action="activateSkill" type="button"><span
                 class="actions-icon action-{{item.system.action.actionImage}}">Spend Charge</span></button>
         {{else}}
-        <button class="skill-deactivate" type="button"><span class="actions-icon action-0a">Deactivate</span></button>
+        <button class="skill-deactivate" data-action="deactivateSkill" type="button"><span
+                class="actions-icon action-0a">Deactivate</span></button>
         {{/if}}
         {{else}}
         {{#if item.system.action.actionCost}}
-        <button class="skill-activate" type="button"><span
+        <button class="skill-activate" data-action="activateSkill" type="button"><span
                 class="actions-icon action-{{item.system.action.actionImage}}">Activate</span></button>
         {{/if}}
         {{/if}}
         {{/if}}
         {{#unless item.system.isActivatable}}
         {{#if item.system.action.uses.stackRemovalActivation}}
-        <button class="skill-stack" type="button"><span
+        <button class="skill-stack" data-action="stackSkill" type="button"><span
                 class="actions-icon action-{{item.system.action.actionImage}}">Remove Stack</span></button>
         {{/if}}
         {{/unless}}
         {{#if item.system.action.duration.isConcentration}}
         {{#if item.system.action.isActive}}
-        <button class="skill-concentrate" type="button" data-action-cost="1"><span
+        <button class="skill-concentrate" data-action="concentrateSkill" type="button" data-action-cost="1"><span
                 class="actions-icon action-1a">Concentrate</span></button>
         {{/if}}
         {{/if}}
@@ -92,10 +93,11 @@
                     <i class="fa-regular fa-star"></i>
                     {{/if}}
                 </label>
-                <a class='skill-control skill-edit' title='{{localize "DOCUMENT.Edit" type=' skill'}}'>
+                <a class='skill-control skill-edit' data-action="editSkill" title='{{localize "DOCUMENT.Edit" type='
+                    skill'}}'>
                     <i class='fas fa-edit'></i>
                 </a>
-                <a class='skill-control skill-delete' title='{{localize "DOCUMENT.Delete" type=' skill'}}'>
+                <a class='skill-control skill-delete' data-action="deleteSkill" title='{{localize "DOCUMENT.Delete" type=' skill'}}'>
                     <i class='fas fa-trash'></i>
                 </a>
             </div>

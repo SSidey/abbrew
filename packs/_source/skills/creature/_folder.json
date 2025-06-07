@@ -1,0 +1,21 @@
+{
+  "name": "Creature",
+  "sorting": "a",
+  "folder": null,
+  "type": "Item",
+  "_id": "u1net6Yu6WtLcMKZ",
+  "description": "",
+  "sort": 500000,
+  "color": null,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1748631034680,
+    "modifiedTime": 1748809207355,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!u1net6Yu6WtLcMKZ"
+}

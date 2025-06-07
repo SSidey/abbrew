@@ -112,7 +112,8 @@
             {{#each system.attributes as |attribute key|}}
             <div class="attribute flexrow flex-group-center">
               <label for="system.attributes.{{key}}.value" class="resource-label attribute-check flexlarge align-left"
-                data-attribute="{{key}}" data-label="{{attribute.label}}">{{attribute.label}}</label>
+                data-action="attributeCheck" data-attribute="{{key}}"
+                data-label="{{attribute.label}}">{{attribute.label}}</label>
               <input type="text" name="system.attributes.{{key}}.value" value="{{attribute.value}}" min=0 max=9
                 data-dtype="Number" />
               <input type="text" name="system.attributes.{{key}}.rank" value="{{attribute.rank}}" data-dtype="Number"
@@ -129,15 +130,7 @@
 
         {{!-- For the main skills list, span the right two columns --}}
         <section class="main grid-span-2">
-          {{!-- This is a Handlebars partial. They're stored in the `/parts` folder next to this sheet, and defined in
-          module/helpers/templates.mjs --}}
-          <div class="resource flex-group-center">
-            <label for="system.movement.baseSpeed" class="resource-label">Speed</label>
-            <div class="resource-content flexrow flex-center flex-between">
-              <input type="text" name="system.movement.baseSpeed" value="{{system.movement.baseSpeed}}"
-                data-dtype="Number" readonly />
-            </div>
-          </div>
+          {{> "systems/abbrew/templates/actor/parts/actor-speed.hbs"}}
           {{> "systems/abbrew/templates/actor/parts/actor-anatomy.hbs" showDeleteControl=false}}
           {{> "systems/abbrew/templates/actor/parts/actor-armour.hbs" showEquipState=false armour=wornArmour}}
         </section>
@@ -189,7 +182,7 @@
           <div class="revealed-details">
             <div class='revealed-name'>
               <div class='revealed-image'>
-                <a class='rollable' data-roll-type='item'>
+                <a class='rollable' data-action="rollable" data-roll-type='item'>
                   <img src='{{anatomy.item.img}}' title='{{anatomy.item.name}}' width='24' height='24' />
                 </a>
               </div>
@@ -202,7 +195,7 @@
               <div class="revealed-details">
                 <div class='revealed-name'>
                   <div class='revealed-image'>
-                    <a class='rollable' data-roll-type='item'>
+                    <a class='rollable' data-action="rollable" data-roll-type='item'>
                       <img src='{{weapon.img}}' title='{{weapon.name}}' width='24' height='24' />
                     </a>
                   </div>
@@ -218,7 +211,7 @@
               <div class="revealed-details">
                 <div class='revealed-name'>
                   <div class='revealed-image'>
-                    <a class='rollable' data-roll-type='item'>
+                    <a class='rollable' data-action="rollable" data-roll-type='item'>
                       <img src='{{skill.img}}' title='{{skill.name}}' width='24' height='24' />
                     </a>
                   </div>
@@ -238,7 +231,7 @@
           <div class="revealed-details">
             <div class='revealed-name'>
               <div class='revealed-image'>
-                <a class='rollable' data-roll-type='item'>
+                <a class='rollable' data-action="rollable" data-roll-type='item'>
                   <img src='{{armour.img}}' title='{{armour.name}}' width='24' height='24' />
                 </a>
               </div>
@@ -255,7 +248,7 @@
           <div class="revealed-details">
             <div class='revealed-name'>
               <div class='revealed-image'>
-                <a class='rollable' data-roll-type='item'>
+                <a class='rollable' data-action="rollable" data-roll-type='item'>
                   <img src='{{weapon.img}}' title='{{weapon.name}}' width='24' height='24' />
                 </a>
               </div>

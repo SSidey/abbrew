@@ -1,0 +1,92 @@
+{
+  "folder": "kyKiwT5wM3bF3OZh",
+  "name": "Healing Potion I",
+  "type": "equipment",
+  "_id": "NV9UnAtnB3kemfhA",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "name": {
+      "base": "",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1,
+      "size": 0,
+      "quality": 0
+    },
+    "description": "<p>Reduce any one wound on your character by 1.</p>",
+    "traits": {
+      "raw": "[{\"key\":\"vial\",\"value\":\"Vial\",\"feature\":\"item\",\"subFeature\":\"form\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"consumable\",\"value\":\"Consumable\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "enhancements": [],
+    "quantity": 1,
+    "heft": 1,
+    "complexity": 0,
+    "equipType": "held",
+    "equipPoints": {
+      "required": {
+        "raw": "",
+        "parsed": []
+      },
+      "provided": {
+        "raw": "",
+        "parsed": []
+      }
+    },
+    "handsRequired": "oneHand",
+    "equipState": "stowed",
+    "handsSupplied": 0,
+    "actionCost": 0,
+    "exertActionCost": 0,
+    "validEquipStates": [],
+    "skills": {
+      "granted": [
+        {
+          "name": "Healing Potion I",
+          "id": "2g6RLyGCWc7rRZot",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.2g6RLyGCWc7rRZot",
+          "skillType": ""
+        }
+      ]
+    },
+    "availableEnhancements": 0,
+    "storage": {
+      "hasStorage": false,
+      "type": "",
+      "accessible": false,
+      "value": 0,
+      "traitFilter": {
+        "raw": "",
+        "value": []
+      }
+    },
+    "defense": {
+      "guard": 0,
+      "inflexibility": 0,
+      "protection": []
+    },
+    "storeIn": "lKyqrdGvY21AdMln"
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1748296926772,
+    "modifiedTime": 1748902241512,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!NV9UnAtnB3kemfhA"
+}

@@ -6,7 +6,7 @@
   "system": {
     "description": "",
     "traits": "",
-    "equipType": "held",
+    "equipType": "innate",
     "equipPoints": {
       "required": {
         "raw": "",
@@ -63,7 +63,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075290127,
-    "modifiedTime": 1743076008481,
+    "modifiedTime": 1748277253234,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "ownership": {

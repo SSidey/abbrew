@@ -5,7 +5,8 @@
   showAttackProfiles=true showEquipState=false showItemControls=false}}
   {{/unless}}
   {{#unless (empty favouriteSkills)}}
-  <div class='item flexrow items-header favourites-header' data-skill-section="favourites">
+  <div class='item flexrow items-header favourites-header' data-action="toggleSkillHeader"
+    data-skill-section="favourites">
     <div class='item-name'>Favourites</div>
   </div>
   <ol class='skill-container' style="display: {{getProperty allSkillSections 'favourites'}}"
@@ -16,7 +17,7 @@
   </ol>
   {{/unless}}
   {{#unless (empty activeSkills)}}
-  <div class='item flexrow items-header active-header' data-skill-section="active">
+  <div class='item flexrow items-header active-header' data-action="toggleSkillHeader" data-skill-section="active">
     <div class='item-name'>Active</div>
   </div>
   <ol class='skill-container' style="display: {{getProperty allSkillSections 'active'}}" data-skill-section="active">
@@ -25,7 +26,8 @@
     {{/each}}
   </ol>
   {{/unless}}
-  <div class='item flexrow items-header archetypes-header' data-skill-section="archetypes">
+  <div class='item flexrow items-header archetypes-header' data-action="toggleSkillHeader"
+    data-skill-section="archetypes">
     <div class='item-name'>Archetypes</div>
   </div>
   <ol class="archetype-list" style="display: {{getProperty allSkillSections 'archetypes'}}"
@@ -39,10 +41,12 @@
 
         </div>
         <div class='item-controls'>
-          <a class='item-control archetype-edit' title='{{localize "DOCUMENT.Edit" type=' archetype'}}'>
+          <a class='item-control archetype-edit' data-action="editArchetype" title='{{localize "DOCUMENT.Edit" type='
+            archetype'}}'>
             <i class='fas fa-edit'></i>
           </a>
-          <a class='item-control archetype-delete' title='{{localize "DOCUMENT.Delete" type=' archetype'}}'>
+          <a class='item-control archetype-delete' data-action="deleteArchetype"
+            title='{{localize "DOCUMENT.Delete" type=' archetype'}}'>
             <i class='fas fa-trash'></i>
           </a>
         </div>
@@ -56,7 +60,7 @@
       </div>
     </li>
     {{/each}}
-    <li class="empty-drop-list-element">
+    <li class="empty-drop-list-element" data-drop-type="archetype">
       <span>+ Archetype</span>
     </li>
   </ol>
@@ -68,10 +72,12 @@
     {{!-- TODO: Need to add paths section where each path has the block below to add skills --}}
     {{!-- TODO: Order the sections? basic probably wants to be closer to the top where background maybe are less
     important? --}}
-  <li class='item flexrow items-header skill-header' data-skill-section="{{localize (skillType)}}">
+  <li class='item flexrow items-header skill-header' data-action="toggleSkillHeader"
+    data-skill-section="{{localize (skillType)}}">
     <div class='item-name'>{{localize (skillType)}}</div>
     <div class='item-controls'>
-      <a class='item-control item-create' title='Create item' data-type='skill' data-skill-type={{skillType}}>
+      <a class='item-control item-create' data-action="createItem" title='Create item' data-type='skill'
+        data-skill-type={{skillType}}>
         <i class='fas fa-plus'></i>
         {{localize 'DOCUMENT.New' type='skill'}}
       </a>

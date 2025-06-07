@@ -14,7 +14,7 @@
   <li class='item flexrow items-header'>
     <div class='item-name'>{{localize 'Name'}}</div>
     <div class='item-controls'>
-      <a class='item-control item-create' title='Create item' data-type="anatomy">
+      <a class='item-control item-create' data-action="createItem" title='Create item' data-type="anatomy">
         <i class='fas fa-plus'></i>
         {{localize 'DOCUMENT.New' type="anatomy"}}
       </a>
@@ -24,7 +24,7 @@
   <li class='item item-row' data-item-id='{{item._id}}'>
     <div class='item-name'>
       <div class='item-image'>
-        <a class='rollable' data-roll-type='item'>
+        <a class='rollable' data-action="rollable" data-roll-type='item'>
           <img src='{{item.img}}' title='{{item.name}}' width='24' height='24' />
         </a>
       </div>
@@ -33,7 +33,8 @@
     {{#gm}}
     <div class="icon-label-3">
       <label>
-        <input type="checkbox" class="anatomy-broken" name="system.isBroken" {{ checked item.system.isBroken }}>
+        <input type="checkbox" class="anatomy-broken" name="system.isBroken" data-action="toggleBroken" {{ checked
+          item.system.isBroken }}>
         {{#if item.system.isBroken}}
         <span class="icon icon-anatomy-broken-c" />
         {{else}}
@@ -41,8 +42,8 @@
         {{/if}}
       </label>
       <label>
-        <input type="checkbox" class="anatomy-severed" name="system.isDismembered" {{ checked item.system.isDismembered
-          }}>
+        <input type="checkbox" class="anatomy-severed" data-action="toggleDismembered" name="system.isDismembered" {{
+          checked item.system.isDismembered }}>
         {{#if item.system.isDismembered}}
         <span class="icon icon-anatomy-severed-c" />
         {{else}}
@@ -50,8 +51,8 @@
         {{/if}}
       </label>
       <label>
-        <input type="checkbox" class="anatomy-revealed" name="system.revealed.isRevealed" {{ checked
-          item.system.revealed.isRevealed }}>
+        <input type="checkbox" class="anatomy-revealed" name="system.revealed.isRevealed" data-action="toggleRevealed"
+          {{ checked item.system.revealed.isRevealed }}>
         {{#if item.system.revealed.isRevealed}}
         <span class="icon icon-anatomy-revealed-c" />
         {{else}}
@@ -62,7 +63,8 @@
     {{else}}
     <div class="icon-label-2">
       <label>
-        <input type="checkbox" class="anatomy-broken" name="system.isBroken" {{ checked item.system.isBroken }}>
+        <input type="checkbox" class="anatomy-broken" name="system.isBroken" data-action="toggleBroken" {{ checked
+          item.system.isBroken }}>
         {{#if item.system.isBroken}}
         <span class="icon icon-anatomy-broken-c" />
         {{else}}
@@ -70,8 +72,8 @@
         {{/if}}
       </label>
       <label>
-        <input type="checkbox" class="anatomy-severed" name="system.isDismembered" {{ checked item.system.isDismembered
-          }}>
+        <input type="checkbox" class="anatomy-severed" name="system.isDismembered" data-action="toggleDismembered" {{
+          checked item.system.isDismembered }}>
         {{#if item.system.isDismembered}}
         <span class="icon icon-anatomy-severed-c" />
         {{else}}
@@ -81,16 +83,18 @@
     </div>
     {{/gm}}
     <div class={{#if (or showDeleteControl (isGM))}}'item-controls'{{else}}'item-controls-1'{{/if}}>
-      <a class='item-control item-edit' title='{{localize "DOCUMENT.Edit" type=' anatomy'}}'>
+      <a class='item-control item-edit' data-action="editItem" title='{{localize "DOCUMENT.Edit" type=' anatomy'}}'>
         <i class='fas fa-edit'></i>
       </a>
       {{#gm}}
-      <a class='item-control item-study' title='{{localize "DOCUMENT.Study" type=' equipment'}}'>
+      <a class='item-control item-study' data-action="studyItem" title='{{localize "DOCUMENT.Study" type='
+        equipment'}}'>
         <i class="fa-solid fa-magnifying-glass"></i>
       </a>
       {{/gm}}
       {{#if showDeleteControl}}
-      <a class='item-control item-delete' title='{{localize "DOCUMENT.Delete" type=' anatomy'}}'>
+      <a class='item-control item-delete' data-action="deleteItem" title='{{localize "DOCUMENT.Delete" type='
+        anatomy'}}'>
         <i class='fas fa-trash'></i>
       </a>
       {{/if}}

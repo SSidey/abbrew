@@ -1,0 +1,35 @@
+<section class="tab overview scrollable {{tab.cssClass}}" data-group="primary" data-tab="overview">
+    <section class="grid grid-4col">
+        <aside class="sidebar grid-span-2">
+            {{!-- The grid classes are defined in scss/global/_grid.scss. To use,
+            use both the "grid" and "grid-Ncol" class where "N" can be any number
+            from 1 to 12 and will create that number of columns. --}}
+            <div class="attributes flexcol">
+                {{#each system.attributes as |attribute key|}}
+                <div class="attribute flexrow flex-group-center">
+                    <label for="system.attributes.{{key}}.value"
+                        class="resource-label attribute-check flexlarge align-left" data-action="attributeCheck"
+                        data-attribute="{{key}}" data-label="{{attribute.label}}">{{attribute.label}}</label>
+                    <input type="text" name="system.attributes.{{key}}.value" value="{{attribute.value}}" min=0 max=9
+                        data-dtype="Number" />
+                    <input type="text" name="system.attributes.{{key}}.rank" value="{{attribute.rank}}"
+                        data-dtype="Number" readonly />
+                    <input type="text" name="system.attributes.{{key}}.tier" value="{{attribute.tier}}"
+                        data-dtype="Number" readonly />
+                </div>
+                {{/each}}
+            </div>
+
+            {{> "systems/abbrew/templates/actor/parts/actor-resources.hbs"}}
+            {{> "systems/abbrew/templates/actor/parts/actor-concepts.hbs"}}
+        </aside>
+
+        {{!-- For the main skills list, span the right two columns --}}
+        <section class="main grid-span-2">
+            {{> "systems/abbrew/templates/actor/parts/actor-speed.hbs"}}
+            {{> "systems/abbrew/templates/actor/parts/actor-anatomy.hbs" showDeleteControl=false}}
+            {{> "systems/abbrew/templates/actor/parts/actor-armour.hbs" showEquipState=false armour=wornArmour}}
+        </section>
+
+    </section>
+</section>

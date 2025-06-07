@@ -16,7 +16,7 @@
     },
     "description": "",
     "traits": {
-      "raw": "",
+      "raw": "[{\"key\":\"armour\",\"value\":\"Armour\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]",
       "value": []
     },
     "abbrewId": {
@@ -67,7 +67,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1747684191063,
-    "modifiedTime": 1747848082870,
+    "modifiedTime": 1748279659931,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!1Wmbti3lFhmQt4oC"

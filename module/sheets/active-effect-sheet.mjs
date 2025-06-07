@@ -1,6 +1,6 @@
 import Tagify from "@yaireo/tagify";
 
-export class AbbrewActiveEffectSheet extends ActiveEffectConfig {
+export class AbbrewActiveEffectSheet extends foundry.applications.sheets.ActiveEffectConfig {
     /** @override */
     get template() {
         const path = 'systems/abbrew/templates/effect';

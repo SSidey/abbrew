@@ -44,7 +44,7 @@
     },
     "enhancements": [],
     "quantity": 1,
-    "heft": 0,
+    "heft": 4,
     "complexity": 0,
     "equipType": "worn",
     "equipPoints": {
@@ -93,7 +93,10 @@
       "difficulty": 0,
       "tier": 0
     },
-    "isSundered": false
+    "isSundered": false,
+    "storage": {
+      "type": "count"
+    }
   },
   "effects": [],
   "sort": 0,
@@ -107,7 +110,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1747685682012,
-    "modifiedTime": 1747848068919,
+    "modifiedTime": 1748289659578,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!y6bGftCtAQwWqwtW"

@@ -43,7 +43,18 @@
       "inflexibility": 0,
       "protection": []
     },
-    "naturalWeapons": []
+    "naturalWeapons": [],
+    "skills": {
+      "granted": [
+        {
+          "name": "Sight",
+          "id": "CPjPE4fLiHv5T3vA",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.CPjPE4fLiHv5T3vA",
+          "skillType": ""
+        }
+      ]
+    }
   },
   "effects": [],
   "sort": 0,
@@ -57,7 +68,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075185641,
-    "modifiedTime": 1743075523688,
+    "modifiedTime": 1748711828666,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!JgRv4Rs38Od9BYfw"

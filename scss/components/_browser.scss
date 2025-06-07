@@ -1,0 +1,29 @@
+.browser {
+    display: grid;
+    grid-template-rows: auto 1fr;
+
+    .browser-header {
+        display: grid;
+        grid-auto-columns: max-content;
+    }
+
+    .browser-form {
+        display: grid;
+        grid-template-columns: 1fr 4fr;
+        grid-column-gap: 1em;
+
+        .browser-search {
+            display: grid;
+            grid-auto-rows: auto;
+        }
+
+        .browser-results {
+            .archetype {
+                display: grid;
+                grid-template-columns: 10% 85% 5%;
+                grid-column-gap: 1em;
+                align-items: center;
+            }
+        }
+    }
+}

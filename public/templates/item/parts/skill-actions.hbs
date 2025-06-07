@@ -27,6 +27,20 @@
         <i class="fa fa-toggle-off"></i>
         {{/if}}
     </label>
+    <div class="skill-element-2">
+        <label>Restored Every</label>
+        <select name="system.action.uses.period">
+            {{selectOptions config.durationsLabels selected=system.action.uses.period blank=""
+            localize=true}}
+        </select>
+    </div>
+    <div class="skill-element-2">
+        <label>Empty Every</label>
+        <select name="system.resource.emptyPeriod">
+            {{selectOptions config.durationsLabels selected=system.resource.emptyPeriod blank=""
+            localize=true}}
+        </select>
+    </div>
 </div>
 {{/if}}
 {{#unless (eq system.skillType "resource")}}
@@ -245,6 +259,31 @@
             data-dtype="Number" />
         <label>Maximum Charges</label>
         <input type="text" name="system.action.charges.max" value="{{system.action.charges.max}}" data-dtype="Number" />
+        {{/if}}
+    </div>
+    <div>
+        <h3>Paired Skill Handling</h3>
+        <label class="slide-toggle roboto-upper">
+            <input type="checkbox" name="system.action.removeOnPairedApply" {{ checked system.action.removeOnPairedApply
+                }}>
+            <span>Remove on Paired Skill Apply?</span>
+            {{#if system.action.removeOnPairedApply}}
+            <i class="fa fa-toggle-on"></i>
+            {{else}}
+            <i class="fa fa-toggle-off"></i>
+            {{/if}}
+        </label>
+        {{#if system.action.removeOnPairedApply}}
+        <label class="slide-toggle roboto-upper">
+            <input type="checkbox" name="system.action.handleRemovedSkillExpiry" {{ checked
+                system.action.handleRemovedSkillExpiry }}>
+            <span>Handle Removed Skill Expiry?</span>
+            {{#if system.action.handleRemovedSkillExpiry}}
+            <i class="fa fa-toggle-on"></i>
+            {{else}}
+            <i class="fa fa-toggle-off"></i>
+            {{/if}}
+        </label>
         {{/if}}
     </div>
     <div>

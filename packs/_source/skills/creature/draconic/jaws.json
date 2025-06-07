@@ -1,0 +1,125 @@
+{
+  "folder": "JdbwSI50TYFJoPJR",
+  "name": "Jaws",
+  "type": "weapon",
+  "_id": "jWGU1Hixg1LSGe5m",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "name": {
+      "base": "",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1,
+      "size": 0,
+      "quality": 0
+    },
+    "description": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "enhancements": [],
+    "quantity": 1,
+    "heft": 0,
+    "complexity": 0,
+    "equipType": "innate",
+    "equipPoints": {
+      "required": {
+        "raw": "",
+        "parsed": []
+      },
+      "provided": {
+        "raw": "",
+        "parsed": []
+      }
+    },
+    "handsRequired": "",
+    "equipState": "readied",
+    "handsSupplied": 0,
+    "actionCost": 0,
+    "exertActionCost": 0,
+    "validEquipStates": [],
+    "nextValidEquipStates": [],
+    "skills": {
+      "granted": []
+    },
+    "availableEnhancements": 0,
+    "storage": {
+      "hasStorage": false,
+      "type": "",
+      "accessible": false,
+      "value": 0,
+      "max": 0,
+      "storedItems": [],
+      "traitFilter": {
+        "raw": "",
+        "value": []
+      }
+    },
+    "storeIn": "",
+    "revealed": {
+      "isRevealed": false,
+      "revealSkills": {
+        "raw": "",
+        "parsed": []
+      },
+      "difficulty": 0,
+      "tier": 0
+    },
+    "grantedBy": "",
+    "isOverpowerTrained": false,
+    "attackProfiles": [
+      {
+        "name": "Bite",
+        "attackType": "static",
+        "finisherLimit": 10,
+        "hasStrongAttack": true,
+        "critical": 10,
+        "lethal": 0,
+        "reach": "1",
+        "damage": [
+          {
+            "type": "crushing",
+            "value": 8,
+            "penetration": 0,
+            "attributeModifier": "str",
+            "attributeMultiplier": 1,
+            "damageMultiplier": 1,
+            "overallMultiplier": 1
+          }
+        ],
+        "range": 0,
+        "penetration": 0,
+        "ammunition": {
+          "type": "",
+          "id": "",
+          "value": 0,
+          "max": 0,
+          "reloadType": "",
+          "reloadActionCost": 1
+        }
+      }
+    ]
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1748631088903,
+    "modifiedTime": 1748631125552,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!jWGU1Hixg1LSGe5m"
+}

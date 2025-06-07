@@ -5,7 +5,9 @@
   "img": "icons/svg/item-bag.svg",
   "system": {
     "description": "",
-    "traits": "",
+    "traits": {
+      "raw": "[{\"key\":\"weapon\",\"value\":\"Weapon\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"melee\",\"value\":\"Melee\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"standard\",\"value\":\"Standard\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[\"close\",\"long\"]}]"
+    },
     "equipType": "held",
     "equipPoints": {
       "required": {
@@ -28,20 +30,22 @@
         "attackType": "arc",
         "lethal": 0,
         "critical": 10,
+        "reach": "2",
+        "range": 0,
+        "penetration": 0,
+        "ammunition": {
+          "type": "",
+          "id": "",
+          "value": 0,
+          "max": 0,
+          "reloadType": "",
+          "reloadActionCost": 1
+        },
         "damage": [
           {
             "type": "slashing",
             "value": 6,
             "attributeModifier": "str",
-            "attributeMultiplier": 1,
-            "damageMultiplier": 1,
-            "overallMultiplier": 1,
-            "penetration": 0
-          },
-          {
-            "type": "",
-            "value": 0,
-            "attributeModifier": "",
             "attributeMultiplier": 1,
             "damageMultiplier": 1,
             "overallMultiplier": 1,
@@ -56,6 +60,17 @@
         "attackType": "thrust",
         "lethal": 0,
         "critical": 10,
+        "reach": "2",
+        "range": 0,
+        "penetration": 0,
+        "ammunition": {
+          "type": "",
+          "id": "",
+          "value": 0,
+          "max": 0,
+          "reloadType": "",
+          "reloadActionCost": 1
+        },
         "damage": [
           {
             "type": "piercing",
@@ -86,7 +101,8 @@
     "isOverpowerTrained": false,
     "meta": {
       "tier": 0
-    }
+    },
+    "heft": 6
   },
   "effects": [],
   "flags": {},
@@ -96,7 +112,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075307575,
-    "modifiedTime": 1747681199291,
+    "modifiedTime": 1748899136080,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "ownership": {

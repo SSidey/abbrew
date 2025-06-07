@@ -6,13 +6,35 @@
   "system": {
     "description": "",
     "traits": {
-      "raw": "",
-      "value": []
+      "raw": "[{\"key\":\"melee\",\"value\":\"Melee\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"long\",\"value\":\"Long\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[\"standard\",\"long\"]},{\"key\":\"weapon\",\"value\":\"Weapon\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]",
+      "value": [
+        {
+          "key": "melee",
+          "value": "Melee",
+          "feature": "item",
+          "subFeature": "identifiers",
+          "effect": "",
+          "data": "",
+          "exclude": []
+        },
+        {
+          "key": "long",
+          "value": "Long",
+          "feature": "item",
+          "subFeature": "identifiers",
+          "effect": "",
+          "data": "",
+          "exclude": [
+            "standard",
+            "long"
+          ]
+        }
+      ]
     },
     "equipType": "held",
     "equipPoints": {
       "required": {
-        "raw": "",
+        "raw": "[]",
         "parsed": []
       },
       "provided": {
@@ -29,39 +51,22 @@
       {
         "name": "Slash",
         "attackType": "arc",
-        "lethal": 0,
+        "finisherLimit": 10,
+        "hasStrongAttack": true,
         "critical": 10,
-        "reach": "",
-        "range": 0,
-        "penetration": 0,
-        "ammunition": {
-          "type": "",
-          "id": "",
-          "value": 0,
-          "max": 0,
-          "reloadType": "",
-          "reloadActionCost": 1
-        },
+        "lethal": 0,
+        "reach": "3",
         "damage": [
           {
             "type": "slashing",
             "value": 8,
+            "penetration": 0,
             "attributeModifier": "str",
             "attributeMultiplier": 1,
             "damageMultiplier": 1,
-            "overallMultiplier": 1,
-            "penetration": 0
+            "overallMultiplier": 1
           }
         ],
-        "finisherLimit": 10,
-        "hasStrongAttack": true
-      },
-      {
-        "name": "Stab",
-        "attackType": "thrust",
-        "lethal": 0,
-        "critical": 10,
-        "reach": "",
         "range": 0,
         "penetration": 0,
         "ammunition": {
@@ -71,39 +76,50 @@
           "max": 0,
           "reloadType": "",
           "reloadActionCost": 1
-        },
+        }
+      },
+      {
+        "name": "Stab",
+        "attackType": "thrust",
+        "finisherLimit": 10,
+        "hasStrongAttack": false,
+        "critical": 10,
+        "lethal": 0,
+        "reach": "3",
         "damage": [
           {
             "type": "piercing",
             "value": 6,
+            "penetration": 0,
             "attributeModifier": "str",
             "attributeMultiplier": 1,
             "damageMultiplier": 1,
-            "overallMultiplier": 1,
-            "penetration": 0
+            "overallMultiplier": 1
           }
         ],
-        "finisherLimit": 10,
-        "hasStrongAttack": false
+        "range": 0,
+        "penetration": 0,
+        "ammunition": {
+          "type": "",
+          "id": "",
+          "value": 0,
+          "max": 0,
+          "reloadType": "",
+          "reloadActionCost": 1
+        }
       }
     ],
     "handsRequired": "twoHand",
     "validEquipStates": [
       {
         "value": "held2H",
-        "label": "ABBREW.EquipState.heldTwo"
-      },
-      {
-        "value": "worn",
-        "label": "ABBREW.EquipState.worn"
-      },
-      {
-        "value": "stowed",
-        "label": "ABBREW.EquipState.stowed"
+        "label": "ABBREW.EquipStateChange.heldTwo",
+        "cost": 1
       },
       {
         "value": "dropped",
-        "label": "ABBREW.EquipState.dropped"
+        "label": "ABBREW.EquipStateChange.dropped",
+        "cost": 0
       }
     ],
     "abbrewId": {
@@ -126,8 +142,8 @@
       "base": "Greatsword"
     },
     "enhancements": [],
-    "availableEnhancements": 2,
-    "heft": 8
+    "availableEnhancements": 0,
+    "heft": 10
   },
   "effects": [],
   "ownership": {
@@ -140,7 +156,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075324307,
-    "modifiedTime": 1747681176938,
+    "modifiedTime": 1748899090289,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_id": "daBNLIlM2sYINFMv",

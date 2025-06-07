@@ -2,7 +2,7 @@
   <li class='item flexrow items-header'>
     <div class='item-name'>Attacks</div>
     <div class='item-controls'>
-      <a class='item-control item-create' title='Create item' data-type='weapon'>
+      <a class='item-control item-create' data-action="createItem" title='Create item' data-type='weapon'>
         <i class='fas fa-plus'></i>
         {{localize 'DOCUMENT.New' type='weapon'}}
       </a>
@@ -12,7 +12,7 @@
   <li class='item weapon-container' data-item-id='{{item._id}}'>
     <div class='weapon-details'>
       <div class='weapon-image'>
-        <a class='rollable' data-roll-type='item'>
+        <a class='rollable' data-action="rollable" data-roll-type='item'>
           <img src='{{item.img}}' title='{{item.name}}' width='24' height='24' />
         </a>
       </div>
@@ -24,50 +24,51 @@
       <ol class="attack-profiles">
         <li class="attack-profile" data-attack-profile-id="{{attackProfileId}}">
           {{#unless (or (eq attackProfile.attackType "ranged") (eq attackProfile.attackType "thrown"))}}
-          <button type="button" class="attack-damage-button"><span
+          <button type="button" class="attack-button" data-action="handleAttack" data-attack-type="attack"><span
               class="actions-icon action-{{item.system.actionCost}}a">{{attackProfile.name}}</span></button>
           {{#if item.system.isOverpowerTrained}}
           {{#if hasStrongAttack}}
-          <button type="button" class="attack-overpower-button">
+          <button type="button" class="attack-button" data-action="handleAttack" data-attack-type="attack">
             <span class="actions-icon action-{{item.system.exertActionCost}}a">Overpower</span>
           </button>
           {{else}}
           <div></div>
           {{/if}}
           {{/if}}
-          <button type="button" class="attack-feint-button"><span
+          <button type="button" class="attack-button" data-action="handleAttack" data-attack-type="feint"><span
               class="actions-icon action-{{item.system.actionCost}}a" /><span>Feint</span></button>
-          <button type="button" class="attack-finisher-button"><span
+          <button type="button" class="attack-button" data-action="handleAttack" data-attack-type="finisher"><span
               class="actions-icon action-{{item.system.actionCost}}a">Finisher</span></button>
           {{/unless}}
           {{#if (eq attackProfile.attackType "thrown")}}
-          <button type="button" class="attack-throw-button" {{#if (eq item.system.equipState "dropped"
-            )}}disabled{{/if}}><span
+          <button type="button" class="attack-button" data-action="handleAttack" data-attack-type="thrown" {{#if (eq
+            item.system.equipState "dropped" )}}disabled{{/if}}><span
               class="actions-icon action-{{item.system.exertActionCost}}a">{{attackProfile.name}}</span></button>
-          <button type="button" class="attack-pickup-button"><span class="actions-icon action-1a">Pick
+          <button type="button" class="pickup-button" data-action="handlePickup"><span
+              class="actions-icon action-1a">Pick
               Up</span></button>
-          <button type="button" class="attack-finisher-button"><span
+          <button type="button" class="attack-button" data-action="handleAttack" data-attack-type="attack"><span
               class="actions-icon action-{{item.system.actionCost}}a">Finisher</span></button>
           <div></div>
           {{/if}}
           {{#if (eq attackProfile.attackType "ranged")}}
-          <button type="button" class="attack-ranged-button"><span
+          <button type="button" class="attack-button" data-action="handleAttack" data-attack-type="ranged"><span
               class="actions-icon action-1a">{{attackProfile.name}}</span></button>
-          <button type="button" class="attack-aimedshot-button">
+          <button type="button" class="attack-button" data-action="handleAttack" data-attack-type="aimedShot">
             <span class="actions-icon action-2a">Aimed Shot</span>
           </button>
           {{#if (eq attackProfile.ammunition.reloadType "draw")}}
-          <button type="button" class="attack-reload-button">
+          <button type="button" class="reload-button" data-action="handleReload">
             <span
               class="actions-icon action-{{attackProfile.ammunition.reloadActionCost}}a">{{attackProfile.ammunition.reloadType}}</span>
           </button>
           {{else}}
-          <button type="button" class="attack-reload-button">
+          <button type="button" class="reload-button" data-action="handleReload">
             <span
               class="actions-icon action-{{attackProfile.ammunition.reloadActionCost}}a">{{attackProfile.ammunition.reloadType}}</span>
           </button>
           {{/if}}
-          <select class="attack-reload">
+          <select class="attack-reload" name="system.attackProfiles.{{attackProfileId}}.ammunition.id">
             {{selectOptions (filter ../../ammunitionChoices "type" attackProfile.ammunition.type)
             selected=attackProfile.ammunition.id blank=""
             localize=true}}
@@ -78,18 +79,13 @@
       {{/each}}
     </div>
     {{/if}}
-    {{#if ../showEquipState}}
-    <select class="item-select" name="system.equipState">
-      {{selectOptions system.validEquipStates selected=item.system.equipState valueAttr="value" labelAttr="label"
-      localize=true}}
-    </select>
-    {{/if}}
     {{#if ../showItemControls}}
     <div class='item-controls'>
-      <a class='item-control item-edit' title='{{localize "DOCUMENT.Edit" type=' weapon'}}'>
+      <a class='item-control item-edit' data-action="editItem" title='{{localize "DOCUMENT.Edit" type=' weapon'}}'>
         <i class='fas fa-edit'></i>
       </a>
-      <a class='item-control item-delete' title='{{localize "DOCUMENT.Delete" type=' weapon'}}'>
+      <a class='item-control item-delete' data-action="deleteItem" title='{{localize "DOCUMENT.Delete" type='
+        weapon'}}'>
         <i class='fas fa-trash'></i>
       </a>
     </div>

@@ -2,7 +2,7 @@ import { mergeActorWounds } from "../helpers/combat.mjs";
 import { applyFullyParsedModifiers, mergeModifierFields, reduceParsedModifiers } from "../helpers/modifierBuilderFieldHelpers.mjs";
 import { handleSkillActivate, isSkillBlocked } from "../helpers/skills/skill-activation.mjs";
 import { applySkillEffects } from "../helpers/skills/skill-application.mjs";
-import { handleGrantedSkills, handleSkillsGrantedOnAccept } from "../helpers/skills/skill-grants.mjs";
+import { handleGrantedSkills, handleGrantOnExpiry, handleSkillsGrantedOnAccept } from "../helpers/skills/skill-grants.mjs";
 import { getAttackerAdvantageGuardResult, getAttackerAdvantageRiskResult, getDefenderAdvantageGuardResult, getDefenderAdvantageRiskResult } from "../helpers/trainedSkills.mjs";
 import { compareModifierIndices, doesNestedFieldExist, getObjectValueByStringPath } from "../helpers/utils.mjs";
 import { FINISHERS } from "../static/finishers.mjs";
@@ -635,17 +635,20 @@ export default class AbbrewActor extends Actor {
     if (itemId) {
       const item = this.items.find(i => i._id === itemId)
       if (item) {
-        if (item.system.applyOnExpiry && item.isOwner) {
-          await applySkillEffects(this, item);
+        if (item.system.handleExpiryEffects) {
+          if (item.system.applyOnExpiry && item.isOwner) {
+            await applySkillEffects(this, item);
+          }
+          await handleGrantOnExpiry(item, this, item);
         }
         await item.update({ "system.action.charges.value": 0 })
-        if (item.system.skillType === "temporary") {
-          await item.delete();
-        }
         const effects = item.effects;
         const promises = [];
         effects.forEach(e => promises.push(e.update({ "disabled": true })));
         await Promise.all(promises);
+        if (item.system.skillType === "temporary") {
+          await item.delete();
+        }
       }
     }
 

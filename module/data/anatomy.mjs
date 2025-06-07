@@ -12,7 +12,13 @@ export default class AbbrewAnatomy extends AbbrewPhysicalItem {
     schema.isBroken = new fields.BooleanField({ required: true, nullable: false, initial: false });
     schema.isDismembered = new fields.BooleanField({ required: true, nullable: false, initial: false });
     schema.hands = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
-    schema.speed = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
+    schema.speed = new fields.SchemaField(Object.keys(CONFIG.ABBREW.speeds).reduce((obj, speed) => {
+      obj[speed] = new fields.SchemaField({
+        label: new fields.StringField({ required: true, blank: true }),
+        value: new fields.NumberField({ required: true, nullable: true, integer: true, min: 0 }),
+      });
+      return obj;
+    }, {}))
     AbbrewEquipment.addDefenseSchema(schema);
     schema.naturalWeapons = new fields.ArrayField(
       new fields.SchemaField({
@@ -39,10 +45,12 @@ export default class AbbrewAnatomy extends AbbrewPhysicalItem {
 
   prepareBaseData() {
     super.prepareBaseData();
+    for (const key in this.speed) {
+      const rawLabel = CONFIG.ABBREW.speeds[key].label;
+      this.speed[key].label = game.i18n.localize(rawLabel) ?? rawLabel;
+    }
   }
 
-  // TODO: Add revealed button
-  // TODO: NPC sheet and player view that shows revealed armour / anatomy
   prepareDerivedData() {
     // Build the formula dynamically using string interpolation
     const roll = this.roll;

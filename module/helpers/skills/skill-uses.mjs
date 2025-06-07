@@ -1,5 +1,5 @@
 import { rechargeSkill } from "./skill-activation.mjs";
-import { manualSkillExpiry } from "./skill-expiry.mjs";
+import { checkAndExpire, manualSkillExpiry } from "./skill-expiry.mjs";
 
 export async function handleSkillUsesAndCharges(actor, skill, modifierSkills) {
     const usesSkills = [...modifierSkills, skill]
@@ -35,7 +35,7 @@ export async function handleSkillUsesAndCharges(actor, skill, modifierSkills) {
         if (updateCharges <= 0) {
             const effect = actor.getEffectBySkillId(skill._id);
             if (effect) {
-                await manualSkillExpiry(effect);
+                await manualSkillExpiry(actor, item, effect);
             }
         }
     }
@@ -49,12 +49,7 @@ export async function checkForTemporarySkillOutOfUses(skill, actor) {
 
 export async function cleanTemporarySkill(skill, actor) {
     if (skill.system.skillType === "temporary" && skill.system.action.uses.removeWhenNoUsesRemain) {
-        const effect = actor.getEffectBySkillId(skill._id);
-        if (effect) {
-            await manualSkillExpiry(effect);
-        } else {
-            await skill.delete();
-        }
+        await checkAndExpire(actor, skill);
     }
 }
 
@@ -72,4 +67,12 @@ export function skillHasUsesRemaining(skill) {
 
 export function skillHasChargesRemaining(skill) {
     return skill.system.action.charges.hasCharges && skill.system.action.charges.value > 0;
+}
+
+export async function removeSkillStack(actor, skill) {
+    const stackUpdate = skill.system.action.uses.value - 1;
+    await skill.update({ "system.action.uses.value": stackUpdate });
+    if (stackUpdate === 0) {
+        await cleanTemporarySkill(skill, actor);
+    }
 }

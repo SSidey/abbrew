@@ -21,7 +21,9 @@ ABBREW.durationsLabels = {
   minute: "ABBREW.Durations.minute",
   hour: "ABBREW.Durations.hour",
   combat: "ABBREW.Durations.combat",
-  day: "ABBREW.Durations.day"
+  day: "ABBREW.Durations.day",
+  recover: "ABBREW.Durations.recover",
+  rest: "ABBREW.Durations.rest",
 }
 
 ABBREW.size = {
@@ -116,9 +118,6 @@ ABBREW.equipPoints = {
     tail: "ABBREW.EquipPoints.Points.tail",
     wing: "ABBREW.EquipPoints.Points.wing",
     attachment: "ABBREW.EquipPoints.Points.attachment"
-    // ,
-    // holster: "ABBREW.EquipPoints.Points.holster",
-    // scabbard: "ABBREW.EquipPoints.Points.scabbard"
   }
 }
 
@@ -674,6 +673,17 @@ ABBREW.fundamentalSkillSummaries = [
   ...ABBREW.fundamentalAttributeSkillSummaries
 ]
 
+ABBREW.fundamentalSystemSkillIds = [
+  "abbrewRest000000",
+  "abbrewRecover000",
+]
+
+
+ABBREW.fundamentalSystemSkills = {
+  "abbrewRest000000": { id: "abbrewRest000000", name: "Rest", image: "systems/abbrew/assets/icons/skills/rest.svg" },
+  "abbrewRecover000": { id: "abbrewRecover000", name: "Recover", image: "systems/abbrew/assets/icons/skills/recover.svg" },
+}
+
 ABBREW.modifierPrefixes = {
   "numeric": "ABBREW.ModifierPrefixes.numeric",
   "actor": "ABBREW.ModifierPrefixes.actor",
@@ -769,8 +779,21 @@ ABBREW.activeEffectKeys = [
   { value: "system.defense.protection.slashing.reduction", label: "ABBREW.ActiveEffectKeys.slashingReduction" },
   { value: "system.defense.protection.slashing.weakness", label: "ABBREW.ActiveEffectKeys.slashingWeakness" },
   { value: "system.modifiers.initiative", label: "ABBREW.ActiveEffectKeys.initiativeBonus" },
-  { value: "system.movement.baseSpeed", label: "ABBREW.ActiveEffectKeys.baseSpeed" }
+  { value: "system.movement.baseSpeed", label: "ABBREW.ActiveEffectKeys.baseSpeed" },
+  { value: "system.movement.speed.land.value", label: "ABBREW.ActiveEffectKeys.landSpeed" },
+  { value: "system.movement.speed.burrow.value", label: "ABBREW.ActiveEffectKeys.burrowSpeed" },
+  { value: "system.movement.speed.swim.value", label: "ABBREW.ActiveEffectKeys.swimSpeed" },
+  { value: "system.movement.speed.climb.value", label: "ABBREW.ActiveEffectKeys.climbSpeed" },
+  { value: "system.movement.speed.fly.value", label: "ABBREW.ActiveEffectKeys.flySpeed" }
 ]
+
+ABBREW.speeds = {
+  land: { label: "ABBREW.Speeds.land" },
+  burrow: { label: "ABBREW.Speeds.burrow", },
+  swim: { label: "ABBREW.Speeds.swim", },
+  climb: { label: "ABBREW.Speeds.climb", },
+  fly: { label: "ABBREW.Speeds.fly", }
+}
 
 ABBREW.visionModes = CONFIG.Canvas.visionModes;
 ABBREW.detectionModes = CONFIG.Canvas.detectionModes;

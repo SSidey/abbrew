@@ -1,0 +1,87 @@
+{
+  "folder": "kyKiwT5wM3bF3OZh",
+  "name": "Quiver",
+  "type": "equipment",
+  "_id": "ThCd4fh99JzAIZz2",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "name": {
+      "base": "",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1,
+      "size": 0,
+      "quality": 0
+    },
+    "description": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "enhancements": [],
+    "quantity": 1,
+    "heft": 2,
+    "complexity": 0,
+    "equipType": "worn",
+    "equipPoints": {
+      "required": {
+        "raw": "[{\"value\":\"Attachment\"}]",
+        "parsed": []
+      },
+      "provided": {
+        "raw": "",
+        "parsed": []
+      }
+    },
+    "handsRequired": "",
+    "equipState": "readied",
+    "handsSupplied": 0,
+    "actionCost": 0,
+    "exertActionCost": 0,
+    "validEquipStates": [],
+    "nextValidEquipStates": [],
+    "skills": {
+      "granted": []
+    },
+    "availableEnhancements": 0,
+    "storage": {
+      "hasStorage": true,
+      "type": "count",
+      "accessible": true,
+      "value": 0,
+      "max": 20,
+      "storedItems": [],
+      "traitFilter": {
+        "raw": "[{\"key\":\"ammunition\",\"value\":\"Ammunition\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]",
+        "value": []
+      }
+    },
+    "storeIn": "",
+    "defense": {
+      "guard": 0,
+      "inflexibility": 0,
+      "protection": []
+    }
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1748388521173,
+    "modifiedTime": 1748899319557,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!ThCd4fh99JzAIZz2"
+}

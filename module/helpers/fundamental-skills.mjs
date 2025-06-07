@@ -1,4 +1,6 @@
-// TODO: Merge these down
+import AbbrewSkill from "../data/skill.mjs";
+
+// TODO: Cap concepts at visualisation
 export function getAttackSkillWithActions(id, name, actionCost, image, attackProfile, attackMode, handsSupplied, siblingSkillModifiers = [], actorSource, itemSource) {
     const skill = CONFIG.ABBREW.fundamentalAttackSkills[attackMode];
     let critical;
@@ -11,197 +13,39 @@ export function getAttackSkillWithActions(id, name, actionCost, image, attackPro
         critical = 11 - handsSupplied
     }
 
+    const system = AbbrewSkill.schema.getInitialValue();
+    system.abbrewId = { uuid: id ?? skill.id };
+    system.siblingSkillModifiers = siblingSkillModifiers;
+    system.isActivatable = true;
+    system.skillType = "basic";
+    system.sources = { actor: actorSource, items: itemSource };
+    system.action.activationType = "standalone";
+    system.action.actionCost = actionCost;
+    system.action.actionImage = image;
+    system.action.attackProfile = { ...attackProfile, attackMode: attackMode, handsSupplied: handsSupplied, critical: critical, isEnabled: true, finisher: { cost: 0, wounds: [] } };
+
     return ({
         _id: id ?? skill.id,
         name: name,
-        system: {
-            abbrewId: {
-                uuid: id ?? skill.id
-            },
-            siblingSkillModifiers: siblingSkillModifiers,
-            isActivatable: true,
-            traits: [],
-            skillType: "basic",
-            attributeIncrease: "",
-            attributeIncreaseLong: "",
-            attributeRankIncrease: "",
-            sources: {
-                actor: actorSource,
-                items: itemSource
-            },
-            skills: {
-                granted: [],
-                paired: [],
-                grantedOnActivation: [],
-                grantedOnAccept: [],
-            },
-            action: {
-                activationType: "standalone",
-                actionCost: actionCost,
-                actionImage: image,
-                asyncValues: [],
-                duration: {
-                    precision: "0",
-                    value: 0
-                },
-                uses: {
-                    hasUses: false,
-                    value: 0,
-                    max: 0,
-                    period: ""
-                },
-                charges: {
-                    hasCharges: false,
-                    value: 0,
-                    max: 0
-                },
-                isActive: false,
-                attackProfile: { ...attackProfile, attackMode: attackMode, handsSupplied: handsSupplied, critical: critical, isEnabled: true, finisher: { cost: 0, wounds: [] } },
-                skillCheck: [],
-                skillRequest: {
-                    isEnabled: false
-                },
-                modifiers: {
-                    fortune: 0,
-                    attackProfile: { damage: [] },
-                    guard: {
-                        self: {
-                            value: [],
-                            operator: ""
-                        },
-                        target: {
-                            value: [],
-                            operator: ""
-                        }
-                    },
-                    risk: {
-                        self: {
-                            value: [],
-                            operator: ""
-                        },
-                        target: {
-                            value: [],
-                            operator: ""
-                        }
-                    },
-                    wounds: {
-                        self: [],
-                        target: []
-                    },
-                    resolve: {
-                        self: {
-                            value: [],
-                            operator: ""
-                        },
-                        target: {
-                            value: [],
-                            operator: ""
-                        }
-                    },
-                    resources: {
-                        self: [],
-                        target: []
-                    },
-                    concepts: null
-                }
-            }
-        }
+        system: system
     });
 }
 export function getParrySkillWithActions(actionCost, siblingSkillModifiers = []) {
     const skill = CONFIG.ABBREW.fundamentalAttackSkills["parry"];
 
+    const system = AbbrewSkill.schema.getInitialValue();
+    system.abbrewId = { uuid: skill.id };
+    system.siblingSkillModifiers = siblingSkillModifiers;
+    system.isActivatable = true;
+    system.skillType = "basic";
+    system.action.activationType = "standalone";
+    system.action.actionCost = Math.max(1, actionCost);
+    system.action.actionImage = skill.image;
+
     return ({
         _id: skill.id,
         name: skill.name,
-        system: {
-            abbrewId: {
-                uuid: skill.id
-            },
-            siblingSkillModifiers: siblingSkillModifiers,
-            isActivatable: true,
-            traits: [],
-            skillType: "basic",
-            attributeIncrease: "",
-            attributeIncreaseLong: "",
-            attributeRankIncrease: "",
-            skills: {
-                granted: [],
-                paired: [],
-                grantedOnActivation: [],
-                grantedOnAccept: []
-            },
-            action: {
-                activationType: "standalone",
-                actionCost: Math.max(1, actionCost),
-                actionImage: skill.image,
-                asyncValues: [],
-                duration: {
-                    precision: "0",
-                    value: 0
-                },
-                uses: {
-                    hasUses: false,
-                    value: 0,
-                    max: 0,
-                    period: ""
-                },
-                charges: {
-                    hasCharges: false,
-                    value: 0,
-                    max: 0
-                },
-                isActive: false,
-                attackProfile: {},
-                skillCheck: [],
-                skillRequest: {
-                    isEnabled: false
-                },
-                modifiers: {
-                    fortune: 0,
-                    attackProfile: { damage: [] },
-                    guard: {
-                        self: {
-                            value: [],
-                            operator: ""
-                        },
-                        target: {
-                            value: [],
-                            operator: ""
-                        }
-                    },
-                    risk: {
-                        self: {
-                            value: [],
-                            operator: ""
-                        },
-                        target: {
-                            value: [],
-                            operator: ""
-                        }
-                    },
-                    wounds: {
-                        self: [],
-                        target: []
-                    },
-                    resolve: {
-                        self: {
-                            value: [],
-                            operator: ""
-                        },
-                        target: {
-                            value: [],
-                            operator: ""
-                        }
-                    },
-                    resources: {
-                        self: [],
-                        target: []
-                    },
-                    concepts: null
-                }
-            }
-        }
+        system: system
     });
 }
 
@@ -209,206 +53,45 @@ export function getParrySkillWithActions(actionCost, siblingSkillModifiers = [])
 export function getFundamentalSkillWithActionCost(fundamental, actionCost, siblingSkillModifiers = []) {
     const skill = CONFIG.ABBREW.fundamentalAttackSkills[fundamental];
 
+    const system = AbbrewSkill.schema.getInitialValue();
+    system.abbrewId = { uuid: fundamental.id };
+    system.siblingSkillModifiers = siblingSkillModifiers;
+    system.isActivatable = true;
+    system.skillType = "basic";
+    system.action.activationType = "standalone";
+    system.action.actionCost = actionCost;
+    system.action.actionImage = fundamental.image;
+
     return ({
         _id: fundamental.id,
         name: fundamental.name,
-        system: {
-            abbrewId: {
-                uuid: fundamental.id
-            },
-            siblingSkillModifiers: siblingSkillModifiers,
-            isActivatable: true,
-            traits: [],
-            skillType: "basic",
-            attributeIncrease: "",
-            attributeIncreaseLong: "",
-            attributeRankIncrease: "",
-            skills: {
-                granted: [],
-                paired: [],
-                grantedOnActivation: [],
-                grantedOnAccept: []
-            },
-            action: {
-                activationType: "standalone",
-                actionCost: actionCost,
-                actionImage: fundamental.image,
-                asyncValues: [],
-                duration: {
-                    precision: "0",
-                    value: 0
-                },
-                uses: {
-                    hasUses: false,
-                    value: 0,
-                    max: 0,
-                    period: ""
-                },
-                charges: {
-                    hasCharges: false,
-                    value: 0,
-                    max: 0
-                },
-                isActive: false,
-                attackProfile: {
-                    isEnabled: false,
-                },
-                skillCheck: [],
-                skillRequest: {
-                    isEnabled: false
-                },
-                modifiers: {
-                    fortune: 0,
-                    attackProfile: { damage: [] },
-                    guard: {
-                        self: {
-                            value: [],
-                            operator: ""
-                        },
-                        target: {
-                            value: [],
-                            operator: ""
-                        }
-                    },
-                    risk: {
-                        self: {
-                            value: [],
-                            operator: ""
-                        },
-                        target: {
-                            value: [],
-                            operator: ""
-                        }
-                    },
-                    wounds: {
-                        self: [],
-                        target: []
-                    },
-                    resolve: {
-                        self: {
-                            value: [],
-                            operator: ""
-                        },
-                        target: {
-                            value: [],
-                            operator: ""
-                        }
-                    },
-                    resources: {
-                        self: [],
-                        target: []
-                    },
-                    concepts: null
-                }
-            }
-        }
+        system: system
     });
 }
 
 export function getFundamentalAttributeSkill(fundamental, siblingSkillModifiers = []) {
+
+    const system = AbbrewSkill.schema.getInitialValue();
+    system.abbrewId = { uuid: fundamental.id };
+    system.siblingSkillModifiers = siblingSkillModifiers;
+    system.isActivatable = true;
+    system.skillType = "basic";
+    system.action.activationType = "standalone";
+    system.action.actionCost = 0;
+    system.action.actionImage = fundamental.image;
+    system.action.skillCheck = [
+        {
+            operator: "add",
+            type: "actor",
+            path: `system.attributes.${fundamental.attribute}.value`,
+            multiplier: 1,
+            lateParse: false
+        }
+    ];
+
     return ({
         _id: fundamental.id,
         name: fundamental.name,
-        system: {
-            abbrewId: {
-                uuid: fundamental.id
-            },
-            siblingSkillModifiers: siblingSkillModifiers,
-            isActivatable: true,
-            traits: [],
-            skillType: "basic",
-            attributeIncrease: "",
-            attributeIncreaseLong: "",
-            attributeRankIncrease: "",
-            skills: {
-                granted: [],
-                paired: [],
-                grantedOnActivation: [],
-                grantedOnAccept: []
-            },
-            action: {
-                activationType: "standalone",
-                actionCost: 0,
-                actionImage: fundamental.image,
-                asyncValues: [],
-                duration: {
-                    precision: "0",
-                    value: 0
-                },
-                uses: {
-                    hasUses: false,
-                    value: 0,
-                    max: 0,
-                    period: ""
-                },
-                charges: {
-                    hasCharges: false,
-                    value: 0,
-                    max: 0
-                },
-                isActive: false,
-                attackProfile: {
-                    isEnabled: false,
-                },
-                skillCheck: [
-                    {
-                        operator: "add",
-                        type: "actor",
-                        path: `system.attributes.${fundamental.attribute}.value`,
-                        multiplier: 1,
-                        lateParse: false
-                    }
-                ],
-                skillRequest: {
-                    isEnabled: false
-                },
-                modifiers: {
-                    fortune: 0,
-                    attackProfile: { damage: [] },
-                    guard: {
-                        self: {
-                            value: [],
-                            operator: ""
-                        },
-                        target: {
-                            value: [],
-                            operator: ""
-                        }
-                    },
-                    risk: {
-                        self: {
-                            value: [],
-                            operator: ""
-                        },
-                        target: {
-                            value: [],
-                            operator: ""
-                        }
-                    },
-                    wounds: {
-                        self: [],
-                        target: []
-                    },
-                    resolve: {
-                        self: {
-                            value: [],
-                            operator: ""
-                        },
-                        target: {
-                            value: [],
-                            operator: ""
-                        }
-                    },
-                    resources: {
-                        self: [],
-                        target: []
-                    },
-                    conceepts: {
-                        self: [],
-                        target: []
-                    }
-                }
-            }
-        }
+        system: system
     });
 }

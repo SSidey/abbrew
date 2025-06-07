@@ -1,0 +1,84 @@
+{
+  "folder": "kyKiwT5wM3bF3OZh",
+  "name": "Potion Pouch",
+  "type": "equipment",
+  "_id": "7Gogdwnw5xeUjx7I",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "name": {
+      "base": "Potion Pouch",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1,
+      "size": 0,
+      "quality": 0
+    },
+    "description": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "enhancements": [],
+    "quantity": 1,
+    "heft": 1,
+    "complexity": 0,
+    "equipType": "worn",
+    "equipPoints": {
+      "required": {
+        "raw": "[{\"value\":\"Attachment\"}]",
+        "parsed": []
+      },
+      "provided": {
+        "raw": "",
+        "parsed": []
+      }
+    },
+    "handsRequired": "",
+    "equipState": "stowed",
+    "handsSupplied": 0,
+    "actionCost": 0,
+    "exertActionCost": 0,
+    "validEquipStates": [],
+    "skills": {
+      "granted": []
+    },
+    "availableEnhancements": 0,
+    "storage": {
+      "hasStorage": true,
+      "type": "count",
+      "accessible": true,
+      "value": 0,
+      "traitFilter": {
+        "raw": "[{\"key\":\"vial\",\"value\":\"Vial\",\"feature\":\"item\",\"subFeature\":\"form\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]",
+        "value": []
+      },
+      "max": 1
+    },
+    "defense": {
+      "guard": 0,
+      "inflexibility": 0,
+      "protection": []
+    }
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1748296683096,
+    "modifiedTime": 1748387540394,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!7Gogdwnw5xeUjx7I"
+}

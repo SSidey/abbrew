@@ -55,7 +55,8 @@ export default class AbbrewSkill extends AbbrewItemBase {
         schema.grantedBy = new fields.SchemaField({
             actor: new fields.StringField({ ...blankString }),
             item: new fields.StringField({ ...blankString })
-        })
+        });
+        schema.handleExpiryEffects = new fields.BooleanField({ required: true, initial: true });
         schema.skills = new fields.SchemaField({
             granted: new fields.ArrayField(
                 new fields.SchemaField({
@@ -94,6 +95,16 @@ export default class AbbrewSkill extends AbbrewItemBase {
                     sourceId: new fields.StringField({ required: true, blank: true }),
                     grantTimes: new fields.NumberField({ ...requiredInteger, initial: 0 })
                 })
+            ),
+            grantedOnExpiry: new fields.ArrayField(
+                new fields.SchemaField({
+                    name: new fields.StringField({ required: true, blank: true }),
+                    skillType: new fields.StringField({ required: true, blank: true }),
+                    id: new fields.StringField({ required: true, blank: true }),
+                    image: new fields.StringField({ required: true, blank: true }),
+                    sourceId: new fields.StringField({ required: true, blank: true }),
+                    grantTimes: new fields.NumberField({ ...requiredInteger, initial: 0 })
+                })
             )
         });
         schema.resource = new fields.SchemaField({
@@ -102,7 +113,8 @@ export default class AbbrewSkill extends AbbrewItemBase {
             // Used to modify other resource capacities.
             // This should be null for base resources.
             relatedResource: new fields.StringField({ nullable: true, initial: null }),
-            fillCapacityOnCreate: new fields.BooleanField({ required: true, initial: false })
+            fillCapacityOnCreate: new fields.BooleanField({ required: true, initial: false }),
+            emptyPeriod: new fields.StringField({ required: true, blank: true })
         });
         schema.senses = new fields.SchemaField({
             modifiesSenses: new fields.BooleanField({ required: true, initia: false }),
@@ -126,7 +138,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
             actionImage: new fields.StringField({ ...blankString }),
             duration: new fields.SchemaField({
                 isConcentration: new fields.BooleanField({ required: true, initial: false }),
-                precision: new fields.StringField({ ...blankString }),
+                precision: new fields.StringField({ required: true, initial: "0" }),
                 value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
                 expireOnStartOfTurn: new fields.BooleanField({ required: true, initial: true })
             }),
@@ -146,6 +158,8 @@ export default class AbbrewSkill extends AbbrewItemBase {
                 max: new fields.NumberField({ ...requiredInteger, initial: 0 })
             }),
             isActive: new fields.BooleanField({ required: true }),
+            removeOnPairedApply: new fields.BooleanField({ required: true, initial: false }),
+            handleRemovedSkillExpiry: new fields.BooleanField({ required: true, initial: true }),
             asyncValues: new fields.ArrayField(
                 new fields.SchemaField({
                     name: new fields.StringField({ ...blankString }),

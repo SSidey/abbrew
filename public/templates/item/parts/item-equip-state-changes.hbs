@@ -1,4 +1,4 @@
 {{#each equipStates as |equipState|}}
-<button type="button" class="equip-state-button" data-equip-state="{{equipState.value}}"><span
+<button type="button" class="equip-state-button" data-action="equipStateChange" data-equip-state="{{equipState.value}}"><span
         class="actions-icon action-{{equipState.cost}}a">{{localize equipState.label}}</span></button>
 {{/each}}

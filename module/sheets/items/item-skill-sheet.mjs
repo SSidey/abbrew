@@ -56,7 +56,7 @@ export class AbbrewSkillSheet extends ItemSheet {
 
         // Enrich description info for display
         // Enrichment turns text like `[[/r 1d20]]` into buttons
-        context.enrichedDescription = await TextEditor.enrichHTML(
+        context.enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
             this.item.system.description,
             {
                 // Whether to show secret blocks in the finished html
@@ -75,7 +75,7 @@ export class AbbrewSkillSheet extends ItemSheet {
 
         context.config = CONFIG.ABBREW;
 
-        context.enrichedFinisherDescription = await TextEditor.enrichHTML(
+        context.enrichedFinisherDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
             this.item.system.action.attackProfile.finisher.description,
             {
                 // Whether to show secret blocks in the finished html
@@ -90,7 +90,7 @@ export class AbbrewSkillSheet extends ItemSheet {
         );
 
         context.lightFields = this.prepareDataModelFields(foundry.data.LightData, ["system.light"]);
-        context.colorationTechniques = AdaptiveLightingShader.SHADER_TECHNIQUES;
+        context.colorationTechniques = foundry.canvas.rendering.shaders.AdaptiveLightingShader.SHADER_TECHNIQUES;
         context.lightAnimations = CONFIG.Canvas.lightAnimations;
         context.gridUnits = game.canvas.grid.units;
 

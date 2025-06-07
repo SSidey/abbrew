@@ -1,0 +1,21 @@
+{
+  "name": "Background",
+  "sorting": "a",
+  "folder": null,
+  "type": "Item",
+  "_id": "ABRkKLvZsTjb85lP",
+  "description": "",
+  "sort": 800000,
+  "color": null,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1748809204403,
+    "modifiedTime": 1748809207355,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!ABRkKLvZsTjb85lP"
+}

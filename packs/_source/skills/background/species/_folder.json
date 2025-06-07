@@ -1,0 +1,21 @@
+{
+  "name": "Species",
+  "sorting": "a",
+  "folder": "ABRkKLvZsTjb85lP",
+  "type": "Item",
+  "_id": "ZHou5Vo3sNBJlVjR",
+  "description": "",
+  "sort": 100000,
+  "color": null,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1748724734617,
+    "modifiedTime": 1748809210275,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!ZHou5Vo3sNBJlVjR"
+}

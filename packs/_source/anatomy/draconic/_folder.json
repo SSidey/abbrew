@@ -1,0 +1,21 @@
+{
+  "name": "Draconic",
+  "sorting": "a",
+  "folder": null,
+  "type": "Item",
+  "_id": "Ex4DQnC8ep3c8GPp",
+  "description": "",
+  "sort": 0,
+  "color": null,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1748631012559,
+    "modifiedTime": 1748631012559,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!Ex4DQnC8ep3c8GPp"
+}

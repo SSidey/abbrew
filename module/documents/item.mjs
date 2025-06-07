@@ -1,9 +1,8 @@
 import { doesNestedFieldExist, arrayDifference, getNumericParts, getSafeJson } from '../helpers/utils.mjs';
 import { getAttackSkillWithActions, getParrySkillWithActions } from '../helpers/fundamental-skills.mjs';
-import { emitForAll, SocketMessage } from '../socket.mjs';
+
 import { applyOperator } from '../helpers/operators.mjs';
-import { acceptSkillCheck } from '../helpers/skills/skill-check.mjs';
-import { getModifiedSkillActionCost, handleSkillActivate } from '../helpers/skills/skill-activation.mjs';
+import { handleSkillActivate } from '../helpers/skills/skill-activation.mjs';
 import { trackSkillDuration } from '../helpers/skills/skill-duration.mjs';
 import { manualSkillExpiry } from '../helpers/skills/skill-expiry.mjs';
 import { handleGrantedSkills } from '../helpers/skills/skill-grants.mjs';
@@ -273,108 +272,6 @@ export default class AbbrewItem extends Item {
     return rollData;
   }
 
-  static chatListeners(html) {
-    html.on('click', '.card-buttons button[data-action]', this._onChatCardAction.bind(this));
-  }
-
-  static async _onChatCardAction(event) {
-    // event.preventDefault();
-
-    console.log('chat');
-
-    // Extract card data
-    const button = event.currentTarget;
-    // TODO: Might want to do this for targeted effects?
-    // button.disabled = true;
-    const card = button.closest(".chat-card");
-    const messageId = card.closest(".message").dataset.messageId;
-    const message = game.messages.get(messageId);
-    const action = button.dataset.action;
-
-    switch (action) {
-      case 'check': await this._onAcceptCheckAction(message.rolls, message.flags.data, messageId); break;
-      case 'accept': await this._onAcceptEffectAction(message.rolls, message.flags.data, action); break;
-      case 'damage': await this._onAcceptDamageAction(message.rolls, message.flags.data, action); break;
-      case 'overpower': await this._onAcceptDamageAction(message.rolls, message.flags.data, action); break;
-      case 'parry': await this._onAcceptDamageAction(message.rolls, message.flags.data, action); break;
-      case 'finisher': await this._onAcceptFinisherAction(message.rolls, message.flags.data, action, button.dataset.finisherType); break;
-    }
-  }
-
-  static async _onAcceptCheckAction(rolls, data, messageId) {
-    const message = game.messages.get(messageId);
-    const tokens = canvas.tokens.controlled.filter((token) => token.actor);
-    if (tokens.length === 0) {
-      ui.notifications.info("Please select a token to accept the effect.");
-      return;
-    }
-
-    const actor = tokens[0].actor;
-
-    const result = await acceptSkillCheck(actor, data.skillCheckRequest);
-
-    const parsedResult = ({ name: result.actor.name, result: result.result, totalValue: result.totalValue, requiredValue: result.requiredValue, totalSuccesses: result.totalSuccesses, requiredSuccesses: result.requiredSuccesses, skillResult: result.skillResult, contestedResult: result.contestedResult })
-
-    let templateData = message.flags.abbrew.messasgeData.templateData;
-
-    templateData.skillCheck = templateData.skillCheck ? templateData.skillCheck : ({ attempts: [] });
-    templateData.skillCheck.attempts = [...templateData.skillCheck.attempts, parsedResult];
-    templateData.skillCheck.checkType = data.skillCheckRequest.checkType;
-
-    const html = await renderTemplate("systems/abbrew/templates/chat/skill-card.hbs", templateData);
-    // await updateMessageForCheck(messageId, html, templateData);
-    emitForAll("system.abbrew", new SocketMessage(game.user.id, "updateMessageForCheck", { messageId, html, templateData }));
-  }
-
-  static async _onAcceptEffectAction(rolls, data, action) {
-    const tokens = canvas.tokens.controlled.filter((token) => token.actor);
-    if (tokens.length === 0) {
-      ui.notifications.info("Please select a token to accept the effect.");
-      return;
-    }
-
-    const actor = tokens[0].actor;
-
-    await actor.takeEffect(data, rolls, action);
-  }
-
-  static async _onAcceptDamageAction(rolls, data, action) {
-    const tokens = canvas.tokens.controlled.filter((token) => token.actor);
-    if (tokens.length === 0) {
-      ui.notifications.info("Please select a token to accept the effect.");
-      return;
-    }
-
-    const actor = tokens[0].actor;
-
-    if (action === "parry" && actor.doesActorHaveSkillDiscord(getParrySkillWithActions(0))) {
-      ui.notifications.info("You are prevented from parrying.");
-      return;
-    }
-
-    if (action === "parry") {
-      const actions = this.getActionCostForAccept(data, action);
-      if (actions > 0 && !await actor.canActorUseActions(getModifiedSkillActionCost(actor, getParrySkillWithActions(actions)))) {
-        return;
-      }
-    }
-
-    await actor.takeAttack(data, action);
-  }
-
-  static getActionCostForAccept(data, action) {
-    return action === "parry" ? data.actionCost : 0;
-  }
-
-  static async _onAcceptFinisherAction(rolls, data, action, finisherType) {
-    const tokens = canvas.tokens.controlled.filter((token) => token.actor);
-    if (tokens.length === 0) {
-      return;
-    }
-
-    await tokens[0].actor.takeFinisher(rolls, data, finisherType);
-  }
-
   async _preCreate(data, options, user) {
     if (game.user !== user) {
       return;
@@ -555,7 +452,8 @@ export default class AbbrewItem extends Item {
       attackMode: combineForSkill.system.action.modifiers.attackProfile.attackMode,
       handsSupplied: combineForSkill.system.action.modifiers.attackProfile.handsSupplied,
       durationPrecision: combineForSkill.system.action.duration.precision,
-      skillsGrantedOnAccept: combineForSkill.system.skills.grantedOnAccept
+      skillsGrantedOnAccept: combineForSkill.system.skills.grantedOnAccept,
+      skillsGrantedOnExpiry: combineForSkill.system.skills.grantedOnExpiry
     }) : undefined;
 
     if (combineSkill) {
@@ -584,9 +482,10 @@ export default class AbbrewItem extends Item {
 
       if (combineSkill.durationPrecision === "0") {
         const effect = actor.effects.find(e => e.flags?.abbrew?.skill?.trackDuration === combineSkill.id);
-        await manualSkillExpiry(effect);
+        await manualSkillExpiry(actor, combineSkill, effect);
       }
       attackSkill.system.skills.grantedOnAccept = combineSkill.skillsGrantedOnAccept;
+      attackSkill.system.skills.grantedOnExpiry = combineSkill.skillsGrantedOnExpiry;
 
       await actor.update({ "system.combinedAttacks.combined": 0, "system.combinedAttacks.combineFor": null, "system.combinedAttacks.base": null, "system.combinedAttacks.additionalDamage": [] })
       await handleSkillActivate(actor, attackSkill, false);

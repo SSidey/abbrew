@@ -10,6 +10,7 @@ import * as models from './data/_module.mjs';
 // Import Documents Classes
 import * as documents from './documents/_module.mjs';
 import * as abbrewCanvas from './canvas/_module.mjs';
+import * as abbrewApplication from './applications/_module.mjs';
 import { handleActorWoundConditions, handleActorGuardConditions, handleCombatStart, handleCombatEnd, handleTurnChange } from './helpers/combat.mjs';
 import { staticID, doesNestedFieldExist, getSafeJson, getObjectValueByStringPath } from './helpers/utils.mjs';
 import { registerSystemSettings } from './settings.mjs';
@@ -27,6 +28,8 @@ import { AbbrewEquipmentSheet } from './sheets/items/item-equipment-sheet.mjs'
 import { onWorldTimeUpdate } from './helpers/time.mjs';
 import { activateSocketListener, emitForAll, SocketMessage } from './socket.mjs';
 import { handleSkillActivate } from './helpers/skills/skill-activation.mjs';
+import { Browser } from './sheets/browser.mjs';
+const { FormDataExtended } = foundry.applications.ux;
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -39,6 +42,7 @@ Hooks.once('init', function () {
     AbbrewActor: documents.AbbrewActor,
     AbbrewItem: documents.AbbrewItem,
     useSkillMacro,
+    requestSkillCheckMacro,
     rollItemMacro,
   };
 
@@ -86,8 +90,11 @@ Hooks.once('init', function () {
     equipment: models.AbbrewEquipment
   }
 
+  // Token Setup
   CONFIG.Token.documentClass = documents.AbbrewTokenDocument;
   CONFIG.Token.objectClass = abbrewCanvas.AbbrewToken;
+
+  CONFIG.ui.chat = abbrewApplication.AbbrewChatLog;
 
   // Register System Settings  
   registerSystemSettings();
@@ -100,7 +107,7 @@ Hooks.once('init', function () {
   CONFIG.ActiveEffect.dataModels = {
     base: models.AbbrewActiveEffect
   }
-  DocumentSheetConfig.registerSheet(documents.AbbrewActiveEffect, "abbrew", AbbrewActiveEffectSheet,
+  foundry.applications.apps.DocumentSheetConfig.registerSheet(documents.AbbrewActiveEffect, "abbrew", AbbrewActiveEffectSheet,
     {
       types: ["base", "passive", "temporary", "inactive"],
       makeDefault: true,
@@ -109,68 +116,69 @@ Hooks.once('init', function () {
   );
 
   // Register sheet application classes
-  Actors.unregisterSheet('core', ActorSheet);
-  Actors.registerSheet('abbrew', AbbrewActorSheet, {
+  foundry.documents.collections.Actors.unregisterSheet('core', ActorSheet);
+  foundry.documents.collections.Actors.registerSheet('abbrew', AbbrewActorSheet, {
+    types: ["character", "npc"],
     makeDefault: true,
     label: 'ABBREW.SheetLabels.Actor',
   });
-  Items.unregisterSheet('core', ItemSheet);
-  Items.registerSheet('abbrew', AbbrewItemSheet, {
+  foundry.documents.collections.Items.unregisterSheet('core', ItemSheet);
+  foundry.documents.collections.Items.registerSheet('abbrew', AbbrewItemSheet, {
     types: ["item", "feature", "spell", "wound"],
     makeDefault: true,
     label: 'ABBREW.SheetLabels.Item',
   });
-  Items.registerSheet('abbrew', AbbrewEquipmentSheet, {
+  foundry.documents.collections.Items.registerSheet('abbrew', AbbrewEquipmentSheet, {
     types: ["equipment"],
     makeDefault: true,
     label: 'ABBREW.SheetLabels.Equipment',
   });
-  Items.registerSheet('abbrew', AbbrewArmourSheet, {
+  foundry.documents.collections.Items.registerSheet('abbrew', AbbrewArmourSheet, {
     types: ["armour"],
     makeDefault: true,
     label: 'ABBREW.SheetLabels.Armour',
   });
-  Items.registerSheet('abbrew', AbbrewWeaponSheet, {
+  foundry.documents.collections.Items.registerSheet('abbrew', AbbrewWeaponSheet, {
     types: ["weapon"],
     makeDefault: true,
     label: 'ABBREW.SheetLabels.Weapon',
   });
-  Items.registerSheet('abbrew', AbbrewCreatureFormSheet, {
+  foundry.documents.collections.Items.registerSheet('abbrew', AbbrewCreatureFormSheet, {
     types: ["creatureForm"],
     makeDefault: true,
     label: "ABBREW.SheetLabels.CreatureForm"
   });
-  Items.registerSheet('abbrew', AbbrewSkillDeckSheet, {
+  foundry.documents.collections.Items.registerSheet('abbrew', AbbrewSkillDeckSheet, {
     types: ["skillDeck", "background"],
     makeDefault: true,
     label: "ABBREW.SheetLabels.SkillDeck"
   });
-  Items.registerSheet('abbrew', AbbrewAnatomySheet, {
+  foundry.documents.collections.Items.registerSheet('abbrew', AbbrewAnatomySheet, {
     types: ["anatomy"],
     makeDefault: true,
     label: "ABBREW.SheetLabels.Anatomy"
   });
-  Items.registerSheet('abbrew', AbbrewAmmunitionSheet, {
+  foundry.documents.collections.Items.registerSheet('abbrew', AbbrewAmmunitionSheet, {
     types: ["ammunition"],
     makeDefault: true,
     label: "ABBREW.SheetLabels.Ammunition"
   });
-  Items.registerSheet('abbrew', AbbrewSkillSheet, {
+  foundry.documents.collections.Items.registerSheet('abbrew', AbbrewSkillSheet, {
     types: ["skill"],
     makeDefault: true,
     label: "ABBREW.SheetLabels.Skill"
   });
-  Items.registerSheet('abbrew', AbbrewArchetypeSheet, {
+  foundry.documents.collections.Items.registerSheet('abbrew', AbbrewArchetypeSheet, {
     types: ["archetype"],
     makeDefault: true,
     label: "ABBREW.SheetLabels.Archetype"
   });
-  Items.registerSheet('abbrew', AbbrewPathSheet, {
+  foundry.documents.collections.Items.registerSheet('abbrew', AbbrewPathSheet, {
     types: ["path"],
     makeDefault: true,
     label: "ABBREW.SheetLabels.Path"
   });
-  Items.registerSheet('abbrew', AbbrewEnhancementSheet, {
+  foundry.documents.collections.Items.registerSheet('abbrew', AbbrewEnhancementSheet, {
     types: ["enhancement"],
     makeDefault: true,
     label: "ABBREW.SheetLabels.Enhancement"
@@ -405,10 +413,6 @@ Hooks.on("updateItem", async (document, changed, options, userId) => {
 
 Hooks.on("applyActiveEffect", applyCustomEffects);
 
-Hooks.on("renderChatLog", (app, html, data) => {
-  documents.AbbrewItem.chatListeners(html);
-});
-
 Hooks.on("renderChatMessage", async function onMessageRendered(message, html, messageData) {
   //[data-visibility="gm"]
   if (!game.user.isGM) {
@@ -581,6 +585,13 @@ Hooks.on("dropActorSheetData", async (actor, sheet, data) => {
   }
 });
 
+Hooks.on("pauseGame", async function (paused) {
+  console.log("paused");
+  // const data = { content: { builderTitle: "Hello" }, buttons: {} };
+  const browser = await new Browser().render(true);
+  console.log("rendered");
+});
+
 /* -------------------------------------------- */
 /*  Module Specific Hooks                                 */
 /* -------------------------------------------- */
@@ -749,9 +760,98 @@ function getControlledActor() {
   return tokens[0].actor;
 }
 
+async function requestSkillCheckMacro() {
+  const fields = foundry.applications.fields;
+  const nameInput = fields.createTextInput({
+    name: "skillName",
+    value: ""
+  });
+
+  const nameGroup = fields.createFormGroup({
+    input: nameInput,
+    label: "Skill Name",
+    hint: ""
+  });
+
+  const textInput = fields.createTextInput({
+    name: "skillId",
+    value: ""
+  });
+
+  const textGroup = fields.createFormGroup({
+    input: textInput,
+    label: "Custom SkillId",
+    hint: ""
+  });
+
+  const selectInput = fields.createSelectInput({
+    options: [{ label: "", value: "" }, ...Object.entries(CONFIG.ABBREW.attributes).map(e => ({ label: game.i18n.localize(e[1]), value: e[0] }))],
+    name: "selectId"
+  });
+  const selectGroup = fields.createFormGroup({
+    input: selectInput,
+    label: "Select a Skill",
+    hint: "Strength Check"
+  });
+
+  const checkTypeSelect = fields.createSelectInput({
+    options: [{ label: "Successes", value: "successes" }, { label: "Result", value: "result" }],
+    name: "checkType"
+  });
+  const checkTypeSelectGroup = fields.createFormGroup({
+    input: checkTypeSelect,
+    label: "Select Check Type",
+    hint: "Successes"
+  });
+
+  const difficultyInput = fields.createNumberInput({
+    name: "difficulty",
+    value: 0
+  });
+
+  const difficultyGroup = fields.createFormGroup({
+    input: difficultyInput,
+    label: "Difficulty",
+    hint: ""
+  });
+
+  const successesInput = fields.createNumberInput({
+    name: "successes",
+    value: 0
+  });
+
+  const successesGroup = fields.createFormGroup({
+    input: successesInput,
+    label: "Successes Required",
+    hint: ""
+  });
+
+  const content = `${nameGroup.outerHTML} ${textGroup.outerHTML} ${selectGroup.outerHTML} ${checkTypeSelectGroup.outerHTML} ${difficultyGroup.outerHTML} ${successesGroup.outerHTML}`
+
+  const result = await foundry.applications.api.DialogV2.prompt({
+    window: { title: "Select a Skill" },
+    content: content,
+    ok: {
+      label: "Choose",
+      callback: (event, button, dialog) => new FormDataExtended(button.form).object
+    }
+  });
+
+
+  console.log(JSON.stringify(result));
+  if (result.selectId) {
+    const fundamentalSkill = CONFIG.ABBREW.fundamentalAttributeSkillMap[result.selectId];
+    await requestSkillCheck(fundamentalSkill.name, [fundamentalSkill.id], result.checkType, result.difficulty, result.successes);
+  } else if (result.skillId) {
+    await requestSkillCheck(result.skillName, [result.skillId], result.checkType, result.difficulty, result.successes);
+  } else {
+    return;
+  }
+}
+
 // skillIds: [AbbrewId.uuid]
 export async function requestSkillCheck(checkName, skillIds, checkType, difficulty, successes) {
-  let requirements = { modifierIds: skillIds, checkType: checkType, isContested: false, successes: { total: 0, requiredValue: 0 }, result: { requiredValue: 0 }, contestedResult: { dice: [], modifier: 0 } };
+  let requirements = { modifierIds: skillIds, traits: [], checkType: checkType, isContested: false, successes: { total: 0, requiredValue: 0 }, result: { requiredValue: 0 }, contestedResult: { dice: [], modifier: 0 } };
   if (checkType === "successes") {
     requirements.successes.total = successes;
     requirements.successes.requiredValue = difficulty;

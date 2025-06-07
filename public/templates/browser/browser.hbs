@@ -1,0 +1,28 @@
+<form class="abbrew" autocomplete="off">
+    <div class="browser">
+        <div class="browser-header">
+        </div>
+        <div class="browser-form">
+            <div class="browser-search">
+                <div>
+                    <h3>Roles</h3>
+                    <input type="text" name="system.roles.raw" data-dtype="String" />
+                </div>
+            </div>
+            <div class="browser-results">
+                <ol style="list-style:none; padding-left:0px">
+                    {{#each archetypes as |archetype|}}
+                    <li class="archetype" data-id="{{archetype._id}}" data-requiredRoles="{{archetype.roles.required}}"
+                        data-restrictedRoles="{{archetype.roles.restricted}}">
+                        <div class="image-container"><img src="{{archetype.img}}" /></div>
+                        <div class="name"><span>{{archetype.name}}</span></div>
+                        <a class="item-control" data-action="renderArchetypeSheet" title="Open">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                    </li>
+                    {{/each}}
+                </ol>
+            </div>
+        </div>
+    </div>
+</form>

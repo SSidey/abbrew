@@ -11,7 +11,24 @@
       "value": "",
       "uuid": ""
     },
-    "skills": [],
+    "skills": {
+      "granted": [
+        {
+          "name": "Dwarven Constitution",
+          "skillType": "",
+          "id": "Vnlg24Bxid9Uvl3t",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.Vnlg24Bxid9Uvl3t"
+        },
+        {
+          "name": "Dwarven Sight",
+          "id": "iD5FErBuQ2xkzGlO",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.iD5FErBuQ2xkzGlO",
+          "skillType": ""
+        }
+      ]
+    },
     "attributes": {
       "str": {
         "value": 2,
@@ -29,9 +46,9 @@
         "isEnabled": false
       },
       "con": {
-        "value": 1,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       },
       "int": {
         "value": 0,
@@ -44,9 +61,9 @@
         "isEnabled": true
       },
       "wit": {
-        "value": 1,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       },
       "vis": {
         "value": 0,
@@ -73,7 +90,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743076688301,
-    "modifiedTime": 1743080146667,
+    "modifiedTime": 1748809249704,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!f6xkE0Z9Kg8qT3uq"

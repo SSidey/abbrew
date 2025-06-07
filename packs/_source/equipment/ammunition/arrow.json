@@ -22,7 +22,8 @@
       "quality": {
         "base": 0,
         "value": 0
-      }
+      },
+      "tier": 0
     },
     "equipType": "",
     "equipPoints": {
@@ -101,7 +102,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1747590651378,
-    "modifiedTime": 1747591488854,
+    "modifiedTime": 1748899856858,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!Gh2EE8i0Nfeiq6Ct"

@@ -7,7 +7,7 @@
   "system": {
     "description": "",
     "traits": {
-      "raw": "[{\"key\":\"ranged\",\"value\":\"Ranged\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"draw\",\"value\":\"Draw\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[\"reload\"]}]",
+      "raw": "[{\"key\":\"ranged\",\"value\":\"Ranged\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"draw\",\"value\":\"Draw\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[\"reload\"]},{\"key\":\"weapon\",\"value\":\"Weapon\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]",
       "value": []
     },
     "abbrewId": {
@@ -95,7 +95,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1747592852294,
-    "modifiedTime": 1747681214076,
+    "modifiedTime": 1748899019510,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!dDX0UpTkf7iI8dlo"
