@@ -1,9 +1,10 @@
 import Tagify from "@yaireo/tagify";
 import { getSafeJson } from "../helpers/utils.mjs";
+import { DragDropMixin } from "./helpers/drag-drop-mixin.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-export class Browser extends HandlebarsApplicationMixin(ApplicationV2) {
+export class Browser extends DragDropMixin(HandlebarsApplicationMixin(ApplicationV2)) {
     static DEFAULT_OPTIONS = {
         actions: {
             renderArchetypeSheet: Browser.renderArchetypeSheet
@@ -11,7 +12,10 @@ export class Browser extends HandlebarsApplicationMixin(ApplicationV2) {
         position: {
             height: 1000,
             width: 1000
-        }
+        },
+        dragDrop: [
+            { dragSelector: ".archetype", dropSelector: null },
+        ]
     }
 
     static PARTS = {
@@ -48,8 +52,35 @@ export class Browser extends HandlebarsApplicationMixin(ApplicationV2) {
         return context;
     }
 
+    _canDragStart(selector) {
+        // game.user fetches the current user
+        return true;
+    };
+
+    /**
+     * Callback actions which occur at the beginning of a drag start workflow.
+     * @param {DragEvent} event       The originating DragEvent
+     * @protected
+    */
+    async _onDragStart(event) {
+        const el = event.currentTarget;
+        if ('link' in event.target.dataset) return;
+
+        // Extract the data you need
+        let dragData = {
+            type: "Item",
+            uuid: `Compendium.abbrew.archetypes.Item.${event.currentTarget.dataset.id}`
+        };
+
+        if (!dragData) return;
+
+        // Set data transfer
+        event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
+    }
+
     _onRender(context, options) {
         super._onRender(context, options);
+        this.bindDragDrops();
         this._activateRoles();
         this.#search.bind(this.element);
     }

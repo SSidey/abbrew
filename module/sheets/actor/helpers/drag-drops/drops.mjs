@@ -1,3 +1,5 @@
+const { TextEditor } = foundry.applications.ux;
+
 export async function _onArchetypeDrop(event) {
     event.preventDefault();
     if (!this.actor.testUserPermission(game.user, 'OWNER')) {
