@@ -12,8 +12,8 @@
             <div class="browser-results">
                 <ol style="list-style:none; padding-left:0px">
                     {{#each archetypes as |archetype|}}
-                    <li class="archetype" data-id="{{archetype._id}}" data-requiredRoles="{{archetype.roles.required}}"
-                        data-restrictedRoles="{{archetype.roles.restricted}}">
+                    <li class="archetype" data-id="{{archetype.id}}" data-required-roles="{{archetype.roles.required}}"
+                        data-restricted-roles="{{archetype.roles.restricted}}">
                         <div class="image-container"><img src="{{archetype.img}}" /></div>
                         <div class="name"><span>{{archetype.name}}</span></div>
                         <a class="item-control" data-action="renderArchetypeSheet" title="Open">

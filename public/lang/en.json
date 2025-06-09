@@ -674,8 +674,13 @@
         "skills": "Skills",
         "items": "Items",
         "description": "Description",
-        "effects": "Effects"
+        "effects": "Effects",
+        "visible": "Visible"
       }
     }
+  },
+
+  "EFFECT": {
+    "TabDuration": "Duration"
   }
 }

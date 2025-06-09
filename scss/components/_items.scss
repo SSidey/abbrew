@@ -32,7 +32,7 @@
   padding: 0;
   overflow-y: auto;
   scrollbar-width: thin;
-  color: $c-tan;
+  color: var(--color-text-primary);
 
   // Child lists
   .item-list {

@@ -24,18 +24,25 @@ export class Browser extends HandlebarsApplicationMixin(ApplicationV2) {
         const context = await super._prepareContext(options);
 
         const pack = game.packs.get("abbrew.archetypes");
-        const archetypes = structuredClone(await pack.getDocuments({ type: "archetype" }));
+        await pack.getDocuments({ type: "archetype" });
+        const archetypes = structuredClone(game.packs.get("abbrew.archetypes"));
 
-        archetypes.forEach(a => {
-            a.roles = Object.values(a.system.roleRequirements).reduce((fullRoles, requirement) => {
+        archetypes.entries().forEach(([key, a]) => {
+            const { required, restricted } = Object.values(a.system.roleRequirements).reduce((fullRoles, requirement) => {
                 fullRoles.required.push(...getSafeJson(requirement.roles, []).map(r => r.label));
                 fullRoles.restricted.push(...getSafeJson(requirement.restrictedRoles, []).map(r => r.label));
 
                 return fullRoles;
             }, { required: [], restricted: [] });
+
+            const parsedRequirements = JSON.stringify(required);
+            const parsedRestrictions = JSON.stringify(restricted);
+
+            a.roles = { required: parsedRequirements, restricted: parsedRestrictions };
+            a.id = key;
         });
-        
-        context.archetypes = archetypes;
+
+        context.archetypes = Array.from(archetypes.values().map(v => ({ name: v.name, img: v.img, roles: v.roles, id: v.id })));
         context.roles = CONFIG.ABBREW.roles;
 
         return context;
@@ -69,7 +76,7 @@ export class Browser extends HandlebarsApplicationMixin(ApplicationV2) {
         };
         if (roles) {
             var taggedRoles = new Tagify(roles, settings);
-            roles.addEventListener('change', this.onChange)
+            roles.addEventListener('change', this.onChange.bind(this));
         }
     }
 
@@ -92,7 +99,13 @@ export class Browser extends HandlebarsApplicationMixin(ApplicationV2) {
     });
 
     _onSearchFilter(event, query, rgx, html) {
-        console.log("Search");
+        const querySet = new Set(getSafeJson(query, []).map(q => q.label));
+        html.querySelectorAll("li.archetype").forEach(a => {
+            const dataset = a.dataset;
+            const requiredRoles = new Set(getSafeJson(dataset.requiredRoles, []));
+            const restrictedRoles = new Set(getSafeJson(dataset.restrictedRoles, []));
+            a.hidden = (!requiredRoles.isSupersetOf(querySet) || restrictedRoles.intersection(querySet).size > 0)
+        })
     }
 
     _tearDown(options) {

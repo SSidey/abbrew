@@ -1,5 +1,4 @@
 // Import sheet classes.
-import { AbbrewActorSheet } from './sheets/actor-sheet.mjs';
 import { AbbrewItemSheet } from './sheets/item-sheet.mjs';
 import { AbbrewActiveEffectSheet } from './sheets/active-effect-sheet.mjs'
 // Import helper/utility classes and constants.
@@ -29,6 +28,8 @@ import { onWorldTimeUpdate } from './helpers/time.mjs';
 import { activateSocketListener, emitForAll, SocketMessage } from './socket.mjs';
 import { handleSkillActivate } from './helpers/skills/skill-activation.mjs';
 import { Browser } from './sheets/browser.mjs';
+import { AbbrewCharacterSheet } from './sheets/actor/character-sheet.mjs';
+import { AbbrewNPCSheet } from './sheets/actor/npc-sheet.mjs';
 const { FormDataExtended } = foundry.applications.ux;
 
 /* -------------------------------------------- */
@@ -117,8 +118,13 @@ Hooks.once('init', function () {
 
   // Register sheet application classes
   foundry.documents.collections.Actors.unregisterSheet('core', ActorSheet);
-  foundry.documents.collections.Actors.registerSheet('abbrew', AbbrewActorSheet, {
-    types: ["character", "npc"],
+  foundry.documents.collections.Actors.registerSheet('abbrew', AbbrewCharacterSheet, {
+    types: ["character"],
+    makeDefault: true,
+    label: 'ABBREW.SheetLabels.Actor',
+  });
+  foundry.documents.collections.Actors.registerSheet('abbrew', AbbrewNPCSheet, {
+    types: ["npc"],
     makeDefault: true,
     label: 'ABBREW.SheetLabels.Actor',
   });
