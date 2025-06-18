@@ -2,6 +2,8 @@ import AbbrewPhysicalItem from "./item-physical.mjs";
 
 export default class AbbrewAmmunition extends AbbrewPhysicalItem {
 
+    static LOCALIZATION_PREFIXES = [...super.LOCALIZATION_PREFIXES, "ITEM_AMMUNITION"];
+
     static defineSchema() {
         const schema = super.defineSchema();
 

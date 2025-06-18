@@ -320,11 +320,12 @@ export default class AbbrewItem extends Item {
         const capacity = this.system.resource.capacity ?? 0;
         await this.actor.handleResourceFill(id, capacity);
       }
-      if (this.actor && data.effects.find(e => e.flags.abbrew.skill.stacks && data.system.action.uses.hasUses)) {
+      if (this.actor && data.effects.find(e => e.flags.abbrew?.skill?.stacks && data.system.action.uses.hasUses)) {
         const effect = this.effects.find(e => e.flags.abbrew.skill.stacks)
         const stacks = data.effects.find(e => e.flags.abbrew.skill.stacks).flags.abbrew.skill.stacks;
         const visible = stacks > 1;
-        await effect.update({ "flags.statuscounter.visible": visible, "flags.statuscounter.value": stacks });
+        // TODO: Will this module update
+        // await effect.update({ "flags.statuscounter.visible": visible, "flags.statuscounter.value": stacks });
       }
     } else if (data.type === "anatomy") {
       await this.actor?.acceptAnatomy(this);
@@ -409,6 +410,7 @@ export default class AbbrewItem extends Item {
     }
   }
 
+  // TODO: Traits from weapon through to attack
   async handleAttackDamageAction(actor, attackProfileId, attackMode) {
     let attackProfile = structuredClone(this.system.attackProfiles[attackProfileId]);
     let ammunitionId;
@@ -445,6 +447,7 @@ export default class AbbrewItem extends Item {
 
     const combineSkill = combineForSkill ? ({
       name: combineForSkill.name,
+      traits: combineForSkill.system.traits.raw,
       image: combineForSkill.img,
       id: combineForSkill._id,
       value: combineForSkill.system.action.modifiers.attackProfile.combineAttacks.value,
@@ -460,7 +463,7 @@ export default class AbbrewItem extends Item {
       const toCombine = combineSkill.value;
       const combined = actor.system.combinedAttacks.combined;
       if (actor.system.combinedAttacks.combined === 0 && !actor.system.combinedAttacks.base) {
-        const base = { id: combineSkill.id, name: combineSkill.name, actionCost: combineSkill.actionCost, image: combineSkill.image, attackMode: combineSkill.attackMode, handsSupplied: combineSkill.handsSupplied, attackProfile: attackProfile };
+        const base = { id: combineSkill.id, name: combineSkill.name, traits: combineSkill.traits, actionCost: combineSkill.actionCost, image: combineSkill.image, attackMode: combineSkill.attackMode, handsSupplied: combineSkill.handsSupplied, attackProfile: attackProfile };
         await actor.update({ "system.combinedAttacks.itemIds": itemTriggerIds, "system.combinedAttacks.combined": combined + 1, "system.combinedAttacks.base": base });
         return;
       }
@@ -475,7 +478,7 @@ export default class AbbrewItem extends Item {
 
       let base = actor.system.combinedAttacks.base;
       base.attackProfile.damage = [...base.attackProfile.damage, ...fullCombinedDamage];
-      let attackSkill = getAttackSkillWithActions(base.id, base.name, base.actionCost, base.image, base.attackProfile, base.attackMode, base.handsSupplied, [], actor._id, fullItemIds);
+      let attackSkill = getAttackSkillWithActions(base.id, base.name, base.traits, base.actionCost, base.image, base.attackProfile, base.attackMode, base.handsSupplied, [], actor._id, fullItemIds);
       attackSkill.system.action.attackProfile.finisherLimit = applyOperator(attackSkill.system.action.attackProfile.finisherLimit, combineForSkill.system.action.modifiers.attackProfile.finisherLimit.value, combineForSkill.system.action.modifiers.attackProfile.finisherLimit.operator, 0);
       attackSkill.system.action.attackProfile.critical = applyOperator(attackSkill.system.action.attackProfile.critical, combineForSkill.system.action.modifiers.attackProfile.critical.value, combineForSkill.system.action.modifiers.attackProfile.critical.operator, 5);
       attackSkill.system.action.attackProfile.lethal = applyOperator(attackSkill.system.action.attackProfile.lethal, combineForSkill.system.action.modifiers.attackProfile.lethal.value, combineForSkill.system.action.modifiers.attackProfile.lethal.operator, 0);
@@ -492,7 +495,7 @@ export default class AbbrewItem extends Item {
       return;
     }
 
-    const attackSkill = getAttackSkillWithActions(null, this.name, actionCost, this.img, attackProfile, attackMode, this.system.handsSupplied, [], actor._id, itemTriggerIds);
+    const attackSkill = getAttackSkillWithActions(null, this.name, this.system.traits.raw, actionCost, this.img, attackProfile, attackMode, this.system.handsSupplied, [], actor._id, itemTriggerIds);
 
     await handleSkillActivate(actor, attackSkill);
 

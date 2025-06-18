@@ -2,6 +2,8 @@ import { compareModifierIndices, getSafeJson } from "../helpers/utils.mjs";
 
 export default class AbbrewItemBase extends foundry.abstract.TypeDataModel {
 
+  static LOCALIZATION_PREFIXES = ["ITEM_BASE"];
+
   static defineSchema() {
     const schema = {};
     const blankString = { required: true, blank: true };
@@ -20,7 +22,7 @@ export default class AbbrewItemBase extends foundry.abstract.TypeDataModel {
       )
     });
     schema.meta = new fields.SchemaField(this.getMetaEntries());
-    schema.description = new fields.StringField({ ...blankString });
+    schema.description = new fields.HTMLField({ ...blankString });
     schema.traits = new fields.SchemaField({
       raw: new fields.StringField({ ...blankString }),
       value: new fields.ArrayField(

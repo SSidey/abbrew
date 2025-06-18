@@ -1,7 +1,8 @@
 import AbbrewSkill from "../data/skill.mjs";
+import { getSafeJson } from "./utils.mjs";
 
 // TODO: Cap concepts at visualisation
-export function getAttackSkillWithActions(id, name, actionCost, image, attackProfile, attackMode, handsSupplied, siblingSkillModifiers = [], actorSource, itemSource) {
+export function getAttackSkillWithActions(id, name, traits, actionCost, image, attackProfile, attackMode, handsSupplied, siblingSkillModifiers = [], actorSource, itemSource) {
     const skill = CONFIG.ABBREW.fundamentalAttackSkills[attackMode];
     let critical;
     if (attackMode === "ranged") {
@@ -14,6 +15,7 @@ export function getAttackSkillWithActions(id, name, actionCost, image, attackPro
     }
 
     const system = AbbrewSkill.schema.getInitialValue();
+    system.traits = getSafeJson(traits, []);
     system.abbrewId = { uuid: id ?? skill.id };
     system.siblingSkillModifiers = siblingSkillModifiers;
     system.isActivatable = true;

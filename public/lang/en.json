@@ -23,14 +23,127 @@
     },
     "ActiveEffectKeys": {
       "guardMax": "Guard Max",
-      "allReduction": "All Reduction",
-      "allWeakness": "All Weakness",
-      "crushingReduction": "Crushing Reduction",
-      "crushingWeakness": "Crushing Weakness",
-      "piercingReduction": "Piercing Reduction",
-      "piercingWeakness": "Piercing Weakness",
-      "slashingReduction": "Slashing Reduction",
-      "slashingWeakness": "Slashing Weakness",
+      "protectionTypes": {
+        "all": {
+          "reduction": "All Reduction",
+          "weakness": "All Weakness",
+          "resistance": "All Resistance",
+          "amplification": "All Amplification",
+          "immunity": "All Immunity"
+        },
+        "untyped": {
+          "reduction": "Untyped Reduction",
+          "weakness": "Untyped Weakness",
+          "resistance": "Untyped Resistance",
+          "amplification": "Untyped Amplification",
+          "immunity": "Untyped Immunity"
+        },
+        "crushing": {
+          "reduction": "Crushing Reduction",
+          "weakness": "Crushing Weakness",
+          "resistance": "Crushing Resistance",
+          "amplification": "Crushing Amplification",
+          "immunity": "Crushing Immunity"
+        },
+        "piercing": {
+          "reduction": "Piercing Reduction",
+          "weakness": "Piercing Weakness",
+          "resistance": "Piercing Resistance",
+          "amplification": "Piercing Amplification",
+          "immunity": "Piercing Immunity"
+        },
+        "slashing": {
+          "reduction": "Slashing Reduction",
+          "weakness": "Slashing Weakness",
+          "resistance": "Slashing Resistance",
+          "amplification": "Slashing Amplification",
+          "immunity": "Slashing Immunity"
+        },
+        "life": {
+          "reduction": "Life Reduction",
+          "weakness": "Life Weakness",
+          "resistance": "Life Resistance",
+          "amplification": "Life Amplification",
+          "immunity": "Life Immunity"
+        },
+        "death": {
+          "reduction": "Death Reduction",
+          "weakness": "Death Weakness",
+          "resistance": "Death Resistance",
+          "amplification": "Death Amplification",
+          "immunity": "Death Immunity"
+        },
+        "fire": {
+          "reduction": "Fire Reduction",
+          "weakness": "Fire Weakness",
+          "resistance": "Fire Resistance",
+          "amplification": "Fire Amplification",
+          "immunity": "Fire Immunity"
+        },
+        "cold": {
+          "reduction": "Cold Reduction",
+          "weakness": "Cold Weakness",
+          "resistance": "Cold Resistance",
+          "amplification": "Cold Amplification",
+          "immunity": "Cold Immunity"
+        },
+        "electric": {
+          "reduction": "Electric Reduction",
+          "weakness": "Electric Weakness",
+          "resistance": "Electric Resistance",
+          "amplification": "Electric Amplification",
+          "immunity": "Electric Immunity"
+        },
+        "acid": {
+          "reduction": "Acid Reduction",
+          "weakness": "Acid Weakness",
+          "resistance": "Acid Resistance",
+          "amplification": "Acid Amplification",
+          "immunity": "Acid Immunity"
+        },
+        "poison": {
+          "reduction": "Poison Reduction",
+          "weakness": "Poison Weakness",
+          "resistance": "Poison Resistance",
+          "amplification": "Poison Amplification",
+          "immunity": "Poison Immunity"
+        },
+        "dark": {
+          "reduction": "Dark Reduction",
+          "weakness": "Dark Weakness",
+          "resistance": "Dark Resistance",
+          "amplification": "Dark Amplification",
+          "immunity": "Dark Immunity"
+        },
+        "light": {
+          "reduction": "Light Reduction",
+          "weakness": "Light Weakness",
+          "resistance": "Light Resistance",
+          "amplification": "Light Amplification",
+          "immunity": "Light Immunity"
+        },
+        "pain": {
+          "reduction": "Pain Reduction",
+          "weakness": "Pain Weakness",
+          "resistance": "Pain Resistance",
+          "amplification": "Pain Amplification",
+          "immunity": "Pain Immunity"
+        },
+        "emotion": {
+          "reduction": "Emotion Reduction",
+          "weakness": "Emotion Weakness",
+          "resistance": "Emotion Resistance",
+          "amplification": "Emotion Amplification",
+          "immunity": "Emotion Immunity"
+        },
+        "psychic": {
+          "reduction": "Psychic Reduction",
+          "weakness": "Psychic Weakness",
+          "resistance": "Psychic Resistance",
+          "amplification": "Psychic Amplification",
+          "immunity": "Psychic Immunity"
+        }
+      },
       "initiativeBonus": "Initiative Bonus",
       "baseSpeed": "Base Speed",
       "landSpeed": "Land Speed",
@@ -263,6 +376,7 @@
       "hide": "Hide",
       "iron": "Iron",
       "leather": "Leather",
+      "silver": "Silver",
       "mithril": "Mithril",
       "steel": "Steel",
       "chain": "Chain",
@@ -315,7 +429,8 @@
       "dropped": "Drop",
       "active": "Activate",
       "inactive": "Deactivate",
-      "readied": "Ready"
+      "readied": "Ready",
+      "pickup": "Pick Up"
     },
     "AsyncValueTypes": {
       "singleValue": "Single",
@@ -472,9 +587,29 @@
         "consumable": "Consumable",
         "ammunition": "Ammunition"
       },
+      "Material": {
+        "silver": "Silver"
+      },
       "Skill": {
+        "specialisation": "Specialisation",
+        "mastery": "Mastery",
         "poison": "Poison",
-        "disease": "Disease"
+        "disease": "Disease",
+        "untyped": "Untyped",
+        "crushing": "Crushing",
+        "piercing": "Piercing",
+        "slashing": "Slashing",
+        "life": "Life",
+        "death": "Death",
+        "fire": "Fire",
+        "cold": "Cold",
+        "electric": "Electric",
+        "acid": "Acid",
+        "dark": "Dark",
+        "light": "Light",
+        "pain": "Pain",
+        "emotion": "Emotion",
+        "psychic": "Psychic"
       },
       "stance": "Stance"
     },
@@ -530,7 +665,6 @@
     },
     "Item": {
       "item": "Item",
-      "feature": "Feature",
       "spell": "Spell",
       "skill": "Skill",
       "anatomy": "Anatomy",
@@ -677,10 +811,182 @@
         "effects": "Effects",
         "visible": "Visible"
       }
+    },
+    "ITEM": {
+      "TABS": {
+        "description": "Description",
+        "attributes": "Attributes",
+        "skills": "Skills",
+        "storage": "Storage",
+        "attackprofiles": "Attack Profiles",
+        "effects": "Effects",
+        "requirements": "Requirements"
+      }
     }
   },
 
   "EFFECT": {
-    "TabDuration": "Duration"
+    "TabDuration": "Duration",
+    "ParseMode": "Parse Mode",
+    "ChangeNumerator": "Numerator",
+    "ChangeDenominator": "Denominator"
+  },
+
+  "ITEM_BASE": {
+    "FIELDS": {
+      "name": {
+        "base": {
+          "label": "Base Name"
+        }
+      },
+      "meta": {
+        "tier": {
+          "label": "Tier"
+        }
+      },
+      "traits": {
+        "raw": {
+          "label": "Traits"
+        }
+      }
+    }
+  },
+  "ITEM_PATH": {
+    "FIELDS": {
+      "roles": {
+        "label": "Roles"
+      }
+    }
+  },
+  "ITEM_PHYSICAL": {
+    "FIELDS": {
+      "complexity": {
+        "label": "Complexity"
+      },
+      "heft": {
+        "label": "Heft"
+      },
+      "quantity": {
+        "label": "Quantity"
+      },
+      "meta": {
+        "quality": {
+          "label": "Quality"
+        },
+        "tier": {
+          "label": "Tier"
+        }
+      },
+      "revealed": {
+        "revealSkills": {
+          "raw": {
+            "label": "Skills"
+          }
+        },
+        "difficulty": {
+          "label": "Difficulty"
+        }
+      }
+    }
+  },
+  "ITEM_SKILL": {
+    "FIELDS": {
+      "action": {
+        "charges": {
+          "hasCharges": {
+            "label": "Has Charges?"
+          },
+          "value": {
+            "label": "Current Charges"
+          },
+          "max": {
+            "label": "Maximum Charges"
+          }
+        },
+        "modifiers": {
+          "attackProfile": {
+            "combineAttacks": {
+              "value": {
+                "label": "Number Combined"
+              }
+            }
+          },
+          "protection": {
+            "element": {
+              "types": {
+                "raw": {
+                  "label": "Types"
+                }
+              },
+              "modifications": {
+                "raw": {
+                  "label": "Modifications"
+                }
+              },
+              "value": {
+                "label": "Value"
+              },
+              "trigger": {
+                "raw": {
+                  "label": "Trigger"
+                }
+              }
+            }
+          }
+        },
+        "skillRequest": {
+          "targetModifiers": {
+            "label": "Target Modifiers"
+          }
+        }
+      },
+      "attributeRankIncrease": {
+        "label": "Attribute Rank Increase"
+      },
+      "path": {
+        "raw": {
+          "label": "Path"
+        }
+      },
+      "roles": {
+        "raw": {
+          "label": "Roles"
+        }
+      },
+      "skillModifiers": {
+        "synergy": {
+          "label": "Synergy"
+        },
+        "discord": {
+          "label": "Discord"
+        },
+        "synergyTraitFilter": {
+          "raw": {
+            "label": "Trait Filter"
+          }
+        }
+      },
+      "traits": {
+        "raw": {
+          "label": "Skill Traits"
+        }
+      }
+    }
+  },
+  "ITEM_WOUND": {
+    "FIELDS": {
+      "wound": {
+        "type": {
+          "label": "Type"
+        },
+        "value": {
+          "label": "Value"
+        }
+      }
+    }
+  },
+
+  "WINDOW_BUTTONS": {
+    "resetName": "Reset Name"
   }
 }

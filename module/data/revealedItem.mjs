@@ -11,7 +11,7 @@ export default class AbbrewRevealedItem {
                     new fields.StringField({ required: true, blank: true })
                 )
             }),
-            difficulty: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+            difficulty: new fields.NumberField({ ...requiredInteger, initial: 10, min: 0 }),
             tier: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 10 })
         });
     }

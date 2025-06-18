@@ -1,4 +1,5 @@
 import { AbbrewCharacterSheet } from "./character-sheet.mjs";
+import { handleActorOnDrop } from "./helpers/drag-drops/drops.mjs";
 
 /**
  * Extend the basic ActorSheet
@@ -126,5 +127,9 @@ export class AbbrewNPCSheet extends AbbrewCharacterSheet {
             default:
                 return super._canRender(_options);
         }
+    }
+
+    async _onDrop(event) {
+        await handleActorOnDrop(event, this.actor)
     }
 }

@@ -1,0 +1,11 @@
+{{#if (eq system.skillType "path")}}
+{{formGroup system.schema.fields.path.fields.raw value=system.path.raw localize=true disabled=(not (isGM))}}
+{{#if (eq system.path.value.id "abbrewpuniversal")}}
+{{formGroup system.schema.fields.roles.fields.raw value=system.roles.raw localize=true disabled=(not (isGM))}}
+{{/if}}
+{{formGroup system.schema.fields.attributeRankIncrease value=system.attributeRankIncrease localize=true}}
+{{/if}}
+
+{{formGroup system.schema.fields.traits.fields.raw value=system.traits.raw localize=true disabled=(not (isGM))}}
+{{formInput system.schema.fields.description toggled=true value=system.description enriched=enrichedDescription
+classes="editor-full-height"}}

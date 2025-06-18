@@ -35,14 +35,12 @@ export const ActorContextMixin = superclass => class extends superclass {
         context.enrichedBiography = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
             this.actor.system.biography,
             {
-                // Whether to show secret blocks in the finished html
                 secrets: this.document.isOwner,
-                // Necessary in v11, can be removed in v12
-                async: true,
-                // Data to fill in for inline rolls
-                rollData: this.actor.getRollData(),
-                // Relative UUID resolution
-                relativeTo: this.actor,
+                documents: true,
+                links: true,
+                embeds: true,
+                rolls: true,
+                rollData: this.actor.getRollData()
             }
         );
 
@@ -80,7 +78,7 @@ export const ActorContextMixin = superclass => class extends superclass {
         const gear = [];
         const ammunition = [];
         // TODO: Exception when blank
-        const ammunitionChoices = this.actor.items.filter(i => i.type === "ammunition").filter(i => i.system.storeIn && isContainerAccessible(this.actor.items.find(c => c._id === i.system.storeIn))).map(a => ({ label: a.name, type: a.system.type, value: a._id }));
+        const ammunitionChoices = this.actor.items.filter(i => i.type === "ammunition").filter(i => i.system.storeIn && this.isContainerAccessible(this.actor.items.find(c => c._id === i.system.storeIn))).map(a => ({ label: a.name, type: a.system.type, value: a._id }));
         const features = [];
         const skills = { background: [], basic: [], path: [], resource: [], temporary: [], untyped: [], archetype: [], tier: [] };
         const spells = {
@@ -107,7 +105,8 @@ export const ActorContextMixin = superclass => class extends superclass {
         const activeSkills = [];
         const enhancements = [];
         const storage = [];
-        const playerRevealed = { anatomy: [], armour: [], weapons: [], traits: [] }
+        const playerRevealed = { anatomy: [], armour: [], weapons: [], traits: [] };
+        const playerVisible = { armour: [], weapons: [] };
 
         for (let i of context.items) {
             i.img = i.img || Item.DEFAULT_ICON;
@@ -118,7 +117,7 @@ export const ActorContextMixin = superclass => class extends superclass {
             }
 
             if (["armour", "equipment"].includes(i.type) && i.system.storage.hasStorage) {
-                const accessible = isContainerAccessible(i);
+                const accessible = this.isContainerAccessible(i);
                 storage.push({ container: i, contents: context.items.filter(ci => i.system.storage.storedItems.includes(ci._id)), isAccessible: accessible });
             }
 
@@ -134,17 +133,17 @@ export const ActorContextMixin = superclass => class extends superclass {
         // Iterate through items, allocating to containers
         for (let i of context.items) {
             i.img = i.img || Item.DEFAULT_ICON;
-            if (i.system.storeIn) {
-                if (i.type === 'weapon') {
-                    if (['held1H', 'held2H', 'active'].includes(i.system.equipState)) {
-                        equippedWeapons.push(i);
-                        if (i.system.revealed.isRevealed) {
-                            playerRevealed.weapons.push(i);
-                        }
-                    }
-                }
-                continue;
-            }
+            // if (i.system.storeIn) {
+            //     if (i.type === 'weapon') {
+            //         if (['held1H', 'held2H', 'active'].includes(i.system.equipState)) {
+            //             equippedWeapons.push(i);
+            //             if (i.system.revealed.isRevealed) {
+            //                 playerRevealed.weapons.push(i);
+            //             }
+            //         }
+            //     }
+            //     continue;
+            // }
 
             // Append to equipment.
             if (i.type === 'item') {
@@ -206,6 +205,8 @@ export const ActorContextMixin = superclass => class extends superclass {
                     wornArmour.push(i);
                     if (i.system.revealed.isRevealed) {
                         playerRevealed.armour.push(i);
+                    } else if (i.system.equipState !== "stowed") {
+                        playerVisible.armour.push(i);
                     }
                 }
             }
@@ -215,6 +216,8 @@ export const ActorContextMixin = superclass => class extends superclass {
                     equippedWeapons.push(i);
                     if (i.system.revealed.isRevealed) {
                         playerRevealed.weapons.push(i);
+                    } else if (i.system.equipState !== "stowed") {
+                        playerVisible.weapons.push(i);
                     }
                 }
             }
@@ -256,6 +259,7 @@ export const ActorContextMixin = superclass => class extends superclass {
         context.equipment = equipment;
         context.storage = storage;
         context.playerRevealed = playerRevealed;
+        context.playerVisible = playerVisible;
     }
 
     isContainerAccessible(container) {

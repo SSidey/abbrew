@@ -286,6 +286,7 @@ div.skill-card.skill-active {
         padding-bottom: 5px;
         border-bottom: 1px solid #888;
         grid-gap: 5px;
+        align-items: center;
 
         .modifier-operator {
             grid-column: 1 / 3
@@ -367,6 +368,24 @@ div.skill-card.skill-active {
 }
 
 .concept-row-container::after {
+    content: '';
+    display: inherit;
+    width: 50%;
+    margin: 10px auto;
+    border-top: 1px solid gray;
+}
+
+.protection-modifications-container {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-column-gap: 1em;
+
+    .controls {
+        align-content: center;
+    }
+}
+
+.protection-modifications-container::after {
     content: '';
     display: inherit;
     width: 50%;

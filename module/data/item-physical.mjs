@@ -1,8 +1,11 @@
+import { EquipStateManager } from '../helpers/equip-state-manager.mjs';
 import { getNumericParts, getSafeJson } from '../helpers/utils.mjs';
 import AbbrewItemBase from './item-base.mjs'
 import AbbrewRevealedItem from './revealedItem.mjs';
 
 export default class AbbrewPhysicalItem extends AbbrewItemBase {
+
+    static LOCALIZATION_PREFIXES = [...super.LOCALIZATION_PREFIXES, "ITEM_PHYSICAL"];
 
     static defineSchema() {
         const schema = super.defineSchema();
@@ -114,7 +117,7 @@ export default class AbbrewPhysicalItem extends AbbrewItemBase {
         }
 
 
-        this.validEquipStates = this.getValidEquipStates();
+        this.validEquipStates = EquipStateManager.getValidEquipStates(this.equipType, this.equipState, this.handsRequired, this.storeIn);
         this.handsSupplied = this.equipType === "innate" ? 1 : getNumericParts(this.equipState);
         this.actionCost = 0 + this.handsSupplied ?? 1;
         this.exertActionCost = 1 + this.handsSupplied ?? 2;
@@ -144,44 +147,6 @@ export default class AbbrewPhysicalItem extends AbbrewItemBase {
             } else if (this.storage.type === "heft") {
                 this.storage.value = storedItems.filter(i => i.system.equipState === "stowed").map(i => i.system.quantity * i.system.heft).reduce((total, heft) => total += heft, 0);
             }
-        }
-    }
-
-    getValidEquipStates() {
-        if (this.equipType) {
-            if (this.equipState === "worn") {
-                return [{ value: "readied", label: "ABBREW.EquipStateChange.readied", cost: 2 }];
-            }
-
-            const baseEquipStateObject = this.getBaseEquipStates();
-            const validEquipStates = Object.entries(baseEquipStateObject).map(s => ({ value: s[0], label: CONFIG.ABBREW.equipStateChange[s[0]], cost: this.getEquipStateChangeCost(s) }));
-
-            return validEquipStates.filter(e => e.value !== this.equipState);
-        }
-    }
-
-    getBaseEquipStates() {
-        const base = CONFIG.ABBREW.equipState[this.equipType];
-
-        switch (this.equipType) {
-            case "innate":
-            case "worn":
-            case "none":
-                return base;
-            case "held":
-                const validHands = CONFIG.ABBREW.hands[this.handsRequired]?.filterStates ?? [];
-                return Object.keys(base).filter(key => !validHands?.includes(key)).reduce((obj, key) => { obj[key] = base[key]; return obj }, {});
-        }
-    }
-
-    getEquipStateChangeCost(state) {
-        if (state[0] === "dropped" || this.equipType === "innate") {
-            return 0;
-        } else if (state === "readied") {
-            return 2;
-        }
-        else {
-            return 1;
         }
     }
 

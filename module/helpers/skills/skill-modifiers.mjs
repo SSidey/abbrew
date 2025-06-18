@@ -109,7 +109,7 @@ export async function handleTargetUpdates(actor, allSkills, templateData, data) 
     const targetWounds = mergeWoundTargetModifiers(allSkills, actor);
     const targetResources = mergeResourceTargetModifiers(allSkills, actor);
 
-    const showAcceptButton = Object.keys(targetUpdates).length > 0 || targetWounds.length > 0 || targetResources.length > 0;
+    const showAcceptButton = Object.keys(targetUpdates).length > 0 || targetWounds.length > 0 || targetResources.length > 0 || skillsGrantedOnAccept.length > 0;
 
     templateData = {
         ...templateData,

@@ -176,3 +176,10 @@ export function removeItemByKeyFunction(base, value, keyFunction) {
 
     return base;
 }
+
+export function mergeObjects(map1, map2) {
+    return Object.entries(map2).reduce((acc, [key, value]) =>
+        // if key is already in map1, add the values, otherwise, create new pair
+        ({ ...acc, [key]: (acc[key] || 0) + value })
+        , { ...map1 });
+}

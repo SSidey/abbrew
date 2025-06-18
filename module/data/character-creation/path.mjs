@@ -2,6 +2,8 @@ import AbbrewItemBase from "../item-base.mjs";
 
 export default class AbbrewPath extends AbbrewItemBase {
 
+    static LOCALIZATION_PREFIXES = [...super.LOCALIZATION_PREFIXES, "ITEM_PATH"];
+
     static defineSchema() {
         const fields = foundry.data.fields;
         const schema = super.defineSchema();

@@ -1,3 +1,5 @@
+import { requestSkillCheck } from "../../../../abbrew.mjs";
+
 /**
  * Handle creating a new Owned Item for the actor using initial data defined in the HTML dataset
  * @param {Event} event   The originating click event
@@ -51,7 +53,7 @@ export async function _onStudyItem(event, target) {
         return;
     }
     const difficulty = reveal.difficulty;
-    const tier = this.actor.system.meta.tier.value;
+    const tier = item.type === "anatomy" ? this.actor.system.meta.tier.value : item.system.meta.tier;
     const checkName = `Study ${item.name}`;
     await requestSkillCheck(checkName, revealSkills.map(s => s.id), "successes", difficulty, tier);
 };

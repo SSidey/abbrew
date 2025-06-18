@@ -1,0 +1,46 @@
+<section class="tab changes{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <header class="effect-change-list">
+        <div class="key">{{localize "EFFECT.ChangeKey"}}</div>
+        <div class="mode">{{localize "EFFECT.ChangeMode"}}</div>
+        <div class="mode">{{localize "EFFECT.ParseMode"}}</div>
+        <div class="value">{{localize "EFFECT.ChangeValue"}}</div>
+        <div class="numerator">{{localize "EFFECT.ChangeNumerator"}}</div>
+        <div class="denominator">{{localize "EFFECT.ChangeDenominator"}}</div>
+        <div class="priority">{{localize "EFFECT.ChangePriority"}}</div>
+        <div class="controls"><a data-action="addChange"><i class="fa-regular fa-square-plus"></i></a></div>
+    </header>
+    <ol class="scrollable effect-change-list" data-changes>
+        {{#each abbrewChanges as |change i|}}
+        {{#with ../fields.changes.element.fields as |changeFields|}}
+        <li data-index="{{i}}" class="strict-tags-length">
+            <div class="key">
+                {{formInput changeFields.key name=(concat "changes." i ".key") value=change.key}}
+            </div>
+            <div class="mode">
+                {{formInput changeFields.mode name=(concat "changes." i ".mode") value=change.mode choices=@root.modes}}
+            </div>
+            <div class="modifier-type">
+                <select name="system.modifiers.{{i}}.parseMode">
+                    {{selectOptions ../../config.modifierPrefixes selected=change.parseMode
+                    localize=true}}
+                </select>
+            </div>
+            <div class="value">
+                {{formInput changeFields.value name=(concat "changes." i ".value") value=change.value}}
+            </div>
+            <div class="numerator">
+                <input type="number" name="system.modifiers.{{i}}.numerator" value="{{change.numerator}}" />
+            </div>
+            <div class="denominator">
+                <input type="number" name="system.modifiers.{{i}}.denominator" value="{{change.denominator}}" />
+            </div>
+            <div class="priority">
+                {{formInput changeFields.priority name=(concat "changes." i ".priority") value=change.priority
+                placeholder=(lookup ../../priorities change.mode)}}
+            </div>
+            <div class="controls"><a data-action="deleteChange"><i class="fa-solid fa-trash"></i></a></div>
+        </li>
+        {{/with}}
+        {{/each}}
+    </ol>
+</section>

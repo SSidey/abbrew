@@ -29,7 +29,7 @@ export function applyOperatorUnbounded(base, value, operator) {
 }
 
 function mergeValues(base, value) {
-    if(base === undefined || base === null) {
+    if (base === undefined || base === null) {
         return base;
     }
 
@@ -37,14 +37,18 @@ function mergeValues(base, value) {
         return JSON.stringify([...getSafeJson(base, []), value]);
     }
 
+    if (base.length === 0) {
+        return [value];
+    }
+
     return [...base, value]
 }
 
 function splitValues(base, value) {
-    if(base === undefined || base === null) {
+    if (base === undefined || base === null) {
         return base;
     }
-    
+
     if (typeof base === "string") {
         return JSON.stringify(removeItem(getSafeJson(base, []), value));
     }

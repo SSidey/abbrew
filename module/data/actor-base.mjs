@@ -214,7 +214,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       )
     });
 
-    schema.biography = new fields.StringField({ required: true, blank: true });
+    schema.biography = new fields.HTMLField({ required: true, blank: true });
 
     schema.movement = new fields.SchemaField({
       baseSpeed: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),

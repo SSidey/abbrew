@@ -50,7 +50,7 @@
           <h4 class="item-label">{{stored.name}}</h4>
         </div>
         {{#if item.isAccessible}}
-        {{> "systems/abbrew/templates/item/parts/item-equip-state-changes.hbs" equipStates =
+        {{> "systems/abbrew/templates/item/item/templates/item-equip-state-changes.hbs" equipStates =
         stored.system.validEquipStates}}
         {{/if}}
         {{#if (eq stored.type "armour")}}

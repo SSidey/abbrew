@@ -1,4 +1,12 @@
+:root {
+    color-scheme: light dark;
+}
+
 .revealed-item {
+
+    background-color: light-dark(rgba(0, 0, 0, 0.1), var(--color-cool-3));
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
 
     .revealed-details {
         display: grid;
@@ -6,7 +14,7 @@
 
         .revealed-name {
             display: grid;
-            grid-template-columns: 1fr 9fr;
+            grid-template-columns: 1fr 8fr 1fr 1fr;
             align-items: center;
 
             h4 {
@@ -58,6 +66,7 @@
     line-height: 50px;
     text-align: center;
     list-style: none;
+    border-style: inset;
 
     span {
         display: inline-block;

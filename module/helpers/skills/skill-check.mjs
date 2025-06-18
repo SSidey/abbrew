@@ -193,7 +193,9 @@ function getSkillById(actor, skillIds) {
         return result;
     }, null);
 
-    skill.system.isProxied = true;
+    if (skill) {
+        skill.system.isProxied = true;
+    }
 
     return skill;
 }

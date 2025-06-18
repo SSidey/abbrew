@@ -1,0 +1,21 @@
+<div>
+    <h3>Anatomy</h3>
+    <ol class="creature-form-anatomy-list">
+        {{#each system.anatomy as |anatomy id|}}
+        <li class="creature-form-anatomy" data-id="{{id}}" data-item-id="{{anatomy.id}}"
+            data-source-id="{{anatomy.sourceId}}">
+            <div class="anatomy-summary">
+                <div class="image-container" data-action="renderAnatomySheet"><img src="{{anatomy.image}}" /></div>
+                <div class="name" data-action="renderAnatomySheet"><span>{{anatomy.name}}</span></div>
+                <a class='item-control anatomy-delete' data-action="deleteAnatomy"
+                    title='{{localize "DOCUMENT.Delete" type=' anatomy'}}'>
+                    <i class='fas fa-trash'></i>
+                </a>
+            </div>
+        </li>
+        {{/each}}
+        <li class="empty-drop-list-element">
+            <span>+ Anatomy</span>
+        </li>
+    </ol>
+</div>

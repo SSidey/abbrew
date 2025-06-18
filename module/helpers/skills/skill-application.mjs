@@ -168,6 +168,11 @@ function getSkillSummaries(skill, modifierSkills) {
     return [mainSummary, modifierSummaries];
 }
 
+function getSkillTraits(skill, modifierSkills) {
+    const traits = [skill, ...modifierSkills].flatMap(t => t.system.traits);
+    return traits;
+}
+
 function mergeFortune(allSkills) {
     return allSkills.reduce((result, s) => result += s.system.action.modifiers.fortune, 0);
 }
@@ -182,16 +187,20 @@ export async function applySkillEffects(actor, skill, includeTraits = []) {
     await actor.unsetFlag("abbrew", "combat.damage.lastDealt");
 
     let templateData = { user: game.user, skillCheck: { attempts: [] }, actorSize: actor.system.meta.size, actorTier: actor.system.meta.tier };
-    let data = { actorSize: actor.system.meta.size, actorTier: actor.system.meta.tier.value };
 
     const [asyncParsedSkill, mainModifierSkills, modifierSkills, allSkills] = await getGroupedModifierSkills(actor, skill, includeTraits);
     const [mainSummary, modifierSummaries] = getSkillSummaries(skill, modifierSkills);
+    const skillTraits = getSkillTraits(skill, modifierSkills);
 
     templateData = {
         ...templateData,
+        sources: skill.system.sources,
         mainSummary: mainSummary,
-        modifierSummaries: modifierSummaries
+        modifierSummaries: modifierSummaries,
+        traits: skillTraits
     };
+
+    let data = { actorSize: actor.system.meta.size, actorTier: actor.system.meta.tier.value, traits: skillTraits, sources: skill.system.sources };
 
     const fortune = mergeFortune(allSkills);
     const lateSelfUpdates = await handleEarlySelfModifiers(actor, allSkills);

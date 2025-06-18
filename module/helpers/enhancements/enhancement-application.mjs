@@ -86,7 +86,8 @@ export function applyEnhancement(enhancement, actor, baseObject, isInverted) {
         enhancementType: enhancement.system.type,
         id: enhancement._id,
         image: enhancement.img,
-        uuid: enhancement.uuid
+        uuid: enhancement.uuid,
+        cost: enhancement.system.cost
     });
     let enhancements;
 

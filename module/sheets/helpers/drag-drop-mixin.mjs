@@ -1,4 +1,5 @@
 const { DragDrop } = foundry.applications.ux;
+const { TextEditor } = foundry.applications.ux;
 
 export const DragDropMixin = superclass => class extends superclass {
     constructor(args) {

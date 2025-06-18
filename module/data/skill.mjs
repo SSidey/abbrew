@@ -4,6 +4,8 @@ import AbbrewRevealedItem from "./revealedItem.mjs";
 
 export default class AbbrewSkill extends AbbrewItemBase {
 
+    static LOCALIZATION_PREFIXES = [...super.LOCALIZATION_PREFIXES, "ITEM_SKILL"];
+
     // TODO: Add Rank for path skills    
     // TODO: Skill improvement item (just a skill that merges in? Would need more than skill schema e.g. increasing duration)
     static defineSchema() {
@@ -37,8 +39,8 @@ export default class AbbrewSkill extends AbbrewItemBase {
             isActorGrantTriggerRequired: new fields.BooleanField({ required: true, intial: false }),
             isItemGrantTriggerRequired: new fields.BooleanField({ required: true, intial: false })
         });
+        schema.rank = new fields.NumberField({ ...requiredInteger, initial: 1, min: 1, max: 10, step: 1 })
         schema.isFavourited = new fields.BooleanField({ required: true, initial: false });
-        schema.configurable = new fields.BooleanField({ required: true });
         schema.isActivatable = new fields.BooleanField({ required: true, initial: false, label: "ABBREW.IsActivatable" });
         schema.activateOnCreate = new fields.BooleanField({ required: true, initial: false });
         schema.applyTurnStart = new fields.BooleanField({ required: true, initial: false });
@@ -154,8 +156,8 @@ export default class AbbrewSkill extends AbbrewItemBase {
             }),
             charges: new fields.SchemaField({
                 hasCharges: new fields.BooleanField({ required: true, initial: false }),
-                value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-                max: new fields.NumberField({ ...requiredInteger, initial: 0 })
+                value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, step: 1 }),
+                max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, step: 1 })
             }),
             isActive: new fields.BooleanField({ required: true }),
             removeOnPairedApply: new fields.BooleanField({ required: true, initial: false }),
@@ -287,6 +289,20 @@ export default class AbbrewSkill extends AbbrewItemBase {
                         })
                     )
                 }),
+                protection: new fields.ArrayField(
+                    new fields.SchemaField({
+                        types: new fields.SchemaField({
+                            raw: new fields.StringField({ ...blankString })
+                        }),
+                        modifications: new fields.SchemaField({
+                            raw: new fields.StringField({ ...blankString })
+                        }),
+                        value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                        trigger: new fields.SchemaField({
+                            raw: new fields.StringField({ ...blankString })
+                        })
+                    })
+                ),
                 guard: new fields.SchemaField({
                     self: new fields.SchemaField({
                         value: this.getModifierBuilderField(),
@@ -382,7 +398,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
         schema.archetype = new fields.StringField({ ...blankString })
         schema.attributeIncrease = new fields.StringField({ ...blankString });
         schema.attributeIncreaseLong = new fields.StringField({ ...blankString });
-        schema.attributeRankIncrease = new fields.StringField({ ...blankString });
+        schema.attributeRankIncrease = new fields.StringField({ ...blankString, choices: CONFIG.ABBREW.attributes });
         schema.isProxied = new fields.BooleanField({ required: true, initial: false });
         schema.siblingSkillModifiers = new fields.ArrayField(
             new fields.ObjectField({ nullable: false })

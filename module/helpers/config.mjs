@@ -497,6 +497,7 @@ ABBREW.nameParts = [
   { key: "hide", part: "ABBREW.NameParts.hide", affix: -1, order: 8 },
   { key: "iron", part: "ABBREW.NameParts.iron", affix: -1, order: 8 },
   { key: "leather", part: "ABBREW.NameParts.leather", affix: -1, order: 8 },
+  { key: "silver", part: "ABBREW.NameParts.silver", affix: -1, order: 8 },
   { key: "mithril", part: "ABBREW.NameParts.mithril", affix: -1, order: 8 },
   { key: "steel", part: "ABBREW.NameParts.steel", affix: -1, order: 8 },
   { key: "chain", part: "ABBREW.NameParts.chain", affix: -1, order: 9 },
@@ -575,8 +576,29 @@ const itemTraits = [
 ]
 
 const skillTraits = [
+  { key: "specialisation", value: "ABBREW.Traits.Skill.specialisation", feature: "skill", subFeature: "progression", effect: "", data: "", exclude: [] },
+  { key: "mastery", value: "ABBREW.Traits.Skill.mastery", feature: "skill", subFeature: "progression", effect: "", data: "", exclude: [] },
   { key: "disease", value: "ABBREW.Traits.Skill.disease", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
   { key: "poison", value: "ABBREW.Traits.Skill.poison", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "untyped", value: "ABBREW.Traits.Skill.untyped", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "crushing", value: "ABBREW.Traits.Skill.crushing", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "piercing", value: "ABBREW.Traits.Skill.piercing", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "slashing", value: "ABBREW.Traits.Skill.slashing", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "life", value: "ABBREW.Traits.Skill.life", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "death", value: "ABBREW.Traits.Skill.death", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "fire", value: "ABBREW.Traits.Skill.fire", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "cold", value: "ABBREW.Traits.Skill.cold", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "electric", value: "ABBREW.Traits.Skill.electric", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "acid", value: "ABBREW.Traits.Skill.acid", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "dark", value: "ABBREW.Traits.Skill.dark", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "light", value: "ABBREW.Traits.Skill.light", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "pain", value: "ABBREW.Traits.Skill.pain", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "emotion", value: "ABBREW.Traits.Skill.emotion", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "psychic", value: "ABBREW.Traits.Skill.psychic", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] }
+]
+
+const materialTraits = [
+  { key: "silver", value: "ABBREW.Traits.Material.silver", feature: "material", subFeature: "identifiers", effect: "", data: "", exclude: [] }
 ]
 
 ABBREW.traits = [
@@ -585,6 +607,7 @@ ABBREW.traits = [
   ...lingeringWoundImmunities,
   ...skillTraining,
   ...itemTraits,
+  ...materialTraits,
   ...skillTraits
 ]
 
@@ -736,6 +759,14 @@ ABBREW.damageTypes = {
   psychic: { label: "ABBREW.DamageTypes.psychic" }
 }
 
+ABBREW.protectionTypes = {
+  reduction: { label: "ABBREW.Reduction" },
+  amplification: { label: "ABBREW.Amplification" },
+  resistance: { label: "ABBREW.Resistance" },
+  immunity: { label: "ABBREW.Immunity" },
+  weakness: { label: "ABBREW.Weakness" }
+}
+
 ABBREW.roles = {
   melee: { label: "ABBREW.Roles.Name.melee", value: "melee", description: "ABBREW.Roles.Description.melee" },
   ranged: { label: "ABBREW.Roles.Name.ranged", value: "ranged", description: "ABBREW.Roles.Description.ranged" },
@@ -770,14 +801,18 @@ ABBREW.paths = [
 
 ABBREW.activeEffectKeys = [
   { value: "system.defense.guard.max", label: "ABBREW.ActiveEffectKeys.guardMax" },
-  { value: "system.defense.protection.all.reduction", label: "ABBREW.ActiveEffectKeys.allReduction" },
-  { value: "system.defense.protection.all.weakness", label: "ABBREW.ActiveEffectKeys.allWeakness" },
-  { value: "system.defense.protection.crushing.reduction", label: "ABBREW.ActiveEffectKeys.crushingReduction" },
-  { value: "system.defense.protection.crushing.weakness", label: "ABBREW.ActiveEffectKeys.crushingWeakness" },
-  { value: "system.defense.protection.piercing.reduction", label: "ABBREW.ActiveEffectKeys.piercingReduction" },
-  { value: "system.defense.protection.piercing.weakness", label: "ABBREW.ActiveEffectKeys.piercingWeakness" },
-  { value: "system.defense.protection.slashing.reduction", label: "ABBREW.ActiveEffectKeys.slashingReduction" },
-  { value: "system.defense.protection.slashing.weakness", label: "ABBREW.ActiveEffectKeys.slashingWeakness" },
+  { value: "system.defense.protection.all.reduction", label: "ABBREW.ActiveEffectKeys.protectionTypes.all.reduction" },
+  { value: "system.defense.protection.all.weakness", label: "ABBREW.ActiveEffectKeys.protectionTypes.all.weakness" },
+  { value: "system.defense.protection.all.resistance", label: "ABBREW.ActiveEffectKeys.protectionTypes.all.resistance" },
+  { value: "system.defense.protection.all.amplification", label: "ABBREW.ActiveEffectKeys.protectionTypes.all.amplification" },
+  { value: "system.defense.protection.all.immunity", label: "ABBREW.ActiveEffectKeys.protectionTypes.all.immunity" },
+  ...Object.keys(ABBREW.damageTypes).flatMap(k => [
+    { value: `system.defense.protection.${k}.reduction`, label: `ABBREW.ActiveEffectKeys.protectionTypes.${k}.reduction` },
+    { value: `system.defense.protection.${k}.weakness`, label: `ABBREW.ActiveEffectKeys.protectionTypes.${k}.weakness` },
+    { value: `system.defense.protection.${k}.resistance`, label: `ABBREW.ActiveEffectKeys.protectionTypes.${k}.resistance` },
+    { value: `system.defense.protection.${k}.amplification`, label: `ABBREW.ActiveEffectKeys.protectionTypes.${k}.amplification` },
+    { value: `system.defense.protection.${k}.immunity`, label: `ABBREW.ActiveEffectKeys.protectionTypes.${k}.immunity` },
+  ]),
   { value: "system.modifiers.initiative", label: "ABBREW.ActiveEffectKeys.initiativeBonus" },
   { value: "system.movement.baseSpeed", label: "ABBREW.ActiveEffectKeys.baseSpeed" },
   { value: "system.movement.speed.land.value", label: "ABBREW.ActiveEffectKeys.landSpeed" },

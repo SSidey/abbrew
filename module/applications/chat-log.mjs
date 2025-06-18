@@ -52,6 +52,10 @@ export default class AbbrewChatLog extends (foundry.applications?.sidebar?.tabs?
 
         const result = await acceptSkillCheck(actor, data.skillCheckRequest);
 
+        if (!result) {
+            return;
+        }
+
         const parsedResult = ({ name: result.actor.name, result: result.result, totalValue: result.totalValue, requiredValue: result.requiredValue, totalSuccesses: result.totalSuccesses, requiredSuccesses: result.requiredSuccesses, skillResult: result.skillResult, contestedResult: result.contestedResult })
 
         let templateData = message.flags.abbrew.messasgeData.templateData;

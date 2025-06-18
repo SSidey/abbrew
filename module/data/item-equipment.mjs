@@ -23,7 +23,15 @@ export default class AbbrewEquipment extends AbbrewPhysicalItem {
                     resistance: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
                     weakness: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
                     immunity: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-                    label: new fields.StringField({ required: true, blank: true })
+                    label: new fields.StringField({ required: true, blank: true }),
+                    exceptions: new fields.SchemaField({
+                        raw: new fields.StringField({ required: true, blank: true }),
+                        parsed: new fields.StringField({ required: true, blank: true })
+                    }),
+                    requirements: new fields.SchemaField({
+                        raw: new fields.StringField({ required: true, blank: true }),
+                        parsed: new fields.StringField({ required: true, blank: true })
+                    })
                 })
             )
         });

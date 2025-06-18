@@ -4,7 +4,7 @@ import { handleSkillActivate, isSkillBlocked } from "../helpers/skills/skill-act
 import { applySkillEffects } from "../helpers/skills/skill-application.mjs";
 import { handleGrantedSkills, handleGrantOnExpiry, handleSkillsGrantedOnAccept } from "../helpers/skills/skill-grants.mjs";
 import { getAttackerAdvantageGuardResult, getAttackerAdvantageRiskResult, getDefenderAdvantageGuardResult, getDefenderAdvantageRiskResult } from "../helpers/trainedSkills.mjs";
-import { compareModifierIndices, doesNestedFieldExist, getObjectValueByStringPath } from "../helpers/utils.mjs";
+import { compareModifierIndices, doesNestedFieldExist, getObjectValueByStringPath, getSafeJson, mergeObjects } from "../helpers/utils.mjs";
 import { FINISHERS } from "../static/finishers.mjs";
 
 /**
@@ -425,9 +425,13 @@ export default class AbbrewActor extends Actor {
 
   applyModifiersToDamage(data) {
     let rollSuccesses = data.totalSuccesses;
+
     return data.damage.reduce((result, d) => {
       const allProtection = this.system.defense.protection["all"];
-      const protection = this.system.defense.protection[d.damageType];
+      const defenseProtection = this.system.defense.protection[d.damageType];
+      const conditionalProtectionValues = this.getConditionalProtectionForDamageType(d.damageType, data);
+      const protection = mergeObjects(defenseProtection, conditionalProtectionValues);
+
       if (protection.immunity > 0 || allProtection.immunity > 0) {
         return result;
       }
@@ -443,13 +447,76 @@ export default class AbbrewActor extends Actor {
       if (multiplierSelector > 0) {
         multiplier = 0.5;
       } else if (multiplierSelector < 0) {
-        multiplier = 2;
+        multiplier = (2 + Math.abs(multiplierSelector)) / 2;
       }
 
       const dmg = Math.floor(d.value * multiplier) + (protection.amplification + allProtection.amplification) - (protection.reduction + allProtection.reduction);
 
       return result += dmg;
     }, 0);
+  }
+
+  getConditionalProtectionForDamageType(damageType, data) {
+    const traits = data.traits;
+    const traitSet = new Set(traits.map(t => t.key));
+
+    const conditionalProtections = this.items
+      .filter(i => i.type === "skill")
+      .filter(s => s.system.action.activationType === "standalone")
+      .filter(s => s.system.action.isActive || !s.system.isActivatable)
+      .filter(s => s.system.action.modifiers.protection.length > 0)
+      .filter(s => this.isConditionalProtectionValidForTrigger(s, data))
+      .flatMap(p => p.system.action.modifiers.protection);
+
+    return conditionalProtections
+      .filter(p => getSafeJson(p.types.raw, []).map(t => t.key).includes(damageType))
+      .filter(p => !p.trigger.raw || (new Set(getSafeJson(p.trigger.raw, []).map(t => t.key)).intersection(traitSet).size > 0))
+      .reduce((protections, protection) => {
+        const modifications = getSafeJson(protection.modifications.raw, []).map(p => p.label);
+        if (modifications.includes("reduction")) {
+          protections.reduction += protection.value;
+        }
+        if (modifications.includes("amplification")) {
+          protections.amplification += protection.value;
+        }
+        if (modifications.includes("resistance")) {
+          protections.resistance += protection.value;
+        }
+        if (modifications.includes("immunity")) {
+          protections.immunity += protection.value;
+        }
+        if (modifications.includes("weakness")) {
+          protections.weakness += protection.value;
+        }
+
+        return protections;
+      }, {
+        reduction: 0,
+        amplification: 0,
+        resistance: 0,
+        immunity: 0,
+        weakness: 0,
+      });
+  }
+
+  isConditionalProtectionValidForTrigger(skill, data) {
+    if (!(skill.system.skillModifiers.isActorGrantTriggerRequired || skill.system.skillModifiers.isItemGrantTriggerRequired)) {
+      return true;
+    }
+
+    if (skill.system.skillModifiers.isActorGrantTriggerRequired && skill.system.skillModifiers.isItemGrantTriggerRequired) {
+      return (data.sources.actor === skill.system.grantedBy.actor) && (data.sources.items.includes(skill.system.grantedBy.item));
+    }
+
+    if (skill.system.skillModifiers.isActorGrantTriggerRequired) {
+      return data.sources.actor === skill.system.grantedBy.actor;
+    }
+
+    if (skill.system.skillModifiers.isItemGrantTriggerRequired) {
+      return data.sources.items.includes(skill.system.grantedBy.item);
+    }
+
+    return true;
   }
 
   async calculateGuard(damage, guard, isFeint, isStrongAttack, action, attackingActorParryCounter, attackingActorFeint) {

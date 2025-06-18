@@ -19,11 +19,12 @@
       <h4 class="item-label">{{item.name}}</h4>
     </div>
     {{#if ../showEquipState}}
-    {{> "systems/abbrew/templates/item/parts/item-equip-state-changes.hbs" equipStates =
+    {{> "systems/abbrew/templates/item/item/templates/item-equip-state-changes.hbs" equipStates =
     item.system.validEquipStates}}
     {{/if}}
     <label class="icon-label">
-      <input type="checkbox" class="armour-sunder" name="system.isSundered" data-action="toggleSundered" {{ checked item.system.isSundered }}>
+      <input type="checkbox" class="armour-sunder" name="system.isSundered" data-action="toggleSundered" {{ checked
+        item.system.isSundered }}>
       {{#if item.system.isSundered}}
       <span class="icon icon-sunder-c" />
       {{else}}
@@ -34,7 +35,8 @@
       <a class='item-control item-edit' data-action="editItem" title='{{localize "DOCUMENT.Edit" type=' armour'}}'>
         <i class='fas fa-edit'></i>
       </a>
-      <a class='item-control item-delete' data-action="deleteItem" title='{{localize "DOCUMENT.Delete" type=' armour'}}'>
+      <a class='item-control item-delete' data-action="deleteItem" title='{{localize "DOCUMENT.Delete" type='
+        armour'}}'>
         <i class='fas fa-trash'></i>
       </a>
     </div>

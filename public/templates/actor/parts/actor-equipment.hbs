@@ -18,7 +18,7 @@
       </div>
       <h4 class="item-label">{{item.name}}</h4>
     </div>
-    {{> "systems/abbrew/templates/item/parts/item-equip-state-changes.hbs" equipStates =
+    {{> "systems/abbrew/templates/item/item/templates/item-equip-state-changes.hbs" equipStates =
     item.system.validEquipStates}}
     {{#if (hasValue item.container.isSundered)}}
     <label class="icon-label">

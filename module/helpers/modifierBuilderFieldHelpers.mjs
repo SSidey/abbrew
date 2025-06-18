@@ -165,7 +165,7 @@ export function parsePathSync(rawValue, actor, source, target) {
         case 'name':
             return getNamePart(secondPart)
         case 'json':
-            return getObjectFromJson(secondPart);
+            return getObjectFromJson(rawValue.split('.').slice(1).join(""));
         case 'numeric':
             return parseFloat(secondPart) ?? 0;
         case 'skillCount':

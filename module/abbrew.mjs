@@ -1,6 +1,6 @@
 // Import sheet classes.
-import { AbbrewItemSheet } from './sheets/item-sheet.mjs';
-import { AbbrewActiveEffectSheet } from './sheets/active-effect-sheet.mjs'
+import { AbbrewItemSheet } from './sheets/items/generic/item-sheet.mjs';
+import { AbbrewActiveEffectSheet } from './sheets/effects/active-effect-sheet.mjs'
 // Import helper/utility classes and constants.
 import { preloadHandlebarsTemplates } from './helpers/templates.mjs';
 import { ABBREW } from './helpers/config.mjs';
@@ -13,24 +13,25 @@ import * as abbrewApplication from './applications/_module.mjs';
 import { handleActorWoundConditions, handleActorGuardConditions, handleCombatStart, handleCombatEnd, handleTurnChange } from './helpers/combat.mjs';
 import { staticID, doesNestedFieldExist, getSafeJson, getObjectValueByStringPath } from './helpers/utils.mjs';
 import { registerSystemSettings } from './settings.mjs';
-import { AbbrewCreatureFormSheet } from './sheets/items/item-creature-form-sheet.mjs';
-import { AbbrewSkillDeckSheet } from './sheets/items/item-skill-deck-sheet.mjs';
-import { AbbrewAnatomySheet } from './sheets/items/item-anatomy-sheet.mjs';
-import { AbbrewSkillSheet } from './sheets/items/item-skill-sheet.mjs';
-import { AbbrewArchetypeSheet } from './sheets/items/item-archetype-sheet.mjs';
-import { AbbrewPathSheet } from './sheets/items/item-path-sheet.mjs';
-import { AbbrewAmmunitionSheet } from './sheets/items/item-ammunition-sheet.mjs';
-import { AbbrewWeaponSheet } from './sheets/items/item-weapon-sheet.mjs';
-import { AbbrewArmourSheet } from './sheets/items/item-armour-sheet.mjs';
-import { AbbrewEnhancementSheet } from './sheets/items/item-enhancement-sheet.mjs';
-import { AbbrewEquipmentSheet } from './sheets/items/item-equipment-sheet.mjs'
+import { AbbrewCreatureFormSheet } from './sheets/items/creature-form/item-creature-form-sheet.mjs';
+import { AbbrewSkillDeckSheet } from './sheets/items/skill-deck/item-skill-deck-sheet.mjs';
+import { AbbrewAnatomySheet } from './sheets/items/anatomy/item-anatomy-sheet.mjs';
+import { AbbrewSkillSheet } from './sheets/items/skill/item-skill-sheet.mjs';
+import { AbbrewArchetypeSheet } from './sheets/items/archetype/item-archetype-sheet.mjs';
+import { AbbrewAmmunitionSheet } from './sheets/items/ammunition/item-ammunition-sheet.mjs';
+import { AbbrewArmourSheet } from './sheets/items/armour/item-armour-sheet.mjs';
+import { AbbrewEquipmentSheet } from './sheets/items/equipment/item-equipment-sheet.mjs'
 import { onWorldTimeUpdate } from './helpers/time.mjs';
 import { activateSocketListener, emitForAll, SocketMessage } from './socket.mjs';
 import { handleSkillActivate } from './helpers/skills/skill-activation.mjs';
-import { Browser } from './sheets/browser.mjs';
 import { AbbrewCharacterSheet } from './sheets/actor/character-sheet.mjs';
 import { AbbrewNPCSheet } from './sheets/actor/npc-sheet.mjs';
+import { AbbrewWeaponSheet } from './sheets/items/weapon/item-weapon-sheet.mjs';
+import { AbbrewWoundSheet } from './sheets/items/wound/item-wound-sheet.mjs';
+import { AbbrewPathSheet } from './sheets/items/path/item-path-sheet.mjs';
+import { AbbrewEnhancementSheet } from './sheets/items/enhancement/item-enhancement-sheet.mjs';
 const { FormDataExtended } = foundry.applications.ux;
+const { ActorSheet, ItemSheet } = foundry.appv1.sheets;
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -74,7 +75,6 @@ Hooks.once('init', function () {
   CONFIG.Item.documentClass = documents.AbbrewItem;
   CONFIG.Item.dataModels = {
     item: models.AbbrewItem,
-    feature: models.AbbrewFeature,
     spell: models.AbbrewSpell,
     skill: models.AbbrewSkill,
     anatomy: models.AbbrewAnatomy,
@@ -129,11 +129,6 @@ Hooks.once('init', function () {
     label: 'ABBREW.SheetLabels.Actor',
   });
   foundry.documents.collections.Items.unregisterSheet('core', ItemSheet);
-  foundry.documents.collections.Items.registerSheet('abbrew', AbbrewItemSheet, {
-    types: ["item", "feature", "spell", "wound"],
-    makeDefault: true,
-    label: 'ABBREW.SheetLabels.Item',
-  });
   foundry.documents.collections.Items.registerSheet('abbrew', AbbrewEquipmentSheet, {
     types: ["equipment"],
     makeDefault: true,
@@ -188,6 +183,17 @@ Hooks.once('init', function () {
     types: ["enhancement"],
     makeDefault: true,
     label: "ABBREW.SheetLabels.Enhancement"
+  });
+  foundry.documents.collections.Items.registerSheet('abbrew', AbbrewWoundSheet, {
+    types: ["wound"],
+    makeDefault: true,
+    label: "ABBREW.SheetLabels.Wound"
+  });
+  // TODO: Replace all of these with unique sheets, do we even need all of them?
+  foundry.documents.collections.Items.registerSheet('abbrew', AbbrewItemSheet, {
+    types: ["item", "spell"],
+    makeDefault: true,
+    label: 'ABBREW.SheetLabels.Item',
   });
 
   _configureStatusEffects();
@@ -492,13 +498,14 @@ Hooks.on("dropCanvasData", (canvas, data) => {
 });
 
 Hooks.on("preCreateActiveEffect", effect => {
-  const startingStacks = effect.flags?.abbrew?.skill?.stacks ?? effect.getFlag("statuscounter", "value") ?? 1
-  effect.updateSource({
-    "flags.statuscounter.config.dataSource": "flags.abbrew.skill.stacks",
-    "flags.statuscounter.visible": startingStacks > 1,
-    "flags.statuscounter.value": startingStacks,
-    "flags.abbrew.skill.stacks": startingStacks,
-  });
+  // TODO: Will this module update?
+  // const startingStacks = effect.flags?.abbrew?.skill?.stacks ?? effect.getFlag("statuscounter", "value") ?? 1
+  // effect.updateSource({
+  //   "flags.statuscounter.config.dataSource": "flags.abbrew.skill.stacks",
+  //   "flags.statuscounter.visible": startingStacks > 1,
+  //   "flags.statuscounter.value": startingStacks,
+  //   "flags.abbrew.skill.stacks": startingStacks,
+  // });
 });
 
 Hooks.on("actorMustDropItem", async (actor) => {
@@ -568,36 +575,6 @@ Hooks.on("updateActiveEffect", async (effect, update, options, user) => {
 //   console.log(effect);
 // });
 
-Hooks.on("dropActorSheetData", async (actor, sheet, data) => {
-  console.log(data);
-  if (data.type === "Item") {
-    const item = await fromUuid(data.uuid);
-    if (item) {
-      switch (item.type) {
-        case "wound":
-          await handleActorWoundDrop(actor, item);
-          break;
-        case "background":
-          await handleActorBackgroundDrop(actor, item);
-          break;
-        case "skillDeck":
-          await handleActorSkillDeckDrop(actor, item);
-          break;
-        case "creatureForm":
-          await handleActorCreatureFormDrop(actor, item);
-          break;
-      }
-    }
-  }
-});
-
-Hooks.on("pauseGame", async function (paused) {
-  console.log("paused");
-  // const data = { content: { builderTitle: "Hello" }, buttons: {} };
-  const browser = await new Browser().render(true);
-  console.log("rendered");
-});
-
 /* -------------------------------------------- */
 /*  Module Specific Hooks                                 */
 /* -------------------------------------------- */
@@ -614,28 +591,6 @@ Hooks.on("visual-active-effects.createEffectButtons", function (eff, buttons) {
   });
   // }
 });
-
-async function handleActorWoundDrop(actor, item) {
-  const wound = item.system.wound;
-  await actor.acceptWound(wound.type, wound.value);
-}
-
-async function handleActorBackgroundDrop(actor, background) {
-  await actor.acceptBackground(background);
-  await actor.acceptSkillDeck(background);
-  if (background.system.creatureForm.id) {
-    const creatureForm = await fromUuid(background.system.creatureForm.sourceId);
-    await actor.acceptCreatureForm(creatureForm);
-  }
-}
-
-async function handleActorSkillDeckDrop(actor, skillDeck) {
-  await actor.acceptSkillDeck(skillDeck)
-}
-
-async function handleActorCreatureFormDrop(actor, creatureform) {
-  await actor.acceptCreatureForm(creatureform);
-}
 
 /* -------------------------------------------- */
 /*  Hotbar Macros                               */

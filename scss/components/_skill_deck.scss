@@ -92,6 +92,7 @@ li.skill-deck-skill:not(:last-child) {
     line-height: 50px;
     text-align: center;
     list-style: none;
+    border-style: inset;
 
     span {
         display: inline-block;

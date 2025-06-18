@@ -14,8 +14,12 @@
   }
 }
 
-.effect-change {
+.strict-tags-length {
   tag.tagify__tag+span.tagify__input {
     display: none
   }
+}
+
+.effect-change-list {
+  grid-template-columns: 5fr 4fr 4fr 10fr 2fr 2fr 2fr 1fr;
 }

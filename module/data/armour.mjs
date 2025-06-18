@@ -15,8 +15,6 @@ export default class AbbrewArmour extends AbbrewEquipment {
 
     prepareBaseData() {
         super.prepareBaseData();
-
-        this.availableEnhancements = this.meta.quality - this.enhancements.reduce((result, enhancement) => result += enhancement.cost, 0);
     }
 
     prepareDerivedData() {

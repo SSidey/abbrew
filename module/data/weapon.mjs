@@ -1,7 +1,7 @@
+import AbbrewArmour from "./armour.mjs";
 import AbbrewAttackBase from "./attack-base.mjs";
-import AbbrewPhysicalItem from "./item-physical.mjs";
 
-export default class AbbrewWeapon extends AbbrewPhysicalItem {
+export default class AbbrewWeapon extends AbbrewArmour {
 
   static defineSchema() {
     const schema = super.defineSchema();
