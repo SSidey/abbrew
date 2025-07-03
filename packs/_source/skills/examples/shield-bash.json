@@ -209,12 +209,13 @@
   },
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "12.331",
+    "coreVersion": "13.345",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1745691727800,
     "modifiedTime": 1745691747829,
-    "lastModifiedBy": "abbrewpacks00000"
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
   },
   "_id": "08poQRvTJq91pjkk",
   "sort": 0,

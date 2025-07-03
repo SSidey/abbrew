@@ -16,11 +16,11 @@ export async function applySystemFundamentalSkill(actor, skill) {
         const templateData = {
             user: game.user,
             skillCheck: { attempts: [] },
-            actorSize: actor.system.meta.size,
+            actorSize: actor.system.meta.size.value,
             actorTier: actor.system.meta.tier,
             mainSummary: ({ name: skill.name, description: skill.system.description })
         };
-        const data = { actorSize: actor.system.meta.size, actorTier: actor.system.meta.tier.value };
+        const data = { actorSize: actor.system.meta.size.value, actorTier: actor.system.meta.tier.value };
         await renderChatMessage(true, actor, skill, templateData, data);
         await handlePairedSkills(skill, actor);
     }

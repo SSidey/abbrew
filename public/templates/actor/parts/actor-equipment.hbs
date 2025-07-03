@@ -1,12 +1,6 @@
-<ol class='items-list'>
+<ol class='item-container'>
   <li class='item flexrow items-header'>
-    <div class='item-name'>{{localize 'Name'}}</div>
-    <div class='item-controls'>
-      <a class='item-control item-create' data-action="createItem" title='Create item' data-type='equipment'>
-        <i class='fas fa-plus'></i>
-        {{localize 'DOCUMENT.New' type='equipment'}}
-      </a>
-    </div>
+    <div class='item-name'>{{containerName}}</div>
   </li>
   {{#each equipment as |item id|}}
   <li class='item item-row' data-item-id='{{item._id}}'>
@@ -18,22 +12,37 @@
       </div>
       <h4 class="item-label">{{item.name}}</h4>
     </div>
-    {{> "systems/abbrew/templates/item/item/templates/item-equip-state-changes.hbs" equipStates =
-    item.system.validEquipStates}}
-    {{#if (hasValue item.container.isSundered)}}
-    <label class="icon-label">
-      <input type="checkbox" class="armour-sunder" name="system.isSundered" data-action="toggleSundered" {{ checked item.system.isSundered }}>
-      {{#if item.system.isSundered}}
-      <span class="icon icon-sunder-c" />
-      {{else}}
-      <span class="icon icon-sunder-u" />
-      {{/if}}
-    </label>
-    {{/if}}
-    {{#if (eq item.type "anatomy")}}
-    <div class="icon-label-2">
+    <div class="item-equip-controls">
+      {{> "systems/abbrew/templates/item/item/templates/item-equip-state-changes.hbs" equipStates =
+      item.system.validEquipStates}}
+    </div>
+    <div class="item-context-controls">
+      {{#gm}}
       <label>
-        <input type="checkbox" class="anatomy-broken" name="system.isBroken" data-action="toggleBroken" {{ checked item.system.isBroken }}>
+        <input type="checkbox" class="anatomy-revealed" name="system.revealed.isRevealed" {{ checked
+          item.system.revealed.isRevealed }}>
+        {{#if item.system.revealed.isRevealed}}
+        <span class="icon icon-anatomy-revealed-c" />
+        {{else}}
+        <span class="icon icon-anatomy-revealed-u" />
+        {{/if}}
+      </label>
+      {{/gm}}
+      {{#if (hasValue item.system.isSundered)}}
+      <label class="icon-label">
+        <input type="checkbox" class="armour-sunder" name="system.isSundered" data-action="toggleSundered" {{ checked
+          item.system.isSundered }}>
+        {{#if item.system.isSundered}}
+        <span class="icon icon-sunder-c" />
+        {{else}}
+        <span class="icon icon-sunder-u" />
+        {{/if}}
+      </label>
+      {{/if}}
+      {{#if (eq item.type "anatomy")}}
+      <label>
+        <input type="checkbox" class="anatomy-broken" name="system.isBroken" data-action="toggleBroken" {{ checked
+          item.system.isBroken }}>
         {{#if item.system.isBroken}}
         <span class="icon icon-anatomy-broken-c" />
         {{else}}
@@ -41,21 +50,22 @@
         {{/if}}
       </label>
       <label>
-        <input type="checkbox" class="anatomy-severed" name="system.isDismembered" data-action="toggleDismembered" {{ checked item.system.isDismembered
-          }}>
+        <input type="checkbox" class="anatomy-severed" name="system.isDismembered" data-action="toggleDismembered" {{
+          checked item.system.isDismembered }}>
         {{#if item.system.isDismembered}}
         <span class="icon icon-anatomy-severed-c" />
         {{else}}
         <span class="icon icon-anatomy-severed-u" />
         {{/if}}
       </label>
+      {{/if}}
     </div>
-    {{/if}}
     <div class='item-controls'>
       <a class='item-control item-edit' data-action="editItem" title='{{localize "DOCUMENT.Edit" type=' equipment'}}'>
         <i class='fas fa-edit'></i>
       </a>
-      <a class='item-control item-delete' data-action="deleteItem" title='{{localize "DOCUMENT.Delete" type=' equipment'}}'>
+      <a class='item-control item-delete' data-action="deleteItem" title='{{localize "DOCUMENT.Delete" type='
+        equipment'}}'>
         <i class='fas fa-trash'></i>
       </a>
     </div>

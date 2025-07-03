@@ -254,12 +254,13 @@
       "_stats": {
         "compendiumSource": null,
         "duplicateSource": null,
-        "coreVersion": "12.331",
+        "coreVersion": "13.345",
         "systemId": "abbrew",
         "systemVersion": "0.0.2-prerelease31",
         "createdTime": null,
         "modifiedTime": null,
-        "lastModifiedBy": null
+        "lastModifiedBy": null,
+        "exportSource": null
       },
       "_key": "!items.effects!TeyM5fQxVSTbqKCI.37KoTgQsZ8nn4AqJ"
     }
@@ -271,12 +272,13 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "12.331",
+    "coreVersion": "13.345",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746223939260,
     "modifiedTime": 1746347358944,
-    "lastModifiedBy": "abbrewpacks00000"
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
   },
   "_key": "!items!TeyM5fQxVSTbqKCI"
 }

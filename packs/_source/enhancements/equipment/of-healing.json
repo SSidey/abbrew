@@ -1,0 +1,130 @@
+{
+  "folder": "tHJyXL7LNWaiFmsS",
+  "name": "of Healing",
+  "type": "enhancement",
+  "_id": "jYKfxfibQOHuDjJn",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "name": {
+      "base": "",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1
+    },
+    "description": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "enhancements": [],
+    "skills": {
+      "granted": [
+        {
+          "name": "Healing Potion I",
+          "id": "2g6RLyGCWc7rRZot",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.2g6RLyGCWc7rRZot",
+          "skillType": ""
+        }
+      ]
+    },
+    "targetType": "equipment",
+    "target": {
+      "name": "",
+      "id": "",
+      "uuid": ""
+    },
+    "enhancementType": "",
+    "traitFilter": {
+      "raw": "[{\"key\":\"vial\",\"value\":\"Vial\",\"feature\":\"item\",\"subFeature\":\"form\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]",
+      "value": []
+    },
+    "modifications": [
+      {
+        "operator": "merge",
+        "path": "system.description",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "string",
+        "value": "Reduce any one wound on your character by 1.",
+        "numerator": 1,
+        "denominator": 1
+      },
+      {
+        "operator": "merge",
+        "path": "system.traits.raw",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "trait",
+        "value": "consumable",
+        "numerator": 1,
+        "denominator": 1
+      },
+      {
+        "operator": "merge",
+        "path": "system.name.parts",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "name",
+        "value": "ofhealing",
+        "numerator": 1,
+        "denominator": 1
+      },
+      {
+        "operator": "merge",
+        "path": "system.revealed.revealSkills.raw",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "json",
+        "value": "{   \"value\": \"Alchemy (Check)\",   \"id\": \"OLoaLfFfFYG3IhJc\",   \"sourceId\": \"Compendium.abbrew.playerskills.Item.OLoaLfFfFYG3IhJc\" }",
+        "numerator": 1,
+        "denominator": 1
+      }
+    ],
+    "duration": {
+      "precision": "-1",
+      "value": 0,
+      "expireOnStartOfTurn": true
+    },
+    "grantedIds": [],
+    "cost": 0
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.345",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1750411748800,
+    "modifiedTime": 1750419311202,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!jYKfxfibQOHuDjJn"
+}

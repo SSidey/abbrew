@@ -1,0 +1,102 @@
+{
+  "folder": "AsPk8lbhBEAjlH3Q",
+  "name": "Helm",
+  "type": "armour",
+  "_id": "hpYPEC1VmDiHZ2Oo",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "name": {
+      "base": "Helm",
+      "parts": []
+    },
+    "meta": {
+      "tier": 0,
+      "size": 0,
+      "quality": 0
+    },
+    "description": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "abbrew.armour.helm.hpYPEC1VmDiHZ2Oo",
+      "uuid": "hpYPEC1VmDiHZ2Oo"
+    },
+    "enhancements": [],
+    "quantity": 1,
+    "heft": 2,
+    "complexity": 0,
+    "equipType": "worn",
+    "equipPoints": {
+      "required": {
+        "raw": "[{\"value\":\"Head\"}]",
+        "parsed": [
+          {
+            "value": "Head"
+          }
+        ]
+      },
+      "provided": {
+        "raw": "",
+        "parsed": []
+      }
+    },
+    "handsRequired": "",
+    "equipState": "readied",
+    "handsSupplied": 0,
+    "actionCost": 0,
+    "exertActionCost": 1,
+    "nextValidEquipStates": [],
+    "skills": {
+      "granted": []
+    },
+    "availableEnhancements": 0,
+    "storage": {
+      "hasStorage": false,
+      "type": "",
+      "accessible": false,
+      "value": 0,
+      "max": 0,
+      "storedItems": [],
+      "traitFilter": {
+        "raw": "",
+        "value": []
+      }
+    },
+    "storeIn": "",
+    "revealed": {
+      "isRevealed": false,
+      "revealSkills": {
+        "raw": "",
+        "parsed": []
+      },
+      "difficulty": 0,
+      "tier": 0
+    },
+    "grantedBy": "",
+    "defense": {
+      "guard": 0,
+      "inflexibility": 0,
+      "protection": []
+    },
+    "isSundered": false
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.345",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1749490500268,
+    "modifiedTime": 1749490559057,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!hpYPEC1VmDiHZ2Oo"
+}

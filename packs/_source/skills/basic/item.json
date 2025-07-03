@@ -1,0 +1,50 @@
+{
+  "folder": "xv4pBYEWqvTp5C2J",
+  "name": "Item",
+  "type": "item",
+  "_id": "FFSNMtWcv5Ttz1wx",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "name": {
+      "base": "",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1
+    },
+    "description": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "enhancements": [],
+    "quantity": 1,
+    "weight": 0,
+    "roll": {
+      "diceNum": 1,
+      "diceSize": "d20",
+      "diceBonus": "+@str.mod+ceil(@lvl / 2)"
+    }
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "13.345",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1749072910380,
+    "modifiedTime": 1749072910380,
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
+  },
+  "_key": "!items!FFSNMtWcv5Ttz1wx"
+}

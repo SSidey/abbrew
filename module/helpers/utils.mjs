@@ -183,3 +183,7 @@ export function mergeObjects(map1, map2) {
         ({ ...acc, [key]: (acc[key] || 0) + value })
         , { ...map1 });
 }
+
+export function onlyUnique(value, index, array) {
+    return array.indexOf(value) === index;
+}

@@ -1,0 +1,20 @@
+{
+  "type": "Item",
+  "folder": "kyKiwT5wM3bF3OZh",
+  "name": "Raw",
+  "color": null,
+  "sorting": "a",
+  "_id": "cCzr7DeNyY3o5rlq",
+  "description": "",
+  "sort": 0,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.345",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "lastModifiedBy": null
+  },
+  "_key": "!folders!cCzr7DeNyY3o5rlq"
+}

@@ -5,13 +5,13 @@ import { ItemContextMixin } from '../helpers/context/item-context-mixin.mjs';
 import { activeEffectAction } from '../helpers/actions/effect-actions.mjs';
 import { enhancementDelete } from '../helpers/actions/enhancement-actions.mjs';
 import { deleteSkillDeckSkill } from '../helpers/actions/skill-deck-actions.mjs';
-import { _onDamageAction } from '../helpers/actions/damage-control-actions.mjs';
 import { EquipmentTagsMixin } from './helpers/tags/equipment-tags-mixin.mjs';
 import { onDamageReductionAction } from '../helpers/actions/damage-reduction-control-actions.mjs';
 import { renderItemSheet } from '../helpers/actions/render-sheet-actions.mjs';
 import { RevealableTagsMixin } from '../helpers/tags/revealable-tags-mixin.mjs';
 import { revealSkillDrop } from './helpers/drops/revealSkillDrops.mjs';
 import { resetNameAction } from './helpers/actions/base-name-actions.mjs';
+import { _onDamageAction } from '../helpers/actions/attack-profile-damage-action.mjs';
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ItemSheetV2 } = foundry.applications.sheets;
 
@@ -113,7 +113,7 @@ export class AbbrewEquipmentSheet extends DragDropMixin(RevealableTagsMixin(Equi
     const context = await super._prepareContext(options);
     context.tabs = this._prepareTabs("primary");
     await this.prepareItemContext(context);
-    context.datasets = { baseName: { action: "resetName" } };
+    // context.datasets = { baseName: { action: "resetName" } };
 
     return context;
   }

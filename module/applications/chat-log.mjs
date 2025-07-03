@@ -64,8 +64,7 @@ export default class AbbrewChatLog extends (foundry.applications?.sidebar?.tabs?
         templateData.skillCheck.attempts = [...templateData.skillCheck.attempts, parsedResult];
         templateData.skillCheck.checkType = data.skillCheckRequest.checkType;
 
-        const html = await renderTemplate("systems/abbrew/templates/chat/skill-card.hbs", templateData);
-        // await updateMessageForCheck(messageId, html, templateData);
+        const html = await foundry.applications.handlebars.renderTemplate("systems/abbrew/templates/chat/skill-card.hbs", templateData);
         emitForAll("system.abbrew", new SocketMessage(game.user.id, "updateMessageForCheck", { messageId, html, templateData }));
     }
 
@@ -78,7 +77,7 @@ export default class AbbrewChatLog extends (foundry.applications?.sidebar?.tabs?
 
         const actor = tokens[0].actor;
 
-        await actor.takeEffect(data, rolls, action);
+        await actor.takeAttack(data, action);
     }
 
     static async _onAcceptDamageAction(rolls, data, action) {

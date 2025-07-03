@@ -12,7 +12,7 @@
     "meta": {
       "tier": 1
     },
-    "description": "",
+    "description": "<p>You take some time to recover, this is typically 1 hour.</p>",
     "traits": {
       "raw": "",
       "value": []
@@ -34,7 +34,7 @@
     },
     "isFavourited": false,
     "configurable": false,
-    "isActivatable": false,
+    "isActivatable": true,
     "activateOnCreate": false,
     "applyTurnStart": false,
     "applyTurnEnd": false,
@@ -96,8 +96,8 @@
       }
     },
     "action": {
-      "activationType": "",
-      "actionCost": "",
+      "activationType": "standalone",
+      "actionCost": "5",
       "actionImage": "",
       "duration": {
         "isConcentration": false,
@@ -243,8 +243,8 @@
             "name": "physical",
             "label": "ABBREW.Concepts.physical",
             "value": "",
-            "operator": "",
-            "type": "",
+            "operator": "add",
+            "type": "numeric",
             "numerator": 1,
             "denominator": 1
           },
@@ -252,8 +252,8 @@
             "name": "crushing",
             "label": "ABBREW.Concepts.crushing",
             "value": "",
-            "operator": "",
-            "type": "",
+            "operator": "add",
+            "type": "numeric",
             "numerator": 1,
             "denominator": 1
           },
@@ -261,8 +261,8 @@
             "name": "piercing",
             "label": "ABBREW.Concepts.piercing",
             "value": "",
-            "operator": "",
-            "type": "",
+            "operator": "add",
+            "type": "numeric",
             "numerator": 1,
             "denominator": 1
           },
@@ -270,8 +270,8 @@
             "name": "slashing",
             "label": "ABBREW.Concepts.slashing",
             "value": "",
-            "operator": "",
-            "type": "",
+            "operator": "add",
+            "type": "numeric",
             "numerator": 1,
             "denominator": 1
           },
@@ -279,8 +279,8 @@
             "name": "fire",
             "label": "ABBREW.Concepts.fire",
             "value": "",
-            "operator": "",
-            "type": "",
+            "operator": "add",
+            "type": "numeric",
             "numerator": 1,
             "denominator": 1
           },
@@ -288,8 +288,8 @@
             "name": "cold",
             "label": "ABBREW.Concepts.cold",
             "value": "",
-            "operator": "",
-            "type": "",
+            "operator": "add",
+            "type": "numeric",
             "numerator": 1,
             "denominator": 1
           },
@@ -297,8 +297,8 @@
             "name": "water",
             "label": "ABBREW.Concepts.water",
             "value": "",
-            "operator": "",
-            "type": "",
+            "operator": "add",
+            "type": "numeric",
             "numerator": 1,
             "denominator": 1
           },
@@ -306,8 +306,8 @@
             "name": "earth",
             "label": "ABBREW.Concepts.earth",
             "value": "",
-            "operator": "",
-            "type": "",
+            "operator": "add",
+            "type": "numeric",
             "numerator": 1,
             "denominator": 1
           },
@@ -315,8 +315,8 @@
             "name": "air",
             "label": "ABBREW.Concepts.air",
             "value": "",
-            "operator": "",
-            "type": "",
+            "operator": "add",
+            "type": "numeric",
             "numerator": 1,
             "denominator": 1
           },
@@ -324,8 +324,8 @@
             "name": "electricity",
             "label": "ABBREW.Concepts.electricity",
             "value": "",
-            "operator": "",
-            "type": "",
+            "operator": "add",
+            "type": "numeric",
             "numerator": 1,
             "denominator": 1
           },
@@ -333,8 +333,8 @@
             "name": "poison",
             "label": "ABBREW.Concepts.poison",
             "value": "",
-            "operator": "",
-            "type": "",
+            "operator": "add",
+            "type": "numeric",
             "numerator": 1,
             "denominator": 1
           },
@@ -342,8 +342,8 @@
             "name": "flesh",
             "label": "ABBREW.Concepts.flesh",
             "value": "",
-            "operator": "",
-            "type": "",
+            "operator": "add",
+            "type": "numeric",
             "numerator": 1,
             "denominator": 1
           },
@@ -351,8 +351,8 @@
             "name": "blood",
             "label": "ABBREW.Concepts.blood",
             "value": "",
-            "operator": "",
-            "type": "",
+            "operator": "add",
+            "type": "numeric",
             "numerator": 1,
             "denominator": 1
           },
@@ -360,8 +360,8 @@
             "name": "metal",
             "label": "ABBREW.Concepts.metal",
             "value": "",
-            "operator": "",
-            "type": "",
+            "operator": "add",
+            "type": "numeric",
             "numerator": 1,
             "denominator": 1
           },
@@ -369,8 +369,8 @@
             "name": "light",
             "label": "ABBREW.Concepts.light",
             "value": "",
-            "operator": "",
-            "type": "",
+            "operator": "add",
+            "type": "numeric",
             "numerator": 1,
             "denominator": 1
           },
@@ -378,8 +378,8 @@
             "name": "dark",
             "label": "ABBREW.Concepts.dark",
             "value": "",
-            "operator": "",
-            "type": "",
+            "operator": "add",
+            "type": "numeric",
             "numerator": 1,
             "denominator": 1
           },
@@ -387,8 +387,8 @@
             "name": "life",
             "label": "ABBREW.Concepts.life",
             "value": "",
-            "operator": "",
-            "type": "",
+            "operator": "add",
+            "type": "numeric",
             "numerator": 1,
             "denominator": 1
           },
@@ -396,8 +396,8 @@
             "name": "death",
             "label": "ABBREW.Concepts.death",
             "value": "",
-            "operator": "",
-            "type": "",
+            "operator": "add",
+            "type": "numeric",
             "numerator": 1,
             "denominator": 1
           },
@@ -405,8 +405,8 @@
             "name": "war",
             "label": "ABBREW.Concepts.war",
             "value": "",
-            "operator": "",
-            "type": "",
+            "operator": "add",
+            "type": "numeric",
             "numerator": 1,
             "denominator": 1
           },
@@ -414,8 +414,8 @@
             "name": "famine",
             "label": "ABBREW.Concepts.famine",
             "value": "",
-            "operator": "",
-            "type": "",
+            "operator": "add",
+            "type": "numeric",
             "numerator": 1,
             "denominator": 1
           },
@@ -423,8 +423,8 @@
             "name": "pestilence",
             "label": "ABBREW.Concepts.pestilence",
             "value": "",
-            "operator": "",
-            "type": "",
+            "operator": "add",
+            "type": "numeric",
             "numerator": 1,
             "denominator": 1
           },
@@ -432,15 +432,15 @@
             "name": "conquest",
             "label": "ABBREW.Concepts.conquest",
             "value": "",
-            "operator": "",
-            "type": "",
+            "operator": "add",
+            "type": "numeric",
             "numerator": 1,
             "denominator": 1
           }
         }
       }
     },
-    "skillType": "",
+    "skillType": "basic",
     "path": {
       "raw": "",
       "value": {
@@ -475,12 +475,13 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "12.331",
+    "coreVersion": "13.345",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1749070774242,
-    "modifiedTime": 1749070774242,
-    "lastModifiedBy": "abbrewpacks00000"
+    "modifiedTime": 1749072844322,
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
   },
   "_key": "!items!abbrewRecover000"
 }

@@ -22,7 +22,7 @@
   "version": "0.0.2-prerelease31",
   "compatibility": {
     "minimum": 12,
-    "verified": "12.331"
+    "verified": "13.345"
   },
   "esmodules": ["./abbrew.mjs"],
   "styles": ["css/abbrew.css"],

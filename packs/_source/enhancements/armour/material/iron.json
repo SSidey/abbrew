@@ -91,6 +91,34 @@
         "value": "0",
         "numerator": 1,
         "denominator": 1
+      },
+      {
+        "operator": "merge",
+        "path": "system.revealed.revealSkills.raw",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "json",
+        "value": "{\"value\":\"Blacksmith (Check)\",\"id\":\"6GQuhRfuOZjc5kaG\",\"sourceId\":\"Compendium.abbrew.playerskills.Item.6GQuhRfuOZjc5kaG\"}",
+        "numerator": 1,
+        "denominator": 1
+      },
+      {
+        "operator": "add",
+        "path": "system.revealed.difficulty",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "numeric",
+        "value": "0",
+        "numerator": 1,
+        "denominator": 1
       }
     ],
     "duration": {
@@ -110,12 +138,13 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "12.331",
+    "coreVersion": "13.345",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1747680755358,
-    "modifiedTime": 1748281732224,
-    "lastModifiedBy": "abbrewpacks00000"
+    "modifiedTime": 1750200632115,
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
   },
   "_key": "!items!Aqv0NQ0cmD9z7DtM"
 }

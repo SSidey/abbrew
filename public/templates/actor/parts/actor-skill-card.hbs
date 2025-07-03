@@ -46,8 +46,8 @@
                     <label for="system.action.uses" class="resource-label">Uses</label>
                     {{/if}}
                     <div class="resource-content flexrow flex-center flex-between">
-                        <input type="text" name="system.action.uses.value" value="{{item.system.action.uses.value}}"
-                            data-dtype="Number" />
+                        <input type="text" class="skill-card-detail" name="system.action.uses.value"
+                            value="{{item.system.action.uses.value}}" data-dtype="Number" />
                         {{#unless system.action.uses.asStacks}}
                         <span class="skill-per"> / </span>
                         <input type="text"
@@ -63,7 +63,7 @@
                 <div class="skill-charges">
                     <label for="system.action.charges" class="resource-label">Charges</label>
                     <div class="resource-content flexrow flex-center flex-between">
-                        <input type="text" name="system.action.charges.value"
+                        <input type="text" class="skill-card-detail" name="system.action.charges.value"
                             value="{{item.system.action.charges.value}}" data-dtype="Number" />
                         <span class="skill-per"> / </span>
                         <input type="text" value="{{system.action.charges.max}}" data-dtype="Number" readonly />
@@ -97,7 +97,8 @@
                     skill'}}'>
                     <i class='fas fa-edit'></i>
                 </a>
-                <a class='skill-control skill-delete' data-action="deleteSkill" title='{{localize "DOCUMENT.Delete" type=' skill'}}'>
+                <a class='skill-control skill-delete' data-action="deleteSkill"
+                    title='{{localize "DOCUMENT.Delete" type=' skill'}}'>
                     <i class='fas fa-trash'></i>
                 </a>
             </div>

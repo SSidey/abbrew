@@ -1,3 +1,6 @@
+import { getFundamentalSkillWithActionCost } from "../../../../helpers/fundamental-skills.mjs";
+import { getModifiedSkillActionCost } from "../../../../helpers/skills/skill-activation.mjs";
+
 export async function _onAttackDamageAction(event, target) {
     event.preventDefault();
     const attackMode = target.dataset.attackType;

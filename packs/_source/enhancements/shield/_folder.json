@@ -1,0 +1,21 @@
+{
+  "name": "Shield",
+  "sorting": "a",
+  "folder": null,
+  "type": "Item",
+  "_id": "Etju6uXjhoJ3tflp",
+  "description": "",
+  "sort": 100000,
+  "color": null,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1747584137239,
+    "modifiedTime": 1747591087549,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!Etju6uXjhoJ3tflp"
+}

@@ -42,7 +42,7 @@
         "parsed": []
       }
     },
-    "equipState": "stowed",
+    "equipState": "readied",
     "weapon": {
       "size": 8,
       "heft": 8
@@ -152,12 +152,13 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "12.331",
+    "coreVersion": "13.345",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075324307,
     "modifiedTime": 1748899090289,
-    "lastModifiedBy": "abbrewpacks00000"
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
   },
   "_id": "daBNLIlM2sYINFMv",
   "sort": 200000,

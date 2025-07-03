@@ -196,12 +196,13 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "12.331",
+    "coreVersion": "13.345",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1744236348769,
     "modifiedTime": 1744236348769,
-    "lastModifiedBy": "abbrewpacks00000"
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
   },
   "_key": "!items!abbrewVisCheck00"
 }

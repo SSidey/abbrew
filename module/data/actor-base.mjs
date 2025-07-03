@@ -8,7 +8,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   }
 
   get heldArmourGuard() {
-    return this.parent.getActorHeldItems().filter(i => i.type === 'armour').reduce((result, a) => result += a.system.defense.guard, 0);
+    return this.parent.getActorHeldItems().filter(i => ["armour", "weapon"].includes(i.type)).reduce((result, a) => result += a.system.defense.guard, 0);
   }
 
   get anatomy() {
@@ -231,8 +231,10 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     schema.meta = new fields.SchemaField({
       tier: new fields.SchemaField({
         value: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0, max: 10 })
+      }), size: new fields.SchemaField({
+        value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+        dimension: new fields.NumberField({ initial: 1 })
       }),
-      size: new fields.NumberField({ ...requiredInteger, initial: 0 })
     });
 
     schema.skillTraining = new fields.ArrayField(
@@ -277,6 +279,8 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       this.attributes[key].value = Math.min(9, totalIncrease);
       this.attributes[key].rank = totalIncrease;
     }
+
+    this.meta.size.dimension = Object.values(CONFIG.ABBREW.size).find(v => v.value === this.meta.size.value).dimension;
 
     this.defense.risk.value = Math.floor(this.defense.risk.raw / 10);
 
@@ -435,16 +439,17 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   _prepareDefenses() {
     const armour = this.parent.items.filter(i => i.type === 'armour');
     const anatomy = this.parent.items.filter(i => i.type === "anatomy");
-    const wornArmour = this._getAppliedArmour(armour);
-    this._prepareDamageReduction(wornArmour, anatomy);
-    this._prepareGuard(wornArmour, anatomy);
-    this._prepareInflexibility(wornArmour);
+    const appliedArmour = this._getAppliedArmour(armour);
+    this._prepareDamageReduction(appliedArmour, anatomy);
+    this._prepareGuard(appliedArmour, anatomy);
+    this._prepareInflexibility(appliedArmour);
   }
 
   _getAppliedArmour(armour) {
     const wornArmour = armour.filter(a => ['worn', 'none'].includes(a.system.equipState)).filter(a => a.system.equipState === 'worn');
     const heldArmour = armour.filter(a => a.system.equipType === 'held').filter(a => a.system.equipState.startsWith('held'));
-    return [...wornArmour, ...heldArmour];
+    const weaponArmour = this.parent.items.filter(i => i.type === "weapon").filter(w => w.system.defense.guard > 0 || w.system.defense.protection.length > 0).filter(a => ['held1H', 'held2H'].includes(a.system.equipState))
+    return [...wornArmour, ...heldArmour, ...weaponArmour];
   }
 
   _prepareResolve() {

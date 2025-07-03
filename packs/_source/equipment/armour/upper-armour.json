@@ -25,11 +25,11 @@
     },
     "enhancements": [],
     "quantity": 1,
-    "heft": 0,
+    "heft": 6,
     "complexity": 0,
     "equipType": "worn",
     "handsRequired": "",
-    "equipState": "stowed",
+    "equipState": "readied",
     "handsSupplied": 0,
     "actionCost": 0,
     "exertActionCost": 0,
@@ -63,12 +63,13 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "12.331",
+    "coreVersion": "13.345",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1747684191063,
-    "modifiedTime": 1748279659931,
-    "lastModifiedBy": "abbrewpacks00000"
+    "modifiedTime": 1751321672978,
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
   },
   "_key": "!items!1Wmbti3lFhmQt4oC"
 }

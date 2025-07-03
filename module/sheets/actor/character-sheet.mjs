@@ -173,7 +173,7 @@ export class AbbrewCharacterSheet extends DragDropMixin(ActorTagsMixin(ActorCont
     if (!this.isEditable) return;
 
     this.bindDragDrops();
-    bindAllChange(".item input", _onItemChange, this);
+    bindAllChange(".item input.skill-card-detail", _onItemChange, this);
     bindAllChange(".attack-reload", _onAmmunitionSelect, this);
 
     this._activateTraits();

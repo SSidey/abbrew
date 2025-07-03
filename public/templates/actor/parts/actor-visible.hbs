@@ -1,47 +1,16 @@
 <h3>Anatomy</h3>
 <ol style="list-style:none;padding-left: 0px;">
     {{#each playerRevealed.anatomy as |anatomy|}}
-    <li class="revealed-item">
-        <div class="revealed-details">
-            <div class='revealed-name'>
-                <div class='revealed-image'>
-                    <a class='rollable' data-action="rollable" data-roll-type='item'>
-                        <img src='{{anatomy.item.img}}' title='{{anatomy.item.name}}' width='24' height='24' />
-                    </a>
-                </div>
-                <label>{{anatomy.item.name}}</label>
-            </div>
-        </div>
+    <li class="revealed-item item" data-item-id="{{anatomy.item._id}}">
+        {{> "systems/abbrew/templates/actor/parts/actor-visible-item-internal.hbs" item=anatomy.item}}
         <ol style="list-style:none;" class="anatomy-revealed-weapons">
             {{#each anatomy.grantedWeapons as |weapon|}}
-            <li class="revealed-item">
-                <div class="revealed-details">
-                    <div class='revealed-name'>
-                        <div class='revealed-image'>
-                            <a class='rollable' data-action="rollable" data-roll-type='item'>
-                                <img src='{{weapon.img}}' title='{{weapon.name}}' width='24' height='24' />
-                            </a>
-                        </div>
-                        <label>{{weapon.name}}</label>
-                    </div>
-                </div>
-            </li>
+            {{> "systems/abbrew/templates/actor/parts/actor-visible-item.hbs" item=weapon}}
             {{/each}}
         </ol>
         <ol style="list-style:none;" class="anatomy-revealed-skills">
             {{#each anatomy.grantedSkills as |skill|}}
-            <li class="revealed-item">
-                <div class="revealed-details">
-                    <div class='revealed-name'>
-                        <div class='revealed-image'>
-                            <a class='rollable' data-action="rollable" data-roll-type='item'>
-                                <img src='{{skill.img}}' title='{{skill.name}}' width='24' height='24' />
-                            </a>
-                        </div>
-                        <label>{{skill.name}}</label>
-                    </div>
-                </div>
-            </li>
+            {{> "systems/abbrew/templates/actor/parts/actor-visible-item.hbs" item=skill}}
             {{/each}}
         </ol>
     </li>

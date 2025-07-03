@@ -3,7 +3,7 @@ import { getSafeJson } from "./utils.mjs";
 
 // TODO: Cap concepts at visualisation
 export function getAttackSkillWithActions(id, name, traits, actionCost, image, attackProfile, attackMode, handsSupplied, siblingSkillModifiers = [], actorSource, itemSource) {
-    const skill = CONFIG.ABBREW.fundamentalAttackSkills[attackMode];
+    const skill = CONFIG.ABBREW.fundamentalAttackSkills[attackMode.toLowerCase()];
     let critical;
     if (attackMode === "ranged") {
         critical = Number.POSITIVE_INFINITY;

@@ -95,7 +95,7 @@ export default class AbbrewItemBase extends foundry.abstract.TypeDataModel {
       }
 
       const orderedPrefixes = this.name.parts.filter(p => p.affix === "-1").sort(compareModifierIndices).map(p => game.i18n.localize(p.part));
-      const suffixes = this.name.parts.filter(p => p.affix === "1").map(p => game.i18n.localize(p.part));
+      const suffixes = this.name.parts.filter(p => p.affix === "1").sort(compareModifierIndices).map(p => game.i18n.localize(p.part));
       const fullNameArray = [...orderedPrefixes, this.name.base, ...suffixes];
       this.parent.name = fullNameArray.join(" ");
     } else if (this.name.base) {

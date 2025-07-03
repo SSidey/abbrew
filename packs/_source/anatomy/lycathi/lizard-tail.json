@@ -23,7 +23,7 @@
       }
     },
     "handsRequired": "",
-    "equipState": "stowed",
+    "equipState": "readied",
     "handsSupplied": 0,
     "actionCost": 0,
     "exertActionCost": 0,
@@ -60,12 +60,13 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "12.331",
+    "coreVersion": "13.345",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075248134,
     "modifiedTime": 1743075535979,
-    "lastModifiedBy": "abbrewpacks00000"
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
   },
   "_key": "!items!ZM9QeOlpLrHdkauh"
 }

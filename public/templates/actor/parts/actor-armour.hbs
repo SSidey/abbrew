@@ -1,4 +1,4 @@
-<ol class='items-list'>
+<ol class='item-container'>
   <li class='item flexrow items-header'>
     <div class='item-name'>{{localize 'Name'}}</div>
     <div class='item-controls'>
@@ -18,19 +18,23 @@
       </div>
       <h4 class="item-label">{{item.name}}</h4>
     </div>
-    {{#if ../showEquipState}}
-    {{> "systems/abbrew/templates/item/item/templates/item-equip-state-changes.hbs" equipStates =
-    item.system.validEquipStates}}
-    {{/if}}
-    <label class="icon-label">
-      <input type="checkbox" class="armour-sunder" name="system.isSundered" data-action="toggleSundered" {{ checked
-        item.system.isSundered }}>
-      {{#if item.system.isSundered}}
-      <span class="icon icon-sunder-c" />
-      {{else}}
-      <span class="icon icon-sunder-u" />
+    <div class="item-equip-controls">
+      {{#if ../showEquipState}}
+      {{> "systems/abbrew/templates/item/item/templates/item-equip-state-changes.hbs" equipStates =
+      item.system.validEquipStates}}
       {{/if}}
-    </label>
+    </div>
+    <div class="item-context-controls">
+      <label class="icon-label">
+        <input type="checkbox" class="armour-sunder" name="system.isSundered" data-action="toggleSundered" {{ checked
+          item.system.isSundered }}>
+        {{#if item.system.isSundered}}
+        <span class="icon icon-sunder-c" />
+        {{else}}
+        <span class="icon icon-sunder-u" />
+        {{/if}}
+      </label>
+    </div>
     <div class='item-controls'>
       <a class='item-control item-edit' data-action="editItem" title='{{localize "DOCUMENT.Edit" type=' armour'}}'>
         <i class='fas fa-edit'></i>

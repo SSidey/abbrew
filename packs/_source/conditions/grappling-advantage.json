@@ -184,19 +184,20 @@
   },
   "effects": [],
   "folder": null,
-  "sort": 100000,
+  "sort": 500000,
   "ownership": {
     "default": 0
   },
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "12.331",
+    "coreVersion": "13.345",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1744980400845,
-    "modifiedTime": 1745068583375,
-    "lastModifiedBy": "abbrewpacks00000"
+    "modifiedTime": 1749073101863,
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
   },
   "_key": "!items!kzr36Ru92tr41DA2"
 }

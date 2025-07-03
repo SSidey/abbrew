@@ -203,7 +203,8 @@
         "divineadherent": "Divine Adherent",
         "poisoner": "Poisoner",
         "shieldguardian": "Shield Guardian",
-        "snake": "Snake"
+        "snake": "Snake",
+        "sorcerer": "Sorcerer"
       },
       "Description": {
         "universal": "A universal path, skills with this path can be selected if it has roles matching thosee of your paths",
@@ -211,7 +212,8 @@
         "divineadherent": "You worship a deity and derive your powers from prayer and devotion to that deity.",
         "poisoner": "Adept at the production and the usage of poisons.",
         "shieldguardian": "A selfless fighting style, one where you put yourself in harm's way to shield your allies and prevent your enemies from reaching them.",
-        "snake": "A style employing the use of two short weapons and relies on rapid speed and dodges."
+        "snake": "A style employing the use of two short weapons and relies on rapid speed and dodges.",
+        "sorcerer": "A magician that draws on internal powers to manifest spells."
       }
     },
     "EnhancementTargetTypes": {
@@ -338,6 +340,7 @@
       "slashing": "Slashing"
     },
     "Concepts": {
+      "esoteric": "Esoteric",
       "physical": "Physical",
       "crushing": "Crushing",
       "piercing": "Piercing",
@@ -373,6 +376,7 @@
       "padded": "Padded",
       "bone": "Bone",
       "cloth": "Cloth",
+      "glass": "Glass",
       "hide": "Hide",
       "iron": "Iron",
       "leather": "Leather",
@@ -384,7 +388,9 @@
       "lamellar": "Lamellar",
       "laminar": "Laminar",
       "plate": "Plate",
-      "splint": "Splint"
+      "splint": "Splint",
+      "fireimbued": "Fire Imbued",
+      "ofhealing": "of Healing"
     },
     "Type": "Type",
     "AttackTypes": {
@@ -398,7 +404,8 @@
       "attack": "Attack",
       "feint": "Feint",
       "overpower": "Overpower",
-      "finisher": "Finisher"
+      "finisher": "Finisher",
+      "spell": "Spell"
     },
     "ReloadType": {
       "draw": "Draw",
@@ -444,7 +451,8 @@
       "temporary": "Temporary",
       "untyped": "Untyped",
       "background": "Background",
-      "tier": "Tier"
+      "tier": "Tier",
+      "grantModifier": "Grant Modifier"
     },
     "ActionCosts": {
       "passive": "Passive",
@@ -579,6 +587,7 @@
         "reload": "Reload",
         "draw": "Draw",
         "close": "Close",
+        "short": "Short",
         "standard": "Standard",
         "long": "Long",
         "heavy": "Heavy",
@@ -588,6 +597,8 @@
         "ammunition": "Ammunition"
       },
       "Material": {
+        "metal": "Metal",
+        "iron": "Iron",
         "silver": "Silver"
       },
       "Skill": {
@@ -611,7 +622,13 @@
         "emotion": "Emotion",
         "psychic": "Psychic"
       },
-      "stance": "Stance"
+      "stance": "Stance",
+      "Spell": {
+        "spellcomponent": "Spell Component",
+        "concept": "Concept",
+        "spellform": "Spellform",
+        "spellamp": "Spell Amp"
+      }
     },
     "Durations": {
       "instant": "Instant",
@@ -825,6 +842,10 @@
     }
   },
 
+  "SKILL_CHECK": {
+    "Request": "Skill Check Request"
+  },
+
   "EFFECT": {
     "TabDuration": "Duration",
     "ParseMode": "Parse Mode",
@@ -875,6 +896,9 @@
         },
         "tier": {
           "label": "Tier"
+        },
+        "size": {
+          "label": "Size"
         }
       },
       "revealed": {
@@ -891,6 +915,9 @@
   },
   "ITEM_SKILL": {
     "FIELDS": {
+      "rank": {
+        "label": "Rank"
+      },
       "action": {
         "charges": {
           "hasCharges": {
@@ -904,11 +931,22 @@
           }
         },
         "modifiers": {
-          "attackProfile": {
+          "attacProfile": {
             "combineAttacks": {
               "value": {
                 "label": "Number Combined"
               }
+            }
+          },
+          "duration": {
+            "valueSteps": {
+              "label": "Value Steps"
+            },
+            "intervalSteps": {
+              "label": "Interval Steps"
+            },
+            "intervalSet": {
+              "label": "Interval Set"
             }
           },
           "protection": {

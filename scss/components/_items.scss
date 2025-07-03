@@ -1,3 +1,7 @@
+:root {
+  color-scheme: light dark;
+}
+
 // Section Header
 .items-header {
   height: 28px;
@@ -139,11 +143,11 @@ ol li.damage-reduction {
 
 .item.item-row {
   display: grid;
-  grid-template-columns: repeat(10, 1fr);
+  // grid-template-columns: repeat(10, 1fr);
 
   .item-name {
     display: grid;
-    grid-column: 1 / 6;
+    // grid-column: 1 / 6;
     grid-template-columns: repeat(7, 1fr);
 
     >div.item-image {
@@ -162,10 +166,6 @@ ol li.damage-reduction {
   .item-equipState {
     grid-column: 6 / 7;
 
-  }
-
-  .icon-label {
-    grid-column: 8 / 9;
   }
 
   .icon-label-2 {
@@ -427,5 +427,64 @@ ol li.damage-reduction {
 .stored-items {
   margin-left: 5px;
   margin-right: 5px;
-  background: var(--input-background-color);
+  background: rgba(0, 0, 0, 0.1)
+}
+
+.item-container {
+  list-style: none;
+  padding-left: 0px;
+
+  .item-row {
+    background-color: light-dark(rgba(0, 0, 0, 0.1), var(--color-cool-3));
+    display: grid;
+    grid-template-columns: 6fr 4fr 2fr 1fr;
+    align-items: center;
+
+    .item-name {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+
+      >div.item-image {
+        grid-column: 1 / 2;
+        height: 30px;
+        background-size: 30px;
+        border: none;
+        margin-right: 5px;
+      }
+
+      >h4.item-label {
+        grid-column: 2 / 8;
+        margin-top: 0px;
+        margin-bottom: 0px;
+        align-content: center;
+      }
+    }
+
+    .item-equip-controls {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(min-content, 1fr));
+    }
+
+    .item-context-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(24px, max-content));
+      grid-column-gap: 0.5em;
+    }
+
+    .item-controls {
+      display: grid;
+      grid-column: 4 / 5;
+      grid-template-columns: repeat(auto-fit, minmax(17px, max-content));
+
+      a {
+        font-size: 12px;
+        text-align: center;
+        margin: 0 6px;
+      }
+    }
+  }
+}
+
+.stored-items>.item-row {
+  background-color: light-dark(rgba(0, 0, 0, 0.2), rgb(47, 39, 63));
 }

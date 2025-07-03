@@ -1,0 +1,21 @@
+{
+  "name": "Material",
+  "sorting": "a",
+  "folder": "Etju6uXjhoJ3tflp",
+  "type": "Item",
+  "_id": "WpFjUOl3pP8nHlEw",
+  "description": "",
+  "sort": 0,
+  "color": null,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null
+  },
+  "_key": "!folders!WpFjUOl3pP8nHlEw"
+}

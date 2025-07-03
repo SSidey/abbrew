@@ -1,0 +1,116 @@
+{
+  "name": "Mage",
+  "type": "archetype",
+  "_id": "3ES9PU43m6tkfkOM",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "name": {
+      "base": "",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1
+    },
+    "description": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "enhancements": [],
+    "roleRequirements": {
+      "1": {
+        "isActive": true,
+        "roles": "[{\"label\":\"magic\",\"value\":\"Magic\",\"title\":\"You primarily harness magic to combat your foes.\"},{\"label\":\"ranged\",\"value\":\"Ranged\",\"title\":\"You prefer to fight at a distance from your opponents.\"}]",
+        "parsedRoles": [],
+        "restrictedRoles": "",
+        "parsedRestrictedRoles": [],
+        "isMajor": false,
+        "path": {
+          "isRequired": true,
+          "raw": "",
+          "name": "",
+          "id": ""
+        }
+      },
+      "2": {
+        "isActive": false,
+        "roles": "",
+        "parsedRoles": [],
+        "restrictedRoles": "",
+        "parsedRestrictedRoles": [],
+        "isMajor": false,
+        "path": {
+          "isRequired": true,
+          "raw": "",
+          "name": "",
+          "id": ""
+        }
+      },
+      "3": {
+        "isActive": false,
+        "roles": "",
+        "parsedRoles": [],
+        "restrictedRoles": "",
+        "parsedRestrictedRoles": [],
+        "isMajor": false,
+        "path": {
+          "isRequired": true,
+          "raw": "",
+          "name": "",
+          "id": ""
+        }
+      },
+      "4": {
+        "isActive": false,
+        "roles": "",
+        "parsedRoles": [],
+        "restrictedRoles": "",
+        "parsedRestrictedRoles": [],
+        "isMajor": false,
+        "path": {
+          "isRequired": true,
+          "raw": "",
+          "name": "",
+          "id": ""
+        }
+      },
+      "5": {
+        "isActive": false,
+        "roles": "",
+        "parsedRoles": [],
+        "restrictedRoles": "",
+        "parsedRestrictedRoles": [],
+        "isMajor": false,
+        "path": {
+          "isRequired": true,
+          "raw": "",
+          "name": "",
+          "id": ""
+        }
+      }
+    },
+    "skillIds": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.345",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1750272365450,
+    "modifiedTime": 1750272376107,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!3ES9PU43m6tkfkOM"
+}

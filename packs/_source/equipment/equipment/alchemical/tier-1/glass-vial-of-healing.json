@@ -1,0 +1,157 @@
+{
+  "folder": "AcoSCm2CV31zVEb9",
+  "name": "Glass Vial of Healing",
+  "type": "equipment",
+  "_id": "xW9U2bxtAlXElSf7",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "name": {
+      "base": "Vial",
+      "parts": [
+        {
+          "key": "glass",
+          "part": "Glass",
+          "affix": "-1",
+          "order": 8
+        },
+        {
+          "key": "ofhealing",
+          "part": "of Healing",
+          "affix": "1",
+          "order": 9
+        }
+      ]
+    },
+    "meta": {
+      "tier": 1,
+      "size": 0,
+      "quality": 0
+    },
+    "description": "[\"Reduce any one wound on your character by 1\"]",
+    "traits": {
+      "raw": "[{\"key\":\"vial\",\"value\":\"Vial\",\"feature\":\"item\",\"subFeature\":\"form\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"consumable\",\"value\":\"Consumable\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]",
+      "value": [
+        {
+          "key": "vial",
+          "value": "Vial",
+          "feature": "item",
+          "subFeature": "form",
+          "effect": "",
+          "data": "",
+          "exclude": []
+        }
+      ]
+    },
+    "abbrewId": {
+      "value": "abbrew.equipment.vial.xW9U2bxtAlXElSf7",
+      "uuid": "xW9U2bxtAlXElSf7"
+    },
+    "enhancements": [
+      {
+        "name": "Glass",
+        "enhancementType": "",
+        "id": "U3Qdljw5Ph7C0jvk",
+        "image": "icons/svg/item-bag.svg",
+        "uuid": "Compendium.abbrew.enhancements.Item.U3Qdljw5Ph7C0jvk",
+        "cost": 0
+      },
+      {
+        "name": "of Healing",
+        "enhancementType": "",
+        "id": "jYKfxfibQOHuDjJn",
+        "image": "icons/svg/item-bag.svg",
+        "uuid": "Compendium.abbrew.enhancements.Item.jYKfxfibQOHuDjJn",
+        "cost": 0
+      }
+    ],
+    "quantity": 1,
+    "heft": 1,
+    "complexity": 0,
+    "equipType": "held",
+    "equipPoints": {
+      "required": {
+        "raw": "[]",
+        "parsed": []
+      },
+      "provided": {
+        "raw": "",
+        "parsed": []
+      }
+    },
+    "handsRequired": "oneHand",
+    "equipState": "readied",
+    "handsSupplied": 0,
+    "actionCost": 0,
+    "exertActionCost": 1,
+    "validEquipStates": [
+      {
+        "value": "held1H",
+        "label": "ABBREW.EquipStateChange.heldOne",
+        "cost": 1
+      },
+      {
+        "value": "dropped",
+        "label": "ABBREW.EquipStateChange.dropped",
+        "cost": 0
+      }
+    ],
+    "nextValidEquipStates": [],
+    "skills": {
+      "granted": [
+        {
+          "name": "Healing Potion I",
+          "skillType": "",
+          "id": "2g6RLyGCWc7rRZot",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.2g6RLyGCWc7rRZot"
+        }
+      ]
+    },
+    "availableEnhancements": 0,
+    "storage": {
+      "hasStorage": false,
+      "type": "",
+      "accessible": false,
+      "value": 0,
+      "max": 0,
+      "storedItems": [],
+      "traitFilter": {
+        "raw": "",
+        "value": []
+      }
+    },
+    "storeIn": "",
+    "revealed": {
+      "isRevealed": false,
+      "revealSkills": {
+        "raw": "[{\"value\":\"Alchemy (Check)\",\"id\":\"OLoaLfFfFYG3IhJc\",\"sourceId\":\"CompendiumabbrewplayerskillsItemOLoaLfFfFYG3IhJc\"}]",
+        "parsed": []
+      },
+      "difficulty": 10,
+      "tier": 0
+    },
+    "grantedBy": "",
+    "defense": {
+      "guard": 0,
+      "inflexibility": 0,
+      "protection": []
+    }
+  },
+  "effects": [],
+  "sort": 100000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.345",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1750413253548,
+    "modifiedTime": 1750419360609,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!xW9U2bxtAlXElSf7"
+}

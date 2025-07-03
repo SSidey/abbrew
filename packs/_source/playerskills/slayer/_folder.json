@@ -1,0 +1,22 @@
+{
+  "type": "Item",
+  "folder": null,
+  "name": "Slayer",
+  "color": null,
+  "sorting": "a",
+  "_id": "pWiquvxmyjtUaKT3",
+  "description": "",
+  "sort": 0,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.345",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1750204031490,
+    "modifiedTime": 1750204031490,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!pWiquvxmyjtUaKT3"
+}

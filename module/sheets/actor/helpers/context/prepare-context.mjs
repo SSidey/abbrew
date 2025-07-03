@@ -80,7 +80,7 @@ export const ActorContextMixin = superclass => class extends superclass {
         // TODO: Exception when blank
         const ammunitionChoices = this.actor.items.filter(i => i.type === "ammunition").filter(i => i.system.storeIn && this.isContainerAccessible(this.actor.items.find(c => c._id === i.system.storeIn))).map(a => ({ label: a.name, type: a.system.type, value: a._id }));
         const features = [];
-        const skills = { background: [], basic: [], path: [], resource: [], temporary: [], untyped: [], archetype: [], tier: [] };
+        const skills = { background: [], basic: [], path: [], resource: [], temporary: [], untyped: [], archetype: [], tier: [], grantModifier: [] };
         const spells = {
             0: [],
             1: [],
@@ -97,6 +97,7 @@ export const ActorContextMixin = superclass => class extends superclass {
         const equipment = [];
         const armour = [];
         const wornArmour = [];
+        const wornEquipment = [];
         const weapons = [];
         const equippedWeapons = [];
         const archetypes = [];
@@ -116,7 +117,7 @@ export const ActorContextMixin = superclass => class extends superclass {
                 archetypeSkills[i._id] = context.items.filter(j => i.system.skillIds.includes(j.system.abbrewId.uuid));
             }
 
-            if (["armour", "equipment"].includes(i.type) && i.system.storage.hasStorage) {
+            if (["armour", "equipment"].includes(i.type) && i.system.storage.hasStorage && i.system.equipState !== "stowed") {
                 const accessible = this.isContainerAccessible(i);
                 storage.push({ container: i, contents: context.items.filter(ci => i.system.storage.storedItems.includes(ci._id)), isAccessible: accessible });
             }
@@ -150,7 +151,9 @@ export const ActorContextMixin = superclass => class extends superclass {
                 equipment.push(i);
             }
             if (i.type === 'ammunition') {
-                ammunition.push(i);
+                if (!i.system.storeIn) {
+                    equipment.push(i);
+                }
                 ammunitionChoices.push({ name: i.name, type: i.system.type, id: i._id });
             }
             // Append to features.
@@ -158,7 +161,11 @@ export const ActorContextMixin = superclass => class extends superclass {
                 features.push(i);
             }
             else if (i.type === 'equipment') {
-                equipment.push(i);
+                if (['held1H', 'held2H', 'worn'].includes(i.system.equipState)) {
+                    wornEquipment.push(i);
+                } else if (i.system.equipState !== "stowed") {
+                    equipment.push(i);
+                }
             }
             // Append to skills.
             else if (i.type === 'skill') {
@@ -171,7 +178,6 @@ export const ActorContextMixin = superclass => class extends superclass {
                         break;
                     case 'path':
                         skills.path.push(i);
-                        // archetypeSkills[i.archetypeId].push(i);
                         break;
                     case 'resource':
                         skills.resource.push(i)
@@ -185,40 +191,52 @@ export const ActorContextMixin = superclass => class extends superclass {
             }
             else if (i.type === "anatomy") {
                 if (i.system.isDismembered) {
-                    equipment.push(i);
+                    if (!i.system.storeIn) {
+                        equipment.push(i);
+                    }
                 } else {
                     anatomy.push(i);
-                    if (i.system.revealed.isRevealed) {
-                        playerRevealed.anatomy.push(
-                            {
-                                item: i,
-                                grantedWeapons: context.items.filter(i => i.type === "weapon").filter(w => w.system.revealed.isRevealed && w.system.grantedBy === i._id),
-                                grantedSkills: context.items.filter(i => i.type === "skill").filter(w => w.system.revealed.isRevealed && w.system.grantedBy.item === i._id)
-                            }
-                        );
-                    }
+                }
+
+
+                if (i.system.revealed.isRevealed) {
+                    playerRevealed.anatomy.push(
+                        {
+                            item: i,
+                            grantedWeapons: context.items.filter(i => i.type === "weapon").filter(w => w.system.revealed.isRevealed && w.system.grantedBy === i._id),
+                            grantedSkills: context.items.filter(i => i.type === "skill").filter(w => w.system.revealed.isRevealed && w.system.grantedBy.item === i._id)
+                        }
+                    );
                 }
             }
             else if (i.type === 'armour') {
-                armour.push(i);
                 if (['held1H', 'held2H', 'worn'].includes(i.system.equipState)) {
                     wornArmour.push(i);
-                    if (i.system.revealed.isRevealed) {
-                        playerRevealed.armour.push(i);
-                    } else if (i.system.equipState !== "stowed") {
-                        playerVisible.armour.push(i);
-                    }
+                    wornEquipment.push(i);
+                } else if (i.system.equipState !== "stowed") {
+                    equipment.push(i);
+                }
+
+                if (i.system.revealed.isRevealed) {
+                    playerRevealed.armour.push(i);
+                } else if (i.system.equipState !== "stowed") {
+                    playerVisible.armour.push(i);
                 }
             }
             else if (i.type === 'weapon') {
-                weapons.push(i);
                 if (['held1H', 'held2H', 'active'].includes(i.system.equipState)) {
                     equippedWeapons.push(i);
-                    if (i.system.revealed.isRevealed) {
-                        playerRevealed.weapons.push(i);
-                    } else if (i.system.equipState !== "stowed") {
-                        playerVisible.weapons.push(i);
-                    }
+                }
+
+                if (!i.system.storeIn) {
+                    equipment.push(i);
+                }
+
+                if (i.system.revealed.isRevealed) {
+                    playerRevealed.weapons.push(i);
+                } else if (i.system.equipState !== "stowed") {
+                    playerVisible.weapons.push(i);
+
                 }
             }
             else if (i.type === "enhancement") {
@@ -249,6 +267,7 @@ export const ActorContextMixin = superclass => class extends superclass {
         context.anatomy = anatomy;
         context.armour = armour;
         context.wornArmour = wornArmour;
+        context.wornEquipment = wornEquipment;
         context.weapons = weapons;
         context.equippedWeapons = equippedWeapons;
         context.archetypes = archetypes;

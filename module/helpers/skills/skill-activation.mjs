@@ -54,7 +54,7 @@ export function isSkillBlocked(actor, skill) {
 
 export function getModifiedSkillActionCost(actor, skill) {
     const minActions = 0;
-    return Math.max(minActions, getModifierSkills(actor, skill).filter(s => s.system.action.modifiers.actionCost.operator).map(s => s.system.action.modifiers.actionCost).reduce((result, actionCost) => { result = applyOperator(result, actionCost.value, actionCost.operator); return result; }, skill.system.action.actionCost));
+    return Math.max(minActions, getModifierSkills(actor, skill).filter(s => s.system.action.modifiers.actionCost.operator).map(s => s.system.action.modifiers.actionCost).reduce((result, actionCost) => { result = applyOperator(result, actionCost.value, actionCost.operator); return result; }, parseInt(skill.system.action.actionCost)));
 }
 
 export async function handlePairedSkills(skill, actor) {

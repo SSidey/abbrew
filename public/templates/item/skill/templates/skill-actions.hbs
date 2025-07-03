@@ -43,7 +43,24 @@
     </div>
 </div>
 {{/if}}
+{{#if (eq system.skillType "grantModifier")}}
+<div>
+    <h3>Duration</h3>
+    {{formGroup system.schema.fields.action.fields.modifiers.fields.duration.fields.valueSteps
+    value=system.action.modifiers.duration.valueSteps localize=true}}
+    {{formGroup system.schema.fields.action.fields.modifiers.fields.duration.fields.setOrStep
+    value=system.action.modifiers.duration.setOrStep localize=true}}
+    {{#if system.action.modifiers.duration.setOrStep}}
+    {{formGroup system.schema.fields.action.fields.modifiers.fields.duration.fields.intervalSet
+    value=system.action.modifiers.duration.intervalSet localize=true}}
+    {{else}}
+    {{formGroup system.schema.fields.action.fields.modifiers.fields.duration.fields.intervalSteps
+    value=system.action.modifiers.duration.intervalSteps localize=true}}
+    {{/if}}
+</div>
+{{/if}}
 {{#unless (eq system.skillType "resource")}}
+{{#unless (eq system.skillType "grantModifier")}}
 <label class="slide-toggle roboto-upper">
     <input type="checkbox" class="action-activatable" name="system.isActivatable" {{ checked system.isActivatable }}>
     <span>{{localize "ABBREW.IsActivatable"}}</span>
@@ -1340,4 +1357,5 @@
         </div>
     </div>
 </div>
+{{/unless}}
 {{/unless}}

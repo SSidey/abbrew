@@ -96,8 +96,8 @@
       }
     },
     "action": {
-      "activationType": "standalone",
-      "actionCost": "0",
+      "activationType": "synergy",
+      "actionCost": null,
       "actionImage": "0a",
       "duration": {
         "isConcentration": false,
@@ -163,8 +163,8 @@
       "modifiers": {
         "fortune": 0,
         "actionCost": {
-          "value": 0,
-          "operator": ""
+          "value": 1,
+          "operator": "minus"
         },
         "attackProfile": {
           "isEnabled": false,
@@ -248,7 +248,7 @@
                   "multiplier": 1
                 }
               ],
-              "type": ""
+              "type": "vtheAYwEDEcO8a9g"
             }
           ],
           "target": []
@@ -451,13 +451,17 @@
             "type": "numeric",
             "numerator": 1,
             "denominator": 1
+          },
+          "esoteric": {
+            "operator": "add",
+            "type": "numeric"
           }
         }
       }
     },
     "skillType": "path",
     "path": {
-      "raw": "",
+      "raw": "[{\"label\":\"sorcerer\",\"value\":\"Sorcerer\",\"roles\":[\"magic\",\"ranged\"],\"title\":\"A magician that draws on internal powers to manifest spells.\",\"id\":\"abbrewpsorcerer0\"}]",
       "value": {
         "id": ""
       }
@@ -483,19 +487,20 @@
     }
   },
   "effects": [],
-  "sort": 0,
+  "sort": 300000,
   "ownership": {
     "default": 0
   },
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "12.331",
+    "coreVersion": "13.345",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1748903203011,
-    "modifiedTime": 1748903841177,
-    "lastModifiedBy": "abbrewpacks00000"
+    "modifiedTime": 1750607818109,
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
   },
   "_key": "!items!F630viTCiNrvIx0l"
 }

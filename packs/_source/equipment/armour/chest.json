@@ -61,24 +61,10 @@
       }
     },
     "handsRequired": "",
-    "equipState": "stowed",
+    "equipState": "readied",
     "handsSupplied": 0,
     "actionCost": 0,
     "exertActionCost": 1,
-    "validEquipStates": [
-      {
-        "value": "worn",
-        "label": "ABBREW.EquipState.worn"
-      },
-      {
-        "value": "stowed",
-        "label": "ABBREW.EquipState.stowed"
-      },
-      {
-        "value": "dropped",
-        "label": "ABBREW.EquipState.dropped"
-      }
-    ],
     "skills": {
       "granted": []
     },
@@ -95,7 +81,8 @@
     },
     "isSundered": false,
     "storage": {
-      "type": "count"
+      "type": "count",
+      "hasStorage": false
     }
   },
   "effects": [],
@@ -106,12 +93,13 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "12.331",
+    "coreVersion": "13.345",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1747685682012,
-    "modifiedTime": 1748289659578,
-    "lastModifiedBy": "abbrewpacks00000"
+    "modifiedTime": 1749818907379,
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
   },
   "_key": "!items!y6bGftCtAQwWqwtW"
 }

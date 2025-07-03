@@ -1,0 +1,80 @@
+{
+  "folder": "V4iWvQxKYERiAanw",
+  "name": "Flame Imbued",
+  "type": "enhancement",
+  "_id": "dWVOnYfnQbqFLkHc",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "name": {
+      "base": "",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1
+    },
+    "description": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "enhancements": [],
+    "skills": {
+      "granted": []
+    },
+    "targetType": "weapon",
+    "target": {
+      "name": "",
+      "id": "",
+      "uuid": ""
+    },
+    "enhancementType": "",
+    "traitFilter": {
+      "raw": "",
+      "value": []
+    },
+    "modifications": [
+      {
+        "operator": "merge",
+        "path": "",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "name",
+        "value": "",
+        "numerator": 1,
+        "denominator": 1
+      }
+    ],
+    "duration": {
+      "precision": "60",
+      "value": 1,
+      "expireOnStartOfTurn": true
+    },
+    "grantedIds": [],
+    "cost": 0
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.345",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1750410155574,
+    "modifiedTime": 1750610560969,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!dWVOnYfnQbqFLkHc"
+}

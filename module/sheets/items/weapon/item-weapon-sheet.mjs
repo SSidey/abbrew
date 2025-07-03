@@ -34,12 +34,12 @@ export class AbbrewWeaponSheet extends WeaponContextMixin(AbbrewEquipmentSheet) 
       template: "systems/abbrew/templates/item/physical/tabs/item-physical-description.hbs",
       scrollable: [""]
     },
-    attackprofiles: {
-      template: "systems/abbrew/templates/item/weapon/tabs/weapon-attack-profiles.hbs",
-      scrollable: [""]
-    },
     attributes: {
       template: "systems/abbrew/templates/item/equipment/tabs/equipment-attributes.hbs",
+      scrollable: [""]
+    },
+    attackprofiles: {
+      template: "systems/abbrew/templates/item/weapon/tabs/weapon-attack-profiles.hbs",
       scrollable: [""]
     },
     skills: {
@@ -57,8 +57,8 @@ export class AbbrewWeaponSheet extends WeaponContextMixin(AbbrewEquipmentSheet) 
     primary: {
       tabs: [
         { id: "description", icon: "fa-solid fa-book" },
-        { id: "attackprofiles", icon: "" },
         { id: "attributes", icon: "fa-solid fa-square-poll-vertical" },
+        { id: "attackprofiles", icon: "fa-solid fa-bomb" },
         { id: "skills", icon: "fa-solid fa-hurricane" },
         { id: "storage", icon: "fa-solid fa-box" }
       ],

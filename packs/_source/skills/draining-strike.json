@@ -13,28 +13,30 @@
     "skillTraits": "",
     "skillModifiers": {
       "synergy": "[{\"id\":\"abbrewAttack0000\",\"value\":\"Attack\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewAttack0000\"}]",
-      "discord": ""
+      "discord": "",
+      "isItemGrantTriggerRequired": false,
+      "isActorGrantTriggerRequired": false
     },
-    "configurable": true,
+    "configurable": false,
     "isActivatable": true,
     "activateOnCreate": false,
     "applyTurnStart": false,
     "applyTurnEnd": false,
     "applyOnExpiry": false,
     "skills": {
-      "granted": [],
+      "granted": [
+        {
+          "name": "Draining Strike",
+          "skillType": "",
+          "id": "DKO4k6RIfayVJR7A",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.DKO4k6RIfayVJR7A"
+        }
+      ],
       "paired": [],
       "grantedOnActivation": [],
-      "grantedOnAccept": [
-        {
-          "name": "Draining Strike - Heal",
-          "id": "OE3lzNqUJhEGzN0N",
-          "image": "icons/svg/item-bag.svg",
-          "sourceId": "Compendium.abbrew.skills.Item.OE3lzNqUJhEGzN0N",
-          "skillType": "",
-          "grantTimes": 0
-        }
-      ]
+      "grantedOnAccept": [],
+      "grantedOnExpiry": []
     },
     "resource": {
       "capacity": 0,
@@ -44,11 +46,12 @@
     "action": {
       "activationType": "synergy",
       "actionCost": "1",
-      "actionImage": "",
+      "actionImage": "1a",
       "duration": {
-        "precision": "0",
-        "value": 0,
-        "expireOnStartOfTurn": true
+        "precision": "6",
+        "value": 1,
+        "expireOnStartOfTurn": false,
+        "isConcentration": false
       },
       "uses": {
         "hasUses": false,
@@ -61,7 +64,7 @@
       "charges": {
         "hasCharges": false,
         "value": 0,
-        "max": 0
+        "max": 1
       },
       "isActive": false,
       "skillRequest": {
@@ -93,10 +96,14 @@
               "grantedSkills": ""
             }
           }
-        }
+        },
+        "isEnabled": false,
+        "checkType": "successes",
+        "targetModifiers": "",
+        "selfCheck": false
       },
       "attackProfile": {
-        "isEnabled": true,
+        "isEnabled": false,
         "name": "",
         "attackType": "",
         "lethal": 0,
@@ -115,7 +122,7 @@
       "modifiers": {
         "fortune": 0,
         "actionCost": {
-          "value": 0,
+          "value": 1,
           "operator": ""
         },
         "attackProfile": {
@@ -142,57 +149,26 @@
             "cost": null,
             "wounds": []
           },
-          "damage": []
+          "damage": [],
+          "isEnabled": false
         },
         "guard": {
           "self": {
-            "value": [
-              {
-                "operator": "add",
-                "type": "numeric",
-                "path": "",
-                "lateParse": false,
-                "multiplier": 1
-              }
-            ],
+            "value": [],
             "operator": ""
           },
           "target": {
-            "value": [
-              {
-                "operator": "add",
-                "type": "numeric",
-                "path": "",
-                "lateParse": true,
-                "multiplier": 1
-              }
-            ],
+            "value": [],
             "operator": ""
           }
         },
         "risk": {
           "self": {
-            "value": [
-              {
-                "operator": "add",
-                "type": "numeric",
-                "path": "",
-                "lateParse": false,
-                "multiplier": 1
-              }
-            ],
+            "value": [],
             "operator": ""
           },
           "target": {
-            "value": [
-              {
-                "operator": "add",
-                "type": "numeric",
-                "path": "",
-                "lateParse": true,
-                "multiplier": 1
-              }
-            ],
+            "value": [],
             "operator": ""
           }
         },
@@ -202,27 +178,11 @@
         },
         "resolve": {
           "self": {
-            "value": [
-              {
-                "operator": "add",
-                "type": "numeric",
-                "path": "",
-                "lateParse": false,
-                "multiplier": 1
-              }
-            ],
+            "value": [],
             "operator": ""
           },
           "target": {
-            "value": [
-              {
-                "operator": "add",
-                "type": "numeric",
-                "path": "",
-                "lateParse": true,
-                "multiplier": 1
-              }
-            ],
+            "value": [],
             "operator": ""
           }
         },
@@ -321,8 +281,26 @@
             "operator": "add",
             "type": "numeric"
           }
-        }
-      }
+        },
+        "protection": [
+          {
+            "types": {
+              "raw": "[{\"key\":\"crushing\",\"value\":\"Crushing\",\"feature\":\"skill\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"slashing\",\"value\":\"Slashing\",\"feature\":\"skill\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"piercing\",\"value\":\"Piercing\",\"feature\":\"skill\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]"
+            },
+            "modifications": {
+              "raw": "[{\"label\":\"resistance\",\"value\":\"Resistance\"}]"
+            },
+            "value": -3,
+            "trigger": {
+              "raw": "[{\"key\":\"silver\",\"value\":\"Silver\",\"feature\":\"material\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]"
+            }
+          }
+        ]
+      },
+      "removeOnPairedApply": false,
+      "handleRemovedSkillExpiry": true,
+      "asyncValues": [],
+      "skillCheck": []
     },
     "skillType": "path",
     "path": {
@@ -331,9 +309,63 @@
     },
     "attributeIncrease": "",
     "attributeIncreaseLong": "",
-    "attributeRankIncrease": ""
+    "attributeRankIncrease": "",
+    "light": {
+      "luminosity": 0.5,
+      "angle": 359
+    },
+    "senses": {
+      "modifiesSenses": false,
+      "detectionModes": []
+    }
   },
-  "effects": [],
+  "effects": [
+    {
+      "name": "New Active Effect",
+      "img": "icons/svg/aura.svg",
+      "origin": "Compendium.abbrew.skills.Item.DKO4k6RIfayVJR7A",
+      "duration": {
+        "rounds": 1,
+        "startTime": null,
+        "combat": null,
+        "seconds": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "disabled": false,
+      "_id": "cuxb7MMaJ83aSn2B",
+      "type": "base",
+      "system": {
+        "modifiers": [
+          {
+            "parseMode": "json",
+            "numerator": 1,
+            "denominator": 1
+          }
+        ]
+      },
+      "changes": [],
+      "description": "",
+      "tint": "#ffffff",
+      "transfer": true,
+      "statuses": [],
+      "sort": 0,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.345",
+        "systemId": "abbrew",
+        "systemVersion": "0.0.2-prerelease31",
+        "createdTime": 1750004017015,
+        "modifiedTime": 1750015469462,
+        "lastModifiedBy": "abbrewpacks00000"
+      },
+      "_key": "!items.effects!DKO4k6RIfayVJR7A.cuxb7MMaJ83aSn2B"
+    }
+  ],
   "folder": null,
   "sort": 300000,
   "ownership": {
@@ -342,12 +374,13 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "12.331",
+    "coreVersion": "13.345",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1744319408339,
-    "modifiedTime": 1748630996157,
-    "lastModifiedBy": "abbrewpacks00000"
+    "modifiedTime": 1750194762648,
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
   },
   "_key": "!items!DKO4k6RIfayVJR7A"
 }

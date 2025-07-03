@@ -58,7 +58,8 @@
       "capacity": 10,
       "operator": "",
       "relatedResource": "",
-      "fillCapacityOnCreate": false
+      "fillCapacityOnCreate": false,
+      "emptyPeriod": "recover"
     },
     "senses": {
       "modifiesSenses": false,
@@ -475,12 +476,13 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "12.331",
+    "coreVersion": "13.345",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1748903700556,
-    "modifiedTime": 1748903718317,
-    "lastModifiedBy": "abbrewpacks00000"
+    "modifiedTime": 1749158831590,
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
   },
   "_key": "!items!vtheAYwEDEcO8a9g"
 }

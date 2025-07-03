@@ -1,0 +1,22 @@
+{
+  "type": "Item",
+  "folder": null,
+  "name": "Equipment",
+  "color": null,
+  "sorting": "a",
+  "_id": "tHJyXL7LNWaiFmsS",
+  "description": "",
+  "sort": 0,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.345",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1750411726268,
+    "modifiedTime": 1750411726268,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!tHJyXL7LNWaiFmsS"
+}

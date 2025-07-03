@@ -4,33 +4,26 @@
   "system": {
     "description": "",
     "traits": {
-      "raw": "[{\"key\":\"weapon\",\"value\":\"Weapon\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"melee\",\"value\":\"Melee\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"close\",\"value\":\"Close\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[\"standard\",\"long\"]}]"
+      "raw": "[{\"key\":\"weapon\",\"value\":\"Weapon\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"melee\",\"value\":\"Melee\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"short\",\"value\":\"Short\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[\"close\",\"standard\",\"long\"]}]"
     },
     "equipType": "held",
     "attackProfiles": [
       {
-        "name": "Slash",
-        "attackType": "arc",
-        "finisherLimit": 4,
-        "hasStrongAttack": true,
-        "damage": [
-          {
-            "type": "slashing",
-            "value": 4,
-            "attributeModifier": "str",
-            "attributeMultiplier": 1,
-            "damageMultiplier": 1,
-            "overallMultiplier": 1
-          }
-        ],
-        "lethal": 0,
-        "critical": 10
-      },
-      {
         "name": "Stab",
         "attackType": "thrust",
-        "finisherLimit": 10,
-        "hasStrongAttack": false,
+        "lethal": 0,
+        "critical": 10,
+        "reach": "",
+        "range": 0,
+        "penetration": 0,
+        "ammunition": {
+          "type": "",
+          "id": "",
+          "value": 0,
+          "max": 0,
+          "reloadType": "",
+          "reloadActionCost": 1
+        },
         "damage": [
           {
             "type": "piercing",
@@ -38,11 +31,12 @@
             "attributeModifier": "str",
             "attributeMultiplier": 1,
             "damageMultiplier": 1,
-            "overallMultiplier": 1
+            "overallMultiplier": 1,
+            "penetration": 0
           }
         ],
-        "lethal": 0,
-        "critical": 10
+        "finisherLimit": 10,
+        "hasStrongAttack": false
       }
     ],
     "weapon": {
@@ -59,7 +53,7 @@
         "parsed": []
       }
     },
-    "equipState": "stowed",
+    "equipState": "readied",
     "abbrewId": {
       "value": "",
       "uuid": ""
@@ -87,12 +81,13 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "12.331",
+    "coreVersion": "13.345",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075348244,
-    "modifiedTime": 1748899128896,
-    "lastModifiedBy": "abbrewpacks00000"
+    "modifiedTime": 1750446725990,
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
   },
   "_id": "6iQLPlRxcvCEe1YT",
   "sort": 300000,

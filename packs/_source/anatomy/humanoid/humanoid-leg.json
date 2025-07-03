@@ -23,7 +23,7 @@
       }
     },
     "handsRequired": "",
-    "equipState": "stowed",
+    "equipState": "readied",
     "handsSupplied": 0,
     "actionCost": 0,
     "exertActionCost": 0,
@@ -32,7 +32,11 @@
     "isBroken": false,
     "isDismembered": false,
     "hands": 0,
-    "speed": 1,
+    "speed": {
+      "land": {
+        "value": 1
+      }
+    },
     "revealed": {
       "isRevealed": false,
       "difficulty": 0,
@@ -53,12 +57,13 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "12.331",
+    "coreVersion": "13.345",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075222255,
-    "modifiedTime": 1743075516545,
-    "lastModifiedBy": "abbrewpacks00000"
+    "modifiedTime": 1749156786250,
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
   },
   "_key": "!items!Ksnme3tCyxNpe7ML"
 }

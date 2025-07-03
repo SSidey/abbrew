@@ -166,7 +166,95 @@
         },
         "concepts": {
           "self": [],
-          "target": []
+          "target": [],
+          "physical": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "crushing": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "piercing": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "slashing": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "fire": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "cold": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "water": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "earth": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "air": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "electricity": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "poison": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "flesh": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "blood": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "metal": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "light": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "dark": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "life": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "death": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "war": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "famine": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "pestilence": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "conquest": {
+            "operator": "add",
+            "type": "numeric"
+          }
         }
       }
     },
@@ -187,12 +275,13 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "12.331",
+    "coreVersion": "13.345",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743711660124,
-    "modifiedTime": 1745426064184,
-    "lastModifiedBy": "abbrewpacks00000"
+    "modifiedTime": 1749769492912,
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
   },
   "_id": "LC65Qtc9wBcWbcVc",
   "sort": 0,

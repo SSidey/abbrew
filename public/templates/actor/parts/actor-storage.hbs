@@ -1,16 +1,10 @@
-<ol class='items-list'>
+<ol class='item-container'>
   <li class='item flexrow items-header'>
-    <div class='item-name'>{{localize 'Name'}}</div>
-    <div class='item-controls'>
-      <a class='item-control item-create' data-action="createItem" title='Create item' data-type='equipment'>
-        <i class='fas fa-plus'></i>
-        {{localize 'DOCUMENT.New' type='equipment'}}
-      </a>
-    </div>
+    <div class='item-name'>Storage</div>
   </li>
   {{#each storage as |item id|}}
-  <li>
-    <div class="item item-row container" data-item-id='{{item.container._id}}'>
+  <li class="container" data-item-id="{{item.container._id}}">
+    <div class="item item-row">
       <div class='item-name'>
         <div class='item-image'>
           <a class='rollable' data-action="rollable" data-roll-type='item'>
@@ -38,7 +32,7 @@
       </label>
       {{/if}}
     </div>
-    <ol class="stored-items" style="list-style: none; padding-left: 0px;">
+    <ol class="stored-items item-container" style="list-style: none; padding-left: 0px;">
       {{#each item.contents as |stored id|}}
       <li class='item item-row' data-item-id='{{stored._id}}'>
         <div class='item-name'>
@@ -50,31 +44,35 @@
           <h4 class="item-label">{{stored.name}}</h4>
         </div>
         {{#if item.isAccessible}}
-        {{> "systems/abbrew/templates/item/item/templates/item-equip-state-changes.hbs" equipStates =
-        stored.system.validEquipStates}}
+        <div class="item-equip-controls">
+          {{> "systems/abbrew/templates/item/item/templates/item-equip-state-changes.hbs" equipStates =
+          stored.system.validEquipStates}}
+        </div>
         {{/if}}
-        {{#if (eq stored.type "armour")}}
-        <label class="icon-label">
-          <input type="checkbox" class="armour-sunder" name="system.isSundered" data-action="toggleSundered" {{ checked
-            stored.system.isSundered }}>
-          {{#if stored.system.isSundered}}
-          <span class="icon icon-sunder-c" />
-          {{else}}
-          <span class="icon icon-sunder-u" />
+        <div class="item-context-controls">
+          {{#gm}}
+          <label>
+            <input type="checkbox" class="anatomy-revealed" name="system.revealed.isRevealed" {{ checked
+              stored.system.revealed.isRevealed }}>
+            {{#if stored.system.revealed.isRevealed}}
+            <span class="icon icon-anatomy-revealed-c" />
+            {{else}}
+            <span class="icon icon-anatomy-revealed-u" />
+            {{/if}}
+          </label>
+          {{/gm}}
+          {{#if (eq stored.type "armour")}}
+          <label class="icon-label">
+            <input type="checkbox" class="armour-sunder" name="system.isSundered" data-action="toggleSundered" {{
+              checked stored.system.isSundered }}>
+            {{#if stored.system.isSundered}}
+            <span class="icon icon-sunder-c" />
+            {{else}}
+            <span class="icon icon-sunder-u" />
+            {{/if}}
+          </label>
           {{/if}}
-        </label>
-        {{/if}}
-        {{#gm}}
-        <label>
-          <input type="checkbox" class="anatomy-revealed" name="system.revealed.isRevealed" {{ checked
-            stored.system.revealed.isRevealed }}>
-          {{#if stored.system.revealed.isRevealed}}
-          <span class="icon icon-anatomy-revealed-c" />
-          {{else}}
-          <span class="icon icon-anatomy-revealed-u" />
-          {{/if}}
-        </label>
-        {{/gm}}
+        </div>
         <div class='item-controls'>
           {{#gm}}
           <a class='item-control item-study' data-action="studyItem" title='{{localize "DOCUMENT.Study" type='

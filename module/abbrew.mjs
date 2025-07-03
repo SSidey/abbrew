@@ -272,7 +272,7 @@ Handlebars.registerHelper('getPropertyById', function (parent, child) {
 });
 
 Handlebars.registerHelper('hasValue', function (arg1, opts) {
-  return arg1 !== null && arg1 !== undefined ? opts.fn(this) : getInverseIfAvailable(opts);
+  return arg1 !== null && arg1 !== undefined;
 });
 
 function getInverseIfAvailable(opts) {
@@ -498,14 +498,13 @@ Hooks.on("dropCanvasData", (canvas, data) => {
 });
 
 Hooks.on("preCreateActiveEffect", effect => {
-  // TODO: Will this module update?
-  // const startingStacks = effect.flags?.abbrew?.skill?.stacks ?? effect.getFlag("statuscounter", "value") ?? 1
-  // effect.updateSource({
-  //   "flags.statuscounter.config.dataSource": "flags.abbrew.skill.stacks",
-  //   "flags.statuscounter.visible": startingStacks > 1,
-  //   "flags.statuscounter.value": startingStacks,
-  //   "flags.abbrew.skill.stacks": startingStacks,
-  // });
+  const startingStacks = effect.flags?.abbrew?.skill?.stacks ?? effect.getFlag("statuscounter", "value") ?? 1
+  effect.updateSource({
+    "flags.statuscounter.config.dataSource": "flags.abbrew.skill.stacks",
+    "flags.statuscounter.visible": startingStacks > 1,
+    "flags.statuscounter.value": startingStacks,
+    "flags.abbrew.skill.stacks": startingStacks,
+  });
 });
 
 Hooks.on("actorMustDropItem", async (actor) => {
@@ -828,18 +827,17 @@ export async function requestSkillCheck(checkName, skillIds, checkType, difficul
     showSkillRequest: true
   };
 
-  const html = await renderTemplate("systems/abbrew/templates/chat/skill-card.hbs", templateData);
+  const html = await foundry.applications.handlebars.renderTemplate("systems/abbrew/templates/chat/skill-card.hbs", templateData);
 
   // const speaker = ChatMessage.getSpeaker({ actor: actor });
   const rollMode = game.settings.get('core', 'rollMode');
   // const label = `[${skill.system.skillType}] ${skill.name}`;
 
-  ChatMessage.create({
-    // speaker: speaker,
+  foundry.documents.ChatMessage.implementation.create({
     rollMode: rollMode,
-    // flavor: label,
+    flavor: game.i18n.format("SKILL_CHECK.Request"),
     content: html,
-    flags: { data: data, abbrew: { messasgeData: { /* speaker: speaker, */ rollMode: rollMode, /* flavor: label, */ templateData: templateData } } }
+    flags: { data: data, abbrew: { messasgeData: { rollMode: rollMode, templateData: templateData } } }
   });
 }
 

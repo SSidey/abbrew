@@ -13,6 +13,18 @@ ABBREW.durations = {
   permanent: { label: "ABBREW.Durations.permanent", value: -1 }
 }
 
+ABBREW.durationSteps = {
+  0: { label: "ABBREW.Durations.instant", value: 0, valueSteps: [0] },
+  1: { label: "ABBREW.Durations.second", value: 1, valueSteps: [1] },
+  2: { label: "ABBREW.Durations.turn", value: 0.01, valueSteps: [1] },
+  3: { label: "ABBREW.Durations.round", value: 6, valueSteps: Array.from({ length: 9 }, (_, i) => i + 1) },
+  4: { label: "ABBREW.Durations.minute", value: 60, valueSteps: [1, 10, 30, 60] },
+  5: { label: "ABBREW.Durations.combat", value: -2, valueSteps: [1] },
+  6: { label: "ABBREW.Durations.hour", value: 3600, valuesSteps: Array.from({ length: 24 }, (_, i) => i + 1) },
+  7: { label: "ABBREW.Durations.day", value: 86400, valueSteps: [1] },
+  8: { label: "ABBREW.Durations.permanent", value: -1, valueSteps: [0] }
+}
+
 ABBREW.durationsLabels = {
   instant: "ABBREW.Durations.instant",
   second: "ABBREW.Durations.second",
@@ -122,6 +134,7 @@ ABBREW.equipPoints = {
 }
 
 ABBREW.concepts = {
+  esoteric: "ABBREW.Concepts.esoteric",
   physical: "ABBREW.Concepts.physical",
   crushing: "ABBREW.Concepts.crushing",
   piercing: "ABBREW.Concepts.piercing",
@@ -191,7 +204,8 @@ ABBREW.equipState = {
     inactive: "ABBREW.EquipState.inactive"
   },
   none: {
-
+    stowed: "ABBREW.EquipState.stowed",
+    dropped: "ABBREW.EquipState.dropped"
   }
 }
 
@@ -214,7 +228,8 @@ ABBREW.skillTypes = {
   temporary: "ABBREW.SkillTypes.temporary",
   untyped: "ABBREW.SkillTypes.untyped",
   background: "ABBREW.SkillTypes.background",
-  tier: "ABBREW.SkillTypes.tier"
+  tier: "ABBREW.SkillTypes.tier",
+  grantModifier: "ABBREW.SkillTypes.grantModifier"
 }
 
 ABBREW.actionCosts = {
@@ -494,6 +509,7 @@ ABBREW.nameParts = [
   { key: "padded", part: "ABBREW.NameParts.padded", affix: -1, order: 8 },
   { key: "bone", part: "ABBREW.NameParts.bone", affix: -1, order: 8 },
   { key: "cloth", part: "ABBREW.NameParts.cloth", affix: -1, order: 8 },
+  { key: "glass", part: "ABBREW.NameParts.glass", affix: -1, order: 8 },
   { key: "hide", part: "ABBREW.NameParts.hide", affix: -1, order: 8 },
   { key: "iron", part: "ABBREW.NameParts.iron", affix: -1, order: 8 },
   { key: "leather", part: "ABBREW.NameParts.leather", affix: -1, order: 8 },
@@ -506,6 +522,8 @@ ABBREW.nameParts = [
   { key: "laminar", part: "ABBREW.NameParts.laminar", affix: -1, order: 9 },
   { key: "plate", part: "ABBREW.NameParts.plate", affix: -1, order: 9 },
   { key: "splint", part: "ABBREW.NameParts.splint", affix: -1, order: 9 },
+  { key: "fireinfused", part: "ABBREW.NameParts.fireinfused", affix: -1, order: 9 },
+  { key: "ofhealing", part: "ABBREW.NameParts.ofhealing", affix: 1, order: 9 },
 ]
 
 const lingeringWoundImmunities = [
@@ -565,8 +583,9 @@ const itemTraits = [
   { key: "ranged", value: "ABBREW.Traits.Item.ranged", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: [] },
   { key: "reload", value: "ABBREW.Traits.Item.reload", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: ["draw"] },
   { key: "draw", value: "ABBREW.Traits.Item.draw", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: ["reload"] },
-  { key: "close", value: "ABBREW.Traits.Item.close", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: ["standard", "long"] },
-  { key: "standard", value: "ABBREW.Traits.Item.standard", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: ["close", "long"] },
+  { key: "close", value: "ABBREW.Traits.Item.close", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: ["short", "standard", "long"] },
+  { key: "short", value: "ABBREW.Traits.Item.short", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: ["close", "standard", "long"] },
+  { key: "standard", value: "ABBREW.Traits.Item.standard", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: ["close", "short", "long"] },
   { key: "long", value: "ABBREW.Traits.Item.long", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: ["standard", "long"] },
   { key: "heavy", value: "ABBREW.Traits.Item.heavy", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: ["agile"] },
   { key: "agile", value: "ABBREW.Traits.Item.agile", feature: "item", subFeature: "identifiers", effect: "", data: "", exclude: ["heavy"] },
@@ -598,7 +617,16 @@ const skillTraits = [
 ]
 
 const materialTraits = [
+  { key: "metal", value: "ABBREW.Traits.Material.metal", feature: "material", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "iron", value: "ABBREW.Traits.Material.iron", feature: "material", subFeature: "identifiers", effect: "", data: "", exclude: [] },
   { key: "silver", value: "ABBREW.Traits.Material.silver", feature: "material", subFeature: "identifiers", effect: "", data: "", exclude: [] }
+]
+
+const spellTraits = [
+  { key: "spellcomponent", value: "ABBREW.Traits.Spell.spellcomponent", feature: "spell", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "concept", value: "ABBREW.Traits.Spell.concept", feature: "spell", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "spellform", value: "ABBREW.Traits.Spell.spellform", feature: "spell", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "spellamp", value: "ABBREW.Traits.Spell.spellamp", feature: "spell", subFeature: "identifiers", effect: "", data: "", exclude: [] }
 ]
 
 ABBREW.traits = [
@@ -608,14 +636,16 @@ ABBREW.traits = [
   ...skillTraining,
   ...itemTraits,
   ...materialTraits,
-  ...skillTraits
+  ...skillTraits,
+  ...spellTraits
 ]
 
 ABBREW.attackModes = {
   "attack": "ABBREW.AttackModes.attack",
   "feint": "ABBREW.AttackModes.feint",
   "overpower": "ABBREW.AttackModes.overpower",
-  "finisher": "ABBREW.AttackModes.finisher"
+  "finisher": "ABBREW.AttackModes.finisher",
+  "spell": "ABBREW.AttackModes.spell"
 }
 
 ABBREW.modify = {
@@ -797,6 +827,7 @@ ABBREW.paths = [
   { label: "ABBREW.Paths.Name.poisoner", id: "abbrewppoisoner0", value: "poisoner", roles: ["professional", "scoundrel"], description: "ABBREW.Paths.Description.poisoner" },
   { label: "ABBREW.Paths.Name.shieldguardian", id: "abbrewpshieldgua", value: "shieldguardian", roles: ["martial", "melee", "protector", "durable"], description: "ABBREW.Paths.Description.shieldguardian" },
   { label: "ABBREW.Paths.Name.snake", id: "abbrewpsnake0000", value: "snake", roles: ["martial", "melee", "ranges", "scoundrel"], description: "ABBREW.Paths.Description.snake" },
+  { label: "ABBREW.Paths.Name.sorcerer", id: "abbrewpsorcerer0", value: "sorcerer", roles: ["magic", "ranged"], description: "ABBREW.Paths.Description.sorcerer" },
 ]
 
 ABBREW.activeEffectKeys = [

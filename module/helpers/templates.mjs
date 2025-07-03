@@ -26,6 +26,7 @@ export const preloadHandlebarsTemplates = async function () {
     "systems/abbrew/templates/actor/parts/actor-speed.hbs",
     "systems/abbrew/templates/actor/parts/actor-visible.hbs",
     "systems/abbrew/templates/actor/parts/actor-visible-item.hbs",
+    "systems/abbrew/templates/actor/parts/actor-visible-item-internal.hbs",
     // Item partials.
     "systems/abbrew/templates/item/item/parts/item-description.hbs",
     "systems/abbrew/templates/item/item/templates/item-effects.hbs",

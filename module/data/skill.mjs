@@ -238,6 +238,12 @@ export default class AbbrewSkill extends AbbrewItemBase {
                     value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
                     operator: new fields.StringField({ ...blankString }),
                 }),
+                duration: new fields.SchemaField({
+                    valueSteps: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                    setOrStep: new fields.BooleanField({ required: true, initial: false }),
+                    intervalSteps: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                    intervalSet: new fields.StringField({ ...blankString, choices: CONFIG.ABBREW.durationsLabels }),
+                }),
                 attackProfile: new fields.SchemaField({
                     isEnabled: new fields.BooleanField({ required: true, initial: false, nullable: true }),
                     combineAttacks: new fields.SchemaField({

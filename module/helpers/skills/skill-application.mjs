@@ -6,7 +6,7 @@ import { filterSynergiesWithInsufficientResources, handleEarlySelfModifiers, han
 import { applyAttackProfiles } from "./skill-attack.mjs";
 import { renderChatMessage } from "./skill-chat.mjs";
 import { getDialogValue } from "../modifierBuilderFieldHelpers.mjs";
-import { getSafeJson, isASupersetOfB } from "../utils.mjs";
+import { getSafeJson } from "../utils.mjs";
 
 export function getModifierSkills(actor, skill, includeTraits = []) {
     // Get all queued synergy skills (Only include filter out those with charges but 0 remaining)
@@ -186,7 +186,7 @@ export async function applySkillEffects(actor, skill, includeTraits = []) {
     const shouldRenderChatMessage = (skill.system.isProxied === null || skill.system.isProxied === undefined) || (skill.system.isProxied != null && skill.system.isProxied === false);
     await actor.unsetFlag("abbrew", "combat.damage.lastDealt");
 
-    let templateData = { user: game.user, skillCheck: { attempts: [] }, actorSize: actor.system.meta.size, actorTier: actor.system.meta.tier };
+    let templateData = { user: game.user, skillCheck: { attempts: [] }, actorSize: actor.system.meta.size.value, actorTier: actor.system.meta.tier };
 
     const [asyncParsedSkill, mainModifierSkills, modifierSkills, allSkills] = await getGroupedModifierSkills(actor, skill, includeTraits);
     const [mainSummary, modifierSummaries] = getSkillSummaries(skill, modifierSkills);
@@ -200,7 +200,7 @@ export async function applySkillEffects(actor, skill, includeTraits = []) {
         traits: skillTraits
     };
 
-    let data = { actorSize: actor.system.meta.size, actorTier: actor.system.meta.tier.value, traits: skillTraits, sources: skill.system.sources };
+    let data = { actorSize: actor.system.meta.size.value, actorTier: actor.system.meta.tier.value, traits: skillTraits, sources: skill.system.sources };
 
     const fortune = mergeFortune(allSkills);
     const lateSelfUpdates = await handleEarlySelfModifiers(actor, allSkills);

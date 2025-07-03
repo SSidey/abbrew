@@ -1,13 +1,6 @@
 <div class="skill-element-max-input">
-    {{!-- <label class="resource-label">Synergy</label>
-    <input type="text" name="system.skillModifiers.synergy" class="drop-with-fundamentals"
-        value="{{system.skillModifiers.synergy}}" data-dtype="String" data-dropType="skill" {{#unless
-        (isGM)}}readonly{{/unless}}> --}}
     {{formGroup system.schema.fields.skillModifiers.fields.synergy
     value=system.skillModifiers.synergy localize=true dataset=datasets.skillDrop classes="skill-span-2"}}
-    {{!-- <h3>Trait Filter</h3>
-    <input type="text" class="trait-filter" name="system.skillModifiers.synergyTraitFilter.raw"
-        value="{{system.skillModifiers.synergyTraitFilter.raw}}" data-dtype="String" /> --}}
     {{formGroup system.schema.fields.skillModifiers.fields.synergyTraitFilter.fields.raw
     value=system.skillModifiers.synergyTraitFilter.raw localize=true classes="skill-span-2"}}
 

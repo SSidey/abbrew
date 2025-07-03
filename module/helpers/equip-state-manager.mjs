@@ -1,30 +1,31 @@
 export class EquipStateManager {
     static getValidEquipStates(equipType, equipState, handsRequired, storeIn) {
-        if (equipType) {
-            const baseEquipStateObject = this.getBaseEquipStates(equipType, handsRequired);
-            const validEquipStates = Object.entries(baseEquipStateObject).map(s => ({ value: s[0], label: CONFIG.ABBREW.equipStateChange[s[0]], cost: this.getEquipStateChangeCost(s) })).filter(e => e.value !== equipState);
+        const baseEquipStateObject = this.getBaseEquipStates(equipType, handsRequired);
+        let validEquipStates = Object.entries(baseEquipStateObject).map(s => ({ value: s[0], label: CONFIG.ABBREW.equipStateChange[s[0]], cost: this.getEquipStateChangeCost(s) })).filter(e => e.value !== equipState);
+        if (!storeIn || (storeIn && !storeIn.system.storage.accessible && storeIn.system.equipState !== "readied")) {
+            validEquipStates = validEquipStates.filter(e => e.value !== "stowed");
+        }
 
-            switch (equipType) {
-                case "held":
-                    return this.getHeldEquipStateChanges(equipState, validEquipStates, storeIn);
-                case "worn":
-                    return this.getWornEquipStateChanges(equipState, validEquipStates, storeIn);
-                case "innate":
-                    return this.getWornInnateStateChanges(equipState, validEquipStates, storeIn);
-                case "none":
-                    return this.getNoneInnateStateChanges(equipState, validEquipStates, storeIn);
-            }
+        switch (equipType) {
+            case "held":
+                return this.getHeldEquipStateChanges(equipState, validEquipStates, storeIn);
+            case "worn":
+                return this.getWornEquipStateChanges(equipState, validEquipStates, storeIn);
+            case "innate":
+                return this.getWornInnateStateChanges(equipState, validEquipStates, storeIn);
+            case "":
+                return this.getNoneInnateStateChanges(equipState, validEquipStates, storeIn);
+        }
 
-            const fullValidEquipStates = validEquipStates
-            if (storeIn && !equipState !== "dropped" && !equipState !== "stowed") {
-                return fullValidEquipStates;
-            } else if (equipState === "dropped") {
-                return fullValidEquipStates
-            } else if (equipState === "stowed") {
-                return fullValidEquipStates.filter(e => e.value !== "dropped");
-            } else {
-                return fullValidEquipStates;
-            }
+        const fullValidEquipStates = validEquipStates
+        if (storeIn && !equipState !== "dropped" && !equipState !== "stowed") {
+            return fullValidEquipStates;
+        } else if (equipState === "dropped") {
+            return fullValidEquipStates
+        } else if (equipState === "stowed") {
+            return fullValidEquipStates.filter(e => e.value !== "dropped");
+        } else {
+            return fullValidEquipStates;
         }
     }
 
@@ -60,13 +61,27 @@ export class EquipStateManager {
     }
 
     static getNoneInnateStateChanges(equipState, validEquipStates, storeIn) {
-        return validEquipStates;
+        if (!storeIn || equipState === "dropped") {
+            return [
+                { value: "readied", label: "ABBREW.EquipStateChange.pickup", cost: 1 },
+                ...validEquipStates.filter(e => e.value !== "stowed")
+            ];
+        } else if (equipState === "stowed") {
+            return [
+                { value: "readied", label: "ABBREW.EquipStateChange.pickup", cost: 1 },
+                ...validEquipStates.filter(e => e.value !== "dropped")
+            ];
+        }
+        else {
+            return validEquipStates;
+        }
     }
 
     static getBaseEquipStates(equipType, handsRequired) {
-        const base = CONFIG.ABBREW.equipState[equipType];
+        const cleanedEquipType = equipType === "" ? "none" : equipType;
+        const base = CONFIG.ABBREW.equipState[cleanedEquipType];
 
-        switch (equipType) {
+        switch (cleanedEquipType) {
             case "innate":
             case "worn":
             case "none":

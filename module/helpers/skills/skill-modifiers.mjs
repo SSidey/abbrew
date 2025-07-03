@@ -109,7 +109,7 @@ export async function handleTargetUpdates(actor, allSkills, templateData, data) 
     const targetWounds = mergeWoundTargetModifiers(allSkills, actor);
     const targetResources = mergeResourceTargetModifiers(allSkills, actor);
 
-    const showAcceptButton = Object.keys(targetUpdates).length > 0 || targetWounds.length > 0 || targetResources.length > 0 || skillsGrantedOnAccept.length > 0;
+    const showAcceptButton = templateData.showAcceptButton || Object.keys(targetUpdates).length > 0 || targetWounds.length > 0 || targetResources.length > 0 || skillsGrantedOnAccept.length > 0;
 
     templateData = {
         ...templateData,
@@ -245,6 +245,7 @@ export function mergeConceptCosts(allSkills, actor) {
 export function filterSynergiesWithInsufficientResources(skill, modifierSkills, actor) {
     const allSkills = [skill, ...modifierSkills];
     const modifierGroups = allSkills.map(s => ({ skill: s, costs: s.system.action.modifiers.resources.self })).filter(s => s.costs.length > 0);
+    const freeSkills = allSkills.map(s => ({ skill: s, costs: s.system.action.modifiers.resources.self })).filter(s => s.costs.length === 0);
     modifierGroups.forEach(g => {
         g.costs.forEach(
             f => f.type = getSafeJson(f.summary, [{ id: "" }])[0].id
@@ -290,5 +291,5 @@ export function filterSynergiesWithInsufficientResources(skill, modifierSkills, 
 
     }, { skills: [], totalCosts: [] });
 
-    return applicableSynergies.skills.filter(s => s._id !== skill._id);
+    return [...freeSkills.map(s => s.skill).filter(s => s._id !== skill._id), ...applicableSynergies.skills.filter(s => s._id !== skill._id)];
 }

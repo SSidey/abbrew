@@ -13,7 +13,7 @@ export async function applyAttackProfiles(actor, skill, modifierSkills, fortune,
         const attackMode = attackProfile.attackMode;
         const attributeMultiplier = getAttributeModifier(attackMode, attackProfile);
         const damage = Object.entries(attackProfile.damage.map(d => {
-            if (d.type === "") {
+            if (!d || d.type === "") {
                 return null;
             }
 
@@ -52,6 +52,7 @@ export async function applyAttackProfiles(actor, skill, modifierSkills, fortune,
         const isStrongAttack = ['overpower', 'ranged', 'aimedshot', 'thrown'].includes(attackMode);
         const showFinisher = attackMode === 'finisher' || totalSuccesses > 0;
         const isFinisher = attackMode === 'finisher';
+        const showAcceptButton = attackMode === "spell";
 
         templateData = {
             ...templateData,
@@ -67,7 +68,8 @@ export async function applyAttackProfiles(actor, skill, modifierSkills, fortune,
             isStrongAttack,
             isFinisher,
             actionCost: skill.system.action.actionCost,
-            showAttackResult: true
+            showAttackResult: true,
+            showAcceptButton
         };
         data = {
             ...data,
@@ -130,22 +132,26 @@ function mergeAttackProfile(base, attackProfile) {
         }
         let allTypeFilteredModifiers = attackProfile.damage.filter(d => ["skip", "add"].includes(d.modify));
         let modifyOnce = attackProfile.damage.filter(d => d.modify === "one" && !(d.modify === "one" && flags.includes(d.modifyType)));
-        const replacedIndices = baseDamageList.reduce((result, m, i) => {
-            let replacement = output.find(fm => fm.modifyType === m.type);
-            if (!replacement) {
-                const index = modifyOnce.findIndex(mo => mo.modifyType === m.type);
-                const replacements = index > -1 ? modifyOnce.splice(index, 1) : [];
-                replacement = replacements.length === 1 ? replacements[0] : null;
-            }
-            result[i] = replacement ? replacement : null;
-            return result;
-        }, []
-        );
-        modifyDamageList = replacedIndices.reduce((result, m, i) => {
-            result[i] = m ? m : allTypeFilteredModifiers.shift();
-            return result;
-        }, []
-        );
+        if (baseDamageList.length > 0) {
+            const replacedIndices = baseDamageList.reduce((result, m, i) => {
+                let replacement = output.find(fm => fm.modifyType === m.type);
+                if (!replacement) {
+                    const index = modifyOnce.findIndex(mo => mo.modifyType === m.type);
+                    const replacements = index > -1 ? modifyOnce.splice(index, 1) : [];
+                    replacement = replacements.length === 1 ? replacements[0] : null;
+                }
+                result[i] = replacement ? replacement : null;
+                return result;
+            }, []
+            );
+            modifyDamageList = replacedIndices.reduce((result, m, i) => {
+                result[i] = m ? m : allTypeFilteredModifiers.shift();
+                return result;
+            }, []
+            );
+        } else {
+            modifyDamageList = allTypeFilteredModifiers.filter(d => d.modify === "add");
+        }
     }
 
     const last = Math.max(baseDamageList.length, modifyDamageList.length);
@@ -167,7 +173,7 @@ function mergeAttackProfile(base, attackProfile) {
         }
     }
 
-    baseAttackProfile.damage = updatedDamage;
+    baseAttackProfile.damage = updatedDamage.filter(d => d);
 
     return baseAttackProfile;
 }
@@ -225,6 +231,10 @@ function mergeFinishers(baseAttackProfile, modifierSkills, actor) {
     const allAttackProfiles = [baseAttackProfile, ...modifierAttackProfiles];
     const finisherCost = mergeFinisherCost(allAttackProfiles);
     const mergedFinisherTypes = mergeFinisherType(allAttackProfiles);
+    if (!mergedFinisherTypes) {
+        return null;
+    }
+
     const finisherType = mergedFinisherTypes.length > 0 ? mergedFinisherTypes : "untyped";
     const finisherDescription = mergeFinisherDescriptions(allAttackProfiles);
     const finisherWounds = mergeFinisherWounds(allAttackProfiles, actor);

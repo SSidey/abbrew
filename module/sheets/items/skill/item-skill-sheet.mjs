@@ -53,7 +53,7 @@ export class AbbrewSkillSheet extends SkillTagsMixin(DragDropMixin(AbbrewItemBas
 
     static PARTS = {
         header: {
-            template: "systems/abbrew/templates/item/item/parts/item-header.hbs"
+            template: "systems/abbrew/templates/item/skill/parts/skill-header.hbs"
         },
         tabs: {
             // Foundry-provided generic template

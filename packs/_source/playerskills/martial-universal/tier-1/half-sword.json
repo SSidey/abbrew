@@ -1,0 +1,320 @@
+{
+  "folder": "JmqvSalIibJltKn2",
+  "name": "Half Sword",
+  "type": "skill",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "",
+    "traits": "",
+    "abbrewId": {
+      "value": "abbrew.skill.halfsword.Z8Md424d0y5Y9GM8",
+      "uuid": "Z8Md424d0y5Y9GM8"
+    },
+    "skillTraits": "[{\"key\":\"stance\",\"value\":\"Stance\",\"feature\":\"combat\",\"subFeature\":\"\",\"effect\":\"\",\"data\":\"\"}]",
+    "skillModifiers": {
+      "synergy": "[{\"id\":\"abbrewAttack0000\",\"value\":\"Attack\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewAttack0000\"},{\"id\":\"abbrewOverpower0\",\"value\":\"Overpower\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewOverpower0\"},{\"id\":\"abbrewParry00000\",\"value\":\"Parry\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewParry00000\"},{\"id\":\"abbrewFinisher00\",\"value\":\"Finisher\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewFinisher00\"}]",
+      "discord": ""
+    },
+    "configurable": true,
+    "isActivatable": true,
+    "activateOnCreate": false,
+    "applyTurnStart": false,
+    "applyTurnEnd": false,
+    "applyOnExpiry": false,
+    "activateOnDamageAccept": false,
+    "skills": {
+      "granted": [],
+      "paired": [],
+      "grantedOnActivation": [],
+      "grantedOnAccept": []
+    },
+    "resource": {
+      "capacity": 0,
+      "operator": "",
+      "relatedResource": null,
+      "fillCapacityOnCreate": false
+    },
+    "action": {
+      "activationType": "synergy",
+      "actionCost": "0",
+      "actionImage": "",
+      "duration": {
+        "precision": "-1",
+        "value": 0,
+        "expireOnStartOfTurn": true,
+        "isConcentration": false
+      },
+      "uses": {
+        "hasUses": false,
+        "asStacks": false,
+        "removeStackOnUse": true,
+        "value": 0,
+        "max": 0,
+        "period": "",
+        "removeWhenNoUsesRemain": false,
+        "stackRemovalActivation": false
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "skillCheck": [],
+      "skillRequest": {
+        "isEnabled": false,
+        "isContested": false,
+        "selfCheck": false,
+        "checkType": "",
+        "requirements": {
+          "modifiers": "",
+          "successes": 0,
+          "result": 0
+        },
+        "targetModifiers": "",
+        "results": {
+          "success": {
+            "description": ""
+          },
+          "failure": {
+            "description": ""
+          }
+        }
+      },
+      "attackProfile": {
+        "isEnabled": true,
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": 0,
+        "attackMode": "",
+        "finisher": {
+          "type": "",
+          "cost": null,
+          "description": "",
+          "wounds": []
+        },
+        "damage": [],
+        "finisherLimit": 10
+      },
+      "modifiers": {
+        "fortune": 0,
+        "actionCost": {
+          "value": 0,
+          "operator": ""
+        },
+        "attackProfile": {
+          "combineAttacks": {
+            "isEnabled": false,
+            "value": null
+          },
+          "attackType": "thrust",
+          "attackMode": "",
+          "handsSupplied": 2,
+          "finisherLimit": {
+            "value": 10,
+            "operator": ""
+          },
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "penetration": {
+            "value": 10,
+            "operator": ""
+          },
+          "finisher": {
+            "cost": null,
+            "wounds": [],
+            "type": "",
+            "description": ""
+          },
+          "damage": [
+            {
+              "modify": "all",
+              "modifyType": "piercing",
+              "overallMultiplier": 1,
+              "value": "",
+              "type": "",
+              "damageMultiplier": 1,
+              "attributeModifier": "",
+              "attributeMultiplier": 1,
+              "penetration": 3
+            }
+          ]
+        },
+        "guard": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": "",
+            "lateParse": false
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": [],
+          "physical": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "crushing": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "piercing": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "slashing": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "fire": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "cold": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "water": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "earth": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "air": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "electricity": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "poison": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "flesh": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "blood": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "metal": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "light": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "dark": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "life": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "death": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "war": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "famine": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "pestilence": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "conquest": {
+            "operator": "add",
+            "type": "numeric"
+          }
+        }
+      }
+    },
+    "skillType": "path",
+    "path": {
+      "value": {
+        "id": ""
+      },
+      "raw": "[{\"label\":\"universal\",\"value\":\"Universal\",\"roles\":[],\"title\":\"A universal path, skills with this path can be selected if it has roles matching thosee of your paths\",\"id\":\"abbrewpuniversal\"}]"
+    },
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": "",
+    "isProxied": false,
+    "siblingSkillModifiers": [],
+    "roles": {
+      "raw": "[{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"},{\"label\":\"melee\",\"value\":\"Melee\",\"title\":\"You fight primarily in melee with your opponents.\"}]",
+      "parsed": []
+    },
+    "archetype": ""
+  },
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "13.345",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746223937926,
+    "modifiedTime": 1750117125772,
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
+  },
+  "_id": "P0MLOmfOgVTCmALY",
+  "sort": 25000,
+  "_key": "!items!P0MLOmfOgVTCmALY"
+}

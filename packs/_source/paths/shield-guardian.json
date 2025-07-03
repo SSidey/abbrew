@@ -10,7 +10,7 @@
       "value": "",
       "uuid": ""
     },
-    "roles": ""
+    "roles": "[{\"label\":\"melee\",\"value\":\"Melee\",\"title\":\"You fight primarily in melee with your opponents.\"},{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"},{\"label\":\"protector\",\"value\":\"Protector\",\"title\":\"Your main role in combat is in reducing the damage dealt to your allies.\"},{\"label\":\"durable\",\"value\":\"Durable\",\"title\":\"You are capable of withstanding more abuse than most.\"}]"
   },
   "effects": [],
   "folder": null,
@@ -21,12 +21,13 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "12.331",
+    "coreVersion": "13.345",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746382248779,
-    "modifiedTime": 1746382248779,
-    "lastModifiedBy": "abbrewpacks00000"
+    "modifiedTime": 1749990684499,
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
   },
   "_key": "!items!NdNl96xj8we3bPWG"
 }

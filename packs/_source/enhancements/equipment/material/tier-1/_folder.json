@@ -1,0 +1,20 @@
+{
+  "type": "Item",
+  "folder": "LsLrKZceIVY44AWs",
+  "name": "Tier 1",
+  "color": null,
+  "sorting": "a",
+  "_id": "QV7GAV2xTX0JCr4S",
+  "description": "",
+  "sort": 0,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.345",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "lastModifiedBy": null
+  },
+  "_key": "!folders!QV7GAV2xTX0JCr4S"
+}

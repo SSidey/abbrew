@@ -54,7 +54,7 @@
       "type": "count",
       "accessible": true,
       "value": 0,
-      "max": 0,
+      "max": 1,
       "storedItems": [],
       "traitFilter": {
         "raw": "",
@@ -86,12 +86,13 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "12.331",
+    "coreVersion": "13.345",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1748898839334,
-    "modifiedTime": 1748899007494,
-    "lastModifiedBy": "abbrewpacks00000"
+    "modifiedTime": 1751319036996,
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
   },
   "_key": "!items!b5jpCEDBg9PmxFqn"
 }

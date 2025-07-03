@@ -13,13 +13,6 @@
     "skills": {
       "granted": [
         {
-          "name": "1",
-          "skillType": "",
-          "id": "XizlgwldBT1TvJBh",
-          "image": "icons/svg/item-bag.svg",
-          "sourceId": "Compendium.abbrew.skills.Item.XizlgwldBT1TvJBh"
-        },
-        {
           "name": "Dual Slice",
           "skillType": "",
           "id": "LC65Qtc9wBcWbcVc",
@@ -32,6 +25,13 @@
           "id": "gGwNbDdkafpU6rNm",
           "image": "icons/svg/item-bag.svg",
           "sourceId": "Compendium.abbrew.skills.Item.gGwNbDdkafpU6rNm"
+        },
+        {
+          "name": "Draining Strike",
+          "id": "DKO4k6RIfayVJR7A",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.DKO4k6RIfayVJR7A",
+          "skillType": ""
         }
       ]
     }
@@ -45,12 +45,13 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "12.331",
+    "coreVersion": "13.345",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1744242505317,
-    "modifiedTime": 1744242551557,
-    "lastModifiedBy": "abbrewpacks00000"
+    "modifiedTime": 1749769529385,
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
   },
   "_key": "!items!cHxyLOx8m3Wq5gce"
 }

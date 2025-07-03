@@ -1,0 +1,20 @@
+{
+  "type": "Item",
+  "folder": "kyKiwT5wM3bF3OZh",
+  "name": "Alchemical",
+  "color": null,
+  "sorting": "a",
+  "_id": "DsRzjc5sWUJdFIWQ",
+  "description": "",
+  "sort": 0,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.345",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "lastModifiedBy": null
+  },
+  "_key": "!folders!DsRzjc5sWUJdFIWQ"
+}

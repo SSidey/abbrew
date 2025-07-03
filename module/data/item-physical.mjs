@@ -117,7 +117,8 @@ export default class AbbrewPhysicalItem extends AbbrewItemBase {
         }
 
 
-        this.validEquipStates = EquipStateManager.getValidEquipStates(this.equipType, this.equipState, this.handsRequired, this.storeIn);
+        const storeInContainer = this.storeIn ? this.parent?.actor?.items.find(i => i._id === this.storeIn) : null;
+        this.validEquipStates = EquipStateManager.getValidEquipStates(this.equipType, this.equipState, this.handsRequired, storeInContainer);
         this.handsSupplied = this.equipType === "innate" ? 1 : getNumericParts(this.equipState);
         this.actionCost = 0 + this.handsSupplied ?? 1;
         this.exertActionCost = 1 + this.handsSupplied ?? 2;
@@ -176,7 +177,7 @@ export default class AbbrewPhysicalItem extends AbbrewItemBase {
         const requiredInteger = { required: true, nullable: false, integer: true };
         return {
             ...AbbrewItemBase.getMetaEntries(),
-            size: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 9 }),
+            size: new fields.NumberField({ ...requiredInteger, initial: 0 }),
             quality: new fields.NumberField({ ...requiredInteger, initial: 0 })
         }
     }

@@ -1,10 +1,10 @@
-import { isASupersetOfB } from "../../../../helpers/utils.mjs";
+import { isASupersetOfB, onlyUnique } from "../../../../helpers/utils.mjs";
 
 const { TextEditor } = foundry.applications.ux;
 
 export async function _onArchetypeDrop(event) {
     event.preventDefault();
-    event.stopPropogation();
+    event.stopPropagation();
 
     if (!this.actor.testUserPermission(game.user, 'OWNER')) {
         return;
@@ -24,7 +24,7 @@ export async function _onArchetypeDrop(event) {
 
 export async function _onArchetypeSkillDrop(event) {
     event.preventDefault();
-    event.stopPropogation();
+    event.stopPropagation();
 
     if (!this.actor.testUserPermission(game.user, 'OWNER')) {
         return;
@@ -39,7 +39,7 @@ export async function _onArchetypeSkillDrop(event) {
 
     if (item.type === "skill") {
         const target = event.currentTarget;
-        const archetype = this.actor.items.find(i => i._id === target.dataset.itemId);
+        const archetype = this.actor.items.find(i => i._id === event.target.closest(".archetype").dataset.itemId);
         const archetypeRequirements = Object.values(archetype.system.roleRequirements);
         const archetypePaths = archetypeRequirements.map(r => r.path.id).filter(id => id !== "");
         const validPaths = new Set(archetypePaths);
@@ -60,6 +60,7 @@ export async function _onArchetypeSkillDrop(event) {
 
 export async function _onContainerDrop(event) {
     event.preventDefault();
+    event.stopPropagation();
     if (!this.actor.testUserPermission(game.user, 'OWNER')) {
         return;
     }
@@ -69,36 +70,71 @@ export async function _onContainerDrop(event) {
         return;
     }
 
-    const item = await fromUuid(data.uuid);
+    let item = await fromUuid(data.uuid);
+    if (event.currentTarget.dataset.itemId === item._id) {
+        return;
+    }
 
-    if (["armour", "equipment", "weapon", "ammunition"].includes(item.type)) {
+    if (["armour", "equipment", "weapon", "ammunition", "anatomy"].includes(item.type)) {
         const containerId = event.currentTarget.dataset.itemId;
         const container = this.actor.items.find(i => i._id === containerId);
+        if (!container.system.storage.accessible && container.system.equipState !== "readied") {
+            return;
+        }
+
         if (!isASupersetOfB(item.system.traits.value.map(t => t.key), container.system.storage.traitFilter.value.map(t => t.key))) {
             return;
         }
-        const containerValueIncrease = getContainerValueIncrease(container, item);
+        if (!this.actor.items.find(i => i._id === item._id)) {
+            const createItem = structuredClone(item);
+            createItem.system.equipState = "stowed";
+            createItem.system.storeIn = containerId;
+            item = await Item.create(createItem, { parent: this.actor });
+        }
+
+        const containerValueIncrease = getContainerValueIncrease(this.actor, container, item);
         if (container.system.storage.value + containerValueIncrease <= container.system.storage.max) {
-            const storedItems = [...container.system.storage.storedItems, item._id];
+            const storedItems = [...container.system.storage.storedItems, item._id].filter(onlyUnique);
             if (item.system.storeIn) {
                 const oldContainerId = item.system.storeIn;
                 const oldContainer = this.actor.items.find(i => i._id === oldContainerId);
                 const oldContainerStoredItems = oldContainer.system.storage.storedItems.filter(i => i !== item._id);
                 await oldContainer.update({ "system.storage.storedItems": oldContainerStoredItems });
             }
-            await item.update({ "system.storeIn": containerId });
-            await container.update({ "system.storage.storedItems": storedItems });
-        }
 
-        function getContainerValueIncrease(container, item) {
-            let heftIncrease = item.system.quantity * item.system.heft;
-            if (container.system.storage.hasStorage && container.system.storage.type === "heft") {
-                heftIncrease += item.system.storage.value;
+            const alreadyStoredIn = this.actor.items.filter(i => i.system.storage?.hasStorage && i.system.storage.storedItems.includes(item._id));
+            if (alreadyStoredIn.length > 0) {
+                const cleanPromises = alreadyStoredIn.map(async a => {
+                    const newStoredItems = a.system.storage.storedItems.filter(s => s !== item._id);
+                    await a.update({ "system.storage.storedItems": newStoredItems });
+                });
+
+                await Promise.all(cleanPromises);
             }
-
-            return heftIncrease;
+            await container.update({ "system.storage.storedItems": storedItems });
+            await item.update({ "system.storeIn": containerId });
         }
     }
+}
+
+function getContainerValueIncrease(actor, container, item) {
+    if (container.system.storage.hasStorage && container.system.storage.type === "count") {
+        return item.system.quantity;
+    }
+
+    return getItemHeftIncrease(actor, item);
+}
+
+function getItemHeftIncrease(actor, item) {
+    let heftIncrease = item.system.quantity * item.system.heft;
+    if (item.system.storage.hasStorage) {
+        const storedItems = actor.items.filter(i => item.system.storage.storedItems.includes(i._id));
+        heftIncrease += storedItems.reduce((total, stored) => {
+            total += getItemHeftIncrease(stored);
+        }, 0);
+    }
+
+    return heftIncrease;
 }
 
 export async function handleActorBackgroundDrop(actor, background) {
@@ -128,9 +164,7 @@ export async function handleActorItemDrop(actor, item) {
 }
 
 export async function handleActorSkillDrop(actor, item) {
-    const skill = structuredClone(item);
-    skill.system.sources.actor = actor._id;
-    await Item.create(skill, { parent: actor })
+    await Item.create(item, { parent: actor })
 }
 
 export async function handleActorOnDrop(event, actor) {
@@ -163,6 +197,7 @@ export async function handleActorOnDrop(event, actor) {
             case "armour":
             case "equipment":
             case "weapon":
+            case "anatomy":
                 return await handleActorItemDrop(actor, item);
             case "skill":
                 return await handleActorSkillDrop(actor, item);

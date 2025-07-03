@@ -58,9 +58,9 @@ export default class AbbrewActor extends Actor {
   }
 
   async _preUpdate(changed, options, userId) {
-    if (doesNestedFieldExist(changed, "system.meta.size")) {
-      if (!isNaN(changed.system.meta.size)) {
-        const changeSize = parseFloat(changed.system.meta.size);
+    if (doesNestedFieldExist(changed, "system.meta.size.value")) {
+      if (!isNaN(changed.system.meta.size.value)) {
+        const changeSize = parseFloat(changed.system.meta.size.value);
         const dimension = Object.values(CONFIG.ABBREW.size).find(s => s.value === changeSize).dimension;
         const update = { "height": dimension, "width": dimension };
         if (this.token) {
@@ -365,7 +365,7 @@ export default class AbbrewActor extends Actor {
     successes += this.system.defense.risk.value;
     successes -= Math.max(0, (this.system.defense.inflexibility.resistance.value + this.system.defense.protection[finisherType].resistance) - (data.damage.find(d => d.damageType === finisherType)?.penetration ?? 0));
     successes += this.system.defense.protection[finisherType].weakness;
-    successes += (data.actorSize - this.system.meta.size); // TODO Question, do we include this + (data.weaponSize - this.system.meta.size))
+    successes += (data.actorSize - this.system.meta.size.value); // TODO Question, do we include this + (data.weaponSize - this.system.meta.size.value))
     successes += (data.actorTier - this.system.meta.tier.value); // TODO: Material Tier Diff    
     return successes;
   }

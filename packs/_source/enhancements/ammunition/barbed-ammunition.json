@@ -35,7 +35,22 @@
       "raw": "",
       "value": []
     },
-    "modifications": [],
+    "modifications": [
+      {
+        "operator": "merge",
+        "path": "system.name.parts",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "name",
+        "value": "barbed",
+        "numerator": 1,
+        "denominator": 1
+      }
+    ],
     "duration": {
       "precision": "-1",
       "value": 0,
@@ -51,12 +66,13 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "12.331",
+    "coreVersion": "13.345",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1747590952364,
-    "modifiedTime": 1747591161944,
-    "lastModifiedBy": "abbrewpacks00000"
+    "modifiedTime": 1749671869489,
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
   },
   "_key": "!items!7oVZRgDmR6yle9sC"
 }

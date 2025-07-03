@@ -4,7 +4,7 @@
         <h1 class="charname">{{formInput item.schema.fields.name value=item.name placeholder="Name"}}</h1>
         {{#if (isGM)}}
         {{formGroup system.schema.fields.name.fields.base value=system.name.base localize=true
-        classes="resource-label" dataset=datasets.baseName}}
+        classes="resource-label"}}
         {{/if}}
         <div class="grid grid-2col">
             <div class="resource">

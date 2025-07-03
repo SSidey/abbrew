@@ -33,6 +33,10 @@ export default class AbbrewItem extends Item {
         } else {
           await this.grantSkills();
         }
+      } else if (changed.system.equipState === "readied" && !this.isHeldEquipStateChangePossible(changed.system.equipState)) {
+        ui.notifications.info("You are already holding too many items, try stowing some");
+        this.actor.sheet.render();
+        return false;
       } else {
         if ((this.system.skills?.granted?.length ?? 0) > 0) {
           const grantedSkills = this.actor.items.filter(i => i.type === "skill").filter(s => s.system.grantedBy.item === this._id);
@@ -129,6 +133,14 @@ export default class AbbrewItem extends Item {
         await this.actor.acceptAnatomy(this);
       }
     }
+
+    // TODO: Shouldn't be here, effect is not present on item when created...
+    // if (doesNestedFieldExist(changed, "system.action.uses.value") && this.actor && this.actor.effects.find(e => (e.flags.abbrew?.skill?.trackDuration === this._id) && e.flags.abbrew?.skill?.stacks)) {
+    //   const effect = this.actor.effects.find(e => e.flags.abbrew?.skill?.trackDuration === this._id)
+    //   const stacks = changed.system.action.uses.value;
+    //   const visible = stacks > 1;
+    //   await effect.update({ "flags.statuscounter.visible": visible, "flags.abbrew.skill.stacks": stacks });
+    // }
 
     return super._preUpdate(changed, options, userId);
   }
@@ -251,7 +263,9 @@ export default class AbbrewItem extends Item {
   isHeldEquipStateChangePossible(equipState) {
     const actorHands = this.actor.getActorAnatomy().hands;
     const equippedHeldItemHands = this.actor.getActorHeldItems().filter(i => i._id !== this._id).reduce((result, a) => result += getNumericParts(a.system.equipState), 0);
-    const requiredHands = equippedHeldItemHands + getNumericParts(equipState);
+    const readiedHeldItemHands = this.actor.items.filter(a => a.system.equipState && a.system.equipState === "readied").filter(i => i._id !== this._id).filter(i => i.type !== "anatomy" || (i.system.isDismembered)).length;
+    const equipStateHands = equipState === "readied" ? 1 : getNumericParts(equipState);
+    const requiredHands = readiedHeldItemHands + equippedHeldItemHands + equipStateHands;
     return actorHands >= requiredHands;
   }
 
@@ -277,6 +291,8 @@ export default class AbbrewItem extends Item {
       return;
     }
 
+    if ((await super._preCreate(data, options, user)) === false) return false;
+
     if (data.type === "skill") {
       if (this.actor && data.system.abbrewId) {
         const duplicateItem = this.actor.items.find(i => i.system.abbrewId.uuid === data.system.abbrewId.uuid);
@@ -290,7 +306,9 @@ export default class AbbrewItem extends Item {
       }
     }
 
-    return super._preCreate(data, options, user);
+    if (this.actor && data.system.sources.actor === "") {
+      this.updateSource({ "system.sources.actor": this.actor._id });
+    }
   }
 
   async _onDelete(options, userId) {
@@ -324,8 +342,7 @@ export default class AbbrewItem extends Item {
         const effect = this.effects.find(e => e.flags.abbrew.skill.stacks)
         const stacks = data.effects.find(e => e.flags.abbrew.skill.stacks).flags.abbrew.skill.stacks;
         const visible = stacks > 1;
-        // TODO: Will this module update
-        // await effect.update({ "flags.statuscounter.visible": visible, "flags.statuscounter.value": stacks });
+        await effect.update({ "flags.statuscounter.visible": visible, "flags.statuscounter.value": stacks });
       }
     } else if (data.type === "anatomy") {
       await this.actor?.acceptAnatomy(this);
@@ -343,8 +360,8 @@ export default class AbbrewItem extends Item {
       }
 
       const trackedEffects = [
-        ...this.actor.effects.toObject().filter(e => e.flags.abbrew.skill?.trackDuration === this._id),
-        ...this.actor.effects.toObject().filter(e => e.flags.abbrew.enhancement?.trackDuration === this._id)
+        ...this.actor.effects.toObject().filter(e => e.flags.abbrew).filter(e => e.flags.abbrew.skill?.trackDuration === this._id),
+        ...this.actor.effects.toObject().filter(e => e.flags.abbrew).filter(e => e.flags.abbrew.enhancement?.trackDuration === this._id)
       ];
       if (trackedEffects.length > 0) {
         this.actor.deleteEmbeddedDocuments("ActiveEffect", trackedEffects.map(e => e._id));
@@ -353,7 +370,7 @@ export default class AbbrewItem extends Item {
 
       if ((this.system.skills?.granted?.length ?? 0) > 0) {
         const grantedSkills = this.actor.items.filter(i => i.type === "skill").filter(s => s.system.grantedBy.item === this._id);
-        this.actor.deleteEmbeddedDocuments("Item", grantedSkills.map(s => s._id));
+        await this.actor.deleteEmbeddedDocuments("Item", grantedSkills.map(s => s._id));
       }
 
       // If we have one left then clear it out of archetype lists.

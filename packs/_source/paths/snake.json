@@ -10,7 +10,7 @@
       "value": "",
       "uuid": ""
     },
-    "roles": ""
+    "roles": "[{\"label\":\"melee\",\"value\":\"Melee\",\"title\":\"You fight primarily in melee with your opponents.\"},{\"label\":\"ranged\",\"value\":\"Ranged\",\"title\":\"You prefer to fight at a distance from your opponents.\"},{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"},{\"label\":\"scoundrel\",\"value\":\"Scoundrel\",\"title\":\"You are proficient in illicit skills, engaging in underhanded tactics.\"},{\"label\":\"vanguard\",\"value\":\"Vanguard\",\"title\":\"Your main role in combat is to bring down your enemies as quickly as possible.\"}]"
   },
   "effects": [],
   "folder": null,
@@ -21,12 +21,13 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "12.331",
+    "coreVersion": "13.345",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746270039892,
-    "modifiedTime": 1746270039892,
-    "lastModifiedBy": "abbrewpacks00000"
+    "modifiedTime": 1749990714199,
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
   },
   "_key": "!items!ojdNHCSM8aJtEI4U"
 }

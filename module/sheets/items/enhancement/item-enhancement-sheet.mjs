@@ -1,3 +1,4 @@
+import { DragDropMixin } from '../../helpers/drag-drop-mixin.mjs';
 import { AbbrewItemBaseSheet } from '../generic/item-base-sheet.mjs';
 import { activeEffectAction } from '../helpers/actions/effect-actions.mjs';
 import { renderItemSheet } from '../helpers/actions/render-sheet-actions.mjs';
@@ -9,7 +10,7 @@ import { EnhancementTagsMixin } from './tags/enhancement-tags-mixin.mjs';
  * Extend the basic ItemSheet with some very simple modifications
  * @extends {ItemSheet}
  */
-export class AbbrewEnhancementSheet extends EnhancementTagsMixin(AbbrewItemBaseSheet) {
+export class AbbrewEnhancementSheet extends DragDropMixin(EnhancementTagsMixin(AbbrewItemBaseSheet)) {
 
     static DEFAULT_OPTIONS = {
         actions: {
@@ -17,8 +18,8 @@ export class AbbrewEnhancementSheet extends EnhancementTagsMixin(AbbrewItemBaseS
             effectControl: activeEffectAction,
             onModificationAction: modificationAction
         },
-        dragDrops: [
-            { dragSelector: null, dropSelector: null, callbacks: { drop: enhancementSkillDrop } }
+        dragDrop: [
+            { dragSelector: null, dropSelector: "li.empty-drop-list-element", callbacks: { drop: enhancementSkillDrop } }
         ]
     }
 
@@ -56,8 +57,8 @@ export class AbbrewEnhancementSheet extends EnhancementTagsMixin(AbbrewItemBaseS
     /* -------------------------------------------- */
 
     /** @override */
-    activateListeners(html) {
-        super.activateListeners(html);
+    _onRender(context, options) {
+        super._onRender(context, options);
 
         if (!this.isEditable) return;
 
