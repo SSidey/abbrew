@@ -11,7 +11,7 @@ export function getAttackSkillWithActions(id, name, traits, actionCost, image, a
         critical = attackProfile.critical;
     }
     else {
-        critical = 11 - handsSupplied
+        critical = Math.min(11 - handsSupplied, attackProfile.critical);
     }
 
     const system = AbbrewSkill.schema.getInitialValue();

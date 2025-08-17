@@ -11,7 +11,24 @@
       "value": "",
       "uuid": ""
     },
-    "skills": [],
+    "skills": {
+      "granted": [
+        {
+          "name": "Well Rested",
+          "skillType": "background",
+          "id": "XfMG3MYM3HDl1x20",
+          "image": "systems/abbrew/assets/icons/skills/well-rested.svg",
+          "sourceId": "Compendium.abbrew.conditions.Item.XfMG3MYM3HDl1x20"
+        },
+        {
+          "name": "Elf (Species)",
+          "id": "0GeeApTrKhVXQLyN",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.0GeeApTrKhVXQLyN",
+          "skillType": "background"
+        }
+      ]
+    },
     "attributes": {
       "str": {
         "value": 0,
@@ -19,14 +36,14 @@
         "isEnabled": false
       },
       "dex": {
-        "value": 2,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       },
       "agi": {
-        "value": 1,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       },
       "con": {
         "value": 0,
@@ -34,9 +51,9 @@
         "isEnabled": false
       },
       "int": {
-        "value": 1,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       },
       "wil": {
         "value": 0,
@@ -49,9 +66,9 @@
         "isEnabled": false
       },
       "vis": {
-        "value": 1,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       }
     },
     "creatureForm": {
@@ -69,11 +86,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743076678580,
-    "modifiedTime": 1743080051229,
+    "modifiedTime": 1752971083396,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

@@ -7,5 +7,5 @@ export async function _onEffectControl(event, target) {
         row.dataset.parentId === this.actor.id
             ? this.actor
             : this.actor.items.get(row.dataset.parentId);
-    onManageActiveEffect(event, document);
+    await onManageActiveEffect(event, document);
 }

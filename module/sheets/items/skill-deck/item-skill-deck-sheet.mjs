@@ -13,6 +13,12 @@ const { ItemSheetV2 } = foundry.applications.sheets;
  */
 export class AbbrewSkillDeckSheet extends DragDropMixin(ItemTraitsMixin(ItemContextMixin(HandlebarsApplicationMixin(ItemSheetV2)))) {
 
+    // Whitelist for Description Traits
+    TRAITS_WHITELIST = [...CONFIG.ABBREW.traits.map(trait => ({
+        ...trait,
+        value: game.i18n.localize(trait.value)
+    }))];
+
     /** @override */
     static DEFAULT_OPTIONS = {
         form: {
@@ -31,7 +37,7 @@ export class AbbrewSkillDeckSheet extends DragDropMixin(ItemTraitsMixin(ItemCont
             { dragSelector: null, dropSelector: null, callbacks: { drop: skillDeckDrops } },
         ],
         actions: {
-            skillDelete: deleteSkillDeckSkill,
+            deleteSkill: deleteSkillDeckSkill,
             renderItemSheet: renderItemSheet
         }
     }

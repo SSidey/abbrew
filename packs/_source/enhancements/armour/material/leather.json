@@ -75,7 +75,7 @@
         "field": "",
         "type": "target",
         "value": "system.equipPoints.required.parsed.length",
-        "numerator": 10,
+        "numerator": 3,
         "denominator": 1
       },
       {

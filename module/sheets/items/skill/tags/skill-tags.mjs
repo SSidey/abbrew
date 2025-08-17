@@ -2,6 +2,7 @@ import Tagify from "@yaireo/tagify";
 
 export const SkillTagsMixin = superclass => class extends superclass {
     activateSkillTags() {
+        this._activateSkillInnateConcepts();
         this._activateSkillCheck();
         this._activateSynergyTraitFilter();
         this._activateSkillCheckRequestFields();
@@ -12,6 +13,32 @@ export const SkillTagsMixin = superclass => class extends superclass {
         this._activateProtectionModificationDamageTypes();
         this._activateProtectionModificationTypes();
         this._activateProtectionModificationTriggers();
+        this._activateThreatenedDisableByTags();
+        this._activateRequiredActiveSkillsTags();
+        this._activateActivateWithTags();
+    }
+
+    _activateSkillInnateConcepts() {
+        const innateConcepts = this.element.querySelector('input[name="system.innateConcepts.raw"]');
+        const innateConceptsSettings = {
+            dropdown: {
+                maxItems: 20,               // <- mixumum allowed rendered suggestions
+                classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
+                enabled: 0,                 // <- show suggestions on focus
+                closeOnSelect: false,       // <- do not hide the suggestions dropdown once an item has been selected
+                includeSelectedTags: false   // <- Should the suggestions list Include already-selected tags (after filtering)
+            },
+            userInput: true,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+            duplicates: false,             // <- Should duplicate tags be allowed or not
+            whitelist: [...CONFIG.ABBREW.innateConcepts.map(trait => ({
+                ...trait,
+                value: game.i18n.localize(trait.value)
+            }))],
+            enforceWhitelist: true
+        };
+        if (innateConcepts) {
+            var taggedInnateConcepts = new Tagify(innateConcepts, innateConceptsSettings);
+        }
     }
 
     _activateSkillCheck() {
@@ -43,12 +70,13 @@ export const SkillTagsMixin = superclass => class extends superclass {
                 closeOnSelect: false,       // <- do not hide the suggestions dropdown once an item has been selected
                 includeSelectedTags: false   // <- Should the suggestions list Include already-selected tags (after filtering)
             },
-            userInput: false,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+            userInput: true,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
             duplicates: false,             // <- Should duplicate tags be allowed or not
             whitelist: [...CONFIG.ABBREW.traits.map(trait => ({
                 ...trait,
                 value: game.i18n.localize(trait.value)
             }))],
+            enforceWhitelist: true
         };
         if (traitFilter) {
             var taggedTraitFilter = new Tagify(traitFilter, skillCheckSettings);
@@ -197,7 +225,7 @@ export const SkillTagsMixin = superclass => class extends superclass {
             whitelist: [...CONFIG.ABBREW.traits.filter(t => t.feature === "skill" && t.subFeature === "identifiers").map(trait => ({
                 ...trait,
                 value: game.i18n.localize(trait.value)
-            }))],
+            })), { "key": "all", "value": "All", "feature": "skill", "subFeature": "identifiers", "effect": "", "data": "", "exclude": [] }],
             enforceWhitelist: true
         };
         if (modifications) {
@@ -257,6 +285,69 @@ export const SkillTagsMixin = superclass => class extends superclass {
                 var taggedModification = new Tagify(modification, settings);
                 taggedModifications.push(taggedModification);
             });
+        }
+    }
+
+    _activateRequiredActiveSkillsTags() {
+        const tags = this.element.querySelector('.form-group.required-active-skills > div.form-fields > input');
+        const settings = {
+            dropdown: {
+                maxItems: 20,               // <- mixumum allowed rendered suggestions
+                classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
+                enabled: 0,                 // <- show suggestions on focus
+                closeOnSelect: false,       // <- do not hide the suggestions dropdown once an item has been selected
+                includeSelectedTags: false   // <- Should the suggestions list Include already-selected tags (after filtering)
+            },
+            userInput: false,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+            duplicates: false,             // <- Should duplicate tags be allowed or not
+            whitelist: [],
+            enforceWhitelist: false
+        };
+        if (tags) {
+            var taggedTags = new Tagify(tags, settings);
+        }
+    }
+
+    _activateActivateWithTags() {
+        const tags = this.element.querySelector('.form-group.activate-with > div.form-fields > input');
+        const settings = {
+            dropdown: {
+                maxItems: 20,               // <- mixumum allowed rendered suggestions
+                classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
+                enabled: 0,                 // <- show suggestions on focus
+                closeOnSelect: false,       // <- do not hide the suggestions dropdown once an item has been selected
+                includeSelectedTags: false   // <- Should the suggestions list Include already-selected tags (after filtering)
+            },
+            userInput: false,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+            duplicates: false,             // <- Should duplicate tags be allowed or not
+            whitelist: [],
+            enforceWhitelist: false
+        };
+        if (tags) {
+            var taggedTags = new Tagify(tags, settings);
+        }
+    }
+
+    _activateThreatenedDisableByTags() {
+        const disabledBy = this.element.querySelector('.form-group.threatened-disabled-by > div.form-fields > input');
+        const settings = {
+            dropdown: {
+                maxItems: 20,               // <- mixumum allowed rendered suggestions
+                classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
+                enabled: 0,                 // <- show suggestions on focus
+                closeOnSelect: false,       // <- do not hide the suggestions dropdown once an item has been selected
+                includeSelectedTags: false   // <- Should the suggestions list Include already-selected tags (after filtering)
+            },
+            userInput: true,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+            duplicates: false,             // <- Should duplicate tags be allowed or not
+            whitelist: [...Object.entries(CONFIG.ABBREW.statusEffects).map(([key, effect]) => ({
+                label: key,
+                value: game.i18n.localize(effect.name)
+            }))],
+            enforceWhitelist: true
+        };
+        if (disabledBy) {
+            var taggedDisabledBy = new Tagify(disabledBy, settings);
         }
     }
 }

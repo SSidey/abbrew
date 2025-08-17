@@ -21,6 +21,7 @@ export const ActorContextMixin = superclass => class extends superclass {
             this._prepareItems(context);
             this._prepareDefenses(actorData, context);
             this._prepareCharacterData(actorData, context);
+            this._prepareAvailableConcepts(context);
         }
 
         // Prepare NPC data and items.
@@ -28,6 +29,7 @@ export const ActorContextMixin = superclass => class extends superclass {
             this._prepareItems(context);
             this._prepareDefenses(actorData, context);
             this._prepareCharacterData(actorData, context);
+            this._prepareAvailableConcepts(context);
         }
 
         // Enrich biography info for display
@@ -80,7 +82,7 @@ export const ActorContextMixin = superclass => class extends superclass {
         // TODO: Exception when blank
         const ammunitionChoices = this.actor.items.filter(i => i.type === "ammunition").filter(i => i.system.storeIn && this.isContainerAccessible(this.actor.items.find(c => c._id === i.system.storeIn))).map(a => ({ label: a.name, type: a.system.type, value: a._id }));
         const features = [];
-        const skills = { background: [], basic: [], path: [], resource: [], temporary: [], untyped: [], archetype: [], tier: [], grantModifier: [] };
+        const skills = { background: [], basic: [], path: [], resource: [], temporary: [], untyped: [], archetype: [], tier: [], grantModifier: [], item: [] };
         const spells = {
             0: [],
             1: [],
@@ -106,8 +108,12 @@ export const ActorContextMixin = superclass => class extends superclass {
         const activeSkills = [];
         const enhancements = [];
         const storage = [];
+        const itemSkills = [];
         const playerRevealed = { anatomy: [], armour: [], weapons: [], traits: [] };
         const playerVisible = { armour: [], weapons: [] };
+
+        // Reference Only
+        const renderedSkillIds = [];
 
         for (let i of context.items) {
             i.img = i.img || Item.DEFAULT_ICON;
@@ -134,17 +140,6 @@ export const ActorContextMixin = superclass => class extends superclass {
         // Iterate through items, allocating to containers
         for (let i of context.items) {
             i.img = i.img || Item.DEFAULT_ICON;
-            // if (i.system.storeIn) {
-            //     if (i.type === 'weapon') {
-            //         if (['held1H', 'held2H', 'active'].includes(i.system.equipState)) {
-            //             equippedWeapons.push(i);
-            //             if (i.system.revealed.isRevealed) {
-            //                 playerRevealed.weapons.push(i);
-            //             }
-            //         }
-            //     }
-            //     continue;
-            // }
 
             // Append to equipment.
             if (i.type === 'item') {
@@ -169,6 +164,11 @@ export const ActorContextMixin = superclass => class extends superclass {
             }
             // Append to skills.
             else if (i.type === 'skill') {
+                if (i.system.renderUnique && renderedSkillIds.includes(i.system.abbrewId.uuid)) {
+                    continue;
+                }
+
+                renderedSkillIds.push(i.system.abbrewId.uuid);
                 switch (i.system.skillType) {
                     case 'background':
                         skills.background.push(i);
@@ -185,6 +185,8 @@ export const ActorContextMixin = superclass => class extends superclass {
                     case 'temporary':
                         skills.temporary.push(i)
                         break;
+                    case 'item':
+                        skills.item.push(i);
                     default:
                         skills.untyped.push(i);
                 }
@@ -197,7 +199,6 @@ export const ActorContextMixin = superclass => class extends superclass {
                 } else {
                     anatomy.push(i);
                 }
-
 
                 if (i.system.revealed.isRevealed) {
                     playerRevealed.anatomy.push(
@@ -262,7 +263,9 @@ export const ActorContextMixin = superclass => class extends superclass {
         sections.enhancements = enhancements.length > 0 ? "grid" : "none";
         const allSkillSections = this.updateObjectValueByKey(sections, this.skillSectionDisplay);
         context.allSkillSections = allSkillSections;
-        context.skillSections = filterKeys(allSkillSections, ["background", "basic", "path", "resource", "temporary", "untyped"]);
+        context.skillSections = Object.entries(allSkillSections).map(e => ({ type: e[0], display: e[1], name: `ABBREW.SkillTypes.${e[0]}` })).filter(s => Object.keys(this.skillSectionOrder).includes(s.type))
+            .map(s => ({ ...s, order: this.skillSectionOrder[s.type] }))
+            .sort((sa, sb) => sa.order - sb.order);
         context.skills = skills;
         context.anatomy = anatomy;
         context.armour = armour;
@@ -279,6 +282,18 @@ export const ActorContextMixin = superclass => class extends superclass {
         context.storage = storage;
         context.playerRevealed = playerRevealed;
         context.playerVisible = playerVisible;
+        context.isOverpowerTrained = context.system.skillTraining.overpower.value > 0;
+    }
+
+    skillSectionOrder = {
+        "item": 0,
+        "tier": 1,
+        "basic": 2,
+        "path": 3,
+        "resource": 4,
+        "temporary": 5,
+        "untyped": 6,
+        "background": 7
     }
 
     isContainerAccessible(container) {
@@ -320,5 +335,10 @@ export const ActorContextMixin = superclass => class extends superclass {
 
     getSkillSectionKeys(skillTypes) {
         return Object.keys(skillTypes);
+    }
+
+    _prepareAvailableConcepts(context) {
+        const concepts = Object.entries(this.actor.system.concepts.available).map(([key, concept]) => ({ type: key, ...concept })).filter(c => c.value > 0);
+        context.concepts = { available: concepts };
     }
 }

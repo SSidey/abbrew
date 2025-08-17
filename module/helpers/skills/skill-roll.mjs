@@ -1,9 +1,19 @@
 export function getRollFormula(tier, critical, fortune) {
     // 1d10x10cs10
-    const diceCount = getDiceCount(tier, fortune);
+    const absoluteFortune = Math.abs(fortune);
+    const diceCount = getDiceCount(tier, absoluteFortune);
+
+    let fortuneModifier = "";
+    if (fortune < 0) {
+        fortuneModifier = `kl${tier}`;
+    }
+    else if (fortune > 0) {
+        fortuneModifier = `kh${tier}`;
+    }
+
     const explodesOn = critical;
     const successOn = critical;
-    return `${diceCount}d10x>=${explodesOn}cs>=${successOn}`;
+    return `${diceCount}d10${fortuneModifier}x>=${explodesOn}cs>=${successOn}`;
 }
 
 export function getResultDice(result) {
@@ -29,7 +39,11 @@ export function getResultDice(result) {
     return orderedDice.map(die => {
         let baseClasses = "roll die d10";
         if (die.success) {
-            baseClasses = baseClasses.concat(' ', 'success')
+            baseClasses = baseClasses.concat(' ', 'success');
+        }
+
+        if (die.discarded) {
+            baseClasses = baseClasses.concat(' ', 'discarded');
         }
 
         if (die.exploded) {
@@ -42,7 +56,7 @@ export function getResultDice(result) {
 
 export function getTotalSuccessesForResult(result, lethal = 0) {
     const totalSuccesses = result.dice[0].results.reduce((total, r) => {
-        if (r.success) {
+        if (r.success && !(r.discarded)) {
             total += 1;
         }
         return total;

@@ -1,6 +1,6 @@
 import { _onCreateItem, _onDeleteItem, _onEditItem, _onEquipStateChange, _onItemToggleRevealed, _onStudyItem } from './helpers/actions/item-actions.mjs';
 import { _onAttackDamageAction, _onAttackPickUpAction, _onAttackReloadAction } from './helpers/actions/attack-actions.mjs';
-import { _onAttributeSkill, _onDeleteSkill, _onEditSkill, _onSkillActivate, _onSkillConcentrate, _onSkillDeactivate, _onSkillStackRemove } from './helpers/actions/skill-actions.mjs';
+import { _onAttributeSkill, _onDeleteSkill, _onEditSkill, _onSkillActivate, _onSkillConcentrate, _onSkillDeactivate, _onSkillStackRemove, _toggleFavourited } from './helpers/actions/skill-actions.mjs';
 import { _onDeleteArchetype, _onEditArchetype } from './helpers/actions/archetype-actions.mjs';
 import { _onAnatomyToggleBroken, _onAnatomyToggleDismembered } from './helpers/actions/anatomy-actions.mjs';
 import { _onArmourToggleSundered } from './helpers/actions/armour-actions.mjs';
@@ -16,6 +16,7 @@ import { bindAllChange } from '../helpers/utility.mjs';
 import { DragDropMixin } from '../helpers/drag-drop-mixin.mjs';
 import { ActorContextMixin } from './helpers/context/prepare-context.mjs';
 import { openBrowser } from '../helpers/browser-actions.mjs';
+import { changeConceptValue } from './helpers/actions/concept-actions.mjs';
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
 
@@ -75,7 +76,9 @@ export class AbbrewCharacterSheet extends DragDropMixin(ActorTagsMixin(ActorCont
       toggleRevealed: _onItemToggleRevealed,
       toggleSundered: _onArmourToggleSundered,
       openBrowser: openBrowser,
-      rollable: _onRoll
+      rollable: _onRoll,
+      toggleFavourited: _toggleFavourited,
+      changeConceptValue: changeConceptValue
     }
   }
 
@@ -177,6 +180,7 @@ export class AbbrewCharacterSheet extends DragDropMixin(ActorTagsMixin(ActorCont
     bindAllChange(".attack-reload", _onAmmunitionSelect, this);
 
     this._activateTraits();
+    this._activateInnateConcepts();
   }
 
   /** @inheritDoc */

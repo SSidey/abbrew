@@ -2,6 +2,7 @@ import { getParrySkillWithActions } from '../helpers/fundamental-skills.mjs';
 import { emitForAll, SocketMessage } from '../socket.mjs';
 import { acceptSkillCheck } from '../helpers/skills/skill-check.mjs';
 import { getModifiedSkillActionCost } from "../helpers/skills/skill-activation.mjs";
+import { handleSkillsGrantedOnCheck } from '../helpers/skills/skill-grants.mjs';
 
 export default class AbbrewChatLog extends (foundry.applications?.sidebar?.tabs?.ChatLog ?? ChatLog) {
 
@@ -66,6 +67,22 @@ export default class AbbrewChatLog extends (foundry.applications?.sidebar?.tabs?
 
         const html = await foundry.applications.handlebars.renderTemplate("systems/abbrew/templates/chat/skill-card.hbs", templateData);
         emitForAll("system.abbrew", new SocketMessage(game.user.id, "updateMessageForCheck", { messageId, html, templateData }));
+        const totalSuccesses = result.totalSuccesses;
+        if (totalSuccesses > 0) {
+            const successes = totalSuccesses;
+            const successSkills = data.skillCheckRequest.outcomeGrants.success;
+            const sourceActor = data.skillCheckRequest.sourceActor;
+            const updates = {};
+            updates["system.passedValuesForAsync"] = [{ name: "successes", value: successes }];
+            handleSkillsGrantedOnCheck(successSkills, actor, sourceActor, updates);
+        } else if (totalSuccesses <= 0) {
+            const failures = 1 + totalSuccesses;
+            const failureSkills = data.skillCheckRequest.outcomeGrants.failure;
+            const sourceActor = data.skillCheckRequest.sourceActor;
+            const updates = {};
+            updates["system.passedValuesForAsync"] = [{ name: "failures", value: failures }];
+            handleSkillsGrantedOnCheck(failureSkills, actor, sourceActor, updates);
+        }
     }
 
     static async _onAcceptEffectAction(rolls, data, action) {

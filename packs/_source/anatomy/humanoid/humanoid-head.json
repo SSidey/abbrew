@@ -6,7 +6,9 @@
   "img": "icons/svg/item-bag.svg",
   "system": {
     "description": "",
-    "traits": "",
+    "traits": {
+      "raw": ""
+    },
     "abbrewId": {
       "value": "",
       "uuid": ""
@@ -35,8 +37,8 @@
     "speed": 0,
     "revealed": {
       "isRevealed": false,
-      "difficulty": 0,
-      "tier": 0
+      "difficulty": 15,
+      "tier": 1
     },
     "defense": {
       "guard": 0,
@@ -47,13 +49,47 @@
     "skills": {
       "granted": [
         {
+          "name": "Recover",
+          "skillType": "",
+          "id": "abbrewRecover000",
+          "image": "systems/abbrew/assets/icons/skills/recover.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.abbrewRecover000"
+        },
+        {
+          "name": "Rest",
+          "skillType": "",
+          "id": "abbrewRest000000",
+          "image": "systems/abbrew/assets/icons/skills/rest.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.abbrewRest000000"
+        },
+        {
+          "name": "Restore Guard",
+          "skillType": "",
+          "id": "iUJqYFdrcfZyUr6S",
+          "image": "systems/abbrew/assets/icons/skills/restoreguard.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.iUJqYFdrcfZyUr6S"
+        },
+        {
           "name": "Sight",
+          "skillType": "",
           "id": "CPjPE4fLiHv5T3vA",
-          "image": "icons/svg/item-bag.svg",
-          "sourceId": "Compendium.abbrew.skills.Item.CPjPE4fLiHv5T3vA",
+          "image": "systems/abbrew/assets/icons/skills/scan.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.CPjPE4fLiHv5T3vA"
+        },
+        {
+          "name": "Close Eyes",
+          "id": "qmIijqZUEPCZg5Ai",
+          "image": "systems/abbrew/assets/icons/statuses/blind.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.qmIijqZUEPCZg5Ai",
           "skillType": ""
         }
       ]
+    },
+    "name": {
+      "base": "Head"
+    },
+    "meta": {
+      "quality": 0
     }
   },
   "effects": [],
@@ -64,11 +100,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075185641,
-    "modifiedTime": 1748711828666,
+    "modifiedTime": 1753796769365,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

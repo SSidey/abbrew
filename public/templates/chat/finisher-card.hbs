@@ -1,7 +1,8 @@
-<div class="abbrew chat-message chat-card flexcol " data-actor-id="{{actor._id}}" data-token-id="{{tokenId}}" data-message-id="{{messageId}}">
+<div class="abbrew chat-message chat-card flexcol " data-actor-id="{{actor._id}}" data-token-id="{{tokenId}}"
+    data-message-id="{{messageId}}">
     <header>
         {{#if finisher}}
-        <h3 class="finisher-name">{{finisher.type}} {{finisherCost}}</h3>
+        <h3 class="finisher-name">{{localize finisherType}} {{finisherCost}}</h3>
         {{else}}
         <h3 class="finisher-name">No Finisher</h3>
         {{/if}}
@@ -10,8 +11,17 @@
     <div class="message-content">
         {{#if finisher}}
         <div>{{{finisher.text}}}</div>
+        <div>
+            <h4>Wounds</h4>
+            <ol style="list-style:none;padding-left:0px;">
+                {{#each wounds as |wound|}}
+                <span><img class="wound-image" src="systems/abbrew/assets/icons/wounds/{{wound.type}}.webp"
+                        alt="{{wound.type}} {{wound.value}}"> {{wound.name}} {{wound.value}}</span>
+                {{/each}}
+            </ol>
+        </div>
         {{else}}
-        <div>No finisher was available.</div>
+        <div>Unable to perform finisher.</div>
         {{/if}}
     </div>
 </div>

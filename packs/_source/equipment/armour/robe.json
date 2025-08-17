@@ -1,0 +1,120 @@
+{
+  "folder": "AsPk8lbhBEAjlH3Q",
+  "name": "Robe",
+  "type": "armour",
+  "_id": "wqAVG2WhXIHwZ7td",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "name": {
+      "base": "Robe",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1,
+      "size": 0,
+      "quality": 0
+    },
+    "description": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "abbrew.armour.robe.wqAVG2WhXIHwZ7td",
+      "uuid": "wqAVG2WhXIHwZ7td"
+    },
+    "enhancements": [],
+    "quantity": 1,
+    "heft": 0,
+    "complexity": 0,
+    "equipType": "worn",
+    "equipPoints": {
+      "required": {
+        "raw": "[{\"value\":\"Torso\"},{\"value\":\"Arm\"},{\"value\":\"Arm\"}]",
+        "parsed": [
+          {
+            "value": "Torso"
+          },
+          {
+            "value": "Arm"
+          },
+          {
+            "value": "Arm"
+          }
+        ]
+      },
+      "provided": {
+        "raw": "",
+        "parsed": []
+      }
+    },
+    "handsRequired": "",
+    "equipState": "readied",
+    "handsSupplied": 0,
+    "actionCost": 0,
+    "exertActionCost": 1,
+    "validEquipStates": [
+      {
+        "value": "worn",
+        "label": "ABBREW.EquipStateChange.worn",
+        "cost": 1
+      },
+      {
+        "value": "dropped",
+        "label": "ABBREW.EquipStateChange.dropped",
+        "cost": 0
+      }
+    ],
+    "nextValidEquipStates": [],
+    "skills": {
+      "granted": []
+    },
+    "availableEnhancements": 0,
+    "storage": {
+      "hasStorage": false,
+      "type": "",
+      "accessible": false,
+      "value": 0,
+      "max": 0,
+      "storedItems": [],
+      "traitFilter": {
+        "raw": "",
+        "value": []
+      }
+    },
+    "storeIn": "",
+    "revealed": {
+      "isRevealed": false,
+      "revealSkills": {
+        "raw":"[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
+        "parsed": []
+      },
+      "difficulty": 15,
+      "tier": 1
+    },
+    "grantedBy": "",
+    "defense": {
+      "guard": 0,
+      "inflexibility": 0,
+      "protection": []
+    },
+    "isSundered": false
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.346",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1754137230755,
+    "modifiedTime": 1754137352039,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!wqAVG2WhXIHwZ7td"
+}

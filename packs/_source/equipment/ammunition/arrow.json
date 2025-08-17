@@ -7,7 +7,7 @@
   "system": {
     "description": "",
     "traits": {
-      "raw": "",
+      "raw": "[{\"key\":\"ammunition\",\"value\":\"Ammunition\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]",
       "value": []
     },
     "abbrewId": {
@@ -86,11 +86,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1747590651378,
-    "modifiedTime": 1749672625161,
+    "modifiedTime": 1752869532222,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

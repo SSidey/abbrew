@@ -89,7 +89,7 @@
         "damage": [
           {
             "type": "piercing",
-            "value": 6,
+            "value": 4,
             "penetration": 0,
             "attributeModifier": "str",
             "attributeMultiplier": 1,
@@ -143,7 +143,12 @@
     },
     "enhancements": [],
     "availableEnhancements": 0,
-    "heft": 10
+    "heft": 10,
+    "revealed": {
+      "revealSkills": {
+        "raw": "[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]"
+      }
+    }
   },
   "effects": [],
   "ownership": {
@@ -152,11 +157,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075324307,
-    "modifiedTime": 1748899090289,
+    "modifiedTime": 1752866101746,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

@@ -19,9 +19,9 @@
         "isEnabled": false
       },
       "dex": {
-        "value": 1,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       },
       "agi": {
         "value": 0,
@@ -34,19 +34,19 @@
         "isEnabled": false
       },
       "int": {
-        "value": 1,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       },
       "wil": {
-        "value": 1,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       },
       "wit": {
-        "value": 2,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       },
       "vis": {
         "value": 0,
@@ -69,11 +69,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743077412558,
-    "modifiedTime": 1743077412558,
+    "modifiedTime": 1753133357116,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

@@ -40,3 +40,19 @@ function isExpired(effect) {
         effect.duration.remaining <= 0
     );
 }
+
+let interval = null;
+
+export function togglePassingTime(paused, combat) {
+    if (paused || combat) {
+        clearInterval(interval);
+    } else {
+        interval = setInterval(advanceTime, 1000);
+    }
+}
+
+function advanceTime() {
+    if (game.user.isActiveGM) {
+        game.time.advance(1);
+    }
+}

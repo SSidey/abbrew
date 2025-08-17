@@ -1,5 +1,6 @@
 <h3>Speed</h3>
 <div class="actor-speed-collection">
+    {{!-- TODO: Why is it making two rows? --}}
     {{#each system.movement.speed as |speed key|}}
     <div class="actor-speed {{#unless speed.enabled}}hidden-speed{{/unless}}">
         <label>{{speed.label}}</label>

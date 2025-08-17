@@ -74,8 +74,8 @@
             <div class='skill-controls'>
                 {{#gm}}
                 <label>
-                    <input type="checkbox" class="anatomy-revealed" name="system.revealed.isRevealed" {{ checked
-                        item.system.revealed.isRevealed }}>
+                    <input type="checkbox" class="anatomy-revealed" name="system.revealed.isRevealed"
+                        data-action="toggleRevealed" {{ checked item.system.revealed.isRevealed }}>
                     {{#if item.system.revealed.isRevealed}}
                     <span class="icon icon-anatomy-revealed-c" />
                     {{else}}
@@ -84,10 +84,10 @@
                 </label>
                 {{/gm}}
                 <label class="slide-toggle roboto-upper">
-                    <input type="checkbox" class="action-activatable" name="system.isFavourited" {{ checked
-                        system.isFavourited }}>
+                    <input type="checkbox" class="action-activatable" name="system.isFavourited"
+                        data-action="toggleFavourited" {{ checked item.system.isFavourited }}>
                     <span></span>
-                    {{#if system.isFavourited}}
+                    {{#if item.system.isFavourited}}
                     <i class="fa-solid fa-star"></i>
                     {{else}}
                     <i class="fa-regular fa-star"></i>

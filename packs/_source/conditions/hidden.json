@@ -4,7 +4,7 @@
   "_id": "kykHiaVaxVodd8E2",
   "img": "systems/abbrew/assets/icons/statuses/hidden.svg",
   "system": {
-    "description": "<p>You are hidden from your foes and can not be targeted directly, treat any creature hidden from you as @UUID[Compendium.abbrew.conditions.Item.abbrewCOffGuard0]{Off Guard}.</p><p>If this condition relies on you having cover and you break it, you immediately become detected.</p><p>If you were previously detected (or your presence becomes known) they can attempt to locate you with a @UUID[Compendium.abbrew.skills.Item.LRCKYIXnirM5L3mD]{Scan} Check.</p>",
+    "description": "<p>You are hidden from your foes and can not be targeted directly using sight, treat any creature hidden from you as @UUID[Compendium.abbrew.conditions.Item.abbrewCOffGuard0]{Off Guard}.</p><p>If this condition relies on you having cover and you break it, you immediately become detected.</p><p>If you were previously detected (or your presence becomes known) they can attempt to locate you with a @UUID[Compendium.abbrew.skills.Item.LRCKYIXnirM5L3mD]{Scan} Check.</p>",
     "traits": "",
     "abbrewId": {
       "value": "abbrew.skill.hidden.kykHiaVaxVodd8E2",
@@ -35,12 +35,12 @@
       "fillCapacityOnCreate": false
     },
     "action": {
-      "activationType": "",
-      "actionCost": "",
+      "activationType": "standalone",
+      "actionCost": null,
       "actionImage": "",
       "duration": {
         "isConcentration": false,
-        "precision": "",
+        "precision": "0",
         "value": 0,
         "expireOnStartOfTurn": true
       },
@@ -178,7 +178,99 @@
         },
         "concepts": {
           "self": [],
-          "target": []
+          "target": [],
+          "esoteric": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "physical": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "crushing": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "piercing": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "slashing": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "fire": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "cold": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "water": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "earth": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "air": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "electricity": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "poison": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "flesh": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "blood": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "metal": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "light": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "dark": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "life": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "death": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "war": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "famine": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "pestilence": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "conquest": {
+            "operator": "add",
+            "type": "numeric"
+          }
         }
       }
     },
@@ -263,11 +355,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746374127626,
-    "modifiedTime": 1749073101863,
+    "modifiedTime": 1754137577324,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

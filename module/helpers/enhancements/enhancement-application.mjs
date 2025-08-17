@@ -1,6 +1,7 @@
 import { isEquipped } from "../item-physical.mjs";
 import { parsePathSync } from "../modifierBuilderFieldHelpers.mjs";
 import { applyOperatorUnbounded } from "../operators.mjs";
+import { handleSkillGrantOnCreation } from "../skills/skill-grants.mjs";
 import { isASupersetOfB, removeItem, removeItemByKeyFunction } from "../utils.mjs";
 import { trackEnhancementDuration } from "./ehancement-duration.mjs";
 
@@ -31,12 +32,7 @@ export async function handleEnhancement(targetItem, actor, enhancementItem) {
         await trackEnhancementDuration(actor, enhancement[0]);
 
         if (isEquipped(targetItem)) {
-            let skillSummaries = enhancementItem.system.skills.granted;
-            const skillPromises = skillSummaries.map(s => fromUuid(s.sourceId));
-            const skills = structuredClone(await Promise.all(skillPromises));
-            skills.forEach(s => s.system.grantedBy.item = targetItem._id);
-            const createdSkills = await Item.create(skills, { parent: actor });
-
+            const createdSkills = await handleSkillGrantOnCreation(enhancementItem, actor, targetItem);
             await enhancement[0].update({ "system.grantedIds": createdSkills.map(s => s._id) });
         }
     } else {

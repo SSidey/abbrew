@@ -11,12 +11,22 @@
       "value": "",
       "uuid": ""
     },
-    "skills": [],
+    "skills": {
+      "granted": [
+        {
+          "name": "Warborn Orc (Heritage)",
+          "id": "FK4FVyHVCUZodoLw",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.FK4FVyHVCUZodoLw",
+          "skillType": "background"
+        }
+      ]
+    },
     "attributes": {
       "str": {
-        "value": 3,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       },
       "dex": {
         "value": 0,
@@ -29,9 +39,9 @@
         "isEnabled": false
       },
       "con": {
-        "value": 1,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       },
       "int": {
         "value": 0,
@@ -49,9 +59,9 @@
         "isEnabled": false
       },
       "wil": {
-        "value": 1,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       }
     },
     "creatureForm": {
@@ -69,11 +79,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743077589675,
-    "modifiedTime": 1743077589675,
+    "modifiedTime": 1753030657174,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

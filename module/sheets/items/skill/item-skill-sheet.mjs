@@ -15,6 +15,7 @@ import { skillCollectionDrop, skillTagifyDrop } from './drops/skill-drops.mjs';
 import { SkillTagsMixin } from './tags/skill-tags.mjs';
 import { activeEffectAction } from '../helpers/actions/effect-actions.mjs';
 import { protectionModificationAction } from './actions/skill-protection-modification-action.mjs';
+import { onInlineWoundDragStart } from '../wound/drops/inline-wound-drag-drop.mjs';
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -27,11 +28,14 @@ export class AbbrewSkillSheet extends SkillTagsMixin(DragDropMixin(AbbrewItemBas
         value: game.i18n.localize(trait.value)
     }))];
 
+
+
     static DEFAULT_OPTIONS = {
         position: {
             width: 600
         },
         dragDrop: [
+            { dragSelector: ".inline-item", drop: null, callbacks: { dragStart: onInlineWoundDragStart } },
             { dragSelector: null, dropSelector: "ol.skill-deck-skills", callbacks: { drop: skillCollectionDrop } },
             { dragSelector: null, dropSelector: "tags", callbacks: { drop: skillTagifyDrop } },
         ],
@@ -94,6 +98,30 @@ export class AbbrewSkillSheet extends SkillTagsMixin(DragDropMixin(AbbrewItemBas
 
         context.enrichedFinisherDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
             this.item.system.action.attackProfile.finisher.description,
+            {
+                secrets: this.document.isOwner,
+                documents: true,
+                links: true,
+                embeds: true,
+                rolls: true,
+                rollData: this.item.getRollData()
+            }
+        );
+
+        context.enrichedFinisherDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+            this.item.system.action.attackProfile.finisher.description,
+            {
+                secrets: this.document.isOwner,
+                documents: true,
+                links: true,
+                embeds: true,
+                rolls: true,
+                rollData: this.item.getRollData()
+            }
+        );
+
+        context.enrichedModifierFinisherDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+            this.item.system.action.modifiers.attackProfile.finisher.description,
             {
                 secrets: this.document.isOwner,
                 documents: true,

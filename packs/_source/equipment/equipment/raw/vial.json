@@ -64,11 +64,11 @@
     "revealed": {
       "isRevealed": false,
       "revealSkills": {
-        "raw": "",
+        "raw": "[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
         "parsed": []
       },
-      "difficulty": 10,
-      "tier": 0
+      "difficulty": 15,
+      "tier": 1
     },
     "grantedBy": "",
     "defense": {

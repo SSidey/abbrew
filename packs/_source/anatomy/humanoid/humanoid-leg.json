@@ -39,15 +39,74 @@
     },
     "revealed": {
       "isRevealed": false,
-      "difficulty": 0,
-      "tier": 0
+      "difficulty": 15,
+      "tier": 1
     },
     "defense": {
       "guard": 0,
       "inflexibility": 0,
       "protection": []
     },
-    "naturalWeapons": []
+    "naturalWeapons": [],
+    "skills": {
+      "granted": [
+        {
+          "name": "Dodge",
+          "skillType": "",
+          "id": "ocw9C57R2vHbR9gc",
+          "image": "systems/abbrew/assets/icons/skills/dodge.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.ocw9C57R2vHbR9gc"
+        },
+        {
+          "name": "Hide",
+          "skillType": "",
+          "id": "dSFJ7IWr2RsGF288",
+          "image": "systems/abbrew/assets/icons/actions/1a.webp",
+          "sourceId": "Compendium.abbrew.skills.Item.dSFJ7IWr2RsGF288"
+        },
+        {
+          "name": "Jump",
+          "skillType": "",
+          "id": "JcYV8gQi0h9AyxxA",
+          "image": "systems/abbrew/assets/icons/skills/jump.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.JcYV8gQi0h9AyxxA"
+        },
+        {
+          "name": "Move",
+          "skillType": "",
+          "id": "ttDyhN1XtKKSjkXk",
+          "image": "systems/abbrew/assets/icons/actions/2a.webp",
+          "sourceId": "Compendium.abbrew.skills.Item.ttDyhN1XtKKSjkXk"
+        },
+        {
+          "name": "Step",
+          "skillType": "",
+          "id": "jv5DDww4KxR8YbQK",
+          "image": "systems/abbrew/assets/icons/actions/1a.webp",
+          "sourceId": "Compendium.abbrew.skills.Item.jv5DDww4KxR8YbQK"
+        },
+        {
+          "name": "Swim",
+          "skillType": "",
+          "id": "HiSRr2vw5BHNGwkl",
+          "image": "systems/abbrew/assets/icons/skills/swim.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.HiSRr2vw5BHNGwkl"
+        },
+        {
+          "name": "Trip",
+          "id": "cWdN7kjxiodhUHkX",
+          "image": "systems/abbrew/assets/icons/skills/trip.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.cWdN7kjxiodhUHkX",
+          "skillType": ""
+        }
+      ]
+    },
+    "name": {
+      "base": "Leg"
+    },
+    "meta": {
+      "quality": 0
+    }
   },
   "effects": [],
   "sort": 0,
@@ -57,11 +116,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075222255,
-    "modifiedTime": 1749156786250,
+    "modifiedTime": 1753654381211,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

@@ -1,9 +1,10 @@
 <div class="skill-element-max-input">
+    {{formGroup system.schema.fields.activation.fields.requiredActiveSkills value=system.activation.requiredActiveSkills
+    dataset=datasets.skillDrop localize=true classes="required-active-skills skill-span-2" }}
     {{formGroup system.schema.fields.skillModifiers.fields.synergy
     value=system.skillModifiers.synergy localize=true dataset=datasets.skillDrop classes="skill-span-2"}}
     {{formGroup system.schema.fields.skillModifiers.fields.synergyTraitFilter.fields.raw
     value=system.skillModifiers.synergyTraitFilter.raw localize=true classes="skill-span-2"}}
-
     {{formGroup system.schema.fields.skillModifiers.fields.discord
     value=system.skillModifiers.discord localize=true dataset=datasets.skillDrop classes="skill-span-2"}}
 
@@ -36,7 +37,8 @@
     <h3>Granted Skills</h3>
     <ol class="skill-deck-skills" data-collection-name="granted">
         {{#each system.skills.granted as |skill id|}}
-        <li class="skill-deck-skill" data-id="{{id}}" data-item-id="{{{skill.id}}}" data-source-id="{{skill.sourceId}}">
+        <li class="skill-deck-skill" data-id="{{id}}" data-item-id="{{{skill.id}}}" data-source-id="{{skill.sourceId}}"
+            data-action="renderItemSheet">
             <div class="skill-deck-summary">
                 <div class="image-container"><img src="{{skill.image}}" /></div>
                 <div class="name"><span>{{skill.name}}</span></div>
@@ -56,7 +58,8 @@
     <h3>Paired Skills</h3>
     <ol class="skill-deck-skills" data-collection-name="paired">
         {{#each system.skills.paired as |skill id|}}
-        <li class="skill-deck-skill" data-id="{{id}}" data-item-id="{{{skill.id}}}" data-source-id="{{skill.sourceId}}">
+        <li class="skill-deck-skill" data-id="{{id}}" data-item-id="{{{skill.id}}}" data-source-id="{{skill.sourceId}}"
+            data-action="renderItemSheet">
             <div class="skill-deck-summary">
                 <div class="image-container"><img src="{{skill.image}}" /></div>
                 <div class="name"><span>{{skill.name}}</span></div>
@@ -72,11 +75,16 @@
         </li>
     </ol>
 </div>
+{{formGroup system.schema.fields.activation.fields.activateWith value=system.activation.activateWith
+dataset=datasets.skillDrop localize=true classes="activate-with skill-span-2" }}
+{{formGroup system.schema.fields.activation.fields.andDeactivateWith value=system.activation.andDeactivateWith
+localize=true }}
 <div>
     <h3>Grant on Use</h3>
     <ol class="skill-deck-skills" data-collection-name="grantedOnActivation">
         {{#each system.skills.grantedOnActivation as |skill id|}}
-        <li class="skill-deck-skill" data-id="{{id}}" data-item-id="{{{skill.id}}}" data-source-id="{{skill.sourceId}}">
+        <li class="skill-deck-skill" data-id="{{id}}" data-item-id="{{{skill.id}}}" data-source-id="{{skill.sourceId}}"
+            data-action="renderItemSheet">
             <div class="skill-deck-summary">
                 <div class="image-container"><img src="{{skill.image}}" /></div>
                 <div class="name"><span>{{skill.name}}</span></div>
@@ -96,7 +104,8 @@
     <h3>Grant on Accept</h3>
     <ol class="skill-deck-skills" data-collection-name="grantedOnAccept">
         {{#each system.skills.grantedOnAccept as |skill id|}}
-        <li class="skill-deck-skill" data-id="{{id}}" data-item-id="{{{skill.id}}}" data-source-id="{{skill.sourceId}}">
+        <li class="skill-deck-skill" data-id="{{id}}" data-item-id="{{{skill.id}}}" data-source-id="{{skill.sourceId}}"
+            data-action="renderItemSheet">
             <div class="skill-deck-summary">
                 <div class="image-container"><img src="{{skill.image}}" /></div>
                 <div class="name"><span>{{skill.name}}</span></div>
@@ -116,7 +125,8 @@
     <h3>Grant on Expiry</h3>
     <ol class="skill-deck-skills" data-collection-name="grantedOnExpiry">
         {{#each system.skills.grantedOnExpiry as |skill id|}}
-        <li class="skill-deck-skill" data-id="{{id}}" data-item-id="{{{skill.id}}}" data-source-id="{{skill.sourceId}}">
+        <li class="skill-deck-skill" data-id="{{id}}" data-item-id="{{{skill.id}}}" data-source-id="{{skill.sourceId}}"
+            data-action="renderItemSheet">
             <div class="skill-deck-summary">
                 <div class="image-container"><img src="{{skill.image}}" /></div>
                 <div class="name"><span>{{skill.name}}</span></div>
@@ -131,6 +141,33 @@
             <span>+ Skill</span>
         </li>
     </ol>
+</div>
+<div>
+    <h3>Aura</h3>
+    {{formGroup system.schema.fields.aura.fields.isAura value=system.aura.isAura localize=true}}
+    {{#if system.aura.isAura}}
+    {{formGroup system.schema.fields.aura.fields.emanationSize value=system.aura.emanationSize localize=true}}
+    {{formGroup system.schema.fields.aura.fields.emanationDimension value=system.aura.emanationDimension localize=true}}
+    {{formGroup system.schema.fields.aura.fields.affects value=system.aura.affects localize=true}}
+    <ol class="skill-deck-skills" data-collection-name="aura">
+        {{#each system.skills.aura as |skill id|}}
+        <li class="skill-deck-skill" data-id="{{id}}" data-item-id="{{{skill.id}}}" data-source-id="{{skill.sourceId}}"
+            data-action="renderItemSheet">
+            <div class="skill-deck-summary">
+                <div class="image-container"><img src="{{skill.image}}" /></div>
+                <div class="name"><span>{{skill.name}}</span></div>
+                <a class='item-control skill-delete' data-action="deleteSkill"
+                    title='{{localize "DOCUMENT.Delete" type=' skill'}}'>
+                    <i class='fas fa-trash'></i>
+                </a>
+            </div>
+        </li>
+        {{/each}}
+        <li class="empty-drop-list-element">
+            <span>+ Skill</span>
+        </li>
+    </ol>
+    {{/if}}
 </div>
 <div class="skill-configuration-section">
     {{> "systems/abbrew/templates/item/skill/templates/skill-type.hbs"}}

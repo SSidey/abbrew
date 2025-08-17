@@ -1,84 +1,42 @@
+export async function handleSkillGrantOnCreation(data, actor, source) {
+    return await handleSkillGrants(data.system.skills.granted, actor, source);
+}
+
+export async function handleSkillGrantOnActivation(skill, actor, source) {
+    await handleSkillGrants(skill.system.skills.grantedOnActivation, actor, source)
+}
+
+export async function handleSkillGrantOnExpiry(skill, actor, source) {
+    await handleSkillGrants(skill.system.skills.grantedOnExpiry, actor, source);
+}
+
 export async function handleSkillsGrantedOnAccept(data, actor, source) {
-    const skillPromises = data.skillsGrantedOnAccept.map(async s => {
-        const skill = structuredClone(await fromUuid(s.sourceId));
-        if (skill) {
-            skill.system.grantedBy.actor = data.sources.actor;
-            skill.system.grantedBy.item = data.sources.items.length > 0 ? data.sources.items[0] : null;
-            await Item.create(skill, { parent: actor });
-        }
-    });
-
-    await Promise.all(skillPromises);
+    await handleSkillGrants(data.skillsGrantedOnAccept, actor, source);
 }
 
-// export async function handleSkillsGrantedOnAccept(data, actor, source) {
-//     const allSkillsPromises = data.skillsGrantedOnAccept.map(async s => {
-//         return structuredClone(await fromUuid(s.sourceId));
-//     });
+export async function handleSkillsGrantedOnCheck(skills, actor, source, skillUpdates) {
+    await handleSkillGrants(skills, actor, source, true, skillUpdates);
+}
 
-//     const allSkills = await Promise.all(allSkillsPromises);
-//     const grantSkills = allSkills.filter(s => s.system.skillType !== "grantModifier");
-//     const grantModifiers = allSkills.filter(s => s.system.skillType === "grantModifier");
-
-//     const skillPromises = grantSkills.map(async skill => {
-//         skill.system.grantedBy.actor = data.sources.actor;
-//         skill.system.grantedBy.item = data.sources.items.length > 0 ? data.sources.items[0] : null;
-//         applyGrantModifiers(skill, grantModifiers);
-//         await Item.create(skill, { parent: actor });
-//     });
-
-//     await Promise.all(skillPromises);
-// }
-
-// function applyGrantModifiers(skill, grantModifiers) {
-//     const totalModifier = grantModifiers.reduce((result, modifier) => {
-//         result.intervalSteps += modifier.system.action.modifiers.duration.intervalSteps;
-//         result.valueSteps += modifier.system.action.modifiers.duration.valueSteps;
-//     }, { intervalSteps: 0, valueSteps: 0 });
-
-//     const durationSteps = CONFIG.ABBREW.durationSteps;
-//     const currentSteps = Object.entries(durationSteps).filter(s => s[1].value === skill.system.action.duration.precision).map(s => s[0]);
-//     const currentStep = currentSteps.length > 0 ? currentSteps[0] : 0;
-
-//     const updateStep = currentStep + totalModifier.intervalSteps;
-//     const updateInterval = CONFIG.ABBREW.durationSteps[updateStep].value;
-
-//     const currentValue = skill.system.duration.value;
-//     const queryValue = currentValue + totalModifier.valueSteps;
-// }
-
-export async function handleGrantOnUse(skill, actor, source) {
-    if (skill.system.skills.grantedOnActivation.length > 0) {
-        skill.system.skills.grantedOnActivation.forEach(async s => {
-            const grantedSkill = await fromUuid(s.sourceId);
-            if (grantedSkill) {
-                skill.system.grantedBy.actor = actor?._id;
-                skill.system.grantedBy.item = source?._id;
-                await Item.create(grantedSkill, { parent: actor });
-            }
-        });
+async function handleSkillGrants(skillIds, actor, source, isSourceActor = false, skillUpdates = {}) {
+    if (skillIds.length > 0) {
+        const skills = await getSkillsById(skillIds);
+        return await handleGrantedSkills(skills, actor, source, isSourceActor, skillUpdates);
     }
 }
 
-export async function handleGrantedSkills(skills, actor, source) {
-    const createSkills = structuredClone(skills);
+async function getSkillsById(skillIds) {
+    const skillsPromises = skillIds.map(s => fromUuid(s.sourceId));
+    return await Promise.all(skillsPromises);
+}
+
+export async function handleGrantedSkills(skills, actor, source, isSourceActor = false, skillUpdates = {}) {
+    const createSkills = skills.map(s => s.toObject());
     createSkills.forEach(s => {
-        s.system.grantedBy.actor = actor?._id;
+        s.system.grantedBy.actor = isSourceActor ? source?._id : actor?._id;
         s.system.grantedBy.item = source?._id;
+        foundry.utils.mergeObject(s, skillUpdates, { inplace: true, recursive: true })
     });
 
-    await Item.implementation.createDocuments(createSkills, { parent: actor })
-}
-
-export async function handleGrantOnExpiry(skill, actor, source) {
-    if (skill.system.skills.grantedOnExpiry.length > 0) {
-        skill.system.skills.grantedOnExpiry.forEach(async s => {
-            const grantedSkill = await fromUuid(s.sourceId);
-            if (grantedSkill) {
-                skill.system.grantedBy.actor = actor?._id;
-                skill.system.grantedBy.item = source?._id;
-                await Item.create(grantedSkill, { parent: actor });
-            }
-        });
-    }
+    return await Item.implementation.createDocuments(createSkills, { parent: actor })
 }

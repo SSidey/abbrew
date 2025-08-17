@@ -32,7 +32,12 @@
             <div class="resource flex-group-center">
                 <label for="system.attributes.level.value" class="resource-label">Tier</label>
                 <div class="resource-content flexrow flex-center flex-between">
+
+                </div>
+                <div class="resource-content flexrow flex-center flex-between">
                     <input type="text" name="system.meta.tier.value" value="{{system.meta.tier.value}}"
+                        data-dtype="Number" {{#unless (isGM)}}readonly{{/unless}} />
+                    <input type="text" name="system.meta.tier.dice" value="{{system.meta.tier.dice}}"
                         data-dtype="Number" {{#unless (isGM)}}readonly{{/unless}} />
                 </div>
             </div>
@@ -72,6 +77,26 @@
                         data-dtype="Number" />
                 </div>
             </div>
+
+            {{#if (gt concepts.available.length 0)}}
+            <div class="available-concepts">
+                <div class="available-concepts-label">
+                    <label for="system.concepts.available" class="resource-label">Available
+                        Concepts</label>
+                </div>
+                <ol class="concept-container">
+                    {{#each concepts.available as |concept|}}
+                    <li class="concept" data-action="changeConceptValue" data-concept-type="{{concept.type}}"
+                        data-concept-value="{{concept.value}}">
+                        <div class="concept-value">{{concept.value}}</div>
+                        <img class="concept-image" src="systems/abbrew/assets/icons/concepts/{{concept.type}}.svg"
+                            alt="{{concept.type}} {{concept.value}}">
+                        <span class="concept-tooltip">{{concept.name}}</span>
+                    </li>
+                    {{/each}}
+                </ol>
+            </div>
+            {{/if}}
 
         </div>
     </div>

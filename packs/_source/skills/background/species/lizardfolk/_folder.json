@@ -1,0 +1,20 @@
+{
+  "type": "Item",
+  "folder": "ZHou5Vo3sNBJlVjR",
+  "name": "Lizardfolk",
+  "color": null,
+  "sorting": "a",
+  "_id": "kYUczg6WdqGhvfgw",
+  "description": "",
+  "sort": 0,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.346",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "lastModifiedBy": null
+  },
+  "_key": "!folders!kYUczg6WdqGhvfgw"
+}

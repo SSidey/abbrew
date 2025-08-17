@@ -41,7 +41,7 @@ export async function applyAttackProfiles(actor, skill, modifierSkills, fortune,
 
         const resultDice = getResultDice(result);
 
-        const totalSuccesses = getTotalSuccessesForResult(result);
+        const totalSuccesses = getTotalSuccessesForResult(result, attackProfile.lethal);
 
 
         const finisher = attackMode === "finisher" ? mergeFinishers(baseAttackProfile, modifierSkills, actor) : null;
@@ -230,10 +230,8 @@ function mergeFinishers(baseAttackProfile, modifierSkills, actor) {
 
     const allAttackProfiles = [baseAttackProfile, ...modifierAttackProfiles];
     const finisherCost = mergeFinisherCost(allAttackProfiles);
-    const mergedFinisherTypes = mergeFinisherType(allAttackProfiles);
-    if (!mergedFinisherTypes) {
-        return null;
-    }
+    let mergedFinisherTypes = [];
+    mergedFinisherTypes = mergeFinisherType(allAttackProfiles);
 
     const finisherType = mergedFinisherTypes.length > 0 ? mergedFinisherTypes : "untyped";
     const finisherDescription = mergeFinisherDescriptions(allAttackProfiles);
@@ -249,11 +247,11 @@ function mergeFinishers(baseAttackProfile, modifierSkills, actor) {
 }
 
 function mergeFinisherCost(allAttackProfiles) {
-    return allAttackProfiles.reduce((result, attackProfile) => result += attackProfile.finisher.cost, 0);
+    return allAttackProfiles.reduce((result, attackProfile) => result += attackProfile?.finisher?.cost ?? 0, 0);
 }
 
 function mergeFinisherType(allAttackProfiles) {
-    return allAttackProfiles.reduce((result, attackProfile) => { result = attackProfile.finisher.type; return result; }, "untyped");
+    return allAttackProfiles.reduce((result, attackProfile) => { if (attackProfile?.finisher?.type) result.push(attackProfile.finisher.type); return result; }, []);
 }
 
 function mergeFinisherDescriptions(allAttackProfiles) {

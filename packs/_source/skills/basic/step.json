@@ -2,7 +2,7 @@
   "folder": "xv4pBYEWqvTp5C2J",
   "name": "Step",
   "type": "skill",
-  "img": "icons/svg/item-bag.svg",
+  "img": "systems/abbrew/assets/icons/actions/1a.webp",
   "system": {
     "description": "<p>Move up to your size.</p>",
     "traits": "",
@@ -96,7 +96,99 @@
         "resources": [],
         "concepts": {
           "self": [],
-          "target": []
+          "target": [],
+          "esoteric": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "physical": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "crushing": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "piercing": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "slashing": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "fire": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "cold": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "water": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "earth": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "air": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "electricity": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "poison": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "flesh": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "blood": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "metal": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "light": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "dark": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "life": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "death": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "war": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "famine": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "pestilence": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "conquest": {
+            "operator": "add",
+            "type": "numeric"
+          }
         },
         "attackProfile": {
           "finisherLimit": {
@@ -169,17 +261,18 @@
       "discord": ""
     },
     "isActivatable": true,
-    "skills": []
+    "skills": [],
+    "renderUnique": true
   },
   "effects": [],
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743073136357,
-    "modifiedTime": 1745618148003,
+    "modifiedTime": 1753653469775,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },
@@ -187,6 +280,6 @@
     "default": 0
   },
   "_id": "jv5DDww4KxR8YbQK",
-  "sort": 106250,
+  "sort": 1200000,
   "_key": "!items!jv5DDww4KxR8YbQK"
 }

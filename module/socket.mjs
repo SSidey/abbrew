@@ -50,8 +50,7 @@ async function handleCombatTurnChange(data) {
 }
 
 async function executeAsGM(func, userId, data) {
-    // TODO isActiveGM doesn't seem available but would be preferable: game.user !== game.users.isActiveGM 
-    if (!game.user.isGM) {
+    if (!game.user.isActiveGM) {
         return;
     }
 

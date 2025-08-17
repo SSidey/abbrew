@@ -3,7 +3,7 @@
   "name": "Tremorsense",
   "type": "skill",
   "_id": "ymJVaxuWFqM2f7PZ",
-  "img": "icons/svg/item-bag.svg",
+  "img": "systems/abbrew/assets/icons/skills/tremorsense.svg",
   "system": {
     "name": {
       "base": "",
@@ -412,6 +412,10 @@
             "type": "numeric",
             "numerator": 1,
             "denominator": 1
+          },
+          "esoteric": {
+            "operator": "add",
+            "type": "numeric"
           }
         }
       }
@@ -436,26 +440,27 @@
     "revealed": {
       "isRevealed": false,
       "revealSkills": {
-        "raw": "",
+        "raw": "[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
         "parsed": []
       },
-      "difficulty": 0,
-      "tier": 0
-    }
+      "difficulty": 15,
+      "tier": 1
+    },
+    "renderUnique": true
   },
   "effects": [],
-  "sort": 0,
+  "sort": 1100000,
   "ownership": {
     "default": 0
   },
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1748731180127,
-    "modifiedTime": 1748731230431,
+    "modifiedTime": 1753653532543,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

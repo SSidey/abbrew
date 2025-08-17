@@ -1,7 +1,7 @@
 {
   "name": "Vampiric Resilience",
   "type": "skill",
-  "_id": "15v13SP6z9Atwl7M",
+  "_id": "vKQ4ujonBeizEmjY",
   "img": "icons/svg/item-bag.svg",
   "system": {
     "name": {
@@ -17,10 +17,14 @@
       "value": []
     },
     "abbrewId": {
-      "value": "abbrew.skill.vampiricresilience.15v13SP6z9Atwl7M",
-      "uuid": "15v13SP6z9Atwl7M"
+      "value": "abbrew.skill.vampiricresilience.vKQ4ujonBeizEmjY",
+      "uuid": "vKQ4ujonBeizEmjY"
     },
     "enhancements": [],
+    "innateConcepts": {
+      "raw": "",
+      "value": []
+    },
     "skillModifiers": {
       "synergy": "",
       "synergyTraitFilter": {
@@ -32,6 +36,7 @@
       "isItemGrantTriggerRequired": false
     },
     "rank": 1,
+    "renderUnique": false,
     "isFavourited": false,
     "isActivatable": false,
     "activateOnCreate": false,
@@ -169,6 +174,12 @@
           "value": 0,
           "operator": ""
         },
+        "duration": {
+          "valueSteps": 0,
+          "setOrStep": false,
+          "intervalSteps": 0,
+          "intervalSet": ""
+        },
         "attackProfile": {
           "isEnabled": false,
           "combineAttacks": {
@@ -204,12 +215,12 @@
         "protection": [
           {
             "types": {
-              "raw": "[{\"key\":\"crushing\",\"value\":\"Crushing\",\"feature\":\"skill\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"piercing\",\"value\":\"Piercing\",\"feature\":\"skill\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"slashing\",\"value\":\"Slashing\",\"feature\":\"skill\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]"
+              "raw": "[{\"key\":\"piercing\",\"value\":\"Piercing\",\"feature\":\"skill\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"slashing\",\"value\":\"Slashing\",\"feature\":\"skill\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"crushing\",\"value\":\"Crushing\",\"feature\":\"skill\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]"
             },
             "modifications": {
-              "raw": "[{\"label\":\"resistance\",\"value\":\"Resistance\"}]"
+              "raw": "[{\"label\":\"immunity\",\"value\":\"Immunity\"}]"
             },
-            "value": -3,
+            "value": -1,
             "trigger": {
               "raw": "[{\"key\":\"silver\",\"value\":\"Silver\",\"feature\":\"material\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"light\",\"value\":\"Light\",\"feature\":\"skill\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]"
             }
@@ -255,6 +266,15 @@
           "target": []
         },
         "concepts": {
+          "esoteric": {
+            "name": "esoteric",
+            "label": "ABBREW.Concepts.esoteric",
+            "value": "",
+            "operator": "add",
+            "type": "numeric",
+            "numerator": 1,
+            "denominator": 1
+          },
           "physical": {
             "name": "physical",
             "label": "ABBREW.Concepts.physical",
@@ -456,7 +476,7 @@
         }
       }
     },
-    "skillType": "temporary",
+    "skillType": "basic",
     "path": {
       "raw": "",
       "value": {
@@ -476,18 +496,18 @@
     "revealed": {
       "isRevealed": false,
       "revealSkills": {
-        "raw": "",
+        "raw":"[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
         "parsed": []
       },
-      "difficulty": 0,
-      "tier": 0
+      "difficulty": 15,
+      "tier": 1
     }
   },
   "effects": [
     {
       "name": "Vampiric Resilience",
       "img": "icons/svg/aura.svg",
-      "origin": "Compendium.abbrew.skills.Item.15v13SP6z9Atwl7M",
+      "origin": "Compendium.abbrew.skills.Item.vKQ4ujonBeizEmjY",
       "duration": {
         "startTime": null,
         "combat": null,
@@ -498,7 +518,7 @@
         "startTurn": null
       },
       "disabled": false,
-      "_id": "Sa4SOeGL75UYPSl4",
+      "_id": "y862TijbWSo0KC0j",
       "type": "base",
       "system": {
         "modifiers": [
@@ -521,21 +541,21 @@
       },
       "changes": [
         {
-          "key": "[{\"value\":\"Crushing Resistance\",\"label\":\"system.defense.protection.crushing.resistance\"}]",
+          "key": "[{\"value\":\"Crushing Immunity\",\"label\":\"system.defense.protection.crushing.immunity\"}]",
           "mode": 2,
-          "value": "3",
+          "value": "1",
           "priority": null
         },
         {
-          "key": "[{\"value\":\"Piercing Resistance\",\"label\":\"system.defense.protection.piercing.resistance\"}]",
+          "key": "[{\"value\":\"Slashing Immunity\",\"label\":\"system.defense.protection.slashing.immunity\"}]",
           "mode": 2,
-          "value": "3",
+          "value": "1",
           "priority": null
         },
         {
-          "key": "[{\"value\":\"Slashing Resistance\",\"label\":\"system.defense.protection.slashing.resistance\"}]",
+          "key": "[{\"value\":\"Piercing Immunity\",\"label\":\"system.defense.protection.piercing.immunity\"}]",
           "mode": 2,
-          "value": "3",
+          "value": "1",
           "priority": null
         }
       ],
@@ -544,19 +564,33 @@
       "transfer": true,
       "statuses": [],
       "sort": 0,
-      "flags": {},
+      "flags": {
+        "statuscounter": {
+          "config": {
+            "dataSource": "flags.abbrew.skill.stacks",
+            "type": "default"
+          },
+          "visible": false,
+          "value": 1
+        },
+        "abbrew": {
+          "skill": {
+            "stacks": 1
+          }
+        }
+      },
       "_stats": {
         "compendiumSource": null,
         "duplicateSource": null,
         "exportSource": null,
-        "coreVersion": "13.345",
+        "coreVersion": "13.346",
         "systemId": "abbrew",
         "systemVersion": "0.0.2-prerelease31",
-        "createdTime": 1750024223917,
-        "modifiedTime": 1750024630120,
+        "createdTime": 1753310576362,
+        "modifiedTime": 1753310641964,
         "lastModifiedBy": "abbrewpacks00000"
       },
-      "_key": "!items.effects!15v13SP6z9Atwl7M.Sa4SOeGL75UYPSl4"
+      "_key": "!items.effects!vKQ4ujonBeizEmjY.y862TijbWSo0KC0j"
     }
   ],
   "folder": null,
@@ -568,12 +602,12 @@
   "_stats": {
     "duplicateSource": null,
     "exportSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
-    "createdTime": 1750024145634,
-    "modifiedTime": 1750024578213,
+    "createdTime": 1753310568660,
+    "modifiedTime": 1753311261293,
     "lastModifiedBy": "abbrewpacks00000"
   },
-  "_key": "!items!15v13SP6z9Atwl7M"
+  "_key": "!items!vKQ4ujonBeizEmjY"
 }

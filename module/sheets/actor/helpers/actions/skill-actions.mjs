@@ -7,7 +7,6 @@ export async function _onDeleteSkill(event, target) {
     const li = target.closest('.skill');
     const skill = this.actor.items.get(li.dataset.itemId);
     skill.delete();
-    li.slideUp(200, () => this.render(false));
 }
 
 export async function _onEditSkill(event, target) {
@@ -66,4 +65,15 @@ export async function _onAttributeSkill(event, target) {
     const fundamental = CONFIG.ABBREW.fundamentalAttributeSkillMap[dataset.attribute];
     const skill = getFundamentalAttributeSkill(fundamental)
     await handleSkillActivate(this.actor, skill);
+}
+
+export async function _toggleFavourited(event) {
+    event.preventDefault();
+    const target = event.target.closest(".skill");
+    const id = target.dataset.itemId;
+    const skill = this.actor.items.get(id);
+    if (skill) {
+        const favourited = skill.system.isFavourited;
+        await skill.update({ "system.isFavourited": !favourited });
+    }
 }

@@ -26,9 +26,9 @@
           {{#unless (or (eq attackProfile.attackType "ranged") (eq attackProfile.attackType "thrown"))}}
           <button type="button" class="attack-button" data-action="handleAttack" data-attack-type="attack"><span
               class="actions-icon action-{{item.system.actionCost}}a">{{attackProfile.name}}</span></button>
-          {{#if item.system.isOverpowerTrained}}
+          {{#if ../../isOverpowerTrained}}
           {{#if hasStrongAttack}}
-          <button type="button" class="attack-button" data-action="handleAttack" data-attack-type="attack">
+          <button type="button" class="attack-button" data-action="handleAttack" data-attack-type="overpower">
             <span class="actions-icon action-{{item.system.exertActionCost}}a">Overpower</span>
           </button>
           {{else}}

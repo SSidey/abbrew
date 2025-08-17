@@ -35,9 +35,9 @@ export const DragDropMixin = superclass => class extends superclass {
                 drop: this._canDragDrop.bind(this),
             };
             d.callbacks = {
-                dragstart: this._onDragStart.bind(this),
-                dragover: this._onDragOver.bind(this),
-                drop: d.callbacks?.drop.bind(this) ?? this._onDrop.bind(this),
+                dragstart: d.callbacks?.dragStart?.bind(this) ?? this._onDragStart.bind(this),
+                dragover: d.callbacks?.dragOver?.bind(this) ?? this._onDragOver.bind(this),
+                drop: d.callbacks?.drop?.bind(this) ?? this._onDrop.bind(this),
             };
             return new DragDrop(d);
         });

@@ -107,7 +107,8 @@ ABBREW.operators = {
 ABBREW.woundOperators = {
   ...ABBREW.operators,
   suppress: "ABBREW.Operators.suppress",
-  intensify: "ABBREW.Operators.intensify"
+  intensify: "ABBREW.Operators.intensify",
+  immunity: "ABBREW.Operators.immunity"
 }
 
 ABBREW.enhancementOperators = {
@@ -157,6 +158,8 @@ ABBREW.concepts = {
   famine: "ABBREW.Concepts.famine",
   pestilence: "ABBREW.Concepts.pestilence",
   conquest: "ABBREW.Concepts.conquest",
+  rage: "ABBREW.Concepts.rage",
+  fear: "ABBREW.Concepts.fear"
 }
 
 ABBREW.facing = {
@@ -229,7 +232,8 @@ ABBREW.skillTypes = {
   untyped: "ABBREW.SkillTypes.untyped",
   background: "ABBREW.SkillTypes.background",
   tier: "ABBREW.SkillTypes.tier",
-  grantModifier: "ABBREW.SkillTypes.grantModifier"
+  grantModifier: "ABBREW.SkillTypes.grantModifier",
+  item: "ABBREW.SkillTypes.item"
 }
 
 ABBREW.actionCosts = {
@@ -239,6 +243,28 @@ ABBREW.actionCosts = {
   three: "ABBREW.ActionCosts.three",
   reaction: "ABBREW.ActionCosts.reaction",
   other: "ABBREW.ActionCosts.other"
+}
+
+ABBREW.reach = {
+  0: "ABBREW.Reach.none",
+  1: "ABBREW.Reach.close",
+  1: "ABBREW.Reach.short",
+  2: "ABBREW.Reach.standard",
+  3: "ABBREW.Reach.long"
+}
+
+ABBREW.skillAffects = {
+  0: "ABBREW.SkillAffects.none",
+  1: "ABBREW.SkillAffects.enemies",
+  2: "ABBREW.SkillAffects.alliesExclusive",
+  3: "ABBREW.SkillAffects.alliesInclusive",
+  4: "ABBREW.SkillAffects.all",
+  5: "ABBREW.SkillAffects.source"
+}
+
+ABBREW.emanationDimension = {
+  0: "ABBREW.EmanationDimension.grid",
+  1: "ABBREW.EmanationDimension.spaces",
 }
 
 ABBREW.wounds = {
@@ -346,6 +372,16 @@ ABBREW.wounds = {
     name: "ABBREW.Wounds.necrotic",
     lingeringWounds: [],
     concepts: ["death"]
+  },
+  hunger: {
+    name: "ABBREW.Wounds.hunger",
+    lingeringWounds: ["starvation"],
+    concepts: ["famine"]
+  },
+  starvation: {
+    name: "ABBREW.Wounds.starvation",
+    lingeringWounds: [],
+    concepts: ["famine"]
   }
 }
 
@@ -353,12 +389,19 @@ ABBREW.acuteWounds = Object.entries(ABBREW.wounds).filter(w => w[1].lingeringWou
 ABBREW.lingeringWounds = Object.entries(ABBREW.wounds).filter(w => w[1].lingeringWounds.length > 0).map(w => w[0]);
 
 ABBREW.conditions = {
+  blind: {
+    id: "abbrewCBlind0000",
+    name: "ABBREW.EFFECT.Condition.Blind.name",
+    img: "systems/abbrew/assets/icons/statuses/blind.svg",
+    description: "ABBREW.EFFECT.Condition.Blind.description",
+    statuses: ['blind']
+  },
   dead: {
     id: "abbrewCDead00000",
     name: "ABBREW.EFFECT.Condition.Dead.name",
     img: "systems/abbrew/assets/icons/statuses/dead.svg",
     description: "ABBREW.EFFECT.Condition.Dead.description",
-    statuses: ['dead', 'defeated']
+    statuses: ['dead', 'defeated', 'prone', 'blind', 'deaf', 'mute']
   },
   defeated: {
     id: "abbrewCDefeated0",
@@ -369,10 +412,24 @@ ABBREW.conditions = {
   },
   disoriented: {
     id: "abbrewCDisorient",
-    name: "ABBREW.EFFECT.Condition.disoriented.name",
+    name: "ABBREW.EFFECT.Condition.Disoriented.name",
     img: "systems/abbrew/assets/icons/statuses/disoriented.svg",
     description: "ABBREW.EFFECT.Condition.Disoriented.description",
     statuses: ['disoriented']
+  },
+  distracted: {
+    id: "abbrewCDistracte",
+    name: "ABBREW.EFFECT.Condition.Distracted.name",
+    img: "systems/abbrew/assets/icons/statuses/distracted.svg",
+    description: "ABBREW.EFFECT.Condition.Distracted.description",
+    statuses: ['distracted']
+  },
+  grabbed: {
+    id: "abbrewCGrabbed00",
+    name: "ABBREW.EFFECT.Condition.Grabbed.name",
+    img: "systems/abbrew/assets/icons/statuses/grabbed.svg",
+    description: "ABBREW.EFFECT.Condition.Grabbed.description",
+    statuses: ['offGuard']
   },
   guardBreak: {
     id: "abbrewCGuardBrea",
@@ -386,7 +443,14 @@ ABBREW.conditions = {
     name: "ABBREW.EFFECT.Condition.Hidden.name",
     img: "systems/abbrew/assets/icons/statuses/hidden.svg",
     description: "ABBREW.EFFECT.Condition.Hidden.description",
-    statuses: ['offGuard']
+    statuses: ['hidden']
+  },
+  immobilised: {
+    id: "abbrewCImmobilis",
+    name: "ABBREW.EFFECT.Condition.Immobilised.name",
+    img: "systems/abbrew/assets/icons/statuses/immobilised.svg",
+    description: "ABBREW.EFFECT.Condition.Immobilised.description",
+    statuses: ['immobilised']
   },
   offGuard: {
     id: "abbrewCOffGuard0",
@@ -394,10 +458,46 @@ ABBREW.conditions = {
     img: "systems/abbrew/assets/icons/statuses/offGuard.svg",
     description: "ABBREW.EFFECT.Condition.OffGuard.description",
     statuses: ['offGuard']
+  },
+  prone: {
+    id: "abbrewCProne0000",
+    name: "ABBREW.EFFECT.Condition.Prone.name",
+    img: "systems/abbrew/assets/icons/statuses/prone.svg",
+    description: "ABBREW.EFFECT.Condition.Prone.description",
+    statuses: ['offGuard']
+  },
+  staggered: {
+    id: "abbrewCStaggered",
+    name: "ABBREW.EFFECT.Condition.Staggered.name",
+    img: "systems/abbrew/assets/icons/statuses/staggered.svg",
+    description: "ABBREW.EFFECT.Condition.Staggered.description",
+    statuses: ['staggered']
+  },
+  threatened: {
+    id: "abbrewCThreatene",
+    name: "ABBREW.EFFECT.Condition.Threatened.name",
+    img: "systems/abbrew/assets/icons/statuses/threatened.svg",
+    description: "ABBREW.EFFECT.Condition.Threatened.description",
+    statuses: ['threatened']
+  },
+  unconscious: {
+    id: "abbrewCUnconscio",
+    name: "ABBREW.EFFECT.Condition.Unconscious.name",
+    img: "systems/abbrew/assets/icons/statuses/unconscious.svg",
+    description: "ABBREW.EFFECT.Condition.Unconscious.description",
+    statuses: ['offGuard', 'prone', 'blind']
   }
 }
 
 ABBREW.statusEffects = {
+  blind: {
+    name: "ABBREW.EFFECT.Status.blind",
+    img: "systems/abbrew/assets/icons/statuses/blind.svg",
+    description: "You are blinded. If sight is your only primary sense, everything is unobserved to you. You can not use a skill that relies on a target. Your movement is halved.",
+    polarity: "negative",
+    special: "BLIND",
+    order: 2,
+  },
   dead: {
     name: "ABBREW.EFFECT.Status.dead",
     img: "systems/abbrew/assets/icons/statuses/dead.svg",
@@ -405,6 +505,13 @@ ABBREW.statusEffects = {
     polarity: "negative",
     order: 2,
     statuses: ['defeated']
+  },
+  deaf: {
+    name: "ABBREW.EFFECT.Status.deaf",
+    img: "systems/abbrew/assets/icons/statuses/deaf.svg",
+    description: "Your hearing has been damaged.",
+    polarity: "negative",
+    order: 2,
   },
   defeated: {
     name: "ABBREW.EFFECT.Status.defeated",
@@ -417,8 +524,21 @@ ABBREW.statusEffects = {
   disoriented: {
     name: "ABBREW.EFFECT.Status.disoriented",
     img: "systems/abbrew/assets/icons/statuses/disoriented.svg",
-    description: "You have been disoriented, you cannot restore guard nor parry while you have this condition.",
+    description: "You have been disoriented, leaving you unable to use the restore guard, parry and dodge skills.",
     polarity: "negative"
+  },
+  distracted: {
+    name: "ABBREW.EFFECT.Status.distracted",
+    img: "systems/abbrew/assets/icons/statuses/distracted.svg",
+    description: "You have been distracted, at the end of each of your turns while you have this condition, your risk increases by 10 per stack.",
+    olarity: "negative"
+  },
+  grabbed: {
+    name: "ABBREW.EFFECT.Status.grabbed",
+    img: "systems/abbrew/assets/icons/statuses/grabbed.svg",
+    description: "You have been grabbed, you are Off Guard and Immobilised.",
+    polarity: "negative",
+    statuses: ['offGuard', 'immobilised']
   },
   guardBreak: {
     name: "ABBREW.EFFECT.Status.guardBreak",
@@ -432,11 +552,57 @@ ABBREW.statusEffects = {
     description: "You are hidden from your foes and can not be targeted directly, treat any creature hidden from you as Off Guard; if you were previously detected (or your presence becomes known) they can attempt to locate you with a Scan Check.",
     polarity: "positive"
   },
+  immobilised: {
+    name: "ABBREW.EFFECT.Status.immobilised",
+    img: "systems/abbrew/assets/icons/statuses/immobilised.svg",
+    description: "You are immobilised, your movement speeds (aside from teleportation) are set to 0. If you are restrained by an effect, any other effect that attempts to move you must succeed against the restraining effect.",
+    polarity: "negative"
+  },
+  mute: {
+    name: "ABBREW.EFFECT.Status.mute",
+    img: "systems/abbrew/assets/icons/statuses/mute.svg",
+    description: "You are unable to produce verabal sounds, you are incapable of using any skills with the verbal trait",
+    polarity: "negative"
+  },
   offGuard: {
     name: "ABBREW.EFFECT.Status.offGuard",
     img: "systems/abbrew/assets/icons/statuses/offGuard.svg",
     description: "Your are harried and your guard compromised, your foes can directly capitalise on your weakpoints. You can be targeted by finishers.",
     polarity: "negative"
+  },
+  prone: {
+    name: "ABBREW.EFFECT.Status.prone",
+    img: "systems/abbrew/assets/icons/statuses/prone.svg",
+    description: "Your are lying flat, face down. Your movement is halved. You are off guard.",
+    polarity: "neutral",
+    statuses: ['offGuard'],
+    special: "PRONE"
+  },
+  silent: {
+    name: "ABBREW.EFFECT.Status.silent",
+    img: "systems/abbrew/assets/icons/statuses/silent.svg",
+    description: "You cannot be detected by sound.",
+    hud: false,
+    polarity: "neutral",
+  },
+  staggered: {
+    name: "ABBREW.EFFECT.Status.staggered",
+    img: "systems/abbrew/assets/icons/statuses/staggered.svg",
+    description: "You are momentarily staggered, leaving you unable to use the restore guard, parry and dodge skills.",
+    polarity: "negative",
+  },
+  threatened: {
+    name: "ABBREW.EFFECT.Status.threatened",
+    img: "systems/abbrew/assets/icons/statuses/threatened.svg",
+    description: "You are threatened by more enemies than you can keep track of. At the end of each of your turns your risk will increase by 10.",
+    polarity: "negative",
+  },
+  unconscious: {
+    name: "ABBREW.EFFECT.Status.unconscious",
+    img: "systems/abbrew/assets/icons/statuses/unconscious.svg",
+    description: "You are unconscious, prone and blinded.",
+    polarity: "neutral",
+    statuses: ['prone', 'blind']
   }
 }
 
@@ -513,9 +679,11 @@ ABBREW.nameParts = [
   { key: "hide", part: "ABBREW.NameParts.hide", affix: -1, order: 8 },
   { key: "iron", part: "ABBREW.NameParts.iron", affix: -1, order: 8 },
   { key: "leather", part: "ABBREW.NameParts.leather", affix: -1, order: 8 },
+  { key: "oak", part: "ABBREW.NameParts.oak", affix: -1, order: 8 },
   { key: "silver", part: "ABBREW.NameParts.silver", affix: -1, order: 8 },
   { key: "mithril", part: "ABBREW.NameParts.mithril", affix: -1, order: 8 },
   { key: "steel", part: "ABBREW.NameParts.steel", affix: -1, order: 8 },
+  { key: "yew", part: "ABBREW.NameParts.yew", affix: -1, order: 8 },
   { key: "chain", part: "ABBREW.NameParts.chain", affix: -1, order: 9 },
   { key: "jack", part: "ABBREW.NameParts.jack", affix: -1, order: 9 },
   { key: "lamellar", part: "ABBREW.NameParts.lamellar", affix: -1, order: 9 },
@@ -526,6 +694,7 @@ ABBREW.nameParts = [
   { key: "ofhealing", part: "ABBREW.NameParts.ofhealing", affix: 1, order: 9 },
 ]
 
+// TODO: Do we even consider these?
 const lingeringWoundImmunities = [
   { key: "bleedImmunity", value: "ABBREW.Traits.WoundImmunities.bleedImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "bleed", exclude: [] },
   { key: "burningImmunity", value: "ABBREW.Traits.WoundImmunities.burningImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "burning", exclude: [] },
@@ -537,6 +706,7 @@ const lingeringWoundImmunities = [
   { key: "decayImmunity", value: "ABBREW.Traits.WoundImmunities.decayImmunity", feature: "wound", subFeature: "lingeringWound", effect: "immunity", data: "decay", exclude: [] }
 ]
 
+// TODO: Do we even consider these?
 const acuteWoundImmunities = [
   { key: "physicalImmunity", value: "ABBREW.Traits.WoundImmunities.physicalImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "physical", exclude: [] },
   { key: "vitalImmunity", value: "ABBREW.Traits.WoundImmunities.vitalImmunity", feature: "wound", subFeature: "acute", effect: "immunity", data: "vital", exclude: [] },
@@ -561,7 +731,7 @@ const skillTraining = [
   { key: "feintTraining", value: "ABBREW.Traits.SkillTraining.feint", feature: "skillTraining", subFeature: "offensiveSkills", effect: "increase", data: "feint", exclude: [] },
   { key: "parryTraining", value: "ABBREW.Traits.SkillTraining.parry", feature: "skillTraining", subFeature: "defensiveSkills", effect: "increase", data: "parry", exclude: [] },
   { key: "feintCounterTraining", value: "ABBREW.Traits.SkillTraining.feintCounter", feature: "skillTraining", subFeature: "offensiveSkills", effect: "increase", data: "feintCounter", exclude: [] },
-  { key: "parryCounterTraining", value: "ABBREW.Traits.SkillTraining.parryCounter", feature: "skillTraining", subFeature: "defensiveSkills", effect: "increase", data: "parryCounter", exclude: [] }
+  { key: "parryCounterTraining", value: "ABBREW.Traits.SkillTraining.parryCounter", feature: "skillTraining", subFeature: "defensiveSkills", effect: "increase", data: "parryCounter", exclude: [] },
 ]
 
 const generalTraits = [
@@ -606,6 +776,7 @@ const skillTraits = [
   { key: "life", value: "ABBREW.Traits.Skill.life", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
   { key: "death", value: "ABBREW.Traits.Skill.death", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
   { key: "fire", value: "ABBREW.Traits.Skill.fire", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "heat", value: "ABBREW.Traits.Skill.heat", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
   { key: "cold", value: "ABBREW.Traits.Skill.cold", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
   { key: "electric", value: "ABBREW.Traits.Skill.electric", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
   { key: "acid", value: "ABBREW.Traits.Skill.acid", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
@@ -613,11 +784,22 @@ const skillTraits = [
   { key: "light", value: "ABBREW.Traits.Skill.light", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
   { key: "pain", value: "ABBREW.Traits.Skill.pain", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
   { key: "emotion", value: "ABBREW.Traits.Skill.emotion", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
-  { key: "psychic", value: "ABBREW.Traits.Skill.psychic", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] }
+  { key: "psychic", value: "ABBREW.Traits.Skill.psychic", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "risky", value: "ABBREW.Traits.Skill.risky", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "concentrate", value: "ABBREW.Traits.Skill.concentrate", feature: "skill", subFeature: "activation", effect: "", data: "", exclude: [] },
+  { key: "primarySense", value: "ABBREW.Traits.Skill.primarySense", feature: "skill", subFeature: "senses", effect: "", data: "", exclude: [] },
+  { key: "secondarySense", value: "ABBREW.Traits.Skill.secondarySense", feature: "skill", subFeature: "senses", effect: "", data: "", exclude: [] },
+  { key: "tertiarySense", value: "ABBREW.Traits.Skill.tertiarySense", feature: "skill", subFeature: "senses", effect: "", data: "", exclude: [] },
+  { key: "verbal", value: "ABBREW.Traits.Skill.verbal", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "visual", value: "ABBREW.Traits.Skill.visual", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "auditory", value: "ABBREW.Traits.Skill.auditory", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "fortune", value: "ABBREW.Traits.Skill.fortune", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "misfortune", value: "ABBREW.Traits.Skill.misfortune", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
 ]
 
 const materialTraits = [
   { key: "metal", value: "ABBREW.Traits.Material.metal", feature: "material", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "wood", value: "ABBREW.Traits.Material.wood", feature: "material", subFeature: "identifiers", effect: "", data: "", exclude: [] },
   { key: "iron", value: "ABBREW.Traits.Material.iron", feature: "material", subFeature: "identifiers", effect: "", data: "", exclude: [] },
   { key: "silver", value: "ABBREW.Traits.Material.silver", feature: "material", subFeature: "identifiers", effect: "", data: "", exclude: [] }
 ]
@@ -629,6 +811,25 @@ const spellTraits = [
   { key: "spellamp", value: "ABBREW.Traits.Spell.spellamp", feature: "spell", subFeature: "identifiers", effect: "", data: "", exclude: [] }
 ]
 
+ABBREW.innateConcepts = [
+  { key: "flesh", value: "ABBREW.Traits.InnateConcepts.flesh", feature: "innateConcepts", subFeature: "material", effect: "", data: "", exclude: [] },
+  { key: "blood", value: "ABBREW.Traits.InnateConcepts.blood", feature: "innateConcepts", subFeature: "vital", effect: "", data: "", exclude: [] },
+  { key: "mind", value: "ABBREW.Traits.InnateConcepts.mind", feature: "innateConcepts", subFeature: "control", effect: "", data: "", exclude: [] },
+  { key: "soul", value: "ABBREW.Traits.InnateConcepts.soul", feature: "innateConcepts", subFeature: "control", effect: "", data: "", exclude: [] },
+  { key: "life", value: "ABBREW.Traits.InnateConcepts.life", feature: "innateConcepts", subFeature: "aligned", effect: "", data: "", exclude: [] },
+  { key: "death", value: "ABBREW.Traits.InnateConcepts.death", feature: "innateConcepts", subFeature: "aligned", effect: "", data: "", exclude: [] },
+  { key: "humanoid", value: "ABBREW.Traits.InnateConcepts.humanoid", feature: "innateConcepts", subFeature: "form", effect: "", data: "", exclude: [] },
+  { key: "aberration", value: "ABBREW.Traits.InnateConcepts.aberration", feature: "innateConcepts", subFeature: "form", effect: "", data: "", exclude: [] },
+  { key: "human", value: "ABBREW.Traits.InnateConcepts.human", feature: "innateConcepts", subFeature: "species", effect: "", data: "", exclude: [] },
+  { key: "dwarf", value: "ABBREW.Traits.InnateConcepts.dwarf", feature: "innateConcepts", subFeature: "species", effect: "", data: "", exclude: [] },
+  { key: "elf", value: "ABBREW.Traits.InnateConcepts.elf", feature: "innateConcepts", subFeature: "species", effect: "", data: "", exclude: [] },
+  { key: "gnome", value: "ABBREW.Traits.InnateConcepts.gnome", feature: "innateConcepts", subFeature: "species", effect: "", data: "", exclude: [] },
+  { key: "goblin", value: "ABBREW.Traits.InnateConcepts.goblin", feature: "innateConcepts", subFeature: "species", effect: "", data: "", exclude: [] },
+  { key: "orc", value: "ABBREW.Traits.InnateConcepts.orc", feature: "innateConcepts", subFeature: "species", effect: "", data: "", exclude: [] },
+  { key: "lizardfolk", value: "ABBREW.Traits.InnateConcepts.lizardfolk", feature: "innateConcepts", subFeature: "species", effect: "", data: "", exclude: [] },
+  { key: "serpentfolk", value: "ABBREW.Traits.InnateConcepts.serpentfolk", feature: "innateConcepts", subFeature: "species", effect: "", data: "", exclude: [] },
+]
+
 ABBREW.traits = [
   ...generalTraits,
   ...acuteWoundImmunities,
@@ -637,7 +838,8 @@ ABBREW.traits = [
   ...itemTraits,
   ...materialTraits,
   ...skillTraits,
-  ...spellTraits
+  ...spellTraits,
+  ...ABBREW.innateConcepts
 ]
 
 ABBREW.attackModes = {
@@ -743,6 +945,7 @@ ABBREW.modifierPrefixes = {
   "item": "ABBREW.ModifierPrefixes.item",
   "this": "ABBREW.ModifierPrefixes.this",
   "target": "ABBREW.ModifierPrefixes.target",
+  "itemSource": "ABBREW.ModifierPrefixes.itemSource",
   "wound": "ABBREW.ModifierPrefixes.wound",
   "condition": "ABBREW.ModifierPrefixes.condition",
   "statustype": "ABBREW.ModifierPrefixes.statusType",
@@ -816,22 +1019,37 @@ ABBREW.roles = {
   implement: { label: "ABBREW.Roles.Name.implement", value: "implement", description: "ABBREW.Roles.Description.implement" },
   style: { label: "ABBREW.Roles.Name.style", value: "style", description: "ABBREW.Roles.Description.style" },
   durable: { label: "ABBREW.Roles.Name.durable", value: "durable", description: "ABBREW.Roles.Description.durable" },
-  professional: { label: "ABBREW.Roles.Name.professional", value: "professional", description: "ABBREW.Roles.Description.professional" }
+  professional: { label: "ABBREW.Roles.Name.professional", value: "professional", description: "ABBREW.Roles.Description.professional" },
+  scout: { label: "ABBREW.Roles.Name.scout", value: "scout", description: "ABBREW.Roles.Description.scout" },
 }
 
 ABBREW.universalPath = { label: "ABBREW.Paths.Name.universal", id: "abbrewpuniversal", value: "universal", roles: [], description: "ABBREW.Paths.Description.universal" };
 
 ABBREW.paths = [
+  { label: "ABBREW.Paths.Name.barbarian", id: "abbrewpbarbarian", value: "barbarian", roles: ["melee", "martial", "vanguard"], description: "ABBREW.Paths.Description.barbarian" },
   { label: "ABBREW.Paths.Name.fenceroflostbriarith", id: "abbrewpfelopb000", value: "fenceroflostbriarith", roles: ["melee", "martial", "vanguard"], description: "ABBREW.Paths.Description.fenceroflostbriarith" },
   { label: "ABBREW.Paths.Name.divineadherent", id: "abbrewpdivadh000", value: "divineadherent", roles: ["acolyte", "magic", "melee", "ranged"], description: "ABBREW.Paths.Description.divineadherent" },
   { label: "ABBREW.Paths.Name.poisoner", id: "abbrewppoisoner0", value: "poisoner", roles: ["professional", "scoundrel"], description: "ABBREW.Paths.Description.poisoner" },
+  { label: "ABBREW.Paths.Name.shieldedfighter", id: "abbrewpshieldedf", value: "shieldedfighter", roles: ["martial", "melee", "durable"], description: "ABBREW.Paths.Description.shieldedfighter" },
   { label: "ABBREW.Paths.Name.shieldguardian", id: "abbrewpshieldgua", value: "shieldguardian", roles: ["martial", "melee", "protector", "durable"], description: "ABBREW.Paths.Description.shieldguardian" },
-  { label: "ABBREW.Paths.Name.snake", id: "abbrewpsnake0000", value: "snake", roles: ["martial", "melee", "ranges", "scoundrel"], description: "ABBREW.Paths.Description.snake" },
+  { label: "ABBREW.Paths.Name.snake", id: "abbrewpsnake0000", value: "snake", roles: ["martial", "melee", "ranged", "scoundrel"], description: "ABBREW.Paths.Description.snake" },
+  { label: "ABBREW.Paths.Name.sniper", id: "abbrewpsnake0000", value: "snake", roles: ["martial", "ranged", "vanguard", "scout"], description: "ABBREW.Paths.Description.sniper" },
   { label: "ABBREW.Paths.Name.sorcerer", id: "abbrewpsorcerer0", value: "sorcerer", roles: ["magic", "ranged"], description: "ABBREW.Paths.Description.sorcerer" },
 ]
 
+ABBREW.skillTraining = [
+  "attack",
+  "overpower",
+  "parry",
+  "feint",
+  "finisher",
+  "parryCounter",
+  "feintCounter",
+]
+
 ABBREW.activeEffectKeys = [
-  { value: "system.defense.guard.max", label: "ABBREW.ActiveEffectKeys.guardMax" },
+  { value: "system.defense.guard.maxMod", label: "ABBREW.ActiveEffectKeys.guardMax" },
+  { value: "system.defense.guard.maxMult", label: "ABBREW.ActiveEffectKeys.guardMaxMult" },
   { value: "system.defense.protection.all.reduction", label: "ABBREW.ActiveEffectKeys.protectionTypes.all.reduction" },
   { value: "system.defense.protection.all.weakness", label: "ABBREW.ActiveEffectKeys.protectionTypes.all.weakness" },
   { value: "system.defense.protection.all.resistance", label: "ABBREW.ActiveEffectKeys.protectionTypes.all.resistance" },
@@ -850,7 +1068,18 @@ ABBREW.activeEffectKeys = [
   { value: "system.movement.speed.burrow.value", label: "ABBREW.ActiveEffectKeys.burrowSpeed" },
   { value: "system.movement.speed.swim.value", label: "ABBREW.ActiveEffectKeys.swimSpeed" },
   { value: "system.movement.speed.climb.value", label: "ABBREW.ActiveEffectKeys.climbSpeed" },
-  { value: "system.movement.speed.fly.value", label: "ABBREW.ActiveEffectKeys.flySpeed" }
+  { value: "system.movement.speed.fly.value", label: "ABBREW.ActiveEffectKeys.flySpeed" },
+  { value: "system.movement.speed.teleport.value", label: "ABBREW.ActiveEffectKeys.teleportSpeed" },
+  ...ABBREW.skillTraining.flatMap(k => [
+    { value: `system.skillTraining.${k}.value`, label: `ABBREW.ActiveEffectKeys.skillTraining.${k}` },
+  ]),
+  ...Object.keys(ABBREW.attributes).flatMap(k => [
+    { value: `system.attributes.${k}.value`, label: ABBREW.attributes[k] },
+  ]),
+  { value: "system.defense.threatened.threshold", label: "ABBREW.Threatened.threatenedThreshold" },
+  { value: "system.defense.threatened.multiplier", label: "ABBREW.Threatened.threatenedMultiplier" },
+  { value: "system.defense.resolve.maxMod", label: "ABBREW.Defense.Resolve.max" },
+  { value: "system.defense.resolve.maxMult", label: "ABBREW.Defense.Resolve.maxMult" },
 ]
 
 ABBREW.speeds = {
@@ -858,7 +1087,8 @@ ABBREW.speeds = {
   burrow: { label: "ABBREW.Speeds.burrow", },
   swim: { label: "ABBREW.Speeds.swim", },
   climb: { label: "ABBREW.Speeds.climb", },
-  fly: { label: "ABBREW.Speeds.fly", }
+  fly: { label: "ABBREW.Speeds.fly", },
+  teleport: { label: "ABBREW.Speeds.teleport", }
 }
 
 ABBREW.visionModes = CONFIG.Canvas.visionModes;

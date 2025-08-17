@@ -10,7 +10,8 @@ import * as models from './data/_module.mjs';
 import * as documents from './documents/_module.mjs';
 import * as abbrewCanvas from './canvas/_module.mjs';
 import * as abbrewApplication from './applications/_module.mjs';
-import { handleActorWoundConditions, handleActorGuardConditions, handleCombatStart, handleCombatEnd, handleTurnChange } from './helpers/combat.mjs';
+import * as enrichers from './enrichers/_module.mjs';
+import { handleActorWoundConditions, handleActorGuardConditions, handleCombatStart, handleCombatEnd, handleTurnChange, handleThreat, handleTokenUpdate } from './helpers/combat.mjs';
 import { staticID, doesNestedFieldExist, getSafeJson, getObjectValueByStringPath } from './helpers/utils.mjs';
 import { registerSystemSettings } from './settings.mjs';
 import { AbbrewCreatureFormSheet } from './sheets/items/creature-form/item-creature-form-sheet.mjs';
@@ -21,7 +22,7 @@ import { AbbrewArchetypeSheet } from './sheets/items/archetype/item-archetype-sh
 import { AbbrewAmmunitionSheet } from './sheets/items/ammunition/item-ammunition-sheet.mjs';
 import { AbbrewArmourSheet } from './sheets/items/armour/item-armour-sheet.mjs';
 import { AbbrewEquipmentSheet } from './sheets/items/equipment/item-equipment-sheet.mjs'
-import { onWorldTimeUpdate } from './helpers/time.mjs';
+import { onWorldTimeUpdate, togglePassingTime } from './helpers/time.mjs';
 import { activateSocketListener, emitForAll, SocketMessage } from './socket.mjs';
 import { handleSkillActivate } from './helpers/skills/skill-activation.mjs';
 import { AbbrewCharacterSheet } from './sheets/actor/character-sheet.mjs';
@@ -30,6 +31,9 @@ import { AbbrewWeaponSheet } from './sheets/items/weapon/item-weapon-sheet.mjs';
 import { AbbrewWoundSheet } from './sheets/items/wound/item-wound-sheet.mjs';
 import { AbbrewPathSheet } from './sheets/items/path/item-path-sheet.mjs';
 import { AbbrewEnhancementSheet } from './sheets/items/enhancement/item-enhancement-sheet.mjs';
+import { AbbrewBackgroundSheet } from './sheets/items/background/item-background-sheet.mjs';
+import { postNotificationToChat } from './sheets/items/helpers/chat/notification.mjs';
+import AbbrewTokenRuler from './canvas/token-ruler.mjs';
 const { FormDataExtended } = foundry.applications.ux;
 const { ActorSheet, ItemSheet } = foundry.appv1.sheets;
 
@@ -49,6 +53,7 @@ Hooks.once('init', function () {
   };
 
   // Add custom constants for configuration.
+  assignSpecialStatuses(CONFIG)
   CONFIG.ABBREW = ABBREW;
 
   addWoundUtilities();
@@ -108,6 +113,10 @@ Hooks.once('init', function () {
   CONFIG.ActiveEffect.dataModels = {
     base: models.AbbrewActiveEffect
   }
+  CONFIG.Token.rulerClass = AbbrewTokenRuler;
+  AbbrewTokenRuler.applyAbbrewMovementConfig();
+  abbrewCanvas.perception.AbbrewDetectionConfig.applyAbbrewSightConfig();
+  abbrewCanvas.perception.AbbrewVisionConfig.applyAbbrewVisionConfig();
   foundry.applications.apps.DocumentSheetConfig.registerSheet(documents.AbbrewActiveEffect, "abbrew", AbbrewActiveEffectSheet,
     {
       types: ["base", "passive", "temporary", "inactive"],
@@ -115,6 +124,10 @@ Hooks.once('init', function () {
       label: "ABBREW.SheetLabels.ActiveEffect",
     }
   );
+  CONFIG.ChatMessage.documentClass = documents.AbbrewChatMessage;
+
+  enrichers.LocaliseEnricher.registerEnricher();
+  enrichers.WoundEnricher.registerEnricher();
 
   // Register sheet application classes
   foundry.documents.collections.Actors.unregisterSheet('core', ActorSheet);
@@ -150,9 +163,14 @@ Hooks.once('init', function () {
     label: "ABBREW.SheetLabels.CreatureForm"
   });
   foundry.documents.collections.Items.registerSheet('abbrew', AbbrewSkillDeckSheet, {
-    types: ["skillDeck", "background"],
+    types: ["skillDeck"],
     makeDefault: true,
     label: "ABBREW.SheetLabels.SkillDeck"
+  });
+  foundry.documents.collections.Items.registerSheet('abbrew', AbbrewBackgroundSheet, {
+    types: ["background"],
+    makeDefault: true,
+    label: "ABBREW.SheetLabels.Background"
   });
   foundry.documents.collections.Items.registerSheet('abbrew', AbbrewAnatomySheet, {
     types: ["anatomy"],
@@ -201,6 +219,10 @@ Hooks.once('init', function () {
   // Preload Handlebars templates.
   return preloadHandlebarsTemplates();
 });
+
+function assignSpecialStatuses(config) {
+  config.specialStatusEffects.DEAF = "deaf";
+}
 
 /* -------------------------------------------- */
 
@@ -347,6 +369,7 @@ Hooks.once('ready', function () {
   // Wait to register hotbar drop hook on ready so that modules could register earlier if they want to
   Hooks.on('hotbarDrop', (bar, data, slot) => { createItemMacro(data, slot); return false; });
 
+  togglePassingTime(game.paused, game.combat && game.combat.isActive);
   activateSocketListener();
 });
 
@@ -356,6 +379,7 @@ Hooks.once('ready', function () {
 
 Hooks.on("combatStart", async (combat, updateData, updateOptions) => {
   const actors = combat.combatants.toObject().map(c => canvas.tokens.get(c.tokenId).actor);
+  togglePassingTime(game.paused, true);
   await handleCombatStart(actors);
 });
 
@@ -371,23 +395,17 @@ Hooks.on("combatTurnChange", async (combat, prior, current) => {
   //   
   // }
   if (game.user.isGM) {
-    await handleTurnChange(prior, current, canvas.tokens.get(prior.tokenId)?.actor, canvas.tokens.get(current.tokenId).actor)
+    await handleTurnChange(prior, current, canvas.tokens.get(prior.tokenId)?.actor, canvas.tokens.get(current.tokenId)?.actor)
   }
 })
 
 Hooks.on("deleteCombat", async (document, options, userId) => {
   const actors = document.combatants.toObject().map(c => canvas.tokens.get(c.tokenId).actor);
+  togglePassingTime(game.paused, false);
   await handleCombatEnd(actors);
 });
 
-Hooks.on("updateToken", (document, changed, options, userId) => {
-  // const combatId = game.combat._id;
-  // document.flags.elevationruler.movementHistory.combatMoveData[combatId]lastMoveDistance;
-  // use the selectedMovementType to determine?
-  // stepping is 1 action, less than or equal to speed is 2 actions, over that is 4, then should show red or no ruler?
-  // Once another action has been taken, reset for next movement?
-  // console.log("Somewhere to hit");
-});
+Hooks.on("updateToken", handleTokenUpdate.bind(this));
 
 Hooks.on("preUpdateItem", async (document, changed, options, userId) => {
   if (document.type === "skill") {
@@ -415,9 +433,9 @@ Hooks.on("preUpdateItem", async (document, changed, options, userId) => {
   }
 });
 
-Hooks.on("updateItem", async (document, changed, options, userId) => {
-  console.log(changed);
-});
+// Hooks.on("updateItem", async (document, changed, options, userId) => {
+//   console.log(changed);
+// });
 
 /* -------------------------------------------- */
 /*  Other Hooks                                 */
@@ -488,9 +506,7 @@ Hooks.on("preUpdateItem", () => { })
 
 Hooks.on("deleteActiveEffect", async (effect, options, userId) => {
   const parent = effect.parent;
-  if (["character", "npc"].includes(parent.type)) {
-    await parent.handleDeleteActiveEffect(effect);
-  }
+  await parent.handleDeleteActiveEffect(effect);
 });
 
 Hooks.on("dropCanvasData", (canvas, data) => {
@@ -550,7 +566,17 @@ Hooks.on("actorMustDropItem", async (actor) => {
   } else {
     await selectedItem.update({ "system.handsSupplied": 0, "system.equipState": "dropped" });
   }
+
+  const flavor = "Item Dropped";
+  const message = `${actor.name} dropped ${selectedItem.name}`;
+
+  await postNotificationToChat(actor, flavor, message);
 })
+
+Hooks.on("pauseGame", (paused) => {
+  const combat = game.combat && game.combat.isActive;
+  togglePassingTime(paused, combat);
+});
 
 // Hooks.on("createActiveEffect", (document, options, userId) => {
 //   console.log("Created");
@@ -567,6 +593,50 @@ Hooks.on("updateActiveEffect", async (effect, update, options, user) => {
   }
 });
 
+Hooks.on("applyTokenStatusEffect", async (token, statusId, active) => {
+  if (["blind", "deaf"].includes(statusId)) {
+    await token.actor._handleActorCombatThreat();
+    game.canvas.perception.update({
+      initializeVisionModes: true,
+      refreshVision: true,
+      refreshLighting: true
+    });
+  }
+})
+
+// Hooks.on("refreshToken", async (token, options) => {
+//   console.log("Moving");
+//   console.log(token);
+//   if (game.combat && game.combat.isActive && game.user.isGM) {
+//     if (token.document.movement.state === "completed" && isTokenAtDestination(token) && isDestinationDifferentToOrigin(token.document.movement) && token.document.movement.method
+//       === "api") {
+//       await checkForDistraction(document);
+//     }
+//   }
+// });
+
+// function isTokenAtDestination(token) {
+//   const result = Object.entries(token.document.movement.destination).reduce((diff, [key, value]) => {
+//     if (value !== token.document[key]) {
+//       diff = false;
+//     }
+
+//     return diff;
+//   }, true);
+//   return result;
+// }
+
+// function isDestinationDifferentToOrigin(movement) {
+//   const result = Object.entries(movement.origin).reduce((diff, [key, value]) => {
+//     if (value !== movement.destination[key]) {
+//       diff = true;
+//     }
+
+//     return diff;
+//   }, false);
+
+//   return result;
+// }
 // Hooks.on("preUpdateActiveEffect", async (effect, update, options, user) => {
 // });
 
@@ -841,6 +911,10 @@ export async function requestSkillCheck(checkName, skillIds, checkType, difficul
   });
 }
 
-function applyCustomEffects(actor, change) {
-  console.log("CUSTOM");
+function applyCustomEffects(actor, change, current, delta, changes) {
+  console.log(actor);
+  console.log(change);
+  console.log(current);
+  console.log(delta);
+  console.log(changes);
 }

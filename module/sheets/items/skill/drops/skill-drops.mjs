@@ -6,6 +6,9 @@ export async function skillCollectionDrop(event) {
         return;
     }
 
+    event.preventDefault();
+    event.stopPropagation();
+
     const droppedData = event.dataTransfer.getData("text");
     const collection = event.currentTarget.dataset.collectionName;
     const eventJson = JSON.parse(droppedData);
@@ -26,6 +29,9 @@ export async function skillTagifyDrop(event) {
     if (!this.item.testUserPermission(game.user, 'OWNER')) {
         return;
     }
+
+    event.preventDefault();
+    event.stopPropagation();
 
     const target = event.target;
     let inputElement = null;

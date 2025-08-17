@@ -138,7 +138,6 @@ function getItemHeftIncrease(actor, item) {
 }
 
 export async function handleActorBackgroundDrop(actor, background) {
-    await actor.acceptBackground(background);
     await actor.acceptSkillDeck(background);
     if (background.system.creatureForm.id) {
         const creatureForm = await fromUuid(background.system.creatureForm.sourceId);
@@ -167,6 +166,10 @@ export async function handleActorSkillDrop(actor, item) {
     await Item.create(item, { parent: actor })
 }
 
+async function handleActorInlineWoundDrop(wound, actor) {
+    await actor.acceptWound(wound.type, parseInt(wound.value, 10));
+};
+
 export async function handleActorOnDrop(event, actor) {
     event.preventDefault();
     if (!actor.testUserPermission(game.user, 'OWNER')) {
@@ -174,6 +177,10 @@ export async function handleActorOnDrop(event, actor) {
     }
 
     const data = TextEditor.getDragEventData(event);
+    if (data.type === "Wound") {
+        await handleActorInlineWoundDrop(data.wound, actor);
+    }
+
     if (!(data?.type === "Item" && data?.uuid)) {
         return;
     }

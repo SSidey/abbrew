@@ -35,5 +35,9 @@ export const ItemContextMixin = superclass => class extends superclass {
         context.effects = prepareActiveEffectCategories(this.item.effects);
 
         context.config = CONFIG.ABBREW;
+        context.senses = {
+            detectionModes: CONFIG.Canvas.detectionModes,
+            visionModes: CONFIG.Canvas.visionModes
+        };
     }
 }

@@ -1,5 +1,23 @@
 # Abbrew System
 
+# TODO
+
+Check requests with success / failure section for granted skills?
+
+Look into risk cap vs guard gained, everyone could lose it all in one
+
+Chat message order is wrong, whyyyyyy (Foundry version lol)
+
+show concepts on cards
+show reaction vs action
+show standalong vs synergy
+
+deleting where tracked doesn't exist can't delete
+how to hide/show concepts i.e. not targeting a particular one, or maybe they should and you use that if it has it, just a random one if not
+Redo action icons, hard to see now that v2 has <1 alpha
+move background to description
+active to effects
+
 ![Foundry v12](https://img.shields.io/badge/foundry-v12-green)
 
 This system is a abbrew system that you can use as a starting point for building your own custom systems. It's similar to Simple World-building, but has examples of creating attributes in code rather than dynamically through the UI.
@@ -19,7 +37,7 @@ Regardless of which method you choose, think carefully about your system's name.
 This system includes a generator CLI in `package.json`. To use it, you must have [node.js](https://nodejs.org) installed, and it's recommended that you install node 20 or later.
 
 > **Python Generator**
-> 
+>
 > If you would rather use Python than node, there’s an excellent Python-based generator created by Cussa at https://github.com/Cussa/fvtt-abbrew-initializator. Give it a shot!
 
 Once you have npm installed, you can run the following in your terminal or command prompt:

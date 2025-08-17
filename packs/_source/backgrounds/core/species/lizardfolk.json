@@ -11,17 +11,34 @@
       "value": "",
       "uuid": ""
     },
-    "skills": [],
+    "skills": {
+      "granted": [
+        {
+          "name": "Well Rested",
+          "skillType": "background",
+          "id": "XfMG3MYM3HDl1x20",
+          "image": "systems/abbrew/assets/icons/skills/well-rested.svg",
+          "sourceId": "Compendium.abbrew.conditions.Item.XfMG3MYM3HDl1x20"
+        },
+        {
+          "name": "Lizardfolk (Species)",
+          "id": "yEyAHawdjqQs83XW",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.yEyAHawdjqQs83XW",
+          "skillType": "background"
+        }
+      ]
+    },
     "attributes": {
       "str": {
-        "value": 1,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       },
       "dex": {
-        "value": 1,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       },
       "agi": {
         "value": 0,
@@ -29,9 +46,9 @@
         "isEnabled": false
       },
       "con": {
-        "value": 2,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       },
       "int": {
         "value": 0,
@@ -44,9 +61,9 @@
         "isEnabled": false
       },
       "wit": {
-        "value": 1,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       },
       "vis": {
         "value": 0,
@@ -69,11 +86,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743077173909,
-    "modifiedTime": 1743080057887,
+    "modifiedTime": 1752971186014,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

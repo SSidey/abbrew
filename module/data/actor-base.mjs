@@ -37,6 +37,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         })
       )
     });
+    schema.hasAuras = new fields.BooleanField({ required: true, initial: false });
     schema.senses = new fields.SchemaField({
       sight: new fields.SchemaField({
         enabled: new fields.BooleanField({ required: true, initial: false }),
@@ -46,10 +47,13 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       }),
       detectionModes: new fields.ArrayField(
         new fields.SchemaField({
-          mode: new fields.StringField({ required: true, blank: true }),
+          id: new fields.StringField({ required: true, blank: true }),
+          enabled: new fields.BooleanField({ required: true, initial: false }),
           range: new fields.NumberField({ required: true, nullable: true, integer: true }),
         })
-      )
+      ),
+      emitsSound: new fields.BooleanField({ required: true, initial: true }),
+      hasScent: new fields.BooleanField({ required: true, initial: true })
     });
     schema.actions = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 5 });
     schema.wounds = new fields.ArrayField(
@@ -107,12 +111,15 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
           overallMultiplier: new fields.NumberField({ ...requiredInteger }),
         })
       )
-    })
+    });
+    schema.threatReach = new fields.NumberField({ ...requiredInteger, initial: 0 })
     schema.defense = new fields.SchemaField({
       guard: new fields.SchemaField({
         value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
         base: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
         max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+        maxMod: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+        maxMult: new fields.NumberField({ required: true, initial: 1 }),
         label: new fields.StringField({ required: true, blank: true }),
 
       }),
@@ -145,6 +152,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 20 }),
         base: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 20 }),
         max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 20 }),
+        maxMod: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 20 }),
         label: new fields.StringField({ required: true, blank: true })
       }),
       recovery: new fields.SchemaField(Object.keys(CONFIG.ABBREW.lingeringWounds).reduce((obj, wound) => {
@@ -155,7 +163,11 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
           value: new fields.NumberField({ ...requiredInteger, initial: 1 })
         });
         return obj;
-      }, {}))
+      }, {})),
+      threatened: new fields.SchemaField({
+        threshold: new fields.NumberField({ ...requiredInteger, initial: -1 }),
+        multiplier: new fields.NumberField({ ...requiredInteger, initial: 1 })
+      })
     });
     schema.resources = new fields.SchemaField({
       owned: new fields.ArrayField(
@@ -173,14 +185,22 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       )
     });
     schema.concepts = new fields.SchemaField({
-      innate: new fields.SchemaField(Object.keys(CONFIG.ABBREW.concepts).reduce((obj, concept) => {
-        obj[concept] = new fields.SchemaField({
-          name: new fields.StringField({ required: true, initial: concept }),
-          label: new fields.StringField({ required: true, initial: CONFIG.ABBREW.concepts[concept] }),
-          value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-        });
-        return obj;
-      }, {})),
+      innate: new fields.SchemaField({
+        raw: new fields.StringField({ ...blankString }),
+        value: new fields.ArrayField(
+          new fields.SchemaField({
+            key: new fields.StringField({ ...blankString }),
+            value: new fields.StringField({ ...blankString }),
+            feature: new fields.StringField({ ...blankString }),
+            subFeature: new fields.StringField({ ...blankString }),
+            effect: new fields.StringField({ ...blankString }),
+            data: new fields.StringField({ ...blankString }),
+            exclude: new fields.ArrayField(
+              new fields.StringField({ ...blankString })
+            )
+          })
+        )
+      }),
       available: new fields.SchemaField(Object.keys(CONFIG.ABBREW.concepts).reduce((obj, concept) => {
         obj[concept] = new fields.SchemaField({
           name: new fields.StringField({ required: true, initial: concept }),
@@ -230,19 +250,21 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
     schema.meta = new fields.SchemaField({
       tier: new fields.SchemaField({
-        value: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0, max: 10 })
+        value: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0, max: 10 }),
+        dice: new fields.NumberField({ ...requiredInteger, initial: 1, min: 0, max: 10 })
       }), size: new fields.SchemaField({
         value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
         dimension: new fields.NumberField({ initial: 1 })
       }),
     });
 
-    schema.skillTraining = new fields.ArrayField(
-      new fields.SchemaField({
-        type: new fields.StringField({ ...blankString }),
-        value: new fields.NumberField({ ...requiredInteger })
-      })
-    )
+    // Iterate over skill training names and create a new SchemaField for each.
+    schema.skillTraining = new fields.SchemaField(CONFIG.ABBREW.skillTraining.reduce((obj, skillTraining) => {
+      obj[skillTraining] = new fields.SchemaField({
+        value: new fields.NumberField({ ...requiredInteger, initial: 0 })
+      });
+      return obj;
+    }, {}));
 
     // Iterate over attribute names and create a new SchemaField for each.
     schema.attributes = new fields.SchemaField(Object.keys(CONFIG.ABBREW.attributes).reduce((obj, attribute) => {
@@ -257,10 +279,14 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
     schema.momentum = new fields.NumberField({ ...requiredInteger, initial: 0 });
 
+    schema.magic = new fields.SchemaField({
+      conceptCapacity: new fields.NumberField({ ...requiredInteger, initial: 0 })
+    });
+
     schema.modifiers = new fields.SchemaField({
       actionRecovery: new fields.NumberField({ ...requiredInteger, initial: 5, min: 0, max: 5 }),
       initiative: new fields.NumberField({ ...requiredInteger, initial: 0 })
-    })
+    });
 
     schema.favourites = new fields.SchemaField({
       skill: new fields.ArrayField(
@@ -277,37 +303,22 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     for (const key in this.attributes) {
       const totalIncrease = 0 + this.parent.items.filter(i => i.type === 'skill' && i.system.skillType === 'background' && i.system.attributeIncrease === key).length;
       this.attributes[key].value = Math.min(9, totalIncrease);
-      this.attributes[key].rank = totalIncrease;
     }
 
     this.meta.size.dimension = Object.values(CONFIG.ABBREW.size).find(v => v.value === this.meta.size.value).dimension;
 
     this.defense.risk.value = Math.floor(this.defense.risk.raw / 10);
 
-    this.defense.resolve.max = 2 + Math.floor((this._getMaxFromPhysicalAttributes() + this._getMaxFromMentalAttributes()) / 2);
-
-    this.skillTraining = ([
-      { type: "attack", value: 0 },
-      { type: "overpower", value: 0 },
-      { type: "parry", value: 0 },
-      { type: "feint", value: 0 },
-      { type: "finisher", value: 0 },
-      { type: "parryCounter", value: 0 },
-      { type: "feintCounter", value: 0 }
-    ])
-
     this.resources.owned = this._getOwnedResources();
     this._limitResourceValues();
-    this._prepareDefenses();
-    const anatomy = this._prepareAnatomy();
-    this._prepareMovement(anatomy);
   }
 
   // Post Active Effects
   prepareDerivedData() {
     // Loop through attribute scores, and add their modifiers to our sheet output.
     for (const key in this.attributes) {
-      const rankBonus = this.attributes[key].rank;
+      const rankBonus = this.attributes[key].value;
+      this.attributes[key].value = Math.min(9, this.attributes[key].value);
       // Handle attribute label localization.
       this.attributes[key].label = game.i18n.localize(CONFIG.ABBREW.attributes[key]) ?? key;
       // // Rank total for the attribute
@@ -315,6 +326,11 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       // Tier of the attribute
       this.attributes[key].tier = 1 + Math.floor(this.attributes[key].rank / 10);
     }
+
+    const anatomy = this._prepareAnatomy();
+    this._prepareMovement(anatomy);
+
+    this._prepareDefenses();
 
     for (const key in this.movement.speed) {
       this.movement.speed[key].enabled = this.movement.speed[key].value > 0;
@@ -334,10 +350,45 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     this._prepareResolve();
 
     const skillTraining = this.parent.items.filter(i => i.type === "skill").filter(s => s.system.traits.raw).flatMap(s => getSafeJson(s.system.traits.raw, []).filter(st => st.feature === "skillTraining").map(st => st.data)).reduce((result, st) => { if (st in result) { result[st] += 1; } else { result[st] = 1; } return result; }, {});
+    this.traits.value = getSafeJson(this.traits.raw, []);
+    this.concepts.innate.value = getSafeJson(this.concepts.innate.raw, []);
     const mappedTraining = Object.entries(skillTraining).map(e => ({ type: e[0], value: e[1] }));
     this.skillTraining = foundry.utils.mergeObject(this.skillTraining, mappedTraining);
 
+    this.magic.conceptCapacity = this.attributes.vis.value;
+
     this._limitResourceValues();
+
+    this._prepareThreatened();
+
+    this.threatReach = Math.max(
+      0,
+      ...this.parent.items.filter(i => i.type === "weapon")
+        .filter(w => ["held1H", "held2H", "activated"].includes(w.system.equipState))
+        .flatMap(w => w.system.attackProfiles)
+        .filter(ap => ["arc", "thrust", "static"].includes(ap.attackType))
+        .map(ap => ap.reach)
+    ) * this.meta.size.dimension;
+
+    this.hasAuras = this.parent.items.filter(i => i.type === "skill").some(s => s.system.aura.isAura && ((s.system.isActivatable && s.system.action.isActive) || !s.system.isActivatable));
+  }
+
+  _prepareThreatened() {
+    const statuses = this.parent.statuses;
+    const threatenedSkills = this.parent.items
+      .filter(i => i.type === "skill")
+      .filter(s => s.system.senses.threatened.modifiesThreatened)
+      .map(s => s.system.senses.threatened)
+      .reduce((totalThreatened, threatened) => {
+        if (statuses.intersection(new Set(getSafeJson(threatened.disabledBy).flatMap(t => t.label))).size === 0) {
+          totalThreatened.threshold += threatened.threshold;
+          totalThreatened.multiplier *= threatened.multiplier;
+        }
+        return totalThreatened;
+      }, { threshold: this.defense.threatened.threshold, multiplier: this.defense.threatened.multiplier });
+
+    this.defense.threatened.threshold = threatenedSkills.threshold;
+    this.defense.threatened.multiplier = threatenedSkills.multiplier;
   }
 
   _getOwnedResources() {
@@ -388,12 +439,12 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   }
 
   _getMaxFromAttributes(attributes) {
-    return Object.keys(this.attributes).filter(a => attributes.includes(a)).reduce((result, attribute) => Math.max(result, this.attributes[attribute].value), 0);
+    return Object.keys(this.attributes).filter(a => attributes.includes(a)).reduce((result, attribute) => { return Math.max(result, this.attributes[attribute].value) }, 0);
   }
 
   _prepareAnatomy() {
     const res = this.mapAnatomy();
-    const occupiedHands = this.parent.getActorHeldItems().reduce((result, item) => result += item.system.handsSupplied, 0);
+    const occupiedHands = this.parent.getActorHeldItems().reduce((result, item) => result += this.getHandsFromEquipState(item.system.equipState), 0);
     if (occupiedHands > res.hands) {
       Hooks.call("actorMustDropItem", this.parent);
     }
@@ -401,12 +452,21 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     return res;
   }
 
+  getHandsFromEquipState(equipState) {
+    switch (equipState) {
+      case "held2H":
+        return 2;
+      default:
+        return 1;
+    }
+  }
+
   mapAnatomy() {
     const wornItemsWithEquipPoints = this.mapWornEquipPoints();
     const res = this.parent.items.filter(i => i.type == "anatomy").filter(a => !(a.system.isBroken || a.system.isDismembered)).reduce((result, a) => {
       const values = a.system;
       result.hands += values.hands;
-      result.speed = Object.entries(values.speed).reduce((speedResult, [key, value]) => {
+      result.speed = Object.entries(values.speed).filter(e => e[1].value).reduce((speedResult, [key, value]) => {
         if (key in speedResult) {
           speedResult[key] += value.value ?? 0;
         } else {
@@ -453,6 +513,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
   }
 
   _prepareResolve() {
+    this.defense.resolve.max = 2 + Math.floor((this._getMaxFromPhysicalAttributes() + this._getMaxFromMentalAttributes()) / 2) + this.defense.resolve.maxMod;
     const currentResolve = this.defense.resolve.value;
     if (currentResolve > this.defense.resolve.max) {
       this.defense.resolve.value = this.defense.resolve.max;
@@ -480,13 +541,15 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     this.defense.guard.label = game.i18n.localize(CONFIG.ABBREW.Defense.guard) ?? key;
 
     const guardBonus = armour.map(a => a.system.defense.guard).reduce((a, b) => a + b, 0);
-    this.defense.guard.max = this.defense.guard.base + guardBonus;
+    this.defense.guard.max = this.defense.guard.base + guardBonus + this.defense.guard.maxMod;
 
     if (this.defense.guard.value > this.defense.guard.max) {
       this.defense.guard.value = this.defense.guard.max;
     }
   }
 
+  // TODO: Automatic distraction application when multiple adjacent enemies
+  // TODO: Better represent this by splitting up overall inflex and armour inflex
   _prepareInflexibility(wornArmour) {
     const armour = wornArmour.filter(a => !a.system.isSundered);
     const armourInflexibility = armour.map(a => a.system.defense.inflexibility).reduce((a, b) => a + b, 0);

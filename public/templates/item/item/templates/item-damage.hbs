@@ -38,10 +38,10 @@
                             data-dtype="Number" />
                     </div>
                     {{#unless (or (eq attackProfile.attackType "ranged") (eq attackProfile.attackType "thrown"))}}
-                    <div class="attack-profile-detail-entry">
-                        <label>Reach</label>
-                        <input type="text" name="system.attackProfiles.{{i}}.reach" value="{{attackProfile.reach}}"
-                            data-dtype="String" />
+                    <div>
+                        {{formGroup ../system.schema.fields.attackProfiles.element.fields.reach name=(concat
+                        "system.attackProfiles." i
+                        ".reach") value=attackProfile.reach localize=true classes="attack-profile-detail-entry"}}
                     </div>
                     {{/unless}}
                     {{#if (or (eq attackProfile.attackType "ranged") (eq attackProfile.attackType "thrown"))}}
@@ -131,9 +131,12 @@
                                 localize=true}}
                             </select>
                         </div>
-                        <a class="damage-control remove-damage" data-action="damageControl" data-mode="remove-damage">
-                            <i class="fa-solid fa-minus"></i>
-                        </a>
+                        <div>
+                            <a class="damage-control remove-damage" data-action="damageControl"
+                                data-mode="remove-damage">
+                                <i class="fa-solid fa-minus"></i>
+                            </a>
+                        </div>
                     </li>
                     {{/each}}
                     <li class="damage add">
@@ -149,10 +152,12 @@
                 </ol>
                 {{/unless}}
             </div>
-            <a class="attack-profile-control remove-attack-profile" data-action="attackProfileControl"
-                data-mode="remove-attack-profile">
-                <i class="fa-solid fa-minus"></i>
-            </a>
+            <div>
+                <a class="attack-profile-control remove-attack-profile" data-action="attackProfileControl"
+                    data-mode="remove-attack-profile">
+                    <i class="fa-solid fa-minus"></i>
+                </a>
+            </div>
         </li>
         {{/each}}
         <li class="attack-profile add">

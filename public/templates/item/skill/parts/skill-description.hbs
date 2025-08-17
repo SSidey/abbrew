@@ -7,5 +7,9 @@
 {{/if}}
 
 {{formGroup system.schema.fields.traits.fields.raw value=system.traits.raw localize=true disabled=(not (isGM))}}
+{{#if (eq system.skillType "background")}}
+{{formGroup system.schema.fields.innateConcepts.fields.raw value=system.innateConcepts.raw localize=true disabled=(not
+(isGM))}}
+{{/if}}
 {{formInput system.schema.fields.description toggled=true value=system.description enriched=enrichedDescription
 classes="editor-full-height"}}

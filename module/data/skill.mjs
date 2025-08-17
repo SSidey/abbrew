@@ -15,6 +15,28 @@ export default class AbbrewSkill extends AbbrewItemBase {
         const requiredNumber = { required: true, nullable: false };
         const requiredInteger = { required: true, nullable: false, integer: true };
 
+        schema.innateConcepts = new fields.SchemaField({
+            raw: new fields.StringField({ ...blankString }),
+            value: new fields.ArrayField(
+                new fields.SchemaField({
+                    key: new fields.StringField({ ...blankString }),
+                    value: new fields.StringField({ ...blankString }),
+                    feature: new fields.StringField({ ...blankString }),
+                    subFeature: new fields.StringField({ ...blankString }),
+                    effect: new fields.StringField({ ...blankString }),
+                    data: new fields.StringField({ ...blankString }),
+                    exclude: new fields.ArrayField(
+                        new fields.StringField({ ...blankString })
+                    )
+                })
+            )
+        });
+        schema.activation = new fields.SchemaField({
+            requiredActiveSkills: new fields.StringField({ ...blankString }),
+            requiredTraits: new fields.StringField({ ...blankString }),
+            activateWith: new fields.StringField({ ...blankString }),
+            andDeactivateWith: new fields.BooleanField({ required: true, initial: false })
+        });
         schema.skillModifiers = new fields.SchemaField({
             synergy: new fields.StringField({ ...blankString }),
             synergyTraitFilter: new fields.SchemaField({
@@ -39,7 +61,14 @@ export default class AbbrewSkill extends AbbrewItemBase {
             isActorGrantTriggerRequired: new fields.BooleanField({ required: true, intial: false }),
             isItemGrantTriggerRequired: new fields.BooleanField({ required: true, intial: false })
         });
+        schema.passedValuesForAsync = new fields.ArrayField(
+            new fields.SchemaField({
+                name: new fields.StringField({ ...blankString }),
+                value: new fields.NumberField({ ...requiredInteger })
+            })
+        );
         schema.rank = new fields.NumberField({ ...requiredInteger, initial: 1, min: 1, max: 10, step: 1 })
+        schema.renderUnique = new fields.BooleanField({ required: true, initial: false });
         schema.isFavourited = new fields.BooleanField({ required: true, initial: false });
         schema.isActivatable = new fields.BooleanField({ required: true, initial: false, label: "ABBREW.IsActivatable" });
         schema.activateOnCreate = new fields.BooleanField({ required: true, initial: false });
@@ -107,6 +136,33 @@ export default class AbbrewSkill extends AbbrewItemBase {
                     sourceId: new fields.StringField({ required: true, blank: true }),
                     grantTimes: new fields.NumberField({ ...requiredInteger, initial: 0 })
                 })
+            ),
+            aura: new fields.ArrayField(
+                new fields.SchemaField({
+                    name: new fields.StringField({ required: true, blank: true }),
+                    skillType: new fields.StringField({ required: true, blank: true }),
+                    id: new fields.StringField({ required: true, blank: true }),
+                    image: new fields.StringField({ required: true, blank: true }),
+                    sourceId: new fields.StringField({ required: true, blank: true }),
+                })
+            ),
+            grantOnSuccess: new fields.ArrayField(
+                new fields.SchemaField({
+                    name: new fields.StringField({ required: true, blank: true }),
+                    skillType: new fields.StringField({ required: true, blank: true }),
+                    id: new fields.StringField({ required: true, blank: true }),
+                    image: new fields.StringField({ required: true, blank: true }),
+                    sourceId: new fields.StringField({ required: true, blank: true }),
+                })
+            ),
+            grantOnFailure: new fields.ArrayField(
+                new fields.SchemaField({
+                    name: new fields.StringField({ required: true, blank: true }),
+                    skillType: new fields.StringField({ required: true, blank: true }),
+                    id: new fields.StringField({ required: true, blank: true }),
+                    image: new fields.StringField({ required: true, blank: true }),
+                    sourceId: new fields.StringField({ required: true, blank: true }),
+                })
             )
         });
         schema.resource = new fields.SchemaField({
@@ -131,12 +187,25 @@ export default class AbbrewSkill extends AbbrewItemBase {
                     id: new fields.StringField({ required: true, blank: true }),
                     range: new fields.NumberField({ required: true, nullable: true, integer: true }),
                 })
-            )
+            ),
+            threatened: new fields.SchemaField({
+                modifiesThreatened: new fields.BooleanField({ required: true, initial: false }),
+                disabledBy: new fields.StringField({ ...blankString }),
+                threshold: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                multiplier: new fields.NumberField({ ...requiredInteger, initial: 1 })
+            })
         });
         schema.light = new fields.EmbeddedDataField(foundry.data.LightData);
+        schema.aura = new fields.SchemaField({
+            isAura: new fields.BooleanField({ required: true, initial: false }),
+            emanationSize: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+            emanationDimension: new fields.NumberField({ required: true, initial: 0, choices: CONFIG.ABBREW.emanationDimension }),
+            affects: new fields.NumberField({ required: true, initial: 0, choices: CONFIG.ABBREW.skillAffects })
+        });
         schema.action = new fields.SchemaField({
             activationType: new fields.StringField({ ...blankString }),
             actionCost: new fields.StringField({ ...blankString, nullable: true }),
+            tierDiceCost: new fields.NumberField({ ...requiredInteger, initial: 0 }),
             actionImage: new fields.StringField({ ...blankString }),
             duration: new fields.SchemaField({
                 isConcentration: new fields.BooleanField({ required: true, initial: false }),
@@ -210,7 +279,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
                 finisher: new fields.SchemaField({
                     type: new fields.StringField({ required: true, blank: true }),
                     cost: new fields.NumberField({ nullable: true, min: 0, integer: true }),
-                    description: new fields.StringField({ required: true, blank: true }),
+                    description: new fields.HTMLField({ required: true, blank: true }),
                     wounds: new fields.ArrayField(
                         new fields.SchemaField({
                             type: new fields.StringField({ ...blankString }),
@@ -234,6 +303,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
             }),
             modifiers: new fields.SchemaField({
                 fortune: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+                successes: new fields.NumberField({ ...requiredInteger, initial: 0 }),
                 actionCost: new fields.SchemaField({
                     value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
                     operator: new fields.StringField({ ...blankString }),
@@ -272,7 +342,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
                     finisher: new fields.SchemaField({
                         type: new fields.StringField({ required: true, blank: true }),
                         cost: new fields.NumberField({ nullable: true, min: 0, integer: true }),
-                        description: new fields.StringField({ required: true, blank: true }),
+                        description: new fields.HTMLField({ required: true, blank: true }),
                         wounds: new fields.ArrayField(
                             new fields.SchemaField({
                                 type: new fields.StringField({ ...blankString }),
@@ -458,6 +528,8 @@ export default class AbbrewSkill extends AbbrewItemBase {
         if (this.revealed.revealSkills.raw) {
             this.revealed.revealSkills.parsed = getSafeJson(this.revealed.revealSkills.raw, []).map(s => s.value);
         }
+
+        this.innateConcepts.value = getSafeJson(this.innateConcepts.raw, []);
     }
 
     // Post Active Effects

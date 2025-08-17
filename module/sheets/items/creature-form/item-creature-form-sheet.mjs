@@ -20,6 +20,12 @@ const { ItemSheetV2 } = foundry.applications.sheets;
  */
 export class AbbrewCreatureFormSheet extends DragDropMixin(EquipmentTagsMixin(ItemTraitsMixin(ItemContextMixin(HandlebarsApplicationMixin(ItemSheetV2))))) {
 
+    // Whitelist for Description Traits
+    TRAITS_WHITELIST = [...CONFIG.ABBREW.traits.map(trait => ({
+        ...trait,
+        value: game.i18n.localize(trait.value)
+    }))];
+    
     /** @override */
     static DEFAULT_OPTIONS = {
         form: {

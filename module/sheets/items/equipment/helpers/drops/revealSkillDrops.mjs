@@ -33,7 +33,7 @@ export async function revealSkillDrop(event) {
         const value = item.name;
         const path = inputElement.name;
         const inputValue = this.item.system.revealed.revealSkills.raw;
-        const updateValue = [...inputValue, { value: value, id: item.system.abbrewId.uuid, sourceId: eventJson.uuid }];
+        const updateValue = [...getSafeJson(inputValue, []), { value: value, id: item.system.abbrewId.uuid, sourceId: eventJson.uuid }];
         await this.item.update({ "system.revealed.revealSkills.raw": JSON.stringify(updateValue) });
     }
 }

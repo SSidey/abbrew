@@ -11,7 +11,17 @@
       "value": "",
       "uuid": ""
     },
-    "skills": [],
+    "skills": {
+      "granted": [
+        {
+          "name": "Martial Discipline (Training)",
+          "id": "3IyEopCm97YCisDv",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.3IyEopCm97YCisDv",
+          "skillType": "background"
+        }
+      ]
+    },
     "attributes": {
       "str": {
         "value": 2,
@@ -69,11 +79,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743077435972,
-    "modifiedTime": 1743077435972,
+    "modifiedTime": 1753134148157,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

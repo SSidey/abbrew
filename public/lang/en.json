@@ -21,8 +21,21 @@
       "gargantuan": "Gargantuan",
       "colossal": "Colossal"
     },
+    "SkillAffects": {
+      "none": "None",
+      "enemies": "Enemies",
+      "alliesExclusive": "Allies (Not Self)",
+      "alliesInclusive": "Allies (Including Self)",
+      "all": "All",
+      "source": "Source"
+    },
+    "EmanationDimension": {
+      "grid": "Grid",
+      "spaces": "Spaces"
+    },
     "ActiveEffectKeys": {
       "guardMax": "Guard Max",
+      "guardMaxMult": "Guard Max Multiplier",
       "protectionTypes": {
         "all": {
           "reduction": "All Reduction",
@@ -150,7 +163,17 @@
       "burrowSpeed": "Burrow Speed",
       "swimSpeed": "Swim Speed",
       "climbSpeed": "Climb Speed",
-      "flySpeed": "Fly Speed"
+      "flySpeed": "Fly Speed",
+      "teleportSpeed": "Teleport Speed",
+      "skillTraining": {
+        "attack": "Attack Training",
+        "overpower": "Overpower Training",
+        "parry": "Parry Training",
+        "feint": "Feint Training",
+        "finisher": "Finisher Training",
+        "parryCounter": "Parry Counter Training",
+        "feintCounter": "Feint Counter Training"
+      }
     },
     "Roles": {
       "Name": {
@@ -172,7 +195,8 @@
         "implement": "Implement",
         "style": "Style",
         "durable": "Durable",
-        "professional": "Professional"
+        "professional": "Professional",
+        "scout": "Scout"
       },
       "Description": {
         "melee": "You fight primarily in melee with your opponents.",
@@ -193,27 +217,39 @@
         "implement": "You harness magic through implements of power.",
         "style": "You do your thing with panache, drawing attention to yourself.",
         "durable": "You are capable of withstanding more abuse than most.",
-        "professional": "You are skilled in a profession."
+        "professional": "You are skilled in a profession.",
+        "scout": "You head in first, attampting to remain undetected to scope out the situation and provide your party with foresight."
       }
     },
     "Paths": {
       "Name": {
         "universal": "Universal",
+        "barbarian": "Barbarian",
         "fenceroflostbriarith": "Fencer Of Lost Briarith",
         "divineadherent": "Divine Adherent",
         "poisoner": "Poisoner",
+        "shieldedfighter": "Shielded Fighter",
         "shieldguardian": "Shield Guardian",
         "snake": "Snake",
+        "sniper": "Sniper",
         "sorcerer": "Sorcerer"
       },
       "Description": {
         "universal": "A universal path, skills with this path can be selected if it has roles matching thosee of your paths",
+        "barbarian": "A barbarian is a fierce, untamed warrior who channels raw emotion and primal fury into devastating combat prowess, thriving where instinct matters more than discipline.",
         "fenceroflostbriarith": "A fighting style that relies on specialised weapon techniques and swapping between stances.",
         "divineadherent": "You worship a deity and derive your powers from prayer and devotion to that deity.",
         "poisoner": "Adept at the production and the usage of poisons.",
+        "shieldedfighter": "A shielded fighter blends offense and defense, using weapon and shield in perfect balance.",
         "shieldguardian": "A selfless fighting style, one where you put yourself in harm's way to shield your allies and prevent your enemies from reaching them.",
         "snake": "A style employing the use of two short weapons and relies on rapid speed and dodges.",
+        "sniper": "Snipers are the unseen predators of the battlefield, patiently waiting for the moment to strike. They excel in precision shooting, taking down high-value targets, and keeping their location hidden even after an attack. In addition to their deadly aim, Snipers can gather information from afar, guiding their allies with vital intel.",
         "sorcerer": "A magician that draws on internal powers to manifest spells."
+      }
+    },
+    "Archetypes": {
+      "Ranger": {
+        "description": "Masters of the wild and patient hunters, Rangers live for the open air and the satisfaction of a well-placed shot. Whether stalking prey through dense forest or shadowing an enemy force from a ridgeline, Rangers are built for striking from afar and surviving in hostile terrain. In a party, Rangers excel at reconnaissance, harrying enemies from distance, and controlling the battlefield’s range. Their craft blends precision marksmanship with tactical movement — keeping foes off-balance and allies well-informed."
       }
     },
     "EnhancementTargetTypes": {
@@ -271,7 +307,11 @@
       "full": "Damage Reduction"
     },
     "Defense": {
-      "guard": "Guard"
+      "guard": "Guard",
+      "Resolve": {
+        "max": "Maximum Resolve",
+        "maxMult": "Maximum Resolve Multiplier"
+      }
     },
     "DamageTypes": {
       "all": "All",
@@ -310,7 +350,8 @@
       "upgrade": "Upgrade",
       "downgrade": "Downgrade",
       "merge": "Merge",
-      "split": "Split"
+      "split": "Split",
+      "immunity": "Immunity"
     },
     "AttributeRankIncrease": "Attribute Rank Increase",
     "SkillType": "Skill Type",
@@ -362,7 +403,9 @@
       "war": "War",
       "famine": "Famine",
       "pestilence": "Pestilence",
-      "conquest": "Conquest"
+      "conquest": "Conquest",
+      "rage": "Rage",
+      "fear": "Fear"
     },
     "Facing": {
       "front": "front",
@@ -380,10 +423,12 @@
       "hide": "Hide",
       "iron": "Iron",
       "leather": "Leather",
+      "oak": "Oak",
       "silver": "Silver",
       "mithril": "Mithril",
       "steel": "Steel",
-      "chain": "Chain",
+      "yew": "Yew",
+      "chain": "Chainmail",
       "jack": "Jack",
       "lamellar": "Lamellar",
       "laminar": "Laminar",
@@ -452,7 +497,8 @@
       "untyped": "Untyped",
       "background": "Background",
       "tier": "Tier",
-      "grantModifier": "Grant Modifier"
+      "grantModifier": "Grant Modifier",
+      "item": "Item"
     },
     "ActionCosts": {
       "passive": "Passive",
@@ -484,21 +530,42 @@
       "suffering": "Suffering",
       "pain": "Pain",
       "torment": "Torment",
-      "anguish": "Anguish"
+      "anguish": "Anguish",
+      "hunger": "Hunger",
+      "starvation": "Starvation"
     },
     "EFFECT": {
       "Status": {
+        "blind": "Blind",
         "dead": "Dead",
+        "deaf": "Deaf",
         "defeated": "Defeated",
         "disoriented": "Disoriented",
+        "distracted": "Distracted",
+        "grabbed": "Grabbed",
         "guardBreak": "Guard Break",
         "hidden": "Hidden",
-        "offGuard": "Off Guard"
+        "immobilised": "Immobilised",
+        "mute": "Mute",
+        "offGuard": "Off Guard",
+        "prone": "Prone",
+        "silent": "Silent",
+        "staggered": "Staggered",
+        "threatened": "Threatened",
+        "unconscious": "Unconscious"
       },
       "Condition": {
+        "Blind": {
+          "name": "Blind",
+          "description": "You are blinded. If sight is your only primary sense, everything is unobserved to you. You can not use a skill that relies on a target. Your movement is halved."
+        },
         "Dead": {
           "name": "Dead",
           "description": "You have suffered fatal wounds, resulting in death."
+        },
+        "Deaf": {
+          "name": "Deaf",
+          "description": "Your hearing has been damaged."
         },
         "Defeated": {
           "name": "Defeated",
@@ -506,7 +573,15 @@
         },
         "Disoriented": {
           "name": "Disoriented",
-          "description": "You have been disoriented, you cannot restore guard nor parry while you have this condition."
+          "description": "You have been disoriented, leaving you unable to use the restore guard, parry and dodge skills."
+        },
+        "Distracted": {
+          "name": "Distracted",
+          "description": "You have been distracted, at the end of each of your turns while you have this condition, your risk increases by 10 per stack."
+        },
+        "Grabbed": {
+          "name": "Grabbed",
+          "description": "You have been grabbed, you are Off Guard and Immobilised."
         },
         "GuardBreak": {
           "name": "Guard Break",
@@ -516,9 +591,33 @@
           "name": "Hidden",
           "description": "Your are hidden from your foes, if you were previously detected (or your presence becomes known) they can attempt to locate you with a Scan Check."
         },
+        "Immobilised": {
+          "name": "Immobilised",
+          "description": "You are immobilised, your movement speeds (aside from teleportation) are set to 0. If you are restrained by an effect, any other effect that attempts to move you must succeed against the restraining effect."
+        },
+        "Mute": {
+          "name": "Mute",
+          "description": "You are unable to produce verabal sounds, you are incapable of using any skills with the verbal trait."
+        },
         "OffGuard": {
           "name": "Off Guard",
           "description": "Your are harried and your guard compromised, your foes can directly capitalise on your weakpoints. You can be targeted by finishers."
+        },
+        "Prone": {
+          "name": "Prone",
+          "description": "Your are lying flat, face down. Your movement is halved. You are off guard"
+        },
+        "Staggered": {
+          "name": "Staggered",
+          "description": "You are momentarily staggered, leaving you unable to use the restore guard, parry and dodge skills."
+        },
+        "Threatened": {
+          "name": "Threatened",
+          "description": "You are threatened by more enemies than you can keep track of. At the end of each of your turns your risk will increase by 10."
+        },
+        "Unconscious": {
+          "name": "Unconscious",
+          "description": "You are unconscious, prone and blinded."
         }
       }
     },
@@ -528,11 +627,22 @@
       "worn": "Worn",
       "innate": "Innate"
     },
+    "Reach": {
+      "none": "None",
+      "close": "Close",
+      "short": "Short",
+      "standard": "Standard",
+      "long": "Long"
+    },
     "Hands": {
       "none": "None",
       "oneHand": "One Handed",
       "versatile": "Versatile",
       "twoHand": "Two Handed"
+    },
+    "Threatened": {
+      "threatenedThreshold": "Threatened Threshold",
+      "threatenedMultiplier": "Threatened Multiplier"
     },
     "Traits": {
       "General": {
@@ -599,7 +709,8 @@
       "Material": {
         "metal": "Metal",
         "iron": "Iron",
-        "silver": "Silver"
+        "silver": "Silver",
+        "wood": "Wood"
       },
       "Skill": {
         "specialisation": "Specialisation",
@@ -613,6 +724,7 @@
         "life": "Life",
         "death": "Death",
         "fire": "Fire",
+        "heat": "Heat",
         "cold": "Cold",
         "electric": "Electric",
         "acid": "Acid",
@@ -620,7 +732,17 @@
         "light": "Light",
         "pain": "Pain",
         "emotion": "Emotion",
-        "psychic": "Psychic"
+        "psychic": "Psychic",
+        "risky": "Risky",
+        "concentrate": "Concentrate",
+        "primarySense": "Primary Sense",
+        "secondarySense": "Secondary Sense",
+        "tertiarySense": "Tertiary Sense",
+        "verbal": "Verbal",
+        "auditory": "Auditory",
+        "visual": "Visual",
+        "fortune": "Fortune",
+        "misfortune": "Misfortune"
       },
       "stance": "Stance",
       "Spell": {
@@ -628,6 +750,24 @@
         "concept": "Concept",
         "spellform": "Spellform",
         "spellamp": "Spell Amp"
+      },
+      "InnateConcepts": {
+        "flesh": "Flesh",
+        "blood": "Blood",
+        "mind": "Mind",
+        "soul": "Soul",
+        "life": "Life",
+        "death": "Death",
+        "humanoid": "Humanoid",
+        "aberration": "Aberration",
+        "human": "Human",
+        "dwarf": "Dwarf",
+        "elf": "Elf",
+        "gnome": "Gnome",
+        "goblin": "Goblin",
+        "orc": "Orc",
+        "lizardfolk": "Lizardfolk",
+        "serpentfolk": "Serpentfolk"
       }
     },
     "Durations": {
@@ -648,7 +788,8 @@
       "burrow": "Burrow",
       "swim": "Swim",
       "climb": "Climb",
-      "fly": "Fly"
+      "fly": "Fly",
+      "teleport": "Teleport"
     },
     "ModifierPrefixes": {
       "numeric": "Numeric",
@@ -656,6 +797,7 @@
       "item": "Item",
       "this": "This",
       "target": "Target",
+      "itemSource": "Item Source",
       "wound": "Wound",
       "condition": "Condition",
       "statusType": "Status Type",
@@ -846,6 +988,19 @@
     "Request": "Skill Check Request"
   },
 
+  "TOKEN": {
+    "MOVEMENT": {
+      "ACTIONS": {
+        "land": {
+          "label": "Land"
+        },
+        "teleport": {
+          "label": "Teleport"
+        }
+      }
+    }
+  },
+
   "EFFECT": {
     "TabDuration": "Duration",
     "ParseMode": "Parse Mode",
@@ -915,10 +1070,62 @@
   },
   "ITEM_SKILL": {
     "FIELDS": {
+      "innateConcepts": {
+        "raw": {
+          "label": "Innate Concepts"
+        }
+      },
       "rank": {
         "label": "Rank"
       },
+      "renderUnique": {
+        "label": "Render Unique"
+      },
+      "senses": {
+        "threatened": {
+          "disabledBy": {
+            "label": "Disabled By"
+          },
+          "threshold": {
+            "label": "Threshold"
+          },
+          "multiplier": {
+            "label": "Multiplier"
+          }
+        }
+      },
+      "activation": {
+        "requiredActiveSkills": {
+          "label": "Required Active Skills"
+        },
+        "activateWith": {
+          "label": "Activate With"
+        },
+        "andDeactivateWith": {
+          "label": "And Deactivate With"
+        }
+      },
+      "aura": {
+        "isAura": {
+          "label": "Is Aura"
+        },
+        "emanationSize": {
+          "label": "Size"
+        },
+        "emanationDimension": {
+          "label": "Dimension"
+        },
+        "affects": {
+          "label": "Affects Targets"
+        },
+        "uniqueApplication": {
+          "label": "Apply Unique?"
+        }
+      },
       "action": {
+        "tierDiceCost": {
+          "label": "Tier Dice Cost"
+        },
         "charges": {
           "hasCharges": {
             "label": "Has Charges?"
@@ -930,11 +1137,23 @@
             "label": "Maximum Charges"
           }
         },
+        "attackProfile": {
+          "finisher": {
+            "description": {
+              "label": "Finisher Description"
+            }
+          }
+        },
         "modifiers": {
           "attacProfile": {
             "combineAttacks": {
               "value": {
                 "label": "Number Combined"
+              }
+            },
+            "finisher": {
+              "description": {
+                "label": "Finisher Description"
               }
             }
           },
@@ -1011,6 +1230,17 @@
       }
     }
   },
+  "ITEM_WEAPON": {
+    "FIELDS": {
+      "attackProfiles": {
+        "element": {
+          "reach": {
+            "label": "Reach"
+          }
+        }
+      }
+    }
+  },
   "ITEM_WOUND": {
     "FIELDS": {
       "wound": {
@@ -1026,5 +1256,15 @@
 
   "WINDOW_BUTTONS": {
     "resetName": "Reset Name"
+  },
+
+  "VISION": {
+    "ModeHearing": "Hearing",
+    "ModeNone": "None"
+  },
+
+  "DETECTION": {
+    "hearing": "Hearing",
+    "none": "None"
   }
 }

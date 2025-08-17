@@ -2,6 +2,10 @@
     color-scheme: light dark;
 }
 
+.full-width-tags {
+    width: 100%;
+}
+
 .revealed-item {
 
     background-color: light-dark(rgba(0, 0, 0, 0.1), var(--color-cool-3));
@@ -43,7 +47,7 @@
 .actor-speed {
     display: grid;
     grid-template-rows: 1fr 2fr;
-    background-color: lightgrey;
+    background-color: light-dark(rgba(0, 0, 0, 0.1), var(--color-cool-3));
     text-align: center;
     border: black;
     border-width: 1px;
@@ -51,8 +55,9 @@
     border-style: solid;
 
     input {
-        margin-left: 1em;
-        margin-right: 1em;
+        margin-left: 0.5em;
+        margin-right: 0.5em;
+        text-align: center;
     }
 }
 
@@ -73,4 +78,78 @@
         vertical-align: middle;
         line-height: normal;
     }
+}
+
+.available-concepts {
+    grid-column: span 3;
+    padding-bottom: 0.5em;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-column-gap: 0.5em;
+}
+
+.available-concepts-label {
+    align-content: center;
+}
+
+ol.concept-container {
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    min-height: 40px;
+}
+
+.concept {
+    position: relative;
+    display: inline-block;
+    height: 40px;
+    width: 40px;
+    margin-bottom: 0px;
+    vertical-align: top;
+}
+
+.concept-container li.concept img {
+    height: 40px;
+    width: 40px;
+    margin-bottom: 0px;
+}
+
+.concept-value {
+    float: right;
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    z-index: 1000;
+    background-color: #000000;
+    color: #FFFFFF;
+    font-weight: bold;
+    text-shadow: #000000 0px 0px 10px;
+    font-size: 1rem;
+}
+
+.concept-details {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-column-gap: 1em;
+}
+
+.concept-tooltip {
+    display: none;
+    position: absolute;
+    z-index: 10;
+    left: 50%;
+    -webkit-transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
+    transform: translateX(-50%);
+    background: #333;
+    color: #fff;
+    text-align: center;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.concept:hover .concept-tooltip {
+    display: block;
+    pointer-events: none;
 }

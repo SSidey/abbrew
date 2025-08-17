@@ -15,10 +15,17 @@
       "granted": [
         {
           "name": "Apprentice Poisoner",
+          "skillType": "background",
           "id": "eXiBX6PlLeJSywAb",
           "image": "systems/abbrew/assets/icons/paths/poisoner.svg",
-          "sourceId": "Compendium.abbrew.playerskills.Item.eXiBX6PlLeJSywAb",
-          "skillType": ""
+          "sourceId": "Compendium.abbrew.playerskills.Item.eXiBX6PlLeJSywAb"
+        },
+        {
+          "name": "Poisoner (Profession)",
+          "id": "yX9uM6bFqIbjZ8uk",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.yX9uM6bFqIbjZ8uk",
+          "skillType": "background"
         }
       ]
     },
@@ -79,11 +86,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746270646211,
-    "modifiedTime": 1746271787752,
+    "modifiedTime": 1753133057198,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

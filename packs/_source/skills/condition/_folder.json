@@ -1,0 +1,22 @@
+{
+  "type": "Item",
+  "folder": null,
+  "name": "Condition",
+  "color": null,
+  "sorting": "a",
+  "_id": "QQZvoeINrIpJ6eVL",
+  "description": "",
+  "sort": 0,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.346",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1753040824268,
+    "modifiedTime": 1753040824268,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!QQZvoeINrIpJ6eVL"
+}

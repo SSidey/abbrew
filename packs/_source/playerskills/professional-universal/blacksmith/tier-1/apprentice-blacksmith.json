@@ -26,11 +26,11 @@
     "skills": {
       "granted": [
         {
-          "name": "Blacksmith (Check)",
+          "name": "Blacksmith (Craft)",
+          "skillType": "",
           "id": "6GQuhRfuOZjc5kaG",
           "image": "systems/abbrew/assets/icons/general/anvil.svg",
-          "sourceId": "Compendium.abbrew.playerskills.Item.6GQuhRfuOZjc5kaG",
-          "skillType": ""
+          "sourceId": "Compendium.abbrew.playerskills.Item.6GQuhRfuOZjc5kaG"
         }
       ],
       "paired": [],
@@ -216,11 +216,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746226420400,
-    "modifiedTime": 1746271612994,
+    "modifiedTime": 1753034001805,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

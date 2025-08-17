@@ -1,8 +1,7 @@
 import { mergeModifierFields, parseModifierFieldValue } from "./modifierBuilderFieldHelpers.mjs";
 import { applyOperator, getOrderForOperator } from "./operators.mjs";
 import { applySkillEffects } from "./skills/skill-application.mjs";
-import { handleSkillExpiry } from "./time.mjs";
-import { getSafeJson } from "./utils.mjs";
+import { checkAndExpire } from "./skills/skill-expiry.mjs";
 
 export async function handleCombatStart(actors) {
     for (const index in actors) {
@@ -15,7 +14,7 @@ export async function handleCombatEnd(actors) {
     actors.forEach(a => {
         const actorSkills = a.items.filter(i => i.type === "skill");
         const combatDurationSkills = actorSkills.filter(s => s.system.action.isActive && s.system.action.duration.precision === "-2").map(s => s._id);
-        const effects = a.effects.filter(e => combatDurationSkills.includes(e.flags.abbrew.skill.trackDuration));
+        const effects = a.effects.filter(e => e.flags.abbrew?.skill?.trackDuration && combatDurationSkills.includes(e.flags.abbrew.skill.trackDuration));
         effects.forEach(async e => await e.delete());
         const combatFrequencySkills = actorSkills.filter(s => (s.system.action.uses.hasUses) && ["combat", "turn", "round"].includes(s.system.action.uses.period));
         combatFrequencySkills.forEach(async s => {
@@ -32,11 +31,15 @@ export async function handleTurnChange(prior, current, priorActor, currentActor)
     if (priorActor) {
         await turnEnd(priorActor);
     }
-    await turnStart(currentActor);
+    if (currentActor) {
+        await turnStart(currentActor);
+    }
 }
 
 export function mergeActorWounds(actor, incomingWounds) {
-    return mergeActorWoundsWithOperator(actor, incomingWounds, 'add');
+    const woundImmunities = getWoundImmunities(actor);
+    const cleanedIncomingWounds = incomingWounds.filter(w => !woundImmunities.includes(w.type))
+    return mergeActorWoundsWithOperator(actor, cleanedIncomingWounds, 'add');
 }
 
 export function mergeActorWoundsWithOperator(actor, incomingWounds, operator) {
@@ -45,19 +48,29 @@ export function mergeActorWoundsWithOperator(actor, incomingWounds, operator) {
 }
 
 export function mergeWoundsWithOperator(wounds, incomingWounds, operator) {
-    const result = [...wounds, ...incomingWounds].reduce((a, { type, value }) => ({ ...a, [type]: a[type] ? { type, value: applyOperator(a[type].value, value, operator) } : { type, value } }), {});
-    return Object.values(result).filter(v => v.value > 0);
+    const woundsResult = [...wounds, ...incomingWounds].reduce((result, { type, value }) => {
+        const foundWound = result.find(w => w.type === type);
+        if (foundWound) {
+            foundWound.value = applyOperator((foundWound.value ?? 0), value, operator)
+        } else {
+            result.push({ type, value });
+        }
+
+        return result;
+    }, []);
+    return woundsResult.filter(v => v.value > 0);
 }
 
 export async function updateActorWounds(actor, updateWounds) {
     const woundImmunities = getWoundImmunities(actor);
     const woundsAfterImmunity = updateWounds.filter(w => !woundImmunities.includes(w.type));
-    await actor.update({ "system.wounds": woundsAfterImmunity });
+    const immunedWounds = actor.system.wounds.filter(w => woundImmunities.includes(w.type));
+    const fullWoundSet = [...immunedWounds, ...woundsAfterImmunity];
+    await actor.update({ "system.wounds": fullWoundSet });
 }
 
-function getWoundImmunities(actor) {
-    const woundImmunities = actor.items.filter(i => i.type === "skill" && getSafeJson(i.system.traits.raw, false)).map(s => JSON.parse(s.system.traits.raw)).filter(s => s.some(st => st.feature === "wound" && st.effect === "immunity")).flatMap(s => s.data);
-    return woundImmunities ? woundImmunities : [];
+export function getWoundImmunities(actor) {
+    return Object.keys(getWoundsWithOperator(actor, "immunity"));
 }
 
 export async function checkActorFatalWounds(actor) {
@@ -73,10 +86,26 @@ export async function checkActorFatalWounds(actor) {
 export async function handleActorGuardConditions(actor) {
     if (actor.system.defense.guard.value <= 0) {
         await setActorToGuardBreak(actor);
+        await setActorStaggered(actor);
     } else if (actor.effects.toObject().find(e => e.name === 'Guard Break')) {
         const id = actor.effects.toObject().find(e => e.name === 'Guard Break')._id;
         await actor.deleteEmbeddedDocuments('ActiveEffect', [id]);
     }
+}
+
+async function setActorStaggered(actor) {
+    await createActorItemFromPack(actor, "abbrew.conditions", "abbrewCStaggered");
+}
+
+async function createActorItemFromPack(actor, packId, itemId) {
+    const item = await getPackItem(packId, itemId);
+    await Item.create(item, { parent: actor });
+}
+
+async function getPackItem(packId, itemId) {
+    const pack = game.packs.get(packId);
+    await pack.getIndex();
+    return await pack.getDocument(itemId);
 }
 
 export async function handleActorWoundConditions(actor) {
@@ -115,25 +144,166 @@ async function setActorCondition(actor, conditionName) {
     const condition = CONFIG.ABBREW.conditions[conditionName];
     const statusSet = new Set(condition.statuses);
 
-    if (statusSet.difference(actor.statuses).size) {
-        const conditionEffectData = {
-            _id: actor._id,
-            name: game.i18n.localize(condition.name),
-            img: condition.img,
-            changes: [],
-            disabled: false,
-            duration: {},
-            description: game.i18n.localize(condition.description),
-            origin: actor._id,
-            tint: '',
-            transfer: false,
-            statuses: statusSet,
-            flags: {}
-        };
-
-        await actor.createEmbeddedDocuments('ActiveEffect', [conditionEffectData]);
-        console.log(`${actor.name} gained ${conditionName}`);
+    if (actor.effects.find(e => e.flags.abbrew?.status?.id === conditionName)) {
+        return;
     }
+
+    const conditionEffectData = {
+        _id: actor._id,
+        name: game.i18n.localize(condition.name),
+        img: condition.img,
+        changes: [],
+        disabled: false,
+        duration: {},
+        description: game.i18n.localize(condition.description),
+        origin: actor._id,
+        tint: '',
+        transfer: false,
+        statuses: statusSet,
+        flags: { abbrew: { status: { id: conditionName } } }
+    };
+
+    await actor.createEmbeddedDocuments('ActiveEffect', [conditionEffectData]);
+    console.log(`${actor.name} gained ${conditionName}`);
+}
+
+export async function handleTokenUpdate(document, changed, options, userId) {
+    if (game.combat && game.combat.isActive) {
+        if (!game.user.isActiveGM) {
+            return;
+        }
+
+        if (changed.x || changed.y) {
+            await foundry.canvas.animation.CanvasAnimation.getAnimation(document.object.animationName)?.promise;
+            await handleThreat(document, { x: changed.x ?? document.x, y: changed.y ?? document.y, elevation: document.elevation }, getTokenCenter(changed.x ?? document.x, changed.y ?? document.y, document.elevation, document.getSize(), document.height));
+        } else if (changed.elevation) {
+            await handleThreat(document, { x: document.x, y: document.y, elevation: changed.elevation }, getTokenCenter(document.x, document.y, document.elevation ?? document.elevation, document.getSize(), document.height));
+        }
+    }
+}
+
+export function getTokenCenter(x, y, elevation, { width, height }, size) {
+    return { x: x + (width / 2), y: y + (height / 2), elevation: elevation + (size / 2) };
+}
+
+export async function handleThreat(document, tokenPosition, tokenCenter) {
+    await handleThreatForActor(document, tokenCenter, canvas.tokens.placeables);
+    await handleAurasForActor(document, tokenCenter, canvas.tokens.placeables);
+    const otherTokensForAdjustment = canvas.tokens.placeables.filter(t => t.document !== document);
+    const movedDocument = new AbbrewMovedToken(document.actor, tokenCenter, document.disposition, document.width);
+    movedDocument.x = tokenPosition.x;
+    movedDocument.y = tokenPosition.y;
+    movedDocument.elevation = tokenPosition.elevation;
+    const otherPromises = game.canvas.tokens.placeables.map(t => t.document).filter(d => d !== document).flatMap(d =>
+        [
+            handleThreatForActor(d, d.getCenterPoint(), [...otherTokensForAdjustment, movedDocument]),
+            handleAurasForActor(d, d.getCenterPoint(), [...otherTokensForAdjustment, movedDocument])
+        ]
+    );
+    await Promise.all(otherPromises);
+}
+
+class AbbrewMovedToken {
+    constructor(actor, tokenCenter, disposition, width) {
+        this.tokenCenter = tokenCenter;
+        this.document = {};
+        this.document.disposition = disposition;
+        this.document.width = width;
+        this.actor = actor;
+    }
+
+    getCenterPoint() { return this.tokenCenter; }
+
+}
+
+async function handleThreatForActor(document, tokenCenter, otherTokens) {
+    const enemyThreat = getHostileTokenCount(tokenCenter, document.height, document.disposition, otherTokens);
+    if ((enemyThreat - document.actor.system.defense.threatened.threshold) * document.actor.system.defense.threatened.multiplier > 0) {
+        setActorCondition(document.actor, 'threatened');
+    } else {
+        const id = document.actor.effects.toObject().find(e => e.name === 'Threatened')?._id;
+        if (id) {
+            await document.actor.deleteEmbeddedDocuments('ActiveEffect', [id]);
+        }
+    }
+}
+
+async function handleAurasForActor(document, tokenCenter, otherTokens) {
+    if (!document.actor.system.hasAuras) {
+        return;
+    }
+
+    const fullTokenArray = [document, ...otherTokens];
+
+    const auras = document.actor.items.filter(i => i.type === "skill").filter(s => s.system.aura.isAura);
+    const aurasWithTargets = auras.map(a => ({ aura: a, targets: doesEmanationAffectToken(a, document, tokenCenter, otherTokens) }));
+    const promises = [];
+    for (const auraIndex in aurasWithTargets) {
+        const thisAuraWithTargets = aurasWithTargets[auraIndex];
+        const aura = thisAuraWithTargets.aura;
+        const targets = thisAuraWithTargets.targets;
+        const unaffectedTokens = fullTokenArray.filter(t => !targets.includes(t));
+        for (const targetIndex in targets) {
+            const actor = targets[targetIndex].actor;
+            if (actor) {
+                aura.system.skills.aura.forEach(as => {
+                    const skill = actor.items.filter(i => i.type === "skill").find(s => s.system.abbrewId.uuid === as.id && s.system.grantedBy.actor === document.actor._id);
+                    if (!skill) {
+                        promises.push(new Promise(async () => {
+                            const createSkill = await fromUuid(as.sourceId);
+                            await Item.create(createSkill, { parent: actor })
+                        }));
+                    }
+                }
+                )
+            }
+        }
+        for (const unaffectedIndex in unaffectedTokens) {
+            const actor = unaffectedTokens[unaffectedIndex].actor;
+            if (actor) {
+                const skills = actor.items.filter(i => i.type === "skill").filter(s => s.system.abbrewId.uuid === aura.system.abbrewId.uuid && s.system.grantedBy.actor === document.actor._id);
+                if (skills.length > 0) {
+                    skills.forEach(s => promises.push(checkAndExpire(actor, s)));
+                }
+            }
+        }
+    }
+
+    await Promise.all(promises);
+}
+
+function doesEmanationAffectToken(aura, document, tokenCenter, otherTokens) {
+    const auraAffects = aura.system.aura.affects;
+    const availableTargets = filterAuraTargets(auraAffects, document, otherTokens);
+    const targetsInEmanation = availableTargets.filter(t => isTokenWithinEmanation(tokenCenter, document.height, t.getCenterPoint(), t.document.width, aura.system.aura.emanationSize))
+    return targetsInEmanation;
+}
+
+function filterAuraTargets(auraAffects, document, otherTokens) {
+    const sourceDisposition = document.disposition
+    switch (auraAffects) {
+        case 0:
+            return [];
+        case 1:
+            return otherTokens.filter(t => determineHostileDisposition(sourceDisposition, t.document.disposition));
+        case 2:
+            return otherTokens.filter(t => t.document.disposition === sourceDisposition);
+        case 3:
+            return [...otherTokens.filter(t => t.document.disposition === sourceDisposition), document.token];
+        case 4:
+            return [document.token, ...otherTokens];
+        case 5:
+            return document.token;
+        default:
+            return [];
+    }
+}
+
+function getHostileTokenCount(tokenCenter, tokenSize, tokenDisposition, otherTokens) {
+    return otherTokens
+        .filter(t => determineHostileDisposition(tokenDisposition, t.document.disposition))
+        .filter(t => getSpacesBetweenTokens(tokenCenter, tokenSize, t.getCenterPoint(), t.document.width) <= t.actor.system.threatReach)
+        .length;
 }
 
 async function setActorToDefeated(actor) {
@@ -158,7 +328,96 @@ async function turnEnd(actor) {
     await applyActiveSkills(actor, "end");
     // TODO: Determine if we can remove this, time should handle it.
     // await handleSkillExpiry("end", actor);
+    await checkForDistraction(actor);
     await actor.update({ "system.actions": actor.system.modifiers.actionRecovery });
+}
+
+async function checkForDistraction(actor) {
+    const enemyDistraction = actor.statuses.has("threatened") ? 1 : 0;
+    const distraction = enemyDistraction + actor.effects.filter(e => e.statuses.toObject().includes("distracted")).reduce((total, effect) => {
+        const update = effect.flags?.abbrew?.skill?.stacks ?? 0;
+        return total += update;
+    }, 0);
+
+    const distractionRisk = distraction * 10;
+    const actorRisk = actor.system.defense.risk.raw;
+
+    const updateRisk = Math.min(100, actorRisk + distractionRisk);
+
+    await actor.update({ "system.defense.risk.raw": updateRisk });
+}
+
+function determineHostileDisposition(tokenDisposition, otherDisposition) {
+    switch (tokenDisposition) {
+        case 1:
+        case 0:
+            return otherDisposition === -1;
+        case -1:
+            return otherDisposition === 1;
+        case -2:
+            return false;
+    }
+}
+
+function getSpacesBetweenTokens(origin, originSize, destination, destinationSize) {
+    const grid = canvas.grid.size;
+    const distance = spacesFromTokenToToken(origin, originSize, destination, destinationSize, distanceChebyshev, grid)
+    return distance;
+}
+
+function isTokenWithinEmanation(origin, originSize, destination, destinationSize, emanationRadius) {
+    const grid = canvas.grid.size;
+    const inEmanation = isTargetWithinEmanation(origin, originSize, destination, destinationSize, distanceAlternating1_2, emanationRadius, grid);
+    return inEmanation;
+}
+
+function distanceChebyshev(dxSteps, dySteps) {
+    return Math.max(dxSteps, dySteps);
+}
+
+// 1–2 alternating diagonal distance between two integer step counts
+function distanceAlternating1_2(dxSteps, dySteps) {
+    const a = Math.max(dxSteps, dySteps);
+    const b = Math.min(dxSteps, dySteps);
+    return a + Math.floor(b / 2);
+}
+
+// Nearest *square center* on the source token to a given coordinate.
+// Works for odd/even token sizes. All args in pixels.
+function nearestSourceSquareCenterCoord(srcCenterCoord, srcSize, targetCoord, grid = canvas.grid.size) {
+    // Offsets (in grid units) of the token’s square centers relative to token center:
+    // {minOff, minOff+1, ..., maxOff}, where minOff = 0.5 - s/2
+    const minOff = 0.5 - srcSize / 2;       // e.g., s=3 -> -1, s=2 -> -0.5
+    const off = Math.round((targetCoord - srcCenterCoord) / grid - minOff) + minOff;
+    const clampedOff = Math.max(minOff, Math.min(off, -minOff)); // clamp into range
+    return srcCenterCoord + clampedOff * grid;
+}
+
+// Distance (in squares) from a token’s *space* (any of its squares) to a cell center,
+// using the 1–2 alternating diagonal rule.
+function spacesFromTokenToToken(sourceCenter, sourceSize, targetCenter, targetSize, distanceFunction, grid = canvas.grid.size) {
+    const { dx, dy } = distanceBetweenNearestSquareWithTokens(sourceCenter, sourceSize, targetCenter, targetSize, grid);
+
+    return distanceFunction(dx, dy);
+}
+
+function distanceBetweenNearestSquareWithTokens(sourceCenter, sourceSize, targetCenter, targetSize, grid = canvas.grid.size) {
+    // Pick the source square-center that’s closest to the cell center on each axis
+    const mx = nearestSourceSquareCenterCoord(sourceCenter.x, sourceSize, targetCenter.x, grid);
+    const my = nearestSourceSquareCenterCoord(sourceCenter.y, sourceSize, targetCenter.y, grid);
+
+    const nx = nearestSourceSquareCenterCoord(targetCenter.x, targetSize, sourceCenter.x, grid);
+    const ny = nearestSourceSquareCenterCoord(targetCenter.y, targetSize, sourceCenter.y, grid);
+
+    // Convert to integer step counts (centers are on-grid, so round)
+    const dx = Math.round(Math.abs(nx - mx) / grid);
+    const dy = Math.round(Math.abs(ny - my) / grid);
+
+    return { dx, dy };
+}
+
+function isTargetWithinEmanation(sourceCenter, sourceSize, targetCenter, targetSize, distanceFunction, emanationRadius, grid = canvas.grid.size) {
+    return spacesFromTokenToToken(sourceCenter, sourceSize, targetCenter, targetSize, distanceFunction, grid) <= emanationRadius;
 }
 
 async function turnStart(actor) {
@@ -228,7 +487,7 @@ async function updateTurnStartWounds(actor) {
 }
 
 function getWoundsWithOperator(actor, operator) {
-    return actor.items.filter(i => i.type === "skill").filter(s => s.system.action.modifiers.wounds.self.some(w => w.operator === operator)).filter(s => (!s.system.isActivatable && s.system.skillType === "standalone") || (actor.system.activeSkills.includes(s._id))).flatMap(s => s.system.action.modifiers.wounds.self.filter(w => w.operator === operator)).reduce((result, ws) => {
+    return actor.items.filter(i => i.type === "skill").filter(s => s.system.action.modifiers.wounds.self.some(w => w.operator === operator)).filter(s => s.system.action.activationType === "standalone").filter(s => !s.system.isActivatable || s.system.action.isActive).flatMap(s => s.system.action.modifiers.wounds.self.filter(w => w.operator === operator)).reduce((result, ws) => {
         if (ws.type in result) {
             result[ws.type].push({ operator: ws.operator, ...parseModifierFieldValue(ws.value, actor, ws), index: getOrderForOperator(ws.operator) });
         } else {

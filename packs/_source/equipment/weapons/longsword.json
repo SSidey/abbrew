@@ -28,9 +28,22 @@
       {
         "name": "Slash",
         "attackType": "arc",
-        "lethal": 0,
+        "finisherLimit": 8,
+        "hasStrongAttack": true,
         "critical": 10,
-        "reach": "2",
+        "lethal": 0,
+        "reach": 2,
+        "damage": [
+          {
+            "type": "slashing",
+            "value": 5,
+            "penetration": 0,
+            "attributeModifier": "str",
+            "attributeMultiplier": 1,
+            "damageMultiplier": 1,
+            "overallMultiplier": 1
+          }
+        ],
         "range": 0,
         "penetration": 0,
         "ammunition": {
@@ -40,27 +53,27 @@
           "max": 0,
           "reloadType": "",
           "reloadActionCost": 1
-        },
-        "damage": [
-          {
-            "type": "slashing",
-            "value": 6,
-            "attributeModifier": "str",
-            "attributeMultiplier": 1,
-            "damageMultiplier": 1,
-            "overallMultiplier": 1,
-            "penetration": 0
-          }
-        ],
-        "finisherLimit": 8,
-        "hasStrongAttack": true
+        }
       },
       {
         "name": "Stab",
         "attackType": "thrust",
-        "lethal": 0,
+        "finisherLimit": 10,
+        "hasStrongAttack": false,
         "critical": 10,
-        "reach": "2",
+        "lethal": 0,
+        "reach": 2,
+        "damage": [
+          {
+            "type": "piercing",
+            "value": 5,
+            "penetration": 0,
+            "attributeModifier": "str",
+            "attributeMultiplier": 1,
+            "damageMultiplier": 1,
+            "overallMultiplier": 1
+          }
+        ],
         "range": 0,
         "penetration": 0,
         "ammunition": {
@@ -70,20 +83,7 @@
           "max": 0,
           "reloadType": "",
           "reloadActionCost": 1
-        },
-        "damage": [
-          {
-            "type": "piercing",
-            "value": 5,
-            "attributeModifier": "str",
-            "attributeMultiplier": 1,
-            "damageMultiplier": 1,
-            "overallMultiplier": 1,
-            "penetration": 0
-          }
-        ],
-        "finisherLimit": 10,
-        "hasStrongAttack": false
+        }
       }
     ],
     "handsRequired": "versatile",
@@ -102,17 +102,25 @@
     "meta": {
       "tier": 0
     },
-    "heft": 6
+    "heft": 6,
+    "revealed": {
+      "revealSkills": {
+        "raw": "[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]"
+      }
+    },
+    "name": {
+      "base": "Longsword"
+    }
   },
   "effects": [],
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075307575,
-    "modifiedTime": 1748899136080,
+    "modifiedTime": 1752866075466,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

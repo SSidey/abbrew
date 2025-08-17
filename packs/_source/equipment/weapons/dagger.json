@@ -51,9 +51,22 @@
       {
         "name": "Slash",
         "attackType": "arc",
-        "lethal": 0,
+        "finisherLimit": 2,
+        "hasStrongAttack": true,
         "critical": 10,
-        "reach": "",
+        "lethal": 0,
+        "reach": 0,
+        "damage": [
+          {
+            "type": "slashing",
+            "value": 1,
+            "penetration": 0,
+            "attributeModifier": "str",
+            "attributeMultiplier": 1,
+            "damageMultiplier": 1,
+            "overallMultiplier": 1
+          }
+        ],
         "range": 0,
         "penetration": 0,
         "ammunition": {
@@ -63,27 +76,27 @@
           "max": 0,
           "reloadType": "",
           "reloadActionCost": 1
-        },
-        "damage": [
-          {
-            "type": "slashing",
-            "value": 2,
-            "attributeModifier": "str",
-            "attributeMultiplier": 1,
-            "damageMultiplier": 1,
-            "overallMultiplier": 1,
-            "penetration": 0
-          }
-        ],
-        "finisherLimit": 2,
-        "hasStrongAttack": true
+        }
       },
       {
         "name": "Stab",
         "attackType": "thrust",
-        "lethal": 0,
+        "finisherLimit": 10,
+        "hasStrongAttack": false,
         "critical": 10,
-        "reach": "",
+        "lethal": 0,
+        "reach": 0,
+        "damage": [
+          {
+            "type": "piercing",
+            "value": 3,
+            "penetration": 0,
+            "attributeModifier": "str",
+            "attributeMultiplier": 1,
+            "damageMultiplier": 1,
+            "overallMultiplier": 1
+          }
+        ],
         "range": 0,
         "penetration": 0,
         "ammunition": {
@@ -93,20 +106,7 @@
           "max": 0,
           "reloadType": "",
           "reloadActionCost": 1
-        },
-        "damage": [
-          {
-            "type": "piercing",
-            "value": 3,
-            "attributeModifier": "str",
-            "attributeMultiplier": 1,
-            "damageMultiplier": 1,
-            "overallMultiplier": 1,
-            "penetration": 0
-          }
-        ],
-        "finisherLimit": 10,
-        "hasStrongAttack": false
+        }
       }
     ],
     "abbrewId": {
@@ -142,6 +142,11 @@
       "meta": {
         "size": -2
       }
+    },
+    "revealed": {
+      "revealSkills": {
+        "raw": "[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]"
+      }
     }
   },
   "effects": [],
@@ -151,11 +156,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075360599,
-    "modifiedTime": 1750446211251,
+    "modifiedTime": 1752865861012,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

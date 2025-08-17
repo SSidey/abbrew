@@ -41,9 +41,11 @@ export async function handleSkillUsesAndCharges(actor, skill, modifierSkills) {
     }
 }
 
-export async function checkForTemporarySkillOutOfUses(skill, actor) {
+export async function checkForTemporarySkillExpiry(skill, actor) {
     if (((skill.system.action.uses.hasUses && skill.system.action.uses.value === 0) && skill.system.action.charges.value === 0) || (skill.system.action.charges.hasCharges && skill.system.action.charges.value === 0)) {
         await cleanTemporarySkill(skill, actor);
+    } else if (skill.system.action.duration.precision === "0" && skill.system.skillType === "temporary") {
+        await checkAndExpire(actor, skill);
     }
 }
 

@@ -1,0 +1,52 @@
+{
+    "type": "Archetype",
+    "name": "Ranger",
+    "theme": "Masters of the wild and patient hunters, Rangers live for the open air and the satisfaction of a well-placed shot. Whether stalking prey through dense forest or shadowing an enemy force from a ridgeline, Rangers are built for striking from afar and surviving in hostile terrain. In a party, Rangers excel at reconnaissance, harrying enemies from distance, and controlling the battlefield’s range. Their craft blends precision marksmanship with tactical movement — keeping foes off-balance and allies well-informed.",
+    "requirements": [
+      { "skillsPerRank": 4, "roles": ["martial", "ranged"] }
+    ],
+    "restrictions": [],
+    "profession_synergies": ["hunter","tracker","fletcher","beast handler","wilderness guide"],
+    "tier_skills": [
+      {
+        "rank": 1,
+        "name": "Hunter’s Instinct",
+        "flavor": "Flow like wind, strike like a falling hawk.",
+        "mechanics": {
+          "activation": "onUse",
+          "actions": { "cost": 0 },
+          "movement": { "freeMove": "halfMove", "noReactions": true },
+          "fortune": { "add": 1 },
+          "debuffs": { "targetHalfMoveNextTurn": true }
+        },
+        "humanReadableMechanics": "Activate: free. Move up to half your speed without provoking; then make a Martial or Ranged attack at +1 Fortune. On hit, target’s movement is halved until end of its next turn."
+      },
+      {
+        "rank": 6,
+        "name": "Master of the Wilds",
+        "flavor": "The wild bends to your will.",
+        "mechanics": {
+          "activation": "onUse",
+          "durationRounds": 3,
+          "stance": true,
+          "fortune": { "add": 2, "condition": "inNaturalTerrain" },
+          "armour": { "penetration": 2, "vsTags": ["naturalArmor:hide","chitin","scale"] },
+          "utility": { "trackPreyFree": true, "revealHiddenOnHit": true }
+        },
+        "humanReadableMechanics": "Activate stance for 3 rounds. In natural terrain: +2 Fortune on Martial/Ranged; enemies you hit cannot Hide until your next turn; once per stance you may Track Prey (free). Your attacks gain penetration 2 vs hide/chitin/scale."
+      },
+      {
+        "rank": 10,
+        "name": "Apex Predator",
+        "flavor": "When the apex hunts, the world grows quiet.",
+        "mechanics": {
+          "activation": "onUse",
+          "multiTarget": { "count": 3, "range": "max" },
+          "risk": { "targetGain": 10 },
+          "tierDice": { "refundOnDefeat": 1 },
+          "armour": { "ignoreResistance": [{ "type": "piercing", "n": 99 }, { "type": "slashing", "n": 99 }] }
+        },
+        "humanReadableMechanics": "Choose up to 3 enemies at max range; make one attack roll vs each. Each hit adds +10 Risk. Regain 1 Tier Die per defeated enemy. This volley ignores resistance to piercing and slashing."
+      }
+    ]
+  }

@@ -1,0 +1,107 @@
+{
+    "role": "martial",
+    "skills": [
+      {
+        "name": "Quickdraw",
+        "flavor": "Faster than thought.",
+        "mechanics": {
+          "activation": "passive",
+          "actions": { "firstAttackCostMod": -1 }
+        },
+        "humanReadableMechanics": "Your first attack each turn costs 1 fewer action."
+      },
+      {
+        "name": "Weapon Familiarity",
+        "flavor": "Hand and weapon move as one.",
+        "mechanics": {
+          "activation": "passive",
+          "fortune": { "add": 1, "condition": "chosenWeapon" }
+        },
+        "humanReadableMechanics": "+1 Fortune when attacking with your chosen weapon type."
+      },
+      {
+        "name": "Battlefield Shift",
+        "flavor": "Strike, step, reset.",
+        "mechanics": {
+          "activation": "onUse",
+          "actions": { "cost": 1 },
+          "movement": { "stepAfterAttack": 2 }
+        },
+        "humanReadableMechanics": "After an attack, spend 1 action to move 2 extra squares."
+      },
+      {
+        "name": "Defensive Bind",
+        "flavor": "Turn their edge aside.",
+        "mechanics": {
+          "activation": "onUse",
+          "actions": { "cost": 1 },
+          "reactions": { "parryPrepared": true }
+        },
+        "humanReadableMechanics": "Spend 1 action to prepare a Parry before your next turn."
+      },
+      {
+        "name": "Pressing Advance",
+        "flavor": "Give no ground.",
+        "mechanics": {
+          "activation": "onHit",
+          "movement": { "enterSpace": true, "shove": 1 }
+        },
+        "humanReadableMechanics": "On hit, step into the target’s space and push them back 1 square."
+      },
+      {
+        "name": "Weapon Master’s Eye",
+        "flavor": "One chance perfected.",
+        "mechanics": {
+          "activation": "onUse",
+          "uses": { "perEncounter": 1 },
+          "reroll": { "miss": 1 }
+        },
+        "humanReadableMechanics": "Once per encounter, reroll a missed attack."
+      },
+      {
+        "name": "Cleaving Strike",
+        "flavor": "Edge bites deep.",
+        "mechanics": {
+          "activation": "onHit",
+          "damage": { "types": ["slashing"] },
+          "wounds": {
+            "lingering": ["bleed"],
+            "riskThreshold": 20,
+            "applyLingeringIfMet": { "bleed": 1 }
+          }
+        },
+        "humanReadableMechanics": "Add slashing damage. If target’s Risk ≥ 20, also apply Bleed (1)."
+      },
+      {
+        "name": "Crushing Blow",
+        "flavor": "Weight makes ruin.",
+        "mechanics": {
+          "activation": "onHit",
+          "damage": { "types": ["crushing"] },
+          "guard": { "targetMod": -2, "persistent": true }
+        },
+        "humanReadableMechanics": "Add crushing damage and permanently reduce the target’s Guard by 2."
+      },
+      {
+        "name": "Armour Splitter",
+        "flavor": "Find the seam.",
+        "mechanics": {
+          "activation": "onHit",
+          "damage": { "types": ["piercing"] },
+          "armour": { "penetration": 3 }
+        },
+        "humanReadableMechanics": "Add piercing damage; this attack has penetration 3."
+      },
+      {
+        "name": "Disarm Twist",
+        "flavor": "Grip, torque, drop.",
+        "mechanics": {
+          "activation": "onHit",
+          "checks": { "opposed": { "attacker": "strength", "defender": "strength" } },
+          "effects": { "disarm": true }
+        },
+        "humanReadableMechanics": "On hit, make an opposed Strength check; on success, disarm the target."
+      }
+    ]
+  }
+  

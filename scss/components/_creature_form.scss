@@ -78,6 +78,8 @@ li.creature-form-anatomy:not(:last-child) {
     height: 50px;
     line-height: 50px;
     text-align: center;
+    list-style: none;
+    border-style: inset;
 
     span {
         display: inline-block;

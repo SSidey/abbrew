@@ -35,8 +35,8 @@
     "speed": 0,
     "revealed": {
       "isRevealed": false,
-      "difficulty": 0,
-      "tier": 0
+      "difficulty": 15,
+      "tier": 1
     },
     "defense": {
       "guard": 0,
@@ -52,7 +52,63 @@
       }
     ],
     "skills": {
-      "granted": []
+      "granted": [
+        {
+          "name": "Apply Pressure",
+          "skillType": "",
+          "id": "CvI0LhIFyMYsBwxx",
+          "image": "systems/abbrew/assets/icons/actions/1a.webp",
+          "sourceId": "Compendium.abbrew.skills.Item.CvI0LhIFyMYsBwxx"
+        },
+        {
+          "name": "Climb",
+          "skillType": "",
+          "id": "MdEjJXPBEVBhBgfC",
+          "image": "systems/abbrew/assets/icons/actions/0a.webp",
+          "sourceId": "Compendium.abbrew.skills.Item.MdEjJXPBEVBhBgfC"
+        },
+        {
+          "name": "Disarm",
+          "skillType": "",
+          "id": "iIibvIpO1Fz3BkvT",
+          "image": "systems/abbrew/assets/icons/skills/disarm.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.iIibvIpO1Fz3BkvT"
+        },
+        {
+          "name": "Grab",
+          "skillType": "",
+          "id": "nU042uDuvcVY0Bnm",
+          "image": "systems/abbrew/assets/icons/skills/grab.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.nU042uDuvcVY0Bnm"
+        },
+        {
+          "name": "Handle",
+          "skillType": "",
+          "id": "E1FoPANt1CjHlRvV",
+          "image": "systems/abbrew/assets/icons/actions/1a.webp",
+          "sourceId": "Compendium.abbrew.skills.Item.E1FoPANt1CjHlRvV"
+        },
+        {
+          "name": "Reposition",
+          "skillType": "",
+          "id": "U2cK5wpOqnCHHTLu",
+          "image": "systems/abbrew/assets/icons/skills/reposition.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.U2cK5wpOqnCHHTLu"
+        },
+        {
+          "name": "Shove",
+          "id": "1stLJNCnkgVA0ceT",
+          "image": "systems/abbrew/assets/icons/skills/shove.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.1stLJNCnkgVA0ceT",
+          "skillType": ""
+        }
+      ]
+    },
+    "name": {
+      "base": "Arm"
+    },
+    "meta": {
+      "quality": 0
     }
   },
   "effects": [],
@@ -63,11 +119,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075194922,
-    "modifiedTime": 1749677886512,
+    "modifiedTime": 1753654336741,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

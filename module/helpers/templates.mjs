@@ -42,6 +42,8 @@ export const preloadHandlebarsTemplates = async function () {
     "systems/abbrew/templates/item/anatomy/parts/anatomy-attributes.hbs",
     // Archetype partials.
     "systems/abbrew/templates/item/archetype/parts/archetype-requirements.hbs",
+    // Background partials.
+    "systems/abbrew/templates/item/background/parts/background-attributes.hbs",
     // Creature-Form partials.
     "systems/abbrew/templates/item/creature-form/parts/creature-form-attributes.hbs",
     // Enhancement partials.

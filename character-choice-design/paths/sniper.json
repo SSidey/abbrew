@@ -1,0 +1,579 @@
+{
+  "type": "Path",
+  "name": "Sniper",
+  "theme": "Snipers are the unseen predators of the battlefield, patiently waiting for the moment to strike. They excel in precision shooting, taking down high-value targets, and keeping their location hidden even after an attack. In addition to their deadly aim, Snipers can gather information from afar, guiding their allies with vital intel.",
+  "roles": ["martial", "ranged", "vanguard", "scout"],
+  "tier_skills": [
+    {
+      "rank": 1,
+      "name": "Deadeye’s Patience",
+      "flavor": "The world narrows to a single heartbeat… and then it stops.",
+      "mechanics": {
+        "activation": "onUse",
+        "actions": { "cost": 0 },
+        "timing": { "delayAttackToAnyPointThisRound": true },
+        "fortune": { "add": 2, "condition": "targetMovedSinceYourLastTurn" }
+      },
+      "humanReadableMechanics": "Delay one attack to any point this round. If the target moved since your last turn, that attack gains +2 Fortune."
+    },
+    {
+      "rank": 6,
+      "name": "Perfect Kill",
+      "flavor": "No second shot. No witnesses. No escape.",
+      "mechanics": {
+        "activation": "onUse",
+        "lethality": { "mult": 2.0 },
+        "stealth": { "remainHiddenOnKill": true },
+        "armour": { "ignoreResistance": [{ "type": "piercing", "n": 99 }] }
+      },
+      "humanReadableMechanics": "Make a single shot with doubled Lethality. If it defeats the target, you remain Hidden. The shot ignores resistance to piercing."
+    },
+    {
+      "rank": 10,
+      "name": "One Shot, One Legend",
+      "flavor": "The tale will spread — of the shot no defence could stop.",
+      "mechanics": {
+        "activation": "onUse",
+        "crit": { "autoExplodeOnce": true },
+        "defenceBypass": { "ignoreParryBlockMagicShield": true },
+        "teamBuff": {
+          "alliesNextAttackFortune": 2,
+          "scope": "anyEnemyInSight"
+        },
+        "armour": { "penetration": 5 }
+      },
+      "humanReadableMechanics": "This attack auto-crits once (explodes) and ignores parry, block, and magic shields. On kill, allies gain +2 Fortune on their next attack against any enemy in line of sight. Penetration 5."
+    }
+  ],
+  "ranks": {
+    "1": [
+      {
+        "name": "Shadowed Nest",
+        "flavor": "You become part of the terrain, unseen until you choose to reveal yourself.",
+        "mechanics": {
+          "activation": "onUse",
+          "stealth": { "startHiddenBonus": true },
+          "fortune": { "add": 1, "firstAttackOnly": true },
+          "revealOnMiss": false
+        },
+        "humanReadableMechanics": "When combat starts from stealth: your first attack gains +1 Fortune and you remain Hidden if it misses."
+      },
+      {
+        "name": "Rangefinder",
+        "flavor": "A quick measure, a subtle calculation — and the arrow flies true.",
+        "mechanics": {
+          "activation": "passive",
+          "range": { "ignorePenaltyTiers": 1 }
+        },
+        "humanReadableMechanics": "Ignore the first range penalty tier."
+      },
+      {
+        "name": "Low Silhouette",
+        "flavor": "Keep your profile tight and the enemy guessing.",
+        "mechanics": {
+          "activation": "passive",
+          "guard": { "bonusVsRangedWhileProne": 1 }
+        },
+        "humanReadableMechanics": "While prone, you gain +1 Guard against ranged attacks."
+      },
+      {
+        "name": "Predator’s Calm",
+        "flavor": "No twitch, no breath, only focus.",
+        "mechanics": {
+          "activation": "passive",
+          "actions": {
+            "aimedShotCostMod": -1,
+            "condition": "didNotMoveThisTurn"
+          }
+        },
+        "humanReadableMechanics": "If you did not move this turn, Aimed Shot costs 1 fewer action."
+      },
+      {
+        "name": "Heartseeker",
+        "flavor": "Aim for where life beats hardest.",
+        "mechanics": {
+          "activation": "onHit",
+          "damage": { "types": ["piercing"] },
+          "wounds": { "acute": ["vital"], "riskThreshold": 20 }
+        },
+        "humanReadableMechanics": "Add piercing damage. If target’s Risk ≥ 20, also apply Vital (1) wound."
+      },
+      {
+        "name": "Camber Shot",
+        "flavor": "An arcing shot to slip over cover.",
+        "mechanics": {
+          "activation": "onUse",
+          "cover": { "ignoreLowCover": true }
+        },
+        "humanReadableMechanics": "Your next shot ignores low cover via a high arc/angle."
+      },
+      {
+        "name": "Lethal Setup",
+        "flavor": "Time your shot for maximum devastation.",
+        "mechanics": {
+          "activation": "onUse",
+          "turnCommit": { "onlyAimThisTurn": true },
+          "lethality": { "add": 2, "appliesToNextShot": true }
+        },
+        "humanReadableMechanics": "If you spend your whole turn aiming, your next shot gains +2 Lethality."
+      },
+      {
+        "name": "Glass Sight",
+        "flavor": "You see what others cannot.",
+        "mechanics": {
+          "activation": "passive",
+          "senses": { "visionRangeMod": 0.2 }
+        },
+        "humanReadableMechanics": "Increase detection/targeting vision range by 20%."
+      },
+      {
+        "name": "Armour Probe",
+        "flavor": "Test the armour, find its weakness.",
+        "mechanics": {
+          "activation": "onHit",
+          "armour": {
+            "reduceResistance": [
+              { "type": "piercing", "n": 1, "durationRounds": 2 }
+            ]
+          }
+        },
+        "humanReadableMechanics": "On hit, reduce target’s piercing resistance by 1 for 2 rounds."
+      },
+      {
+        "name": "Mark and Measure",
+        "flavor": "Fix your mark and judge the moment.",
+        "mechanics": {
+          "activation": "onUse",
+          "actions": { "cost": 1 },
+          "guard": { "ignoreGuardOnNextAttack": true }
+        },
+        "humanReadableMechanics": "Spend 1 action: your next attack this round ignores Guard."
+      }
+    ],
+    "2": [
+      {
+        "name": "Vital Mark",
+        "flavor": "A silent promise — this one won’t survive.",
+        "mechanics": {
+          "activation": "onUse",
+          "actions": { "cost": 1 },
+          "mark": true,
+          "lethality": { "add": 1, "appliesToNextAttackThisTurn": true }
+        },
+        "humanReadableMechanics": "Spend 1 action to Mark a target; your next attack this turn gains +1 Lethality."
+      },
+      {
+        "name": "Wind Reader",
+        "flavor": "Feel the wind in your bones, and adjust.",
+        "mechanics": {
+          "activation": "onUse",
+          "uses": { "perEncounter": 1 },
+          "range": { "ignoreEnvPenalties": true }
+        },
+        "humanReadableMechanics": "Once per encounter, ignore environmental penalties (wind, rain, etc.) for one shot."
+      },
+      {
+        "name": "Tag & Report",
+        "flavor": "Eyes on the target, voice in the ear.",
+        "mechanics": {
+          "activation": "onUse",
+          "actions": { "cost": 1 },
+          "allyBuff": { "targetedNextAttackFortune": 1 }
+        },
+        "humanReadableMechanics": "Spend 1 action: highlight an enemy; allies get +1 Fortune on their next attack against it."
+      },
+      {
+        "name": "Stillness Training",
+        "flavor": "Sometimes the smallest motion is the loudest.",
+        "mechanics": {
+          "activation": "passive",
+          "fortune": { "add": 1, "condition": "didNotMoveThisRound" }
+        },
+        "humanReadableMechanics": "If you didn’t move this round, gain +1 Fortune on ranged attacks."
+      },
+      {
+        "name": "Burning Brand",
+        "flavor": "Let the arrow carry the fire.",
+        "mechanics": {
+          "activation": "onHit",
+          "damage": { "types": ["fire"] },
+          "wounds": {
+            "lingering": ["burning"],
+            "riskThreshold": 20,
+            "applyLingeringIfMet": { "burning": 2 }
+          }
+        },
+        "humanReadableMechanics": "Add fire damage. If target’s Risk ≥ 20, apply Burning (2)."
+      },
+      {
+        "name": "Silencing Shot",
+        "flavor": "No scream, no warning.",
+        "mechanics": {
+          "activation": "onHit",
+          "status": ["mute"],
+          "durationRounds": 2
+        },
+        "humanReadableMechanics": "On hit, target becomes Mute for 2 rounds."
+      },
+      {
+        "name": "Weakpoint Scan",
+        "flavor": "Strip away every illusion of defence.",
+        "mechanics": {
+          "activation": "onUse",
+          "checks": { "attacker": "wits" },
+          "armour": { "ignoreArmourOnNextAttack": true }
+        },
+        "humanReadableMechanics": "Make a Wits check; on success, your next attack ignores armour."
+      },
+      {
+        "name": "Penetrator Tip",
+        "flavor": "Punch through to the marrow.",
+        "mechanics": {
+          "activation": "onHit",
+          "damage": { "types": ["piercing"] },
+          "armour": { "penetration": 2 }
+        },
+        "humanReadableMechanics": "Add piercing; attack gains penetration 2."
+      },
+      {
+        "name": "Shiver Bolt",
+        "flavor": "Cold creeps in where armour gaps.",
+        "mechanics": {
+          "activation": "onHit",
+          "damage": { "types": ["cold"] },
+          "equip": { "inflexibilityModTarget": -2, "durationRounds": 2 }
+        },
+        "humanReadableMechanics": "Add cold damage; target’s inflexibility is reduced by 2 for 2 rounds (takes less Risk from hits)."
+      },
+      {
+        "name": "Explosive Tip",
+        "flavor": "Make a statement they can’t ignore.",
+        "mechanics": {
+          "activation": "onHit",
+          "damage": { "types": ["fire"] },
+          "aoe": { "radius": 2, "secondaryTargetsTakeHalf": true }
+        },
+        "humanReadableMechanics": "Add fire damage; enemies within 2 squares of the target take half damage."
+      }
+    ],
+    "3": [
+      {
+        "name": "Ghost Relocation",
+        "flavor": "Strike, vanish, relocate — they’ll never pin you down.",
+        "mechanics": {
+          "activation": "onUse",
+          "actions": { "cost": 2, "trigger": "afterRangedAttack" },
+          "movement": { "freeMove": "full", "noReactions": true }
+        },
+        "humanReadableMechanics": "After a ranged attack, spend 2 actions to move your full movement without provoking reactions."
+      },
+      {
+        "name": "Target Acquisition",
+        "flavor": "Snap to the next mark without hesitation.",
+        "mechanics": {
+          "activation": "passive",
+          "actions": {
+            "firstAttackVsNewTargetCostMod": -1,
+            "oncePerTurn": true
+          }
+        },
+        "humanReadableMechanics": "Once per turn, your first ranged attack against a new target costs 1 fewer action."
+      },
+      {
+        "name": "Spotter’s Lens",
+        "flavor": "Even the smallest twitch betrays them.",
+        "mechanics": {
+          "activation": "passive",
+          "senses": { "withOpticsPerceptionRangeMult": 2.0 }
+        },
+        "humanReadableMechanics": "Perception range is doubled when using optics."
+      },
+      {
+        "name": "Veiled Exit",
+        "flavor": "A shadow leaves no trace.",
+        "mechanics": {
+          "activation": "passive",
+          "guard": {
+            "bonus": 1,
+            "condition": "startTurnHidden",
+            "durationRounds": 1
+          }
+        },
+        "humanReadableMechanics": "If you start your turn Hidden, gain +1 Guard until your next turn."
+      },
+      {
+        "name": "Piercing Ice",
+        "flavor": "Cold slows more than flesh.",
+        "mechanics": {
+          "activation": "onHit",
+          "damage": { "types": ["cold"] },
+          "movement": { "targetHalfMoveRounds": 2 }
+        },
+        "humanReadableMechanics": "Add cold damage; target’s movement is halved for 2 rounds."
+      },
+      {
+        "name": "Disruptive Bolt",
+        "flavor": "Short-circuit their senses.",
+        "mechanics": {
+          "activation": "onHit",
+          "damage": { "types": ["electric"] },
+          "status": ["disoriented"]
+        },
+        "humanReadableMechanics": "Add electric damage; on hit, target becomes Disoriented."
+      },
+      {
+        "name": "Armour Breaker",
+        "flavor": "Peel away their shell.",
+        "mechanics": {
+          "activation": "onHit",
+          "guard": { "targetMod": -2, "persistent": true }
+        },
+        "humanReadableMechanics": "On hit, reduce the target’s Guard by 2 (until repaired/restored)."
+      },
+      {
+        "name": "Flash Shot",
+        "flavor": "Let light blind their eyes.",
+        "mechanics": {
+          "activation": "onHit",
+          "status": ["blind"],
+          "durationRounds": 1
+        },
+        "humanReadableMechanics": "On hit, apply Blind for 1 round."
+      },
+      {
+        "name": "Pinion Arrow",
+        "flavor": "Pin them to the spot.",
+        "mechanics": {
+          "activation": "onHit",
+          "damage": { "types": ["piercing"] },
+          "status": ["immobilised"],
+          "durationRounds": 1
+        },
+        "humanReadableMechanics": "Add piercing; target is Immobilised for 1 round."
+      },
+      {
+        "name": "Poison Tip",
+        "flavor": "A slow kill is still a kill.",
+        "mechanics": {
+          "activation": "onHit",
+          "damage": { "types": ["poison"] },
+          "wounds": { "lingering": ["poisoned"], "stacks": 3 }
+        },
+        "humanReadableMechanics": "Add poison damage; apply Poisoned (3) lingering."
+      }
+    ],
+    "4": [
+      {
+        "name": "Crack the Guard",
+        "flavor": "One shot to shatter their stance.",
+        "mechanics": {
+          "activation": "onHit",
+          "conditions": ["targetGuardBroken"],
+          "risk": { "effectiveRiskBonus": 10 }
+        },
+        "humanReadableMechanics": "When attacking a guard-broken target, add +10 effective Risk."
+      },
+      {
+        "name": "Piercing Arc",
+        "flavor": "Straight through one, into the next.",
+        "mechanics": {
+          "activation": "onUse",
+          "linePierce": { "extraTargetsBehind": 1 }
+        },
+        "humanReadableMechanics": "Your attack hits one additional enemy in a straight line behind the primary target."
+      },
+      {
+        "name": "Pressure Lock",
+        "flavor": "Distance makes the pressure worse.",
+        "mechanics": {
+          "activation": "onHit",
+          "conditions": ["atMaxRange"],
+          "risk": { "targetGain": 5 }
+        },
+        "humanReadableMechanics": "If you hit at maximum range, the target gains +5 Risk."
+      },
+      {
+        "name": "Phantom’s Bluff",
+        "flavor": "Confuse them with where you’re not.",
+        "mechanics": {
+          "activation": "onUse",
+          "actions": { "cost": 0, "trigger": "afterRangedAttack" },
+          "checks": { "attacker": "wits" },
+          "stealth": { "misleadOrigin": true }
+        },
+        "humanReadableMechanics": "After a ranged attack, make a Bluff check to mislead enemies about your position."
+      },
+      {
+        "name": "Shadowburst",
+        "flavor": "Snuff the light, own the dark.",
+        "mechanics": {
+          "activation": "onHit",
+          "damage": { "types": ["dark"] },
+          "senses": { "extinguishLightRadius": 3 }
+        },
+        "humanReadableMechanics": "Add dark damage; extinguish non-magical light in a 3‑square radius."
+      },
+      {
+        "name": "Flame Relay",
+        "flavor": "Set the battlefield alight.",
+        "mechanics": {
+          "activation": "onHit",
+          "damage": { "types": ["fire"] },
+          "terrain": { "igniteSquares": 1, "durationRounds": 2 }
+        },
+        "humanReadableMechanics": "Add fire damage; the impacted square ignites as burning terrain for 2 rounds."
+      },
+      {
+        "name": "Sapping Bolt",
+        "flavor": "Drain their will to fight.",
+        "mechanics": {
+          "activation": "onHit",
+          "resolve": { "targetMod": -1, "durationRounds": 1 }
+        },
+        "humanReadableMechanics": "On hit, reduce the target’s Resolve by 1 for 1 round."
+      },
+      {
+        "name": "Distracting Ricochet",
+        "flavor": "Make them look the wrong way.",
+        "mechanics": {
+          "activation": "onHit",
+          "status": ["distracted"],
+          "stacks": 1
+        },
+        "humanReadableMechanics": "On hit, apply Distracted (1)."
+      },
+      {
+        "name": "Armour Stress",
+        "flavor": "Make their armour work against them.",
+        "mechanics": {
+          "activation": "onHit",
+          "equip": { "inflexibilityModTarget": "+3", "durationRounds": 1 }
+        },
+        "humanReadableMechanics": "On hit, increase the target’s inflexibility by 3 for 1 round (they take more Risk from hits, up to their cap)."
+      },
+      {
+        "name": "Overdraw",
+        "flavor": "Push the bow — and your body — past its limit.",
+        "mechanics": {
+          "activation": "onUse",
+          "damage": { "overall_mult": 1.5 },
+          "selfCost": { "guardLoss": 1 }
+        },
+        "humanReadableMechanics": "Increase this attack’s final damage by x1.5; you lose 1 Guard from strain."
+      }
+    ],
+    "5": [
+      {
+        "name": "Breath Control",
+        "flavor": "One breath out, one arrow loosed.",
+        "mechanics": {
+          "activation": "onUse",
+          "uses": { "perEncounter": 1 },
+          "fortune": { "add": 3 },
+          "turnLock": { "noOtherActions": true }
+        },
+        "humanReadableMechanics": "Once per encounter, gain +3 Fortune on an aimed shot; you can take no other actions that turn."
+      },
+      {
+        "name": "Double Tap",
+        "flavor": "Two quick hits, one killing motion.",
+        "mechanics": {
+          "activation": "onUse",
+          "actions": { "additionalCost": 1 },
+          "attackMod": {
+            "extraShotSameTarget": true,
+            "combineDamageForRisk": true
+          }
+        },
+        "humanReadableMechanics": "Spend +1 action to fire twice at the same target; combine damage for Risk effects."
+      },
+      {
+        "name": "Patience of the Hunter",
+        "flavor": "Wait until their fate is certain.",
+        "mechanics": {
+          "activation": "onUse",
+          "skipAttack": true,
+          "fortune": { "addNextAttack": 1, "windowRounds": 2 }
+        },
+        "humanReadableMechanics": "Skip attacking to gain +1 Fortune on your next attack within 2 rounds."
+      },
+      {
+        "name": "Marked for Death",
+        "flavor": "You’re already dead — you just don’t know it yet.",
+        "mechanics": {
+          "activation": "onUse",
+          "actions": { "cost": 1 },
+          "mark": true,
+          "onKill": { "regainActions": 2 }
+        },
+        "humanReadableMechanics": "Spend 1 action to Mark a target; if it’s defeated this turn, you regain 2 actions."
+      },
+      {
+        "name": "Bleedout Arrow",
+        "flavor": "One wound to drain them dry.",
+        "mechanics": {
+          "activation": "onHit",
+          "damage": { "types": ["slashing"] },
+          "wounds": {
+            "lingering": ["bleed"],
+            "riskThreshold": 20,
+            "applyLingeringIfMet": { "bleed": 2 }
+          }
+        },
+        "humanReadableMechanics": "Add slashing damage; if target’s Risk ≥ 20, apply Bleed (2)."
+      },
+      {
+        "name": "Corrupting Shaft",
+        "flavor": "Let the rot take hold.",
+        "mechanics": {
+          "activation": "onHit",
+          "damage": { "types": ["death"] },
+          "wounds": { "lingering": ["decay"], "stacks": 1 }
+        },
+        "humanReadableMechanics": "Add death damage; apply Decay (1) lingering."
+      },
+      {
+        "name": "Nervebreaker",
+        "flavor": "Pain can be more final than death.",
+        "mechanics": {
+          "activation": "onHit",
+          "damage": { "types": ["pain"] },
+          "wounds": { "lingering": ["suffering"], "stacks": 2 }
+        },
+        "humanReadableMechanics": "Add pain damage; apply Suffering (2) lingering."
+      },
+      {
+        "name": "Binding Wire",
+        "flavor": "They won’t be going anywhere.",
+        "mechanics": {
+          "activation": "onHit",
+          "status": ["grabbed"],
+          "durationRounds": 1
+        },
+        "humanReadableMechanics": "On hit, target is Grabbed for 1 round."
+      },
+      {
+        "name": "Armour Null",
+        "flavor": "For this shot, their armour may as well be paper.",
+        "mechanics": {
+          "activation": "onUse",
+          "armour": {
+            "treatAllResistanceAsZero": true,
+            "respectImmunity": true
+          }
+        },
+        "humanReadableMechanics": "This attack treats all resistances as 0 (immunities still apply)."
+      },
+      {
+        "name": "Last Light",
+        "flavor": "A burning arrow of hope — or doom.",
+        "mechanics": {
+          "activation": "onHit",
+          "damage": { "types": ["light"] },
+          "vsTags": { "darkAlignedDoubleDamage": true }
+        },
+        "humanReadableMechanics": "Add light damage; deal double damage to dark-aligned targets."
+      }
+    ]
+  }
+}

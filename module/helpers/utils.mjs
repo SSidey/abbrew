@@ -187,3 +187,8 @@ export function mergeObjects(map1, map2) {
 export function onlyUnique(value, index, array) {
     return array.indexOf(value) === index;
 }
+
+export function generateAbbrewId(type, name, id) {
+    const formattedName = name.toLowerCase().replace(/\s/g, '');
+    return `abbrew.${type}.${formattedName}.${id}`
+}

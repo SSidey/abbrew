@@ -3,7 +3,7 @@
   "name": "Sight",
   "type": "skill",
   "_id": "CPjPE4fLiHv5T3vA",
-  "img": "icons/svg/item-bag.svg",
+  "img": "systems/abbrew/assets/icons/skills/scan.svg",
   "system": {
     "name": {
       "base": "",
@@ -14,7 +14,7 @@
     },
     "description": "",
     "traits": {
-      "raw": "",
+      "raw": "[{\"key\":\"primarySense\",\"value\":\"Primary Sense\",\"feature\":\"skill\",\"subFeature\":\"senses\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"visual\",\"value\":\"Visual\",\"feature\":\"skill\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]",
       "value": []
     },
     "abbrewId": {
@@ -45,7 +45,15 @@
       "item": ""
     },
     "skills": {
-      "granted": [],
+      "granted": [
+        {
+          "name": "Scan",
+          "id": "LRCKYIXnirM5L3mD",
+          "image": "systems/abbrew/assets/icons/skills/scan.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.LRCKYIXnirM5L3mD",
+          "skillType": ""
+        }
+      ],
       "paired": [],
       "grantedOnActivation": [],
       "grantedOnAccept": []
@@ -69,7 +77,12 @@
           "id": "lightPerception",
           "range": null
         }
-      ]
+      ],
+      "threatened": {
+        "modifiesThreatened": true,
+        "threshold": 1,
+        "disabledBy": "[{\"label\":\"blind\",\"value\":\"Blind\"}]"
+      }
     },
     "action": {
       "activationType": "standalone",
@@ -412,6 +425,10 @@
             "type": "numeric",
             "numerator": 1,
             "denominator": 1
+          },
+          "esoteric": {
+            "operator": "add",
+            "type": "numeric"
           }
         }
       }
@@ -436,26 +453,27 @@
     "revealed": {
       "isRevealed": false,
       "revealSkills": {
-        "raw": "",
+        "raw": "[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
         "parsed": []
       },
-      "difficulty": 0,
-      "tier": 0
-    }
+      "difficulty": 15,
+      "tier": 1
+    },
+    "renderUnique": true
   },
   "effects": [],
-  "sort": 0,
+  "sort": 100000,
   "ownership": {
     "default": 0
   },
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1748711746419,
-    "modifiedTime": 1748713351709,
+    "modifiedTime": 1753892580278,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

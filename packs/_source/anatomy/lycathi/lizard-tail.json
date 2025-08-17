@@ -35,8 +35,8 @@
     "speed": 0,
     "revealed": {
       "isRevealed": false,
-      "difficulty": 0,
-      "tier": 0
+      "difficulty": 15,
+      "tier": 1
     },
     "defense": {
       "guard": 0,

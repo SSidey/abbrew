@@ -3,7 +3,7 @@
  * @param {MouseEvent} event      The left-click event on the effect control
  * @param {Actor|Item} owner      The owning document which manages this effect
  */
-export function onManageActiveEffect(event, owner) {
+export async function onManageActiveEffect(event, owner) {
   event.preventDefault();
   const a = event.target.closest("a");
   const li = event.target.closest('li')
@@ -12,7 +12,7 @@ export function onManageActiveEffect(event, owner) {
     : null;
   switch (a.dataset.effectAction) {
     case 'create':
-      return owner.createEmbeddedDocuments('ActiveEffect', [
+      return await owner.createEmbeddedDocuments('ActiveEffect', [
         {
           name: game.i18n.format('DOCUMENT.New', {
             type: game.i18n.localize('DOCUMENT.ActiveEffect'),
@@ -25,12 +25,12 @@ export function onManageActiveEffect(event, owner) {
         },
       ]);
     case 'edit':
-      return effect.sheet.render(true);
+      return await effect.sheet.render(true);
     case 'delete':
       // Active Effect on an Effect, not a duration tracking one.
-      return effect.delete();
+      return await effect.delete();
     case 'toggle':
-      return effect.update({ disabled: !effect.disabled });
+      return await effect.update({ disabled: !effect.disabled });
   }
 }
 

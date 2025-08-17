@@ -17,16 +17,16 @@ export class EquipStateManager {
                 return this.getNoneInnateStateChanges(equipState, validEquipStates, storeIn);
         }
 
-        const fullValidEquipStates = validEquipStates
-        if (storeIn && !equipState !== "dropped" && !equipState !== "stowed") {
-            return fullValidEquipStates;
-        } else if (equipState === "dropped") {
-            return fullValidEquipStates
-        } else if (equipState === "stowed") {
-            return fullValidEquipStates.filter(e => e.value !== "dropped");
-        } else {
-            return fullValidEquipStates;
-        }
+        // const fullValidEquipStates = validEquipStates
+        // if (storeIn && !equipState !== "dropped" && !equipState !== "stowed") {
+        //     return fullValidEquipStates;
+        // } else if (equipState === "dropped") {
+        //     return fullValidEquipStates
+        // } else if (equipState === "stowed") {
+        //     return fullValidEquipStates.filter(e => e.value !== "dropped");
+        // } else {
+        //     return fullValidEquipStates;
+        // }
     }
 
     static getHeldEquipStateChanges(equipState, validEquipStates, storeIn) {
@@ -61,11 +61,11 @@ export class EquipStateManager {
     }
 
     static getNoneInnateStateChanges(equipState, validEquipStates, storeIn) {
-        if (!storeIn || equipState === "dropped") {
+        if (equipState !== "readied" && (!storeIn || equipState === "dropped")) {
             return [
                 { value: "readied", label: "ABBREW.EquipStateChange.pickup", cost: 1 },
                 ...validEquipStates.filter(e => e.value !== "stowed")
-            ];
+            ]
         } else if (equipState === "stowed") {
             return [
                 { value: "readied", label: "ABBREW.EquipStateChange.pickup", cost: 1 },

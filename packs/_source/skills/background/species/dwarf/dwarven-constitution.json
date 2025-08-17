@@ -135,7 +135,7 @@
         "finisherLimit": 10
       },
       "modifiers": {
-        "fortune": 0,
+        "fortune": 1,
         "actionCost": {
           "value": 0,
           "operator": ""
@@ -410,6 +410,10 @@
             "type": "numeric",
             "numerator": 1,
             "denominator": 1
+          },
+          "esoteric": {
+            "operator": "add",
+            "type": "numeric"
           }
         }
       }
@@ -434,11 +438,11 @@
     "revealed": {
       "isRevealed": false,
       "revealSkills": {
-        "raw": "",
+        "raw": "[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
         "parsed": []
       },
-      "difficulty": 0,
-      "tier": 0
+      "difficulty": 15,
+      "tier": 1
     }
   },
   "effects": [],
@@ -449,11 +453,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1748725994807,
-    "modifiedTime": 1748814555950,
+    "modifiedTime": 1752612716380,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

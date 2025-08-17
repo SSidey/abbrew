@@ -6,7 +6,7 @@ export default class AbbrewRevealedItem {
         schema.revealed = new fields.SchemaField({
             isRevealed: new fields.BooleanField({ required: true, default: true }),
             revealSkills: new fields.SchemaField({
-                raw: new fields.StringField({ required: true, blank: true }),
+                raw: new fields.StringField({ required: true, initial: '[{"id": "abbrewIntCheck00","value": "Intelligence Check","sourceId": "Compendium.abbrew.skills.Item.abbrewIntCheck00"}]' }),
                 parsed: new fields.ArrayField(
                     new fields.StringField({ required: true, blank: true })
                 )

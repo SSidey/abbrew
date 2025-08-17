@@ -5,6 +5,7 @@
         {{selectOptions config.skillTypes selected=system.skillType blank="" localize=true}}
     </select>
 </div>
+{{formGroup system.schema.fields.renderUnique value=system.renderUnique localize=true}}
 {{#if (eq system.skillType "background")}}
 {{!-- Ability Increase --}}
 <div class="form-group">

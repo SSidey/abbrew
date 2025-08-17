@@ -15,8 +15,8 @@
       "uuid": ""
     },
     "quantity": 1,
-    "heft": 0,
-    "complexity": 0,
+    "heft": 2,
+    "complexity": 6,
     "meta": {
       "size": 0,
       "quality": {
@@ -68,7 +68,7 @@
         "hasStrongAttack": true,
         "critical": 10,
         "lethal": 0,
-        "range": 0,
+        "range": 200,
         "penetration": 3,
         "ammunition": {
           "type": "arrow",
@@ -78,10 +78,18 @@
           "reloadType": "draw",
           "reloadActionCost": 1
         },
-        "reach": "",
+        "reach": 0,
         "damage": []
       }
-    ]
+    ],
+    "revealed": {
+      "revealSkills": {
+        "raw": "[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]"
+      }
+    },
+    "name": {
+      "base": "Shortbow"
+    }
   },
   "effects": [],
   "sort": 0,
@@ -91,11 +99,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1747592852294,
-    "modifiedTime": 1748899019510,
+    "modifiedTime": 1752869211710,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

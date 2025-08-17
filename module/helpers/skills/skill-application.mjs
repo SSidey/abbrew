@@ -1,7 +1,7 @@
 import { makeSkillCheck, makeSkillCheckRequest } from "./skill-check.mjs";
 import { handleInstantModifierExpiry } from "./skill-expiry.mjs";
-import { checkForTemporarySkillOutOfUses, handleSkillUsesAndCharges, skillDoesNotUseCharges, skillHasChargesRemaining, skillHasInfiniteUses, skillHasUsesRemaining } from "./skill-uses.mjs";
-import { handlePairedSkills, isSkillBlocked } from "./skill-activation.mjs";
+import { checkForTemporarySkillExpiry, handleSkillUsesAndCharges, skillDoesNotUseCharges, skillHasChargesRemaining, skillHasInfiniteUses, skillHasUsesRemaining } from "./skill-uses.mjs";
+import { areSkillActivationRequirementsMet, handleActivateWithSkills, handlePairedSkills, isSkillBlocked } from "./skill-activation.mjs";
 import { filterSynergiesWithInsufficientResources, handleEarlySelfModifiers, handleLateSelfModifiers, handleTargetUpdates } from "./skill-modifiers.mjs";
 import { applyAttackProfiles } from "./skill-attack.mjs";
 import { renderChatMessage } from "./skill-chat.mjs";
@@ -18,8 +18,18 @@ export function getModifierSkills(actor, skill, includeTraits = []) {
     // Get passives that have synergy with the main skill
     const passiveSynergies = passiveSkills.filter(s => s.system.skillModifiers.synergy).map(s => ({ skill: s, synergy: JSON.parse(s.system.skillModifiers.synergy).flatMap(s => [s.id, foundry.utils.parseUuid(s.sourceId).id]) })).filter(s => s.synergy.includes(skill.system.abbrewId.uuid)).map(s => s.skill)
     // Combine all relevant skills, filtering for those that are out of charges    
-    const baseSynergies = [...passiveSynergies, ...queuedSynergies].filter(s => isSynergyValidForTrigger(skill, s)).filter(s => isSynergyValidForTraits(includeTraits, s));
+    const baseSynergies = [...passiveSynergies, ...queuedSynergies].filter(s => isSynergyValidForActiveSkills(actor, s)).filter(s => isSynergyValidForTrigger(skill, s)).filter(s => isSynergyValidForTraits(includeTraits, s));
     return filterSynergiesWithInsufficientResources(skill, baseSynergies, actor);
+}
+
+function isSynergyValidForActiveSkills(actor, skill) {
+    const requiredSkills = getSafeJson(skill.system.activation.requiredActiveSkills, []).map(s => s.id);
+
+    if (skill.system.isActivatable || requiredSkills.length === 0) {
+        return true;
+    }
+
+    return areSkillActivationRequirementsMet(actor, skill);
 }
 
 function isSynergyValidForTrigger(skill, synergy) {
@@ -76,7 +86,15 @@ async function handleAsyncModifierTypes(actor, skill, mainModifierSkills, siblin
         skills.filter(s =>
             s.system.action.asyncValues.length > 0
         ).forEach(s => {
-            promises.push(preparseDialogs(actor, s.system.action.asyncValues));
+            s.system.action.asyncValues.forEach(v => {
+                if (skill.system.passedValuesForAsync.some(p => p.name === v.name)) {
+                    const value = skill.system.passedValuesForAsync.find(p => p.name === v.name)?.value ?? 0;
+                    v.value = value;
+                }
+            });
+            if (s.system.action.asyncValues.some(v => !v.value)) {
+                promises.push(preparseDialogs(actor, s.system.action.asyncValues));
+            }
         })
     });
 
@@ -169,7 +187,15 @@ function getSkillSummaries(skill, modifierSkills) {
 }
 
 function getSkillTraits(skill, modifierSkills) {
-    const traits = [skill, ...modifierSkills].flatMap(t => t.system.traits);
+    const traits = [skill, ...modifierSkills]
+        .flatMap(t => t.system.traits)
+        .flatMap(t => {
+            if (t.raw) {
+                return getSafeJson(t.raw, [])
+            }
+
+            return t;
+        });
     return traits;
 }
 
@@ -186,7 +212,7 @@ export async function applySkillEffects(actor, skill, includeTraits = []) {
     const shouldRenderChatMessage = (skill.system.isProxied === null || skill.system.isProxied === undefined) || (skill.system.isProxied != null && skill.system.isProxied === false);
     await actor.unsetFlag("abbrew", "combat.damage.lastDealt");
 
-    let templateData = { user: game.user, skillCheck: { attempts: [] }, actorSize: actor.system.meta.size.value, actorTier: actor.system.meta.tier };
+    let templateData = { actor: actor, user: game.user, skillCheck: { attempts: [] }, actorSize: actor.system.meta.size.value, actorTier: actor.system.meta.tier };
 
     const [asyncParsedSkill, mainModifierSkills, modifierSkills, allSkills] = await getGroupedModifierSkills(actor, skill, includeTraits);
     const [mainSummary, modifierSummaries] = getSkillSummaries(skill, modifierSkills);
@@ -200,7 +226,7 @@ export async function applySkillEffects(actor, skill, includeTraits = []) {
         traits: skillTraits
     };
 
-    let data = { actorSize: actor.system.meta.size.value, actorTier: actor.system.meta.tier.value, traits: skillTraits, sources: skill.system.sources };
+    let data = { actor: actor, actorSize: actor.system.meta.size.value, actorTier: actor.system.meta.tier.value, traits: skillTraits, sources: skill.system.sources };
 
     const fortune = mergeFortune(allSkills);
     const lateSelfUpdates = await handleEarlySelfModifiers(actor, allSkills);
@@ -208,7 +234,7 @@ export async function applySkillEffects(actor, skill, includeTraits = []) {
     let skillResult;
     [skillResult, templateData, data] = await makeSkillCheck(actor, asyncParsedSkill, allSkills, fortune, templateData, data);
 
-    [skillResult, templateData, data] = await makeSkillCheckRequest(actor, asyncParsedSkill, modifierSkills, skillResult, templateData, data);
+    [skillResult, templateData, data] = await makeSkillCheckRequest(actor, asyncParsedSkill, modifierSkills, skill, skillResult, templateData, data);
     modifierSkills.filter(s => s.system.action.skillRequest.isEnabled).forEach(async s => {
         let modData = foundry.utils.deepClone(data);
         let modTemplate = foundry.utils.deepClone(templateData);
@@ -228,8 +254,9 @@ export async function applySkillEffects(actor, skill, includeTraits = []) {
 
     await handleSkillUsesAndCharges(actor, skill, mainModifierSkills);
     await handlePairedSkills(skill, actor);
+    await handleActivateWithSkills(skill, actor);
     await handleInstantModifierExpiry(actor, mainModifierSkills);
-    await checkForTemporarySkillOutOfUses(skill, actor);
+    await checkForTemporarySkillExpiry(skill, actor);
 
     return skillResult;
 }

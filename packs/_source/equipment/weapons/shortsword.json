@@ -9,11 +9,24 @@
     "equipType": "held",
     "attackProfiles": [
       {
-        "name": "Stab",
-        "attackType": "thrust",
-        "lethal": 0,
+        "name": "Slash",
+        "attackType": "arc",
+        "finisherLimit": 10,
+        "hasStrongAttack": true,
         "critical": 10,
-        "reach": "",
+        "lethal": 0,
+        "reach": 1,
+        "damage": [
+          {
+            "type": "slashing",
+            "value": 3,
+            "penetration": 0,
+            "attributeModifier": "str",
+            "attributeMultiplier": 1,
+            "damageMultiplier": 1,
+            "overallMultiplier": 1
+          }
+        ],
         "range": 0,
         "penetration": 0,
         "ammunition": {
@@ -23,20 +36,37 @@
           "max": 0,
           "reloadType": "",
           "reloadActionCost": 1
-        },
+        }
+      },
+      {
+        "name": "Stab",
+        "attackType": "thrust",
+        "finisherLimit": 10,
+        "hasStrongAttack": false,
+        "critical": 10,
+        "lethal": 0,
+        "reach": 1,
         "damage": [
           {
             "type": "piercing",
-            "value": 4,
+            "value": 3,
+            "penetration": 0,
             "attributeModifier": "str",
             "attributeMultiplier": 1,
             "damageMultiplier": 1,
-            "overallMultiplier": 1,
-            "penetration": 0
+            "overallMultiplier": 1
           }
         ],
-        "finisherLimit": 10,
-        "hasStrongAttack": false
+        "range": 0,
+        "penetration": 0,
+        "ammunition": {
+          "type": "",
+          "id": "",
+          "value": 0,
+          "max": 0,
+          "reloadType": "",
+          "reloadActionCost": 1
+        }
       }
     ],
     "weapon": {
@@ -70,7 +100,15 @@
     "meta": {
       "tier": 0
     },
-    "heft": 4
+    "heft": 4,
+    "revealed": {
+      "revealSkills": {
+        "raw": "[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]"
+      }
+    },
+    "name": {
+      "base": "Shortsword"
+    }
   },
   "img": "icons/svg/item-bag.svg",
   "effects": [],
@@ -81,11 +119,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075348244,
-    "modifiedTime": 1750446725990,
+    "modifiedTime": 1752866027093,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

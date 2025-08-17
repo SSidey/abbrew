@@ -1,0 +1,22 @@
+{
+  "name": "Item",
+  "sorting": "a",
+  "folder": null,
+  "type": "Item",
+  "_id": "CBUrKPnMactDG7PT",
+  "description": "",
+  "sort": 100000,
+  "color": null,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "13.346",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746969046823,
+    "modifiedTime": 1753037704287,
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
+  },
+  "_key": "!folders!CBUrKPnMactDG7PT"
+}

@@ -127,8 +127,8 @@
         "raw": "[{\"value\":\"Alchemy (Check)\",\"id\":\"OLoaLfFfFYG3IhJc\",\"sourceId\":\"CompendiumabbrewplayerskillsItemOLoaLfFfFYG3IhJc\"}]",
         "parsed": []
       },
-      "difficulty": 10,
-      "tier": 0
+      "difficulty": 15,
+      "tier": 1
     },
     "grantedBy": "",
     "defense": {

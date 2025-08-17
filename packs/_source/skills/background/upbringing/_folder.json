@@ -1,0 +1,21 @@
+{
+  "type": "Item",
+  "folder": "ABRkKLvZsTjb85lP",
+  "name": "Upbringing",
+  "color": null,
+  "sorting": "a",
+  "_id": "tR7y8lpNpFjvu6Sr",
+  "description": "",
+  "sort": 100000,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.346",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "lastModifiedBy": "abbrewpacks00000",
+    "modifiedTime": 1753029524677
+  },
+  "_key": "!folders!tR7y8lpNpFjvu6Sr"
+}

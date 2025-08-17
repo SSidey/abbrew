@@ -3,6 +3,8 @@ import AbbrewAttackBase from "./attack-base.mjs";
 
 export default class AbbrewWeapon extends AbbrewArmour {
 
+  static LOCALIZATION_PREFIXES = [...super.LOCALIZATION_PREFIXES, "ITEM_WEAPON"];
+
   static defineSchema() {
     const schema = super.defineSchema();
 
@@ -27,10 +29,6 @@ export default class AbbrewWeapon extends AbbrewArmour {
 
   // Post Active Effects
   prepareDerivedData() {
-    this.isOverpowerTrained = this.doesParentActorHaveSkillTrait("skillTraining", "offensiveSkills", "base", "overpower") ?? false;
-  }
-
-  doesParentActorHaveSkillTrait(feature, subFeature, effect, data) {
-    return this?.parent?.actor?.doesActorHaveSkillTrait(feature, subFeature, effect, data) ?? false;
+    super.prepareDerivedData();
   }
 }

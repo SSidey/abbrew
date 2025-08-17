@@ -4,7 +4,7 @@
   "_id": "abbrewCDisorient",
   "img": "systems/abbrew/assets/icons/statuses/disoriented.svg",
   "system": {
-    "description": "<p>You have been disoriented, you cannot restore guard nor parry while you have this condition.</p>",
+    "description": "<p>You have been disoriented, leaving you unable to use the @UUID[Compendium.abbrew.skills.Item.iUJqYFdrcfZyUr6S]{restore guard}, @UUID[Compendium.abbrew.skills.Item.abbrewParry00000]{parry} and @UUID[Compendium.abbrew.skills.Item.ocw9C57R2vHbR9gc]{dodge} skills.</p>",
     "traits": "",
     "abbrewId": {
       "value": "abbrew.skill.disoriented.abbrewCDisorient",
@@ -13,7 +13,7 @@
     "skillTraits": "",
     "skillModifiers": {
       "synergy": "",
-      "discord": "[{\"id\":\"abbrewParry00000\",\"value\":\"Parry\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewParry00000\"},{\"value\":\"Restore Guard\",\"id\":\"iUJqYFdrcfZyUr6S\",\"sourceId\":\"Compendium.abbrew.skills.Item.iUJqYFdrcfZyUr6S\"}]"
+      "discord": "[{\"id\":\"abbrewParry00000\",\"value\":\"Parry\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewParry00000\"},{\"value\":\"Restore Guard\",\"id\":\"iUJqYFdrcfZyUr6S\",\"sourceId\":\"Compendium.abbrew.skills.Item.iUJqYFdrcfZyUr6S\"},{\"value\":\"Dodge\",\"id\":\"ocw9C57R2vHbR9gc\",\"sourceId\":\"Compendium.abbrew.skills.Item.ocw9C57R2vHbR9gc\"}]"
     },
     "configurable": true,
     "isActivatable": false,
@@ -204,6 +204,10 @@
           "conquest": {
             "operator": "add",
             "type": "numeric"
+          },
+          "esoteric": {
+            "operator": "add",
+            "type": "numeric"
           }
         }
       }
@@ -283,11 +287,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743076241070,
-    "modifiedTime": 1749073101863,
+    "modifiedTime": 1753643487511,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

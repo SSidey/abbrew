@@ -11,7 +11,31 @@
       "value": "",
       "uuid": ""
     },
-    "skills": [],
+    "skills": {
+      "granted": [
+        {
+          "name": "Well Rested",
+          "skillType": "background",
+          "id": "XfMG3MYM3HDl1x20",
+          "image": "systems/abbrew/assets/icons/skills/well-rested.svg",
+          "sourceId": "Compendium.abbrew.conditions.Item.XfMG3MYM3HDl1x20"
+        },
+        {
+          "name": "Orc (Species)",
+          "skillType": "background",
+          "id": "WfQXeinK9oid3Za9",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.WfQXeinK9oid3Za9"
+        },
+        {
+          "name": "Orc Rage",
+          "id": "YSH9tmF6bwStUlgA",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.YSH9tmF6bwStUlgA",
+          "skillType": "background"
+        }
+      ]
+    },
     "attributes": {
       "str": {
         "value": 3,
@@ -69,11 +93,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743076697715,
-    "modifiedTime": 1743080054582,
+    "modifiedTime": 1753032579838,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

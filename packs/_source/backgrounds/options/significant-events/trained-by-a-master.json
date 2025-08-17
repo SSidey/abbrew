@@ -11,17 +11,27 @@
       "value": "",
       "uuid": ""
     },
-    "skills": [],
+    "skills": {
+      "granted": [
+        {
+          "name": "Trained by a Master (Significant Event)",
+          "id": "qD0x6rhy4sCi5I5v",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.qD0x6rhy4sCi5I5v",
+          "skillType": "background"
+        }
+      ]
+    },
     "attributes": {
       "str": {
-        "value": 1,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       },
       "dex": {
-        "value": 2,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       },
       "agi": {
         "value": 0,
@@ -34,9 +44,9 @@
         "isEnabled": false
       },
       "int": {
-        "value": 1,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       },
       "wil": {
         "value": 0,
@@ -44,9 +54,9 @@
         "isEnabled": false
       },
       "wit": {
-        "value": 1,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       },
       "vis": {
         "value": 0,
@@ -69,11 +79,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743077389457,
-    "modifiedTime": 1743077389457,
+    "modifiedTime": 1753133614324,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

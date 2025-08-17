@@ -1,3 +1,4 @@
+import { mergeActorWounds, updateActorWounds } from "../combat.mjs";
 import { applyFullyParsedComplexModifiers, applyFullyParsedModifiers, mergeComplexModifierFields, mergeLateComplexModifiers, mergeModifierFields, parsePathSync } from "../modifierBuilderFieldHelpers.mjs";
 import { applyOperator, getOrderForOperator } from "../operators.mjs";
 import { getSafeJson } from "../utils.mjs";
@@ -17,9 +18,18 @@ export async function handleEarlySelfModifiers(actor, allSkills) {
         ...applyFullyParsedModifiers(guardSelfUpdate, actor, "system.defense.guard.value"),
         ...applyFullyParsedModifiers(riskSelfUpdate, actor, "system.defense.risk.raw"),
         ...applyFullyParsedModifiers(resolveSelfUpdate, actor, "system.defense.resolve.value"),
-        ...applyFullyParsedComplexModifiers(mergedSelfWounds, actor, "system.wounds", "type"),
         ...applyConceptCosts(mergedConceptCosts, actor)
     };
+
+    const woundUpdate = applyFullyParsedComplexModifiers(mergedSelfWounds, actor, "system.wounds", "type");
+    if (woundUpdate["system.wounds"]?.length > 0) {
+        const actorWounds = structuredClone(actor.system.wounds);
+        actorWounds.forEach(r => {
+            if (!woundUpdate["system.wounds"].some(u => u.type === r.type)) {
+                woundUpdate["system.wounds"].push(r);
+            }
+        });
+    }
 
     const resourceUpdate = applyFullyParsedComplexModifiers(mergedSelfResources, actor, "system.resources.values", "id");
     if (resourceUpdate["system.resources.values"]?.length > 0) {
@@ -33,7 +43,8 @@ export async function handleEarlySelfModifiers(actor, allSkills) {
 
     updates = {
         ...updates,
-        ...resourceUpdate
+        ...resourceUpdate,
+        ...woundUpdate
     };
 
     // TODO: Add restored on X to resources / a restore button or something.
@@ -57,7 +68,9 @@ export async function handleEarlySelfModifiers(actor, allSkills) {
 function applyConceptCosts(conceptCosts, actor) {
     const initialConcepts = structuredClone(actor.system.concepts.available);
     const modifiedConcepts = Object.keys(initialConcepts).reduce((concepts, key) => {
-        concepts[key] = { ...initialConcepts[key], value: initialConcepts[key].value + (conceptCosts[key] ?? 0) };
+        if (conceptCosts[key]) {
+            concepts[key] = { ...initialConcepts[key], value: initialConcepts[key].value + (conceptCosts[key] ?? 0) };
+        }
         return concepts;
     }, {});
 
@@ -147,7 +160,7 @@ function mergeGuardTargetModifiers(allSkills, actor) {
 }
 
 function mergeGuardModifiers(allSkills, actor, target) {
-    const modifierFields = allSkills.map(s => s.system.action.modifiers.guard[target]);
+    const modifierFields = allSkills.map(s => ({ ...s.system.action.modifiers.guard[target], source: s }));
     return mergeModifierFields(modifierFields, actor);
 }
 
@@ -209,7 +222,7 @@ function mergeResourceTargetModifiers(allSkills, actor) {
 
 function getApplicableWounds(woundFields) {
     return woundFields
-        .filter(w => !["suppress", "intensify"].includes(w.operator));
+        .filter(w => !["suppress", "intensify", "immunity"].includes(w.operator));
 }
 
 function noopFilter(fields) {
@@ -224,11 +237,11 @@ export function mergeModifiers(modifiers, value) {
 
 export function mergeConceptCosts(allSkills, actor) {
     return allSkills.reduce((conceptCosts, skill) => {
-        if (skill.system.action.modifiers.concepts) {
+        if (Object.values(skill.system.action.modifiers.concepts).some(c => c.value)) {
             Object.keys(CONFIG.ABBREW.concepts).forEach(key => {
                 const concept = skill.system.action.modifiers.concepts[key];
                 if (concept.value) {
-                    const skillCost = parsePathSync(concept.value, actor, null, null);
+                    const skillCost = parsePathSync(`${concept.type}.${concept.value}`, actor, null, null);
                     if (key in conceptCosts) {
                         conceptCosts[key] = applyOperator(conceptCosts[key], skillCost, concept.operator);
                     } else {

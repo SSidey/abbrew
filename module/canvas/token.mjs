@@ -6,12 +6,10 @@ export default class AbbrewToken extends (foundry.canvas?.placeables?.Token ?? T
     }
 
     _onClickLeft(event) {
-        console.log(event);
         super._onClickLeft(event);
     }
 
     _onClickLeft2(event) {
-        console.log(event);
         super._onClickLeft2(event);
     }
 
@@ -19,44 +17,40 @@ export default class AbbrewToken extends (foundry.canvas?.placeables?.Token ?? T
         return true;
     }
 
-    // _createInteractionManager() {
+    _onApplyStatusEffect(statusId, active) {
+        super._onApplyStatusEffect(statusId, active);
+        switch (statusId) {
+            case CONFIG.specialStatusEffects.PRONE:
+                this.setMovementAction();
+                break;
+        }
+    }
 
-    //     // Handle permissions to perform various actions
-    //     const permissions = {
-    //         hoverIn: this._canHover,
-    //         clickLeft: this._canControl,
-    //         clickLeft2: this._canView,
-    //         clickRight: this._canHUD,
-    //         clickRight2: this._canConfigure,
-    //         dragStart: this._canDrag,
-    //         dragLeftStart: this._canDragLeftStart
-    //     };
+    _onCreate(document, options, userId) {
+        const actor = game.actors.get(document.actorId);
+        if (actor && actor.items.filter(i => i.type === "skill").filter(s => s.system.senses.modifiesSenses).length === 0) {
+            document.sight.visionMode = null;
+        }
+        super._onCreate(document, options, userId);
+    }
 
-    //     // Define callback functions for each workflow step
-    //     const callbacks = {
-    //         hoverIn: this._onHoverIn,
-    //         hoverOut: this._onHoverOut,
-    //         clickLeft: this._onClickLeft,
-    //         clickLeft2: this._onClickLeft2,
-    //         clickRight: this._onClickRight,
-    //         clickRight2: this._onClickRight2,
-    //         unclickLeft: this._onUnclickLeft,
-    //         unclickRight: this._onUnclickRight,
-    //         dragLeftStart: this._onDragLeftStart,
-    //         dragLeftMove: this._onDragLeftMove,
-    //         dragLeftDrop: this._onDragLeftDrop,
-    //         dragLeftCancel: this._onDragLeftCancel,
-    //         dragRightStart: this._onDragRightStart,
-    //         dragRightMove: this._onDragRightMove,
-    //         dragRightDrop: this._onDragRightDrop,
-    //         dragRightCancel: this._onDragRightCancel,
-    //         longPress: this._onLongPress
-    //     };
+    setMovementAction() {
+        this.document.update({ "movementAction": this.document._inferMovementAction() });
+    }
 
-    //     // Define options
-    //     const options = { target: this.controlIcon ? "controlIcon" : null };
+    render(renderer) {
+        super.render(renderer);
+        if (!this.mesh) return;
 
-    //     // Create the interaction manager
-    //     return new MouseInteractionManager(this, canvas.stage, permissions, callbacks, options);
-    // }
+        const configuredTint = this.document.texture.tint ?? Color.fromString("#FFFFFF");
+        if (this.mesh.tint !== 0 && this.detectionFilter instanceof foundry.canvas.rendering.filters.OutlineOverlayFilter) {
+            this.mesh.tint = 0;
+        } else if (
+            this.mesh.tint === 0 &&
+            configuredTint.toString() !== "#000000" &&
+            !(this.detectionFilter instanceof foundry.canvas.rendering.filters.OutlineOverlayFilter)
+        ) {
+            this.mesh.tint = Number(configuredTint);
+        }
+    }
 }

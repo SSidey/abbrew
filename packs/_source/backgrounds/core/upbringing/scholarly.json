@@ -11,7 +11,17 @@
       "value": "",
       "uuid": ""
     },
-    "skills": [],
+    "skills": {
+      "granted": [
+        {
+          "name": "Scholarly (Upbringing)",
+          "id": "UP4LO2yso41LErpm",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.UP4LO2yso41LErpm",
+          "skillType": "background"
+        }
+      ]
+    },
     "attributes": {
       "str": {
         "value": 0,
@@ -34,24 +44,24 @@
         "isEnabled": false
       },
       "int": {
-        "value": 2,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       },
       "wil": {
-        "value": 1,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       },
       "wit": {
-        "value": 1,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       },
       "vis": {
-        "value": 1,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       }
     },
     "creatureForm": {
@@ -62,18 +72,18 @@
     }
   },
   "effects": [],
-  "sort": 0,
+  "sort": 200000,
   "ownership": {
     "default": 0
   },
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743077272179,
-    "modifiedTime": 1743077272179,
+    "modifiedTime": 1753033677169,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

@@ -1,4 +1,4 @@
-import { compareModifierIndices, getSafeJson } from "../helpers/utils.mjs";
+import { compareModifierIndices, generateAbbrewId, getSafeJson } from "../helpers/utils.mjs";
 
 export default class AbbrewItemBase extends foundry.abstract.TypeDataModel {
 
@@ -60,7 +60,7 @@ export default class AbbrewItemBase extends foundry.abstract.TypeDataModel {
   // Prior to Active Effects
   prepareBaseData() {
     if (this.abbrewId.value === "") {
-      this.abbrewId.value = this.generateAbbrewId();
+      this.abbrewId.value = generateAbbrewId(this.parent.type, this.parent.name, this.parent._id);
       this.abbrewId.uuid = this.parent._id;
     }
 
@@ -82,10 +82,6 @@ export default class AbbrewItemBase extends foundry.abstract.TypeDataModel {
  */
   static migrateData(source) {
     return super.migrateData(source);
-  }
-
-  generateAbbrewId() {
-    return `abbrew.${this.parent.type}.${this.parent.name.toLowerCase().replace(/\s/g, '')}.${this.parent._id}`
   }
 
   prepareName() {

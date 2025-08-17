@@ -40,7 +40,6 @@ export async function _onDeleteItem(event, target) {
     const li = target.closest('.item');
     const item = this.actor.items.get(li.dataset.itemId);
     item.delete();
-    li.slideUp(200, () => this.render(false));
 }
 
 export async function _onStudyItem(event, target) {
@@ -54,7 +53,7 @@ export async function _onStudyItem(event, target) {
     }
     const difficulty = reveal.difficulty;
     const tier = item.type === "anatomy" ? this.actor.system.meta.tier.value : item.system.meta.tier;
-    const checkName = `Study ${item.name}`;
+    const checkName = `Study ${item.system.name.base}`;
     await requestSkillCheck(checkName, revealSkills.map(s => s.id), "successes", difficulty, tier);
 };
 

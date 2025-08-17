@@ -1,13 +1,12 @@
 import { applyFullyParsedComplexModifiers } from "../modifierBuilderFieldHelpers.mjs";
 import { applyOperator } from "../operators.mjs";
-import { getSafeJson } from "../utils.mjs";
+import { getSafeJson, isASupersetOfB } from "../utils.mjs";
 import { applySkillEffects, getModifierSkills } from "./skill-application.mjs";
 import { addSkillToActiveSkills, addSkillToQueuedSkills, trackSkillDuration } from "./skill-duration.mjs";
 import { checkAndExpire } from "./skill-expiry.mjs";
 import { applySystemFundamentalSkill } from "./skill-fundamental-system-application.mjs";
-import { handleGrantOnUse } from "./skill-grants.mjs";
+import { handleSkillGrantOnActivation } from "./skill-grants.mjs";
 import { mergeConceptCosts, mergeResourceSelfModifiers } from "./skill-modifiers.mjs";
-import { removeSkillStack } from "./skill-uses.mjs";
 
 export async function handleSkillActivate(actor, skill, checkActions = true, includeSkillTraits = []) {
     const isSkillProxied = skill.system.isProxied;
@@ -18,6 +17,11 @@ export async function handleSkillActivate(actor, skill, checkActions = true, inc
 
     if (isSkillBlocked(actor, skill)) {
         ui.notifications.info(`You are blocked from using ${skill.name}`);
+        return false;
+    }
+
+    if (!areSkillActivationRequirementsMet(actor, skill)) {
+        ui.notifications.info(`You have not activated the required skills to use ${skill.name}`);
         return false;
     }
 
@@ -52,9 +56,20 @@ export function isSkillBlocked(actor, skill) {
     return skillDiscord.includes(skillId);
 }
 
+export function areSkillActivationRequirementsMet(actor, skill) {
+    const requiredSkills = getSafeJson(skill.system.activation.requiredActiveSkills, []).map(s => s.id);
+    if (requiredSkills.length === 0) {
+        return true;
+    }
+
+    const activeOrQueuedSkills = [...actor.system.activeSkills, ...actor.system.queuedSkills].map(id => actor.items.find(i => i._id === id).system.abbrewId.uuid);
+    const passives = actor.items.filter(i => i.type === "skill").filter(s => !s.system.isActivatable).map(s => s.system.abbrewId.uuid);
+    return isASupersetOfB([...activeOrQueuedSkills, ...passives], requiredSkills);
+}
+
 export function getModifiedSkillActionCost(actor, skill) {
     const minActions = 0;
-    return Math.max(minActions, getModifierSkills(actor, skill).filter(s => s.system.action.modifiers.actionCost.operator).map(s => s.system.action.modifiers.actionCost).reduce((result, actionCost) => { result = applyOperator(result, actionCost.value, actionCost.operator); return result; }, parseInt(skill.system.action.actionCost)));
+    return Math.max(minActions, getModifierSkills(actor, skill).filter(s => s.system.action.modifiers.actionCost.operator).map(s => s.system.action.modifiers.actionCost).reduce((result, actionCost) => { result = applyOperator(result, actionCost.value, actionCost.operator); return result; }, parseInt(skill.system.action.actionCost ?? 0)));
 }
 
 export async function handlePairedSkills(skill, actor) {
@@ -69,6 +84,22 @@ export async function handlePairedSkills(skill, actor) {
             }
         });
     }
+}
+
+export async function handleActivateWithSkills(skill, actor) {
+    const activateWithSkills = getActivateWithSkills(skill, actor);
+
+    for (const index in activateWithSkills) {
+        const nActor = await fromUuid(actor.uuid);
+        await handleSkillActivate(nActor, activateWithSkills[index]);
+    }
+}
+
+export function getActivateWithSkills(skill, actor) {
+    return actor.items
+        .filter(i => i.type === "skill")
+        .filter(i => i.system.activation.activateWith)
+        .filter(i => getSafeJson(i.system.activation.activateWith, []).map(a => a.id).includes(skill.system.abbrewId.uuid));
 }
 
 export async function rechargeSkill(actor, skill) {
@@ -145,11 +176,14 @@ export async function activateSkill(actor, skill, includeSkillTraits = []) {
             actor: actor,
             tokenId: actor.token?.uuid || null,
             actionCost: skill.system.action.actionCost,
-            title: skill.name,
-            message: skill.system.description
+            mainSummary: {
+                name: skill.name,
+                description: skill.system.description
+            },
+            traits: skill.system.traits.value
         };
 
-        const html = await renderTemplate("systems/abbrew/templates/chat/notification-card.hbs", templateData);
+        const html = await foundry.applications.handlebars.renderTemplate("systems/abbrew/templates/chat/skill-card.hbs", templateData);
 
         const speaker = ChatMessage.getSpeaker({ actor: actor });
         const rollMode = game.settings.get('core', 'rollMode');
@@ -162,7 +196,7 @@ export async function activateSkill(actor, skill, includeSkillTraits = []) {
             flags: {}
         });
 
-        await handleGrantOnUse(skill, actor);
+        await handleSkillGrantOnActivation(skill, actor, skill);
         return true;
     }
 
@@ -176,7 +210,7 @@ export async function activateSkill(actor, skill, includeSkillTraits = []) {
     } else {
         skillResult = await applySkillEffects(actor, skill, includeSkillTraits);
     }
-    await handleGrantOnUse(skill, actor);
+    await handleSkillGrantOnActivation(skill, actor, skill);
     await handleConsumables(skill, actor);
     return skillResult;
 }
@@ -186,7 +220,7 @@ async function handleConsumables(skill, actor) {
     const grantingItem = skill.system.grantedBy.item;
     if (grantingItem) {
         const item = actor.items.find(i => i._id === grantingItem);
-        if (getSafeJson(item.system.traits.raw, []).some(t => t.key === "consumable")) {
+        if (item && getSafeJson(item.system.traits.raw, []).some(t => t.key === "consumable")) {
             if (item.system.quantity > 1) {
                 const update = { "system.quantity": item.system.quantity - 1 };
                 if (item.system.equipState.startsWith('held')) {

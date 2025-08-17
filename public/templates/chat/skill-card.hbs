@@ -1,5 +1,12 @@
 <div class="abbrew chat-message chat-card flexcol " data-actor-id="{{actor._id}}" data-item-id="{{item._id}}"
     data-token-id="{{tokenId}}" data-message-id="{{messageId}}">
+    <div>
+        {{#each traits as |trait|}}
+        {{#if trait.value}}
+        <span class="chat-message-trait">{{trait.value}}</span>
+        {{/if}}
+        {{/each}}
+    </div>
     <header>
         <h3 class="item-name">{{item.name}}</h3>
     </header>
@@ -8,7 +15,7 @@
         <div>
             <ol class="skill-card-descriptions">
                 {{#each modifierSummaries as |summary| }}
-                <li {{#unless (showGmSection ../user)}}data-visibility="gm" {{/unless}}>
+                {{!-- <li {{#unless (showGmSection ../user)}}data-visibility="gm" {{/unless}}> --}}
                     <h3>{{summary.name}}</h3>
                     <span>
                         {{{summary.description}}}
@@ -28,7 +35,7 @@
             <h3>Skill Check</h3>
             <div class="dice-result">
                 {{#if skillResult.baseDicePool}}
-                <div class="dice-tooltip" {{#unless (showGmSection user)}}data-visibility="gm" {{/unless}}>
+                <div class="dice-tooltip" {{!-- {{#unless (showGmSection user)}}data-visibility="gm" {{/unless}} --}}>
                     <section class="tooltip-part">
                         <div class="dice">
                             <ol class="dice-rolls">
@@ -44,7 +51,7 @@
                 {{/if}}
                 {{#if skillResult.simpleResult}}
                 <h4 class="dice-total">
-                    <span {{#unless (showGmSection user)}}data-visibility="gm" {{/unless}}>
+                    <span {{!-- {{#unless (showGmSection user)}}data-visibility="gm" {{/unless}} --}}>
                         {{skillResult.simpleResult}}
                         {{#unless skillResult.isContested}}
                         {{#if skillResult.result}}
@@ -54,7 +61,7 @@
                         {{/if}}
                         {{/unless}}
                     </span>
-                    <label {{#unless (showGmSection user)}}data-visibility="player" {{/unless}}>??</label>
+                    {{!-- <label {{#unless (showGmSection user)}}data-visibility="player" {{/unless}}>??</label> --}}
                 </h4>
                 {{/if}}
             </div>
@@ -89,10 +96,11 @@
         <div class="dice-roll">
             <h3>Damage</h3>
             <div class="dice-result">
-                <div class="dice-formula" {{#unless (showGmSection user)}}data-visibility="gm" {{/unless}}>
+                <div class="dice-formula" {{!-- {{#unless (showGmSection user)}}data-visibility="gm" {{/unless}} --}}>
                     {{totalSuccesses}}</div>
-                <div class="dice-formula" {{#unless (showGmSection user)}}data-visibility="player" {{/unless}}>??</div>
-                <div class="dice-tooltip" {{#unless (showGmSection user)}}data-visibility="gm" {{/unless}}>
+                {{!-- <div class="dice-formula" {{#unless (showGmSection user)}}data-visibility="player" {{/unless}}>??
+                </div> --}}
+                <div class="dice-tooltip" {{!-- {{#unless (showGmSection user)}}data-visibility="gm" {{/unless}} --}}>
                     <section class="tooltip-part">
                         <div class="dice">
                             <ol class="dice-rolls">
@@ -108,13 +116,13 @@
                 <h4 class="dice-total">
                     <ol class="skill-damage">
                         {{#each damage as |dmg id|}}
-                        <div {{#unless (showGmSection ../user)}}data-visibility="gm" {{/unless}}>
+                        <div {{!-- {{#unless (showGmSection ../user)}}data-visibility="gm" {{/unless}} --}}>
                             <label>{{dmg.value}} {{dmg.damageType}}</label>
                         </div>
                         {{/each}}
-                        <div {{#unless (showGmSection user)}}data-visibility="player" {{/unless}}>
+                        {{!-- <div #unless (showGmSection user)}}data-visibility="player" {{/unless}}>
                             <label>??</label>
-                        </div>
+                        </div> --}}
                     </ol>
                 </h4>
             </div>

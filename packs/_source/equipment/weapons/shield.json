@@ -65,15 +65,15 @@
     "revealed": {
       "isRevealed": false,
       "revealSkills": {
-        "raw": "",
+        "raw": "[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
         "parsed": []
       },
-      "difficulty": 10,
-      "tier": 0
+      "difficulty": 15,
+      "tier": 1
     },
     "grantedBy": "",
     "defense": {
-      "guard": 15,
+      "guard": 0,
       "inflexibility": 10,
       "protection": []
     },
@@ -87,7 +87,7 @@
         "hasStrongAttack": true,
         "critical": 10,
         "lethal": 0,
-        "reach": "1",
+        "reach": 1,
         "damage": [
           {
             "type": "crushing",
@@ -121,11 +121,11 @@
   "_stats": {
     "duplicateSource": null,
     "exportSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1751069603184,
-    "modifiedTime": 1751315650475,
+    "modifiedTime": 1752871427379,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!sfqPfP90kh4VSCJV"

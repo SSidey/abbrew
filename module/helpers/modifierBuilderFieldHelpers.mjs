@@ -37,7 +37,7 @@ export function parseModifierFieldValue(modifierFieldValue, actor, source) {
 export function mergeModifierFields(modifierFields, actor) {
     const parsedSkills = modifierFields.filter(m => m.operator).map(m => {
         const operator = m.operator;
-        return ({ ...parseModifierFieldValue(m.value, actor, m), operator: operator, index: getOrderForOperator(operator) });
+        return ({ ...parseModifierFieldValue(m.value, actor, m.source), operator: operator, index: getOrderForOperator(operator) });
     }).sort(compareModifierIndices);
 
     const fullyParsed = parsedSkills.filter(s => s.fullyParsed);
@@ -193,6 +193,8 @@ export function parsePathSync(rawValue, actor, source, target) {
             case 'item':
                 const id = rawValue.split('.').slice(1, 2).shift();
                 return id ? actor.items.filter(i => i._id === id).shift() : actor;
+            case 'itemSource':
+                return actor.items.find(i => i._id === source.system.grantedBy.item);
         }
     })();
 
@@ -201,6 +203,7 @@ export function parsePathSync(rawValue, actor, source, target) {
             case 'this':
             case 'target':
             case 'actor':
+            case 'itemSource':
                 return rawValue.split('.').slice(1).join('.');
             case 'item':
                 return rawValue.split('.').slice(2).join('.');
@@ -280,7 +283,7 @@ export async function getDialogValue(actor, asyncValues) {
 
     const fields = foundry.applications.fields;
     const ranges = {};
-    const content = asyncValues.map(a => {
+    const content = asyncValues.filter(a => !a.value).map(a => {
         if (a.type === "single") {
             const minMultiplier = a.minOperator === "add" ? 1 : -1;
             const maxMultiplier = a.maxOperator === "add" ? 1 : -1;

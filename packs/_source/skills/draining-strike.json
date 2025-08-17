@@ -24,15 +24,7 @@
     "applyTurnEnd": false,
     "applyOnExpiry": false,
     "skills": {
-      "granted": [
-        {
-          "name": "Draining Strike",
-          "skillType": "",
-          "id": "DKO4k6RIfayVJR7A",
-          "image": "icons/svg/item-bag.svg",
-          "sourceId": "Compendium.abbrew.skills.Item.DKO4k6RIfayVJR7A"
-        }
-      ],
+      "granted": [],
       "paired": [],
       "grantedOnActivation": [],
       "grantedOnAccept": [],
@@ -374,11 +366,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1744319408339,
-    "modifiedTime": 1750194762648,
+    "modifiedTime": 1753136439659,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

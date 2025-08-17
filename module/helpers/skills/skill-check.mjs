@@ -44,15 +44,31 @@ export async function makeSkillCheck(actor, skill, allSkills, fortune, templateD
     return [skillResult, templateData, data];
 }
 
-export async function makeSkillCheckRequest(actor, skill, modifierSkills, skillResult, templateData, data) {
+export async function makeSkillCheckRequest(actor, skill, modifierSkills, parentSkill, skillResult, templateData, data) {
     if (skill.system.action.skillRequest.isEnabled) {
         const skillRequest = skill.system.action.skillRequest;
-        let requirements = { modifierIds: [], traits: getSafeJson(skill.system.traits.raw, []), checkType: skillRequest.checkType, isContested: skillRequest.isContested, successes: { total: 0, requiredValue: 0 }, result: { requiredValue: 0 }, contestedResult: { dice: [], modifier: 0 } };
-        const targetModifiers = getSafeJson(skillRequest.targetModifiers).map(m => m.id);
+        let requirements = {
+            actorSource: actor._id,
+            modifierIds: [],
+            traits: getSafeJson(skill.system.traits.raw, []),
+            checkType: skillRequest.checkType,
+            isContested: skillRequest.isContested,
+            successes: { total: 0, requiredValue: 0 },
+            result: { requiredValue: 0 },
+            contestedResult: { dice: [], modifier: 0 },
+            outcomeGrants: {
+                success: [...skill.system.skills.grantOnSuccess, ...modifierSkills.flatMap(s => s.system.skills.grantOnSuccess)],
+                failure: [...skill.system.skills.grantOnFailure, ...modifierSkills.flatMap(s => s.system.skills.grantOnFailure)]
+            }
+        };
+        const targetModifiers = getSafeJson(skillRequest.targetModifiers, []).map(m => m.id);
         requirements.modifierIds = targetModifiers;
         if (skillRequest.isContested) {
             const modifierIds = getSafeJson(skillRequest.requirements.modifiers, []).map(m => m.id);
-            const skill = getSkillById(actor, modifierIds);
+            const skill = await getSkillById(actor, modifierIds);
+            const deactivatedParent = parentSkill.toObject();
+            deactivatedParent.system.action.skillRequest.isEnabled = false;
+            skill.system.siblingSkillModifiers.push(deactivatedParent);
             skill.system.siblingSkillModifiers.push(...modifierSkills);
 
             if (skill) {
@@ -94,21 +110,18 @@ export async function makeSkillCheckRequest(actor, skill, modifierSkills, skillR
     return [skillResult, templateData, data];
 }
 
-function mutateArrayForFortune(array, fortune) {
-    if (fortune === 0) {
-        return array;
-    }
-
-    return array.slice(0, -1 * fortune);
+function mutateArrayForFortune(array) {
+    return array.filter(r => !r.classes.split(" ").includes("discarded"));
 }
 
 export async function acceptSkillCheck(actor, requirements) {
-    const skill = getSkillById(actor, requirements.modifierIds);
+    const skill = await getSkillById(actor, requirements.modifierIds);
     if (skill && skill.system.action.skillCheck) {
         const skillResult = await handleSkillActivate(actor, skill, false, requirements.traits.map(t => t.key));
         if (requirements.isContested) {
             if (requirements.checkType === "successes") {
-                const baseRequiredValues = mutateArrayForFortune(requirements.contestedResult.dice/* .slice(0, requirements.contestedResult.baseDicePool) */, requirements.contestedResult.fortune);
+                requirements.contestedResult.dice.sort((a, b) => b.result - a.result);
+                const baseRequiredValues = mutateArrayForFortune(requirements.contestedResult.dice);
                 const requiredNaturals = baseRequiredValues.filter(d => d.result === 10).length;
                 const requiredValues = baseRequiredValues.filter(d => d.result !== 10).map(d => d.result + requirements.contestedResult.modifier).sort((a, b) => b - a);
                 const baseResultValues = mutateArrayForFortune(skillResult.dice/* .slice(0, skillResult.baseDicePool) */, skillResult.fortune);
@@ -138,12 +151,13 @@ export async function acceptSkillCheck(actor, requirements) {
                 return ({ actor: actor, result: providedSuccesses > requiredSuccesses, totalSuccesses: providedSuccesses, requiredSuccesses: requiredSuccesses, skillResult: skillResult, contestedResult: requirements.contestedResult });
             } else if (requirements.checkType === "result") {
                 const requiredValue = Math.max(...requirements.contestedResult.dice.map(d => d.result)) + requirements.contestedResult.modifier;
-                const totalValue = Math.max(...skillResult.dice.map(d => d.result)) + skillResult.modifier;
+                const filteredSkillResult = mutateArrayForFortune(skillResult.dice);
+                const totalValue = Math.max(...filteredSkillResult.map(d => d.result)) + skillResult.modifier;
                 return ({ actor: actor, result: totalValue > requiredValue, totalValue: totalValue, requiredValue: requiredValue, skillResult: skillResult, contestedResult: requirements.contestedResult });
             }
         } else {
             if (requirements.checkType === "successes") {
-                const filteredSkillResult = mutateArrayForFortune(skillResult.dice, skillResult.fortune);
+                const filteredSkillResult = mutateArrayForFortune(skillResult.dice);
                 const filteredNaturals = filteredSkillResult.filter(d => d.result === 10).length;
                 const diceResults = filteredSkillResult.filter(d => d.result !== 10).map(d => d.result + skillResult.modifier).reduce((result, value) => {
                     if (value >= requirements.successes.requiredValue) {
@@ -158,7 +172,8 @@ export async function acceptSkillCheck(actor, requirements) {
                 return ({ actor: actor, result: totalSuccesses >= requirements.successes.total, totalSuccesses: totalSuccesses, requiredSuccesses: requirements.successes.total, skillResult: skillResult });
             } else if (requirements.checkType === "result") {
                 const requiredValue = requirements.result.requiredValue;
-                const totalValue = Math.max(...skillResult.dice.map(d => d.result)) + skillResult.modifier;
+                const filteredSkillResult = mutateArrayForFortune(skillResult.dice);
+                const totalValue = Math.max(...filteredSkillResult.map(d => d.result)) + skillResult.modifier;
                 return ({ actor: actor, result: totalValue >= requiredValue, totalValue: totalValue, requiredValue: requiredValue, skillResult: skillResult });
             }
         }
@@ -175,12 +190,71 @@ function getCritSuccesses(dice) {
     }, 0);
 }
 
-function getSkillById(actor, skillIds) {
+async function getSkillById(actor, rawSkillIds) {
     const actorSkills = actor.items.filter(i => i.type === "skill");
+    const fundamentalSkillIds = CONFIG.ABBREW.fundamentalAttributeSkillIds;
+    const fundamentalSkills = CONFIG.ABBREW.fundamentalAttributeSkillSummaries;
+
+    const fundamentalFilteredSkillsIds = rawSkillIds.filter(id => fundamentalSkillIds.includes(id));
+    const actorFilteredSkillIds = rawSkillIds.filter(id => !fundamentalSkillIds.includes(id)).filter(id => actorSkills.find(s => s.system.abbrewId.uuid === id));
+    const skillIds = [...actorFilteredSkillIds, ...fundamentalFilteredSkillsIds];
+
+    let skill = null;
+    if (actorFilteredSkillIds.length > 1 || (actorFilteredSkillIds.length === 0 && fundamentalFilteredSkillsIds.length > 1)) {
+        const skillOptions = skillIds.reduce((skills, id) => {
+            if (fundamentalFilteredSkillsIds.includes(id)) {
+                const skillCandidate = fundamentalSkills.find(s => s.id === id);
+                skills.push({ label: skillCandidate.value, value: id });
+            } else {
+                const skillCandidate = actorSkills.find(s => s.system.abbrewId.uuid === id);
+                skills.push({ label: skillCandidate.name, value: id })
+            }
+
+            return skills;
+        }, []);
+
+        const fields = foundry.applications.fields;
+        const selectInput = fields.createSelectInput({
+            options: skillOptions,
+            name: 'skillIds'
+        })
+        const selectGroup = fields.createFormGroup({
+            input: selectInput,
+            label: "Select a Skill"
+        })
+
+        const content = `${selectGroup.outerHTML}`
+
+        try {
+            const skillId = await foundry.applications.api.DialogV2.prompt({
+                window: { title: "Attempt With Skill" },
+                content: content,
+                ok: {
+                    label: "Select Skill",
+                    callback: (event, button, dialog) => button.form.elements.skillIds.selectedOptions[0]?.value ?? button.form.elements.skillIds.options[0].value
+                }
+            });
+            skill = getFirstApplicableSkill([skillId], actorSkills);
+        } catch (ex) {
+            console.log(`${actor.name} did not select a skill.`);
+            skill = getFirstApplicableSkill(skillIds, actorSkills);
+        }
+    } else {
+        skill = getFirstApplicableSkill(skillIds, actorSkills);
+    }
+
+    if (skill) {
+        skill.system.isProxied = true;
+    }
+
+    return skill;
+}
+
+function getFirstApplicableSkill(skillIds, actorSkills) {
     const fundamentalSkillIds = CONFIG.ABBREW.fundamentalAttributeSkillIds;
     const fundamentalSkills = CONFIG.ABBREW.fundamentalAttributeSkills;
 
-    const skill = skillIds.reduce((result, id) => {
+    return skillIds.reduce((result, id) => {
         if (!result) {
             if (fundamentalSkillIds.includes(id)) {
                 const fundamental = fundamentalSkills[id];
@@ -192,10 +266,4 @@ function getSkillById(actor, skillIds) {
 
         return result;
     }, null);
-
-    if (skill) {
-        skill.system.isProxied = true;
-    }
-
-    return skill;
 }

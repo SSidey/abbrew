@@ -58,4 +58,6 @@ export default class AbbrewAnatomy extends AbbrewPhysicalItem {
     // this.formula = `${roll.diceNum}${roll.diceSize}${roll.diceBonus}`
     super.prepareDerivedData();
   }
+
+  prepareName() { };
 }

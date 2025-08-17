@@ -11,7 +11,17 @@
       "value": "",
       "uuid": ""
     },
-    "skills": [],
+    "skills": {
+      "granted": [
+        {
+          "name": "Deep Gnome (Heritage)",
+          "id": "LhTnBGNk6rznKErJ",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.LhTnBGNk6rznKErJ",
+          "skillType": "background"
+        }
+      ]
+    },
     "attributes": {
       "str": {
         "value": 0,
@@ -69,11 +79,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743077614930,
-    "modifiedTime": 1743077614930,
+    "modifiedTime": 1753030092221,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

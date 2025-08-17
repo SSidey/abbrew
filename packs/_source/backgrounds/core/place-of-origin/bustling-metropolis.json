@@ -11,7 +11,17 @@
       "value": "",
       "uuid": ""
     },
-    "skills": [],
+    "skills": {
+      "granted": [
+        {
+          "name": "Bustling Metropolis",
+          "id": "E3BOynwoAhcq0q1g",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.E3BOynwoAhcq0q1g",
+          "skillType": "background"
+        }
+      ]
+    },
     "attributes": {
       "str": {
         "value": 0,
@@ -19,9 +29,9 @@
         "isEnabled": false
       },
       "dex": {
-        "value": 1,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       },
       "agi": {
         "value": 0,
@@ -34,9 +44,9 @@
         "isEnabled": false
       },
       "int": {
-        "value": 1,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       },
       "wil": {
         "value": 0,
@@ -44,14 +54,14 @@
         "isEnabled": false
       },
       "wit": {
-        "value": 2,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       },
       "vis": {
-        "value": 1,
+        "value": 0,
         "label": "",
-        "isEnabled": true
+        "isEnabled": false
       }
     },
     "creatureForm": {
@@ -69,11 +79,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743077302729,
-    "modifiedTime": 1743077302729,
+    "modifiedTime": 1753033024736,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

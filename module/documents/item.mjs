@@ -1,5 +1,5 @@
 import { doesNestedFieldExist, arrayDifference, getNumericParts, getSafeJson } from '../helpers/utils.mjs';
-import { getAttackSkillWithActions, getParrySkillWithActions } from '../helpers/fundamental-skills.mjs';
+import { getAttackSkillWithActions } from '../helpers/fundamental-skills.mjs';
 
 import { applyOperator } from '../helpers/operators.mjs';
 import { handleSkillActivate } from '../helpers/skills/skill-activation.mjs';
@@ -7,6 +7,7 @@ import { trackSkillDuration } from '../helpers/skills/skill-duration.mjs';
 import { manualSkillExpiry } from '../helpers/skills/skill-expiry.mjs';
 import { handleGrantedSkills } from '../helpers/skills/skill-grants.mjs';
 import { applyEnhancement } from '../helpers/enhancements/enhancement-application.mjs';
+import { postNotificationToChat } from '../sheets/items/helpers/chat/notification.mjs';
 /**
  * Extend the basic Item with some very simple modifications.
  * @extends {Item}
@@ -66,7 +67,9 @@ export default class AbbrewItem extends Item {
     }
 
     if (doesNestedFieldExist(changed, "system.isDismembered") && changed.system.isDismembered === true) {
+      await postNotificationToChat(this.actor, "Anatomy Dismembered", `${this.name} was dismembered`);
       foundry.utils.setProperty(changed, `system.equipState`, "dropped");
+      await postNotificationToChat(this.actor, "Item Dropped", `${this.actor.name} dropped ${this.name}`);
     }
 
     // Set appropriate values for concentration duration skill.
@@ -122,7 +125,7 @@ export default class AbbrewItem extends Item {
       }
     }
 
-    if (doesNestedFieldExist(changed, "system.isDismembered") && this.actor && this.system.naturalWeapons.length > 0) {
+    if (doesNestedFieldExist(changed, "system.isDismembered") && this.actor) {
       if (changed.system.isDismembered) {
         const weaponPromises = this.actor.items.filter(i => i.type === "weapon").filter(i => i.system.grantedBy === this._id).map(i => i.delete());
         const skillPromises = this.actor.items.filter(i => i.type === "skill").filter(i => i.system.grantedBy.item === this._id).map(i => i.delete());
@@ -133,14 +136,6 @@ export default class AbbrewItem extends Item {
         await this.actor.acceptAnatomy(this);
       }
     }
-
-    // TODO: Shouldn't be here, effect is not present on item when created...
-    // if (doesNestedFieldExist(changed, "system.action.uses.value") && this.actor && this.actor.effects.find(e => (e.flags.abbrew?.skill?.trackDuration === this._id) && e.flags.abbrew?.skill?.stacks)) {
-    //   const effect = this.actor.effects.find(e => e.flags.abbrew?.skill?.trackDuration === this._id)
-    //   const stacks = changed.system.action.uses.value;
-    //   const visible = stacks > 1;
-    //   await effect.update({ "flags.statuscounter.visible": visible, "flags.abbrew.skill.stacks": stacks });
-    // }
 
     return super._preUpdate(changed, options, userId);
   }
@@ -162,6 +157,12 @@ export default class AbbrewItem extends Item {
     super._onUpdate(changed, options, userId);
   }
 
+  async handleDeleteActiveEffect(effect) {
+    if (this.type === "skill" && this.system.skillType === "temporary") {
+      await this.delete();
+    }
+  }
+
   async handleLight() {
     const light = this.system.light;
     const update = { "system.light": light };
@@ -179,17 +180,9 @@ export default class AbbrewItem extends Item {
         .map(s => s.system.senses);
       const update = senseSkills.reduce((update, senses) => {
         update.sight.enabled = true;
-        if (senses.sight.range === null) {
-          update.sight.range = null;
-        } else if (senses.sight.range && update.sight.range !== null && senses.sight.range > update.sight.range) {
-          update.sight.range = senses.sight.range;
-        }
-        if (senses.sight.angle < update.sight.angle) {
-          update.sight.angle = senses.sight.angle;
-        }
-        if (update.sight.visionMode !== "basic") {
-          update.sight.visionMode = senses.sight.visionMode;
-        }
+
+        // TODO: Use this for all modifications here
+        update.sight = this._getVisionModeForUpdate(update.sight, senses.sight);
 
         update.detectionModes = senses.detectionModes.reduce((detectionModes, mode) => {
           const oldMode = detectionModes.find(m => m.id === mode.id);
@@ -205,32 +198,65 @@ export default class AbbrewItem extends Item {
           return detectionModes;
         }, update.detectionModes);
 
-        if (update.detectionModes.some(m => m.id === "basicSight")) {
-          const mode = update.detectionModes.find(m => m.id === "basicSight");
-          update.sight.range = mode.range;
-          update.sight.visionMode = "darkvision";
-          update.sight.saturation = -1;
-        } else if (update.sight.visionMode === "monochromatic") {
-          update.sight.saturation = -1;
-        } else if (update.sight.visionMode === "tremorsense") {
-          update.sight.brightness = 1;
-          update.sight.saturation = -0.3;
-          update.sight.contrast = 0.2;
-        } else if (update.sight.visionMode === "lightAmplification") {
-          update.sight.brightness = 1;
-          update.sight.saturation = -0.5;
-          update.sight.contrast = 0;
-        }
-        else {
-          update.sight.visionMode = "basic";
-          update.sight.saturation = 0;
-        }
-
         return update;
-      }, { sight: { enabled: true, range: 0, angle: 360, visionMode: "" }, detectionModes: [] });
+      }, { sight: { enabled: true, range: 0, angle: 360, visionMode: "none" }, detectionModes: [] });
+
+      if (update.detectionModes.length === 0) {
+        update.detectionModes.push({ id: "none", enabled: true, range: 0 });
+      }
+
+      if (!update.sight.visionMode) {
+        update.sight.visionMode = "none";
+      }
+
+      this._setDefaultsForVisionMode(update);
 
       await this.actor.update({ "system.senses": update });
     }
+  }
+
+  _setDefaultsForVisionMode(update) {
+    const visionMode = CONFIG.Canvas.visionModes[update.sight.visionMode];
+    const defaults = visionMode.vision.defaults;
+    const desiredKeys = ["color", "attenuation", "contrast", "saturation", "brightness"]
+    const desiredKeyDefaults = {
+      color: null,
+      attenuation: 0,
+      contrast: 0,
+      saturation: 0,
+      brightness: 0,
+    }
+    const configValues = Object.keys(defaults).reduce((result, key) => {
+      if (desiredKeys.includes(key)) {
+        result[key] = defaults[key] ?? desiredKeyDefaults[key];
+      }
+
+      return result;
+    }, {});
+
+    const fullSight = { ...update.sight, ...configValues };
+    update.sight = fullSight;
+  }
+
+  _getVisionModeForUpdate(updateMode, senseMode) {
+    if (this.actor?.statuses.has("blind")) {
+      return { enabled: true, range: null, angle: 360, visionMode: "blindness" };
+    }
+
+    const updatePriority = this.visionModePriority[updateMode.visionMode] ?? "none";
+    const sensePriority = this.visionModePriority[senseMode.visionMode] ?? "none";
+    return sensePriority > updatePriority ? senseMode : updateMode;
+  }
+
+  visionModePriority = {
+    "none": 0,
+    "tremorsense": 1,
+    "hearing": 2,
+    "basic": 3,
+    "lightAmplification": 4,
+    "monochromatic": 5,
+    "darkvision": 6,
+    "blindness": 100,
   }
 
   isWornEquipStateChangePossible() {
@@ -295,8 +321,8 @@ export default class AbbrewItem extends Item {
 
     if (data.type === "skill") {
       if (this.actor && data.system.abbrewId) {
-        const duplicateItem = this.actor.items.find(i => i.system.abbrewId.uuid === data.system.abbrewId.uuid);
-        if (duplicateItem) {
+        const duplicateItem = this.actor.items.find(i => i.system.abbrewId.uuid === this.system.abbrewId.uuid);
+        if (duplicateItem && duplicateItem.type === "skill") {
           const uses = duplicateItem.system.action.uses;
           if (uses.hasUses && uses.asStacks) {
             await duplicateItem.update({ "system.action.uses.value": uses.value + data.system.action.uses.value });
@@ -306,8 +332,12 @@ export default class AbbrewItem extends Item {
       }
     }
 
-    if (this.actor && data.system.sources.actor === "") {
+    if (this.actor && (data.system.sources && data.system.sources.actor === "")) {
       this.updateSource({ "system.sources.actor": this.actor._id });
+    }
+
+    if (this.actor && data.type === "weapon" && data.system.equipType === "innate") {
+      this.updateSource({ "system.equipState": "inactive" });
     }
   }
 
@@ -326,7 +356,7 @@ export default class AbbrewItem extends Item {
     if (data.type === "skill") {
       await this.handleSenses();
       await this.handleLight();
-      await this.actor?.acceptSkillDeck(data);
+      await this.actor?.acceptSkillDeck(this);
       if (this.actor && ((!this.system.isActivatable && this.system.action.duration.value > 0) || (this.system.skillType === "temporary"))) {
         await trackSkillDuration(this.actor, this);
       }
@@ -343,6 +373,10 @@ export default class AbbrewItem extends Item {
         const stacks = data.effects.find(e => e.flags.abbrew.skill.stacks).flags.abbrew.skill.stacks;
         const visible = stacks > 1;
         await effect.update({ "flags.statuscounter.visible": visible, "flags.statuscounter.value": stacks });
+      }
+      if (this.actor && data.system.innateConcepts.raw.length > 0) {
+        const updateConcepts = [...this.actor.system.concepts.innate.value, ...getSafeJson(data.system.innateConcepts.raw)];
+        await this.actor.update({ "system.concepts.innate.raw": JSON.stringify(updateConcepts) });
       }
     } else if (data.type === "anatomy") {
       await this.actor?.acceptAnatomy(this);

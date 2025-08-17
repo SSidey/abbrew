@@ -35,15 +35,21 @@
     "speed": 0,
     "revealed": {
       "isRevealed": false,
-      "difficulty": 0,
-      "tier": 0
+      "difficulty": 15,
+      "tier": 1
     },
     "defense": {
       "guard": 0,
       "inflexibility": 0,
       "protection": []
     },
-    "naturalWeapons": []
+    "naturalWeapons": [],
+    "name": {
+      "base": "Torso"
+    },
+    "meta": {
+      "quality": 0
+    }
   },
   "effects": [],
   "sort": 0,
@@ -53,11 +59,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075214426,
-    "modifiedTime": 1743075504691,
+    "modifiedTime": 1752874683680,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

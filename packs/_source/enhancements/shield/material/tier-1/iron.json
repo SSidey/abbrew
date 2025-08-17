@@ -78,6 +78,20 @@
         "value": "metal",
         "numerator": 1,
         "denominator": 1
+      },
+      {
+        "operator": "add",
+        "path": "system.defense.guard",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "target",
+        "value": "system.defense.inflexibility",
+        "numerator": 3,
+        "denominator": 2
       }
     ],
     "duration": {
@@ -97,11 +111,11 @@
   "_stats": {
     "duplicateSource": null,
     "exportSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1750025146938,
-    "modifiedTime": 1750026928052,
+    "modifiedTime": 1752871664867,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!XTOV3GEhpMEv52ZI"

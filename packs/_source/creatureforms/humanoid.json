@@ -58,11 +58,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075106612,
-    "modifiedTime": 1749677579003,
+    "modifiedTime": 1752612599394,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

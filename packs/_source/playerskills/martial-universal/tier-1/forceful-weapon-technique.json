@@ -6,7 +6,7 @@
   "system": {
     "description": "",
     "traits": {
-      "raw": "[{\"key\":\"overpowerBaseTraining\",\"value\":\"Overpower Base\",\"feature\":\"skillTraining\",\"subFeature\":\"offensiveSkills\",\"effect\":\"base\",\"data\":\"overpower\",\"exclude\":[]}]"
+      "raw": ""
     },
     "abbrewId": {
       "value": "abbrew.skill.forcefulweapontechnique.bAGeebFps0nxhDtE",
@@ -28,11 +28,11 @@
       "grantedOnAccept": []
     },
     "action": {
-      "activationType": "",
-      "actionCost": "",
+      "activationType": "standalone",
+      "actionCost": null,
       "actionImage": "",
       "duration": {
-        "precision": "",
+        "precision": "0",
         "value": 0,
         "isConcentration": false,
         "expireOnStartOfTurn": true
@@ -112,11 +112,11 @@
           "self": {
             "value": [
               {
-                "operator": "",
-                "type": "",
+                "operator": "add",
+                "type": "numeric",
                 "path": "",
-                "multiplier": 1,
-                "lateParse": false
+                "lateParse": false,
+                "multiplier": 1
               }
             ],
             "operator": ""
@@ -124,11 +124,11 @@
           "target": {
             "value": [
               {
-                "operator": "",
-                "type": "",
+                "operator": "add",
+                "type": "numeric",
                 "path": "",
-                "multiplier": 1,
-                "lateParse": true
+                "lateParse": true,
+                "multiplier": 1
               }
             ],
             "operator": ""
@@ -138,11 +138,11 @@
           "self": {
             "value": [
               {
-                "operator": "",
-                "type": "",
+                "operator": "add",
+                "type": "numeric",
                 "path": "",
-                "multiplier": 1,
-                "lateParse": false
+                "lateParse": false,
+                "multiplier": 1
               }
             ],
             "operator": ""
@@ -150,11 +150,11 @@
           "target": {
             "value": [
               {
-                "operator": "",
-                "type": "",
+                "operator": "add",
+                "type": "numeric",
                 "path": "",
-                "multiplier": 1,
-                "lateParse": true
+                "lateParse": true,
+                "multiplier": 1
               }
             ],
             "operator": "",
@@ -169,11 +169,11 @@
           "self": {
             "value": [
               {
-                "operator": "",
-                "type": "",
+                "operator": "add",
+                "type": "numeric",
                 "path": "",
-                "multiplier": 1,
-                "lateParse": false
+                "lateParse": false,
+                "multiplier": 1
               }
             ],
             "operator": ""
@@ -181,11 +181,11 @@
           "target": {
             "value": [
               {
-                "operator": "",
-                "type": "",
+                "operator": "add",
+                "type": "numeric",
                 "path": "",
-                "multiplier": 1,
-                "lateParse": true
+                "lateParse": true,
+                "multiplier": 1
               }
             ],
             "operator": ""
@@ -197,7 +197,99 @@
         },
         "concepts": {
           "self": [],
-          "target": []
+          "target": [],
+          "esoteric": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "physical": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "crushing": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "piercing": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "slashing": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "fire": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "cold": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "water": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "earth": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "air": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "electricity": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "poison": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "flesh": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "blood": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "metal": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "light": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "dark": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "life": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "death": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "war": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "famine": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "pestilence": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "conquest": {
+            "operator": "add",
+            "type": "numeric"
+          }
         }
       },
       "skillCheck": [],
@@ -251,18 +343,85 @@
     "isProxied": false,
     "siblingSkillModifiers": []
   },
-  "effects": [],
+  "effects": [
+    {
+      "name": "Overpower Training",
+      "img": "icons/svg/aura.svg",
+      "origin": "Compendium.abbrew.playerskills.Item.mdZiRCjDtdpcf7GN",
+      "duration": {
+        "startTime": null,
+        "combat": null,
+        "seconds": null,
+        "rounds": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "disabled": false,
+      "_id": "G7IBsAoso6BKMVe4",
+      "type": "base",
+      "system": {
+        "modifiers": [
+          {
+            "parseMode": "numeric",
+            "numerator": 1,
+            "denominator": 1
+          }
+        ]
+      },
+      "changes": [
+        {
+          "key": "[{\"value\":\"Overpower Training\",\"label\":\"system.skillTraining.overpower.value\"}]",
+          "mode": 2,
+          "value": "1",
+          "priority": null
+        }
+      ],
+      "description": "",
+      "tint": "#ffffff",
+      "transfer": true,
+      "statuses": [],
+      "sort": 0,
+      "flags": {
+        "statuscounter": {
+          "config": {
+            "dataSource": "flags.abbrew.skill.stacks",
+            "type": "default"
+          },
+          "visible": false,
+          "value": 1
+        },
+        "abbrew": {
+          "skill": {
+            "stacks": 1
+          }
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.346",
+        "systemId": "abbrew",
+        "systemVersion": "0.0.2-prerelease31",
+        "createdTime": 1752618395009,
+        "modifiedTime": 1752618411321,
+        "lastModifiedBy": "abbrewpacks00000"
+      },
+      "_key": "!items.effects!mdZiRCjDtdpcf7GN.G7IBsAoso6BKMVe4"
+    }
+  ],
   "ownership": {
     "default": 0
   },
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746223939260,
-    "modifiedTime": 1747157674353,
+    "modifiedTime": 1752618393049,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

@@ -53,7 +53,15 @@
     "isAttackTrained": false,
     "isFinisherTrained": false,
     "isFeintTrained": false,
-    "isOverpowerTrained": false
+    "isOverpowerTrained": false,
+    "revealed": {
+      "revealSkills": {
+        "raw": "[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]"
+      }
+    },
+    "name": {
+      "base": "Tail Swipe"
+    }
   },
   "effects": [],
   "flags": {},
@@ -63,7 +71,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075292605,
-    "modifiedTime": 1743076008055,
+    "modifiedTime": 1752264544380,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

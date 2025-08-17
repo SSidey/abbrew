@@ -46,7 +46,7 @@
         "subPathFilterValue": "",
         "field": "",
         "type": "name",
-        "value": "bone",
+        "value": "iron",
         "numerator": 1,
         "denominator": 1
       },
@@ -61,6 +61,34 @@
         "field": "",
         "type": "numeric",
         "value": "1",
+        "numerator": 1,
+        "denominator": 1
+      },
+      {
+        "operator": "add",
+        "path": "system.defense.guard",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "target",
+        "value": "system.equipPoints.required.parsed.length",
+        "numerator": 5,
+        "denominator": 1
+      },
+      {
+        "operator": "add",
+        "path": "system.heft",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "numeric",
+        "value": "0",
         "numerator": 1,
         "denominator": 1
       }

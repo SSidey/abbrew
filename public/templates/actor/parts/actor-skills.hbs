@@ -2,7 +2,7 @@
 <div>
   {{#unless (empty equippedWeapons)}}
   {{> "systems/abbrew/templates/actor/parts/actor-weapon-attacks.hbs" weaponsList=equippedWeapons
-  showAttackProfiles=true showEquipState=false showItemControls=false}}
+  showAttackProfiles=true showEquipState=false showItemControls=false isOverpowerTrained=isOverpowerTrained}}
   {{/unless}}
   {{#unless (empty favouriteSkills)}}
   <div class='item flexrow items-header favourites-header' data-action="toggleSkillHeader"
@@ -66,25 +66,26 @@
   </ol>
 </div>
 <ol class='items-list'>
-  {{#each skillSections as |display skillType|}}
+  {{#each skillSections as |thisSkillSection|}}
   <li>
     {{!-- TODO: Add count of cards, this would be pretty nice considering we can collapse the sections now --}}
     {{!-- TODO: Need to add paths section where each path has the block below to add skills --}}
     {{!-- TODO: Order the sections? basic probably wants to be closer to the top where background maybe are less
     important? --}}
   <li class='item flexrow items-header skill-header' data-action="toggleSkillHeader"
-    data-skill-section="{{localize (skillType)}}">
-    <div class='item-name'>{{localize (skillType)}}</div>
+    data-skill-section="{{thisSkillSection.type}}">
+    <div class='item-name'>{{localize thisSkillSection.name}}</div>
     <div class='item-controls'>
       <a class='item-control item-create' data-action="createItem" title='Create item' data-type='skill'
-        data-skill-type={{skillType}}>
+        data-skill-type={{thisSkillSection.type}}>
         <i class='fas fa-plus'></i>
         {{localize 'DOCUMENT.New' type='skill'}}
       </a>
     </div>
   </li>
-  <ol class='skill-container' style="display: {{display}}" data-skill-section="{{localize (skillType)}}">
-    {{#each (getProperty ../skills (localize (skillType))) as |item id|}}
+  <ol class='skill-container' style="display: {{thisSkillSection.display}}"
+    data-skill-section="{{thisSkillSection.type}}">
+    {{#each (getProperty ../skills thisSkillSection.type) as |item id|}}
     {{> "systems/abbrew/templates/actor/parts/actor-skill-card.hbs" item=item}}
     {{/each}}
   </ol>

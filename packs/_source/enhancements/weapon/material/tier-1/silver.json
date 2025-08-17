@@ -78,6 +78,20 @@
         "value": "silver",
         "numerator": 1,
         "denominator": 1
+      },
+      {
+        "operator": "merge",
+        "path": "system.revealed.revealSkills.raw",
+        "filterPath": "",
+        "filterValue": "",
+        "subPath": "",
+        "subPathFilter": "",
+        "subPathFilterValue": "",
+        "field": "",
+        "type": "json",
+        "value": "{\"value\":\"Blacksmith (Check)\",\"id\":\"6GQuhRfuOZjc5kaG\",\"sourceId\":\"Compendium.abbrew.playerskills.Item.6GQuhRfuOZjc5kaG\"}",
+        "numerator": 1,
+        "denominator": 1
       }
     ],
     "duration": {
@@ -101,7 +115,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1750025146938,
-    "modifiedTime": 1750026928052,
+    "modifiedTime": 1752265059384,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!Kz4UiGkA45ANP0m5"

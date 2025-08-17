@@ -1,10 +1,10 @@
-import { mergeActorWounds } from "../helpers/combat.mjs";
-import { applyFullyParsedModifiers, mergeModifierFields, reduceParsedModifiers } from "../helpers/modifierBuilderFieldHelpers.mjs";
+import { getTokenCenter, getWoundImmunities, handleThreat, mergeActorWounds } from "../helpers/combat.mjs";
+import { applyFullyParsedModifiers, mergeModifierFields } from "../helpers/modifierBuilderFieldHelpers.mjs";
 import { handleSkillActivate, isSkillBlocked } from "../helpers/skills/skill-activation.mjs";
 import { applySkillEffects } from "../helpers/skills/skill-application.mjs";
-import { handleGrantedSkills, handleGrantOnExpiry, handleSkillsGrantedOnAccept } from "../helpers/skills/skill-grants.mjs";
+import { handleSkillGrantOnCreation, handleSkillGrantOnExpiry, handleSkillsGrantedOnAccept } from "../helpers/skills/skill-grants.mjs";
 import { getAttackerAdvantageGuardResult, getAttackerAdvantageRiskResult, getDefenderAdvantageGuardResult, getDefenderAdvantageRiskResult } from "../helpers/trainedSkills.mjs";
-import { compareModifierIndices, doesNestedFieldExist, getObjectValueByStringPath, getSafeJson, mergeObjects } from "../helpers/utils.mjs";
+import { compareModifierIndices, doesNestedFieldExist, getObjectValueByStringPath, getSafeJson, mergeObjects, onlyUnique } from "../helpers/utils.mjs";
 import { FINISHERS } from "../static/finishers.mjs";
 
 /**
@@ -46,15 +46,31 @@ export default class AbbrewActor extends Actor {
 
     const prototypeToken = {};
     if (this.type === "character") {
-      Object.assign(prototypeToken, {
-        sight: { enabled: true }, actorLink: true, disposition: CONST.TOKEN_DISPOSITIONS.FRIENDLY, detectionModes: []
-      });
+      await this.updateSource({
+        prototypeToken: {
+          actorLink: true,
+          disposition: CONST.TOKEN_DISPOSITIONS.FRIENDLY,
+          sight: { enabled: true, visionMode: "none" },
+          detectionModes: [{ id: "none", enabled: "true", range: 0 }]
+        }
+      }
+      );
     } else {
-      Object.assign(prototypeToken, {
-        sight: { enabled: true }, actorLink: false, disposition: CONST.TOKEN_DISPOSITIONS.HOSTILE, detectionModes: []
-      });
+      await this.updateSource({
+        prototypeToken: {
+          actorLink: false,
+          disposition: CONST.TOKEN_DISPOSITIONS.HOSTILE,
+          sight: { enabled: true, visionMode: "none" },
+          detectionModes: [{ id: "none", enabled: "true", range: 0 }]
+        }
+      }
+      );
     }
-    this.updateSource({ prototypeToken });
+  }
+
+  async _onCreate(data, options, userId) {
+
+    return super._onCreate(data, options, userId);
   }
 
   async _preUpdate(changed, options, userId) {
@@ -74,12 +90,25 @@ export default class AbbrewActor extends Actor {
       }
     }
 
+    if (doesNestedFieldExist(changed, "system.concepts.available")) {
+      // const actorConcepts = structuredClone(actor.system.concepts.available);
+      const fullConceptSet = foundry.utils.mergeObject(this.system.concepts.available, changed.system.concepts.available, { inplace: false, overwrite: true, recursive: true });
+      const totalConcepts = Object.values(fullConceptSet).map(c => c.value).reduce((total, value) => total += value, 0);
+      if (totalConcepts > this.system.magic.conceptCapacity) {
+        delete changed.system.concepts.available;
+      }
+
+      if (Object.keys(changed).length === 3 && Object.keys(changed.system).length === 1 && Object.keys(changed.system.concepts).length === 0) {
+        return false;
+      }
+    }
+
     if (doesNestedFieldExist(changed, "system.senses")) {
       const actorSenses = changed.system.senses;
       if (this.type === "character") {
         actorSenses.sight.enabled = true;
       }
-      const sight = foundry.utils.mergeObject(this.prototypeToken.sight, actorSenses.sight, { overwrite: true });
+      const sight = actorSenses.sight;
       const detectionModes = actorSenses.detectionModes;
       const update = { "sight": sight, "detectionModes": detectionModes };
 
@@ -98,12 +127,25 @@ export default class AbbrewActor extends Actor {
   }
 
   async _onUpdate(changed, options, user) {
-    if (doesNestedFieldExist(changed, "system.activeSkills")) {
+    if (doesNestedFieldExist(changed, "system.activeSkills") || doesNestedFieldExist(changed, "system.queuedSkills")) {
       await this.handleLight();
+    }
+
+    if (!(doesNestedFieldExist(changed, "x") || doesNestedFieldExist(changed, "y") || doesNestedFieldExist(changed, "elevation"))) {
+      await this._handleActorCombatThreat();
     }
 
     return super._onUpdate(changed, options, user);
   }
+
+  async _handleActorCombatThreat() {
+    const document = this.token;
+    if (document) {
+      await handleThreat(document, { x: document.x, y: document.y, elevation: document.elevation }, getTokenCenter(document.x, document.y, document.elevation ?? document.elevation, document.getSize(), document.height));
+    }
+  }
+
+
 
   /**
    * @override
@@ -160,7 +202,7 @@ export default class AbbrewActor extends Actor {
     const lightSkill = this.items.find(
       i => i.type === "skill" &&
         (i.system.light.dim > 0 || i.system.light.bright > 0) &&
-        (!i.system.isActivatable || (i.system.isActivatable && i.system.action.isActive && this.system.activeSkills.includes(i._id)))
+        (!i.system.isActivatable || (i.system.isActivatable && i.system.action.isActive && (this.system.activeSkills.includes(i._id) || this.system.queuedSkills.includes(i._id))))
     );
 
     const update = lightSkill ? { "light": lightSkill.system.light } : { "light.bright": 0, "light.dim": 0 };
@@ -176,6 +218,11 @@ export default class AbbrewActor extends Actor {
     const tokenDocuments = game.canvas.tokens.placeables.filter(e => e.document.actorId === this._id);
     const tokenPromises = tokenDocuments.map(t => t.document.update(update));
     await Promise.all(tokenPromises);
+    game.canvas.perception.update({
+      initializeVisionModes: true,
+      refreshVision: true,
+      refreshLighting: true
+    });
   }
 
   async takeActionUpdates(data) {
@@ -273,8 +320,8 @@ export default class AbbrewActor extends Actor {
     let risk = this.system.defense.risk.raw;
     const inflexibility = this.system.defense.inflexibility.raw;
 
-    const attackingActorParryCounter = data.attackerSkillTraining.find(st => st.type === "parryCounter")?.value ?? 0;
-    const attackingActorFeint = data.attackerSkillTraining.find(st => st.type === "feint")?.value ?? 0;
+    const attackingActorParryCounter = data.attackerSkillTraining.parryCounter?.value ?? 0;
+    const attackingActorFeint = data.attackerSkillTraining.feint?.value ?? 0;
 
     //TODO: Tidy this up
     await this.setFlag("abbrew", "combat.damage.lastReceived", data.damage);
@@ -283,10 +330,10 @@ export default class AbbrewActor extends Actor {
     const updateRisk = this.calculateRisk(damage, guard, risk, inflexibility, data.isFeint, data.isStrongAttack, action, attackingActorParryCounter, attackingActorFeint);
     let overFlow = updateRisk > 100 ? updateRisk - 100 : 0;
 
-
+    const previousValues = { guard: this.system.defense.guard.value, risk: this.system.defense.risk.raw };
     const updates = { "system.defense.guard.value": await this.calculateGuard(damage + overFlow, guard, data.isFeint, data.isStrongAttack, action, attackingActorParryCounter, attackingActorFeint), "system.defense.risk.raw": updateRisk };
     await this.update(updates);
-    await this.renderAttackResultCard(data, action);
+    await this.renderAttackResultCard(data, action, previousValues, updates);
     await this.activateDamageTakenSkill();
     return this;
   }
@@ -326,7 +373,7 @@ export default class AbbrewActor extends Actor {
     const uniqueFinisher = data.finisher ? Object.values(data.finisher)[0] : null;
     if (uniqueFinisher?.type && uniqueFinisher?.text) {
       const finisherConstruct = data.finisher;
-      const availableFinishers = Object.entries(finisherConstruct).filter(e => e[1].type === finisherType).reduce((result, e) => { result[e[0]] = e[1]; return result }, {});
+      const availableFinishers = Object.entries(finisherConstruct).filter(e => e[1].type.includes(finisherType)).reduce((result, e) => { result[e[0]] = e[1]; return result }, {});
       finisherCost = this.getFinisherCost(availableFinishers, totalRisk, data.attackProfile);
       finisher = this.getFinisher(availableFinishers, finisherCost);
     } else {
@@ -334,9 +381,11 @@ export default class AbbrewActor extends Actor {
       finisherCost = this.getFinisherCost(availableFinishers, totalRisk, data.attackProfile);
       finisher = this.getFinisher(availableFinishers, finisherCost);
     }
-    await this.sendFinisherToChat(finisher, finisherCost);
+
     if (finisher) {
       return await this.applyFinisher(risk, finisher, finisherCost);
+    } else {
+      await this.sendFinisherToChat();
     }
   }
 
@@ -357,7 +406,9 @@ export default class AbbrewActor extends Actor {
 
   applyModifiersToRisk(rolls, data, finisherType) {
     let successes = 0;
-    if (this.system.defense.protection[finisherType].immunity > 0) {
+    const allProtection = this.getConditionalModifiedProtectionForDamageType("all", data);
+    const protection = this.getConditionalModifiedProtectionForDamageType(finisherType, data);
+    if (protection.immunity > 0 || allProtection.immunity > 0) {
       return successes;
     }
 
@@ -391,19 +442,24 @@ export default class AbbrewActor extends Actor {
 
   // TODO: Move to another module?
   async sendFinisherToChat(finisher, finisherCost) {
+    const wounds = (finisher && finisher.wounds) ? finisher.wounds.filter(w => !getWoundImmunities(this).includes(w.type)).map(w => ({ type: w.type, value: w.value, name: game.i18n.localize(CONFIG.ABBREW.wounds[w.type].name) })) : [];
+    const finisherType = (finisher && finisher.type) ? CONFIG.ABBREW.damageTypes[finisher.type].label : "Untyped";
+
     const templateData = {
       finisherCost,
       finisher,
+      finisherType,
+      wounds,
       actor: this,
       tokenId: this.token?.uuid || null,
     };
 
-    const html = await renderTemplate("systems/abbrew/templates/chat/finisher-card.hbs", templateData);
+    const html = await foundry.applications.handlebars.renderTemplate("systems/abbrew/templates/chat/finisher-card.hbs", templateData);
 
     // Initialize chat data.
     const speaker = ChatMessage.getSpeaker({ actor: this.actor });
     // const rollMode = game.settings.get('core', 'rollMode');
-    const label = finisher ? `${finisher.name}` : "No available finisher";
+    const label = this.getFinisherFlavour(finisher, finisherCost, finisherType);
     ChatMessage.create({
       speaker: speaker,
       // rollMode: rollMode,
@@ -413,9 +469,20 @@ export default class AbbrewActor extends Actor {
     });
   }
 
+  getFinisherFlavour(finisher, finisherCost, finisherType) {
+    if (finisher && finisher.name) {
+      return finisher.name;
+    } else if (finisher) {
+      return `${game.i18n.localize(finisherType)} ${finisherCost}`;
+    } else {
+      return "No available finisher";
+    }
+  }
+
   async applyFinisher(risk, finisher, finisherCost) {
     const updates = { "system.wounds": mergeActorWounds(this, finisher.wounds), "system.defense.risk.raw": this.reduceRiskForFinisher(risk, finisherCost) };
     await this.update(updates);
+    await this.sendFinisherToChat(finisher, finisherCost);
     return this;
   }
 
@@ -427,10 +494,8 @@ export default class AbbrewActor extends Actor {
     let rollSuccesses = data.totalSuccesses;
 
     return data.damage.reduce((result, d) => {
-      const allProtection = this.system.defense.protection["all"];
-      const defenseProtection = this.system.defense.protection[d.damageType];
-      const conditionalProtectionValues = this.getConditionalProtectionForDamageType(d.damageType, data);
-      const protection = mergeObjects(defenseProtection, conditionalProtectionValues);
+      const allProtection = this.getConditionalModifiedProtectionForDamageType("all", data);
+      const protection = this.getConditionalModifiedProtectionForDamageType(d.damageType, data);
 
       if (protection.immunity > 0 || allProtection.immunity > 0) {
         return result;
@@ -454,6 +519,17 @@ export default class AbbrewActor extends Actor {
 
       return result += dmg;
     }, 0);
+  }
+
+  getConditionalModifiedProtectionForDamageType(damageType, data) {
+    const defenseProtection = this.system.defense.protection[damageType];
+    const conditionalProtectionValues = this.getConditionalProtectionForDamageType(damageType, data);
+    if (damageType !== "all") {
+      const conditionalAllProtectionValues = this.getConditionalProtectionForDamageType("all", data);
+      const allModifiedProtectionValues = mergeObjects(conditionalProtectionValues, conditionalAllProtectionValues);
+      return mergeObjects(defenseProtection, allModifiedProtectionValues);
+    }
+    return mergeObjects(defenseProtection, conditionalProtectionValues);
   }
 
   getConditionalProtectionForDamageType(damageType, data) {
@@ -533,11 +609,11 @@ export default class AbbrewActor extends Actor {
     }
 
     if (this.attackerGainsAdvantage(isFeint, action)) {
-      return getAttackerAdvantageGuardResult(this.system.skillTraining.find(st => st.type === "feintCounter")?.value ?? 0, attackingActorFeint, damage);
+      return getAttackerAdvantageGuardResult(this.system.skillTraining.feintCounter?.value ?? 0, attackingActorFeint, damage);
     }
 
     if (this.defenderGainsAdvantage(isFeint, action)) {
-      return getDefenderAdvantageGuardResult(this.system.skillTraining.find(st => st.type === "parry")?.value ?? 0, attackingActorParryCounter, damage);
+      return getDefenderAdvantageGuardResult(this.system.skillTraining.parry?.value ?? 0, attackingActorParryCounter, damage);
     }
 
     return 0 + damage;
@@ -557,11 +633,11 @@ export default class AbbrewActor extends Actor {
     }
 
     if (this.attackerGainsAdvantage(isFeint, action)) {
-      return getAttackerAdvantageRiskResult(this.system.skillTraining.find(st => st.type === "feintCounter")?.value ?? 0, attackingActorFeint, damage, inflexibility, guard);
+      return getAttackerAdvantageRiskResult(this.system.skillTraining.feintCounter?.value ?? 0, attackingActorFeint, damage, inflexibility, guard);
     }
 
     if (this.defenderGainsAdvantage(isFeint, action)) {
-      return getDefenderAdvantageRiskResult(this.system.skillTraining.find(st => st.type === "parry")?.value ?? 0, attackingActorParryCounter, damage, inflexibility, guard);
+      return getDefenderAdvantageRiskResult(this.system.skillTraining.parry?.value ?? 0, attackingActorParryCounter, damage, inflexibility, guard);
     }
 
     return guard > 0 ? Math.min(damage, inflexibility) : damage;
@@ -579,10 +655,26 @@ export default class AbbrewActor extends Actor {
     return isFeint === true && action === 'damage'
   }
 
-  async renderAttackResultCard(data, action) {
+  async renderAttackResultCard(data, action, previousValues, updates) {
     const attackerAdvantage = this.attackerGainsAdvantage(data.isFeint, action);
     const defenderAdvantage = this.defenderGainsAdvantage(data.isFeint, action);
     const noneResult = this.noneResult(data.isFeint, action);
+    const guardDifference = previousValues.guard - updates.system.defense.guard.value;
+    const riskDifference = previousValues.risk - updates.system.defense.risk.raw;
+    const guardDifferenceConnection = guardDifference > 0 ? "Lost" : "Gained";
+    const riskDifferenceConnection = riskDifference > 0 ? "Lost" : "Gained";
+    const guardMessage = guardDifference !== 0 ? `${guardDifferenceConnection} ${Math.abs(guardDifference)} Guard` : "Guard did not change";
+    const riskMessage = riskDifference !== 0 ? `${riskDifferenceConnection} ${Math.abs(riskDifference)} Risk` : "Risk did not change";
+    let flavor;
+    if (attackerAdvantage) {
+      flavor = `Result: ${data.attackingActor.name} Feint`;
+    } else if (defenderAdvantage) {
+      flavor = `Result: ${this.name} Parry`;
+    } else if (noneResult) {
+      flavor = "Result: Nothing";
+    } else {
+      flavor = "Result: Attacked";
+    }
 
     const templateData = {
       attackerAdvantage,
@@ -592,6 +684,8 @@ export default class AbbrewActor extends Actor {
       defendingActor: this,
       attackingActor: data.attackingActor,
       tokenId: this.token?.uuid || null,
+      guardMessage,
+      riskMessage
     };
 
     const html = await renderTemplate("systems/abbrew/templates/chat/attack-result-card.hbs", templateData);
@@ -601,8 +695,7 @@ export default class AbbrewActor extends Actor {
 
     ChatMessage.create({
       speaker: speaker,
-      // rollMode: rollMode,
-      // flavor: label,
+      flavor,
       content: html,
       flags: { /* data: { finisher, finisherCost } */ }
     });
@@ -614,7 +707,7 @@ export default class AbbrewActor extends Actor {
   }
 
   getActorHeldItems() {
-    return this.items.filter(a => a.system.equipType === 'held').filter(a => a.system.equipState.startsWith('held'));
+    return [...this.items.filter(a => a.system.equipType === 'held').filter(a => a.system.equipState.startsWith('held')), ...this.items.filter(i => i.equipState === "readied")].filter(onlyUnique);
   }
 
   getActorAnatomy() {
@@ -628,57 +721,28 @@ export default class AbbrewActor extends Actor {
   async acceptWound(type, value) {
     const updates = { "system.wounds": mergeActorWounds(this, [{ type, value }]) };
     await this.update(updates);
+    // TODO: Output this to chat
     return this;
-  }
-
-  async acceptBackground(background) {
-    const name = background.name;
-    const image = background.img;
-    const description = background.system.description;
-    const attributeIncreases = Object.entries(background.system.attributes).filter(atr => atr[1].value > 0).reduce((result, attribute) => result.concat(Array(attribute[1].value).fill(attribute[0])), []);
-    for (const index in attributeIncreases) {
-      const system = {
-        description,
-        attributeIncrease: attributeIncreases[index],
-        skillType: "background"
-      };
-      const itemData = {
-        name,
-        img: image,
-        type: 'skill',
-        system
-      };
-      await Item.create(itemData, { parent: this });
-    }
   }
 
   async acceptCreatureForm(creatureForm) {
     const anatomy = await Promise.all(creatureForm.system.anatomy.map(async a => await fromUuid(a.sourceId)));
     for (const index in anatomy) {
       await Item.create(anatomy[index], { parent: this });
-
-      const weapons = await Promise.all(anatomy[index].system.naturalWeapons.map(async w => await fromUuid(w.sourceId)));
-      for (const weaponIndex in weapons) {
-        await Item.create(weapons[weaponIndex], { parent: this });
-      }
     }
   }
 
   async acceptSkillDeck(skillDeck) {
-    const skills = await Promise.all(skillDeck.system.skills.granted.map(async s => await fromUuid(s.sourceId)));
-    await handleGrantedSkills(skills, this, skillDeck);
+    await handleSkillGrantOnCreation(skillDeck, this, skillDeck);
   }
 
   async acceptAnatomy(anatomy) {
     const naturalWeapons = structuredClone(await Promise.all(anatomy.system.naturalWeapons.map(async w => await fromUuid(w.sourceId))));
-    const skills = structuredClone(await Promise.all(anatomy.system.skills.granted.map(async w => await fromUuid(w.sourceId))));
     for (const index in naturalWeapons) {
       naturalWeapons[index].system.grantedBy = anatomy._id;
       await Item.create(naturalWeapons[index], { parent: this })
-    } for (const index in skills) {
-      skills[index].system.grantedBy.item = anatomy._id;
-      await Item.create(skills[index], { parent: this })
     }
+    await handleSkillGrantOnCreation(anatomy, this, anatomy);
   }
 
   async canActorUseActions(actions) {
@@ -706,7 +770,7 @@ export default class AbbrewActor extends Actor {
           if (item.system.applyOnExpiry && item.isOwner) {
             await applySkillEffects(this, item);
           }
-          await handleGrantOnExpiry(item, this, item);
+          await handleSkillGrantOnExpiry(item, this, item);
         }
         await item.update({ "system.action.charges.value": 0 })
         const effects = item.effects;
@@ -730,6 +794,10 @@ export default class AbbrewActor extends Actor {
     const activeSkillsWithDuration = this.effects.toObject().filter(e => e.flags?.abbrew?.skill?.type === "standalone").map(e => e.flags.abbrew.skill.trackDuration);
     const queuedSkillsWithDuration = this.effects.toObject().filter(e => e.flags?.abbrew?.skill?.type === "synergy").map(e => e.flags.abbrew.skill.trackDuration);
     await this.update({ "system.activeSkills": activeSkillsWithDuration, "system.queuedSkills": queuedSkillsWithDuration });
+
+    if (game.combat && game.combat.isActive && effect.statuses.intersection(new Set(["blind", "deaf"])).size > 0) {
+      await this._handleActorCombatThreat();
+    }
   }
 
   doesActorHaveSkillDiscord(skill) {
