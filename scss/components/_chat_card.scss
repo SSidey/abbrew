@@ -31,8 +31,14 @@ label.skill-check-actor-name {
 
 .dice-tooltip .dice-rolls .roll.lethal {
     background-image: url("../../../systems/abbrew/assets/icons/dice/lethal.svg");
+    color: #00000000;
 }
 
 .dice-tooltip .dice-rolls .roll.bonus {
     background-image: url("../../../systems/abbrew/assets/icons/dice/bonus.svg");
+}
+
+.dice-tooltip .dice-rolls .roll.penetration {
+    background-image: url("../../../systems/abbrew/assets/icons/dice/penetration.svg");
+    color: #00000000;
 }

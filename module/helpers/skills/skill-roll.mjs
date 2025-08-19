@@ -16,7 +16,7 @@ export function getRollFormula(tier, critical, fortune) {
     return `${diceCount}d10${fortuneModifier}x>=${explodesOn}cs>=${successOn}`;
 }
 
-export function getResultDice(result, bonusSuccesses = 0, lethal = 0) {
+export function getResultDice(result, bonusSuccesses = 0, lethal = 0, penetration = 0) {
     const groupedDice = result.dice[0].results.reduce((result, die) => {
         if (result.base.length === 0) {
             result.base.push(die);
@@ -67,6 +67,13 @@ export function getResultDice(result, bonusSuccesses = 0, lethal = 0) {
                 "classes": "roll die success lethal"
             })
         }
+    }
+
+    for (let i = 0; i < penetration; i++) {
+        decoratedDice.push({
+            "result": 0,
+            "classes": "roll die penetration"
+        })
     }
 
     return decoratedDice;

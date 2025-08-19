@@ -39,7 +39,7 @@ export async function applyAttackProfiles(actor, skill, modifierSkills, fortune,
 
         await actor.setFlag("abbrew", "combat.damage.lastDealt", damage);
 
-        const resultDice = getResultDice(result, bonusSuccesses, attackProfile.lethal);
+        const resultDice = getResultDice(result, bonusSuccesses, attackProfile.lethal, attackProfile.penetration);
 
         const totalSuccesses = getTotalSuccessesForResult(resultDice);
 

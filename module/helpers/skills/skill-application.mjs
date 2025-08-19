@@ -196,7 +196,14 @@ function getSkillTraits(skill, modifierSkills) {
 
             return t;
         });
-    return traits;
+
+    return traits.reduce((uniqueTraits, trait) => {
+        if (!uniqueTraits.find(u => u.key === trait.key)) {
+            uniqueTraits.push(trait);
+        }
+
+        return uniqueTraits;
+    }, []);
 }
 
 function mergeFortune(allSkills) {
