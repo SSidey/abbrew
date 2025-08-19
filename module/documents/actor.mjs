@@ -131,9 +131,9 @@ export default class AbbrewActor extends Actor {
       await this.handleLight();
     }
 
-    if (!(doesNestedFieldExist(changed, "x") || doesNestedFieldExist(changed, "y") || doesNestedFieldExist(changed, "elevation"))) {
-      await this._handleActorCombatThreat();
-    }
+    // if (!(doesNestedFieldExist(changed, "x") || doesNestedFieldExist(changed, "y") || doesNestedFieldExist(changed, "elevation"))) {
+    //   await this._handleActorCombatThreat();
+    // }
 
     return super._onUpdate(changed, options, user);
   }

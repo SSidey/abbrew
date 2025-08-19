@@ -16,7 +16,7 @@ export function getRollFormula(tier, critical, fortune) {
     return `${diceCount}d10${fortuneModifier}x>=${explodesOn}cs>=${successOn}`;
 }
 
-export function getResultDice(result) {
+export function getResultDice(result, bonusSuccesses = 0, lethal = 0) {
     const groupedDice = result.dice[0].results.reduce((result, die) => {
         if (result.base.length === 0) {
             result.base.push(die);
@@ -36,7 +36,7 @@ export function getResultDice(result) {
 
     const orderedDice = [...groupedDice.base, ...groupedDice.explosions, ...groupedDice.stack];
 
-    return orderedDice.map(die => {
+    const decoratedDice = orderedDice.map(die => {
         let baseClasses = "roll die d10";
         if (die.success) {
             baseClasses = baseClasses.concat(' ', 'success');
@@ -52,17 +52,39 @@ export function getResultDice(result) {
 
         return { result: die.result, classes: baseClasses };
     });
+
+    for (let i = 0; i < bonusSuccesses; i++) {
+        decoratedDice.push({
+            "result": 10,
+            "classes": "roll die success bonus"
+        })
+    }
+
+    if (decoratedDice.some(d => d.classes.includes("success"))) {
+        for (let i = 0; i < lethal; i++) {
+            decoratedDice.push({
+                "result": 10,
+                "classes": "roll die success lethal"
+            })
+        }
+    }
+
+    return decoratedDice;
 }
 
 export function getTotalSuccessesForResult(result, lethal = 0) {
-    const totalSuccesses = result.dice[0].results.reduce((total, r) => {
-        if (r.success && !(r.discarded)) {
-            total += 1;
-        }
-        return total;
-    }, 0);
-
-    return totalSuccesses > 0 ? totalSuccesses + lethal : totalSuccesses;
+    return result
+        .map(r => (
+            {
+                success: r.classes.includes("success"),
+                discarded: r.classes.includes("discarded")
+            }
+        )).reduce((total, r) => {
+            if (r.success && !(r.discarded)) {
+                total += 1;
+            }
+            return total;
+        }, 0);
 }
 
 export function getDiceCount(tier, fortune) {

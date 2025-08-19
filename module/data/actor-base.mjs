@@ -167,7 +167,8 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
       threatened: new fields.SchemaField({
         threshold: new fields.NumberField({ ...requiredInteger, initial: -1 }),
         multiplier: new fields.NumberField({ ...requiredInteger, initial: 1 })
-      })
+      }),
+      adjacentAllies: new fields.NumberField({ ...requiredInteger, initial: 0 })
     });
     schema.resources = new fields.SchemaField({
       owned: new fields.ArrayField(

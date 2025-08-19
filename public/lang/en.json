@@ -173,7 +173,8 @@
         "finisher": "Finisher Training",
         "parryCounter": "Parry Counter Training",
         "feintCounter": "Feint Counter Training"
-      }
+      },
+      "adjacentAllies": "Adjacent Allies"
     },
     "Roles": {
       "Name": {
@@ -1094,6 +1095,11 @@
           }
         }
       },
+      "grantedBy": {
+        "token": {
+          "label": "Token"
+        }
+      },
       "activation": {
         "requiredActiveSkills": {
           "label": "Required Active Skills"
@@ -1123,7 +1129,7 @@
         }
       },
       "action": {
-        "tierDiceCost": {
+        "tierDiceChange": {
           "label": "Tier Dice Cost"
         },
         "charges": {
@@ -1221,6 +1227,9 @@
           "raw": {
             "label": "Trait Filter"
           }
+        },
+        "blockSilently": {
+          "label": "Block Silently"
         }
       },
       "traits": {

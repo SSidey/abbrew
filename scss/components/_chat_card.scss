@@ -28,3 +28,11 @@ label.skill-check-actor-name {
     padding-left: 0.25em;
     padding-right: 0.25em;
 }
+
+.dice-tooltip .dice-rolls .roll.lethal {
+    background-image: url("../../../systems/abbrew/assets/icons/dice/lethal.svg");
+}
+
+.dice-tooltip .dice-rolls .roll.bonus {
+    background-image: url("../../../systems/abbrew/assets/icons/dice/bonus.svg");
+}

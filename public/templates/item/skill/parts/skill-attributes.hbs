@@ -7,9 +7,11 @@
     value=system.skillModifiers.synergyTraitFilter.raw localize=true classes="skill-span-2"}}
     {{formGroup system.schema.fields.skillModifiers.fields.discord
     value=system.skillModifiers.discord localize=true dataset=datasets.skillDrop classes="skill-span-2"}}
+    {{formGroup system.schema.fields.skillModifiers.fields.blockSilently value=system.skillModifiers.blockSilently }}
 
     <label>Granted By Actor</label>
     <input type="text" name="system.grantedBy.actor" value="{{system.grantedBy.actor}}" data-dtype="String" />
+    {{formGroup system.schema.fields.grantedBy.fields.token value=system.grantedBy.token localize=true}}
     <label>Granted By Item</label>
     <input type="text" name="system.grantedBy.item" value="{{system.grantedBy.item}}" data-dtype="String" />
     <label class="slide-toggle roboto-upper">

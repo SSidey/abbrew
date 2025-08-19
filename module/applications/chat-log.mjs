@@ -71,17 +71,19 @@ export default class AbbrewChatLog extends (foundry.applications?.sidebar?.tabs?
         if (totalSuccesses > 0) {
             const successes = totalSuccesses;
             const successSkills = data.skillCheckRequest.outcomeGrants.success;
-            const sourceActor = data.skillCheckRequest.sourceActor;
+            const actorSource = data.skillCheckRequest.actorSource;
+            const tokenSource = data.skillCheckRequest.tokenSource;
             const updates = {};
             updates["system.passedValuesForAsync"] = [{ name: "successes", value: successes }];
-            handleSkillsGrantedOnCheck(successSkills, actor, sourceActor, updates);
+            handleSkillsGrantedOnCheck(successSkills, actor, null, actorSource, tokenSource, updates);
         } else if (totalSuccesses <= 0) {
             const failures = 1 + totalSuccesses;
             const failureSkills = data.skillCheckRequest.outcomeGrants.failure;
-            const sourceActor = data.skillCheckRequest.sourceActor;
+            const actorSource = data.skillCheckRequest.actorSource;
+            const tokenSource = data.skillCheckRequest.tokenSource;
             const updates = {};
             updates["system.passedValuesForAsync"] = [{ name: "failures", value: failures }];
-            handleSkillsGrantedOnCheck(failureSkills, actor, sourceActor, updates);
+            handleSkillsGrantedOnCheck(failureSkills, actor, null, actorSource, tokenSource, updates);
         }
     }
 
@@ -94,7 +96,11 @@ export default class AbbrewChatLog extends (foundry.applications?.sidebar?.tabs?
 
         const actor = tokens[0].actor;
 
-        await actor.takeAttack(data, action);
+        if (data.damage) {
+            await actor.takeAttack(data, action);
+        } else {
+            await actor.takeEffect(data);
+        }
     }
 
     static async _onAcceptDamageAction(rolls, data, action) {

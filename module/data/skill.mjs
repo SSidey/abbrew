@@ -56,6 +56,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
                 )
             }),
             discord: new fields.StringField({ ...blankString }),
+            blockSilently: new fields.BooleanField({ required: true, initial: false }),
             // Whether or not to apply a skil in synergies, if true then the appropriate grantedBy 
             // id(s) must be present in sources for it to be included
             isActorGrantTriggerRequired: new fields.BooleanField({ required: true, intial: false }),
@@ -85,6 +86,9 @@ export default class AbbrewSkill extends AbbrewItemBase {
         });
         schema.grantedBy = new fields.SchemaField({
             actor: new fields.StringField({ ...blankString }),
+            transferActor: new fields.BooleanField({ required: true, initial: false }),
+            selfGrantOnly: new fields.BooleanField({ required: true, initial: false }),
+            token: new fields.StringField({ ...blankString }),
             item: new fields.StringField({ ...blankString })
         });
         schema.handleExpiryEffects = new fields.BooleanField({ required: true, initial: true });
@@ -205,7 +209,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
         schema.action = new fields.SchemaField({
             activationType: new fields.StringField({ ...blankString }),
             actionCost: new fields.StringField({ ...blankString, nullable: true }),
-            tierDiceCost: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+            tierDiceChange: new fields.NumberField({ ...requiredInteger, initial: 0 }),
             actionImage: new fields.StringField({ ...blankString }),
             duration: new fields.SchemaField({
                 isConcentration: new fields.BooleanField({ required: true, initial: false }),

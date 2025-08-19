@@ -16,7 +16,9 @@ export async function handleSkillActivate(actor, skill, checkActions = true, inc
     }
 
     if (isSkillBlocked(actor, skill)) {
-        ui.notifications.info(`You are blocked from using ${skill.name}`);
+        if (!skill.system.skillModifiers.blockSilently) {
+            ui.notifications.info(`You are blocked from using ${skill.name}`);
+        }
         return false;
     }
 
@@ -51,9 +53,25 @@ export async function handleSkillActivate(actor, skill, checkActions = true, inc
 }
 
 export function isSkillBlocked(actor, skill) {
-    const skillDiscord = actor.items.filter(i => i.type === "skill").filter(s => s.system.skillModifiers.discord).flatMap(s => getSafeJson(s.system.skillModifiers.discord, []).map(s => s.id));
+    const skillDiscord = actor.items.filter(i => i.type === "skill").filter(s => s.system.skillModifiers.discord).flatMap(sk => getSafeJson(sk.system.skillModifiers.discord, []).map(s => ({ discord: s.id, skill: sk })));
     const skillId = skill.system.abbrewId.uuid;
-    return skillDiscord.includes(skillId);
+    return skillDiscord.filter(s => s.discord === skillId).some(s => isDiscordApplied(skill, s.skill));
+}
+
+function isDiscordApplied(skill, discordSkill) {
+    if (discordSkill.system.grantedBy.actor === "" || discordSkill.system.grantedBy.token === "") {
+        return true;
+    }
+
+    if (discordSkill.system.skillModifiers.isActorGrantTriggerRequired) {
+        return discordSkill.system.grantedBy.actor === skill.system.grantedBy.actor
+            && (
+                (discordSkill.system.grantedBy.token === skill.system.grantedBy.token)
+                || !discordSkill.system.grantedBy.token
+            )
+    }
+
+    return true;
 }
 
 export function areSkillActivationRequirementsMet(actor, skill) {

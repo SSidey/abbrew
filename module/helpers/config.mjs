@@ -1080,6 +1080,7 @@ ABBREW.activeEffectKeys = [
   { value: "system.defense.threatened.multiplier", label: "ABBREW.Threatened.threatenedMultiplier" },
   { value: "system.defense.resolve.maxMod", label: "ABBREW.Defense.Resolve.max" },
   { value: "system.defense.resolve.maxMult", label: "ABBREW.Defense.Resolve.maxMult" },
+  { value: "system.defense.adjacentAllies", label: "ABBREW.ActiveEffectKeys.adjacentAllies" }
 ]
 
 ABBREW.speeds = {

@@ -192,3 +192,16 @@ export function generateAbbrewId(type, name, id) {
     const formattedName = name.toLowerCase().replace(/\s/g, '');
     return `abbrew.${type}.${formattedName}.${id}`
 }
+
+export function getTokenForActor(actor) {
+    if (actor.token) {
+        return actor.token;
+    }
+
+    const activeTokens = game.actors.get(actor._id).getActiveTokens();
+    if (activeTokens.length === 1) {
+        return [0].document;
+    }
+
+    console.log(`No token for this actor ${actor._id}`);
+}

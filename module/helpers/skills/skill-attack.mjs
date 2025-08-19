@@ -2,7 +2,7 @@ import { parsePathSync } from "../modifierBuilderFieldHelpers.mjs";
 import { applyOperator } from "../operators.mjs";
 import { getResultDice, getRollFormula, getTotalSuccessesForResult } from "./skill-roll.mjs";
 
-export async function applyAttackProfiles(actor, skill, modifierSkills, fortune, templateData, data) {
+export async function applyAttackProfiles(actor, skill, modifierSkills, fortune, bonusSuccesses, templateData, data) {
     if (skill.system.action.attackProfile.isEnabled) {
         const token = actor.token;
         const baseAttackProfile = skill.system.action.attackProfile;
@@ -39,9 +39,9 @@ export async function applyAttackProfiles(actor, skill, modifierSkills, fortune,
 
         await actor.setFlag("abbrew", "combat.damage.lastDealt", damage);
 
-        const resultDice = getResultDice(result);
+        const resultDice = getResultDice(result, bonusSuccesses, attackProfile.lethal);
 
-        const totalSuccesses = getTotalSuccessesForResult(result, attackProfile.lethal);
+        const totalSuccesses = getTotalSuccessesForResult(resultDice);
 
 
         const finisher = attackMode === "finisher" ? mergeFinishers(baseAttackProfile, modifierSkills, actor) : null;

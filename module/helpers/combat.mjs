@@ -2,6 +2,7 @@ import { mergeModifierFields, parseModifierFieldValue } from "./modifierBuilderF
 import { applyOperator, getOrderForOperator } from "./operators.mjs";
 import { applySkillEffects } from "./skills/skill-application.mjs";
 import { checkAndExpire } from "./skills/skill-expiry.mjs";
+import { handleSkillsGrantedByAura } from "./skills/skill-grants.mjs";
 
 export async function handleCombatStart(actors) {
     for (const index in actors) {
@@ -188,15 +189,17 @@ export function getTokenCenter(x, y, elevation, { width, height }, size) {
 
 export async function handleThreat(document, tokenPosition, tokenCenter) {
     await handleThreatForActor(document, tokenCenter, canvas.tokens.placeables);
+    await handleAdjacentAlliesForActor(document, tokenCenter, canvas.tokens.placeables);
     await handleAurasForActor(document, tokenCenter, canvas.tokens.placeables);
     const otherTokensForAdjustment = canvas.tokens.placeables.filter(t => t.document !== document);
-    const movedDocument = new AbbrewMovedToken(document.actor, tokenCenter, document.disposition, document.width);
+    const movedDocument = new AbbrewMovedToken(document.actor, tokenCenter, document.disposition, document.width, document._id);
     movedDocument.x = tokenPosition.x;
     movedDocument.y = tokenPosition.y;
     movedDocument.elevation = tokenPosition.elevation;
     const otherPromises = game.canvas.tokens.placeables.map(t => t.document).filter(d => d !== document).flatMap(d =>
         [
             handleThreatForActor(d, d.getCenterPoint(), [...otherTokensForAdjustment, movedDocument]),
+            handleAdjacentAlliesForActor(d, d.getCenterPoint(), [...otherTokensForAdjustment, movedDocument]),
             handleAurasForActor(d, d.getCenterPoint(), [...otherTokensForAdjustment, movedDocument])
         ]
     );
@@ -204,11 +207,12 @@ export async function handleThreat(document, tokenPosition, tokenCenter) {
 }
 
 class AbbrewMovedToken {
-    constructor(actor, tokenCenter, disposition, width) {
+    constructor(actor, tokenCenter, disposition, width, id) {
         this.tokenCenter = tokenCenter;
         this.document = {};
         this.document.disposition = disposition;
         this.document.width = width;
+        this.document._id = id;
         this.actor = actor;
     }
 
@@ -226,6 +230,19 @@ async function handleThreatForActor(document, tokenCenter, otherTokens) {
             await document.actor.deleteEmbeddedDocuments('ActiveEffect', [id]);
         }
     }
+}
+
+async function handleAdjacentAlliesForActor(document, tokenCenter, otherTokens) {
+    const adjacentAllyCount = getAdjacentAllyCount(tokenCenter, document.height, document.disposition, document._id, otherTokens);
+    await document.actor.update({ "system.defense.adjacentAllies": adjacentAllyCount });
+}
+
+function getAdjacentAllyCount(tokenCenter, tokenSize, tokenDisposition, tokenId, otherTokens) {
+    return otherTokens
+        .filter(t => t.document._id !== tokenId)
+        .filter(t => tokenDisposition === t.document.disposition)
+        .filter(t => getSpacesBetweenTokens(tokenCenter, tokenSize, t.getCenterPoint(), t.document.width) <= 1)
+        .length;
 }
 
 async function handleAurasForActor(document, tokenCenter, otherTokens) {
@@ -246,22 +263,14 @@ async function handleAurasForActor(document, tokenCenter, otherTokens) {
         for (const targetIndex in targets) {
             const actor = targets[targetIndex].actor;
             if (actor) {
-                aura.system.skills.aura.forEach(as => {
-                    const skill = actor.items.filter(i => i.type === "skill").find(s => s.system.abbrewId.uuid === as.id && s.system.grantedBy.actor === document.actor._id);
-                    if (!skill) {
-                        promises.push(new Promise(async () => {
-                            const createSkill = await fromUuid(as.sourceId);
-                            await Item.create(createSkill, { parent: actor })
-                        }));
-                    }
-                }
-                )
+                const unappliedSkills = aura.system.skills.aura.filter(as => !actor.items.filter(i => i.type === "skill").find(s => s.system.abbrewId.uuid === as.id && s.system.grantedBy.actor === document.actor._id))
+                promises.push(handleSkillsGrantedByAura(unappliedSkills, actor, aura, document.actor, document));
             }
         }
         for (const unaffectedIndex in unaffectedTokens) {
             const actor = unaffectedTokens[unaffectedIndex].actor;
             if (actor) {
-                const skills = actor.items.filter(i => i.type === "skill").filter(s => s.system.abbrewId.uuid === aura.system.abbrewId.uuid && s.system.grantedBy.actor === document.actor._id);
+                const skills = actor.items.filter(i => i.type === "skill").filter(s => s.system.grantedBy.item === aura._id && s.system.grantedBy.actor === document.actor._id && s.system.grantedBy.token === document._id);
                 if (skills.length > 0) {
                     skills.forEach(s => promises.push(checkAndExpire(actor, s)));
                 }
@@ -274,12 +283,13 @@ async function handleAurasForActor(document, tokenCenter, otherTokens) {
 
 function doesEmanationAffectToken(aura, document, tokenCenter, otherTokens) {
     const auraAffects = aura.system.aura.affects;
-    const availableTargets = filterAuraTargets(auraAffects, document, otherTokens);
+    const auraGrantedBy = aura.system.grantedBy.token ?? document._id;
+    const availableTargets = filterAuraTargets(auraAffects, auraGrantedBy, document, otherTokens);
     const targetsInEmanation = availableTargets.filter(t => isTokenWithinEmanation(tokenCenter, document.height, t.getCenterPoint(), t.document.width, aura.system.aura.emanationSize))
     return targetsInEmanation;
 }
 
-function filterAuraTargets(auraAffects, document, otherTokens) {
+function filterAuraTargets(auraAffects, auraGrantedBy, document, otherTokens) {
     const sourceDisposition = document.disposition
     switch (auraAffects) {
         case 0:
@@ -293,7 +303,7 @@ function filterAuraTargets(auraAffects, document, otherTokens) {
         case 4:
             return [document.token, ...otherTokens];
         case 5:
-            return document.token;
+            return [otherTokens.find(t => t.document._id === auraGrantedBy)];
         default:
             return [];
     }
@@ -302,7 +312,7 @@ function filterAuraTargets(auraAffects, document, otherTokens) {
 function getHostileTokenCount(tokenCenter, tokenSize, tokenDisposition, otherTokens) {
     return otherTokens
         .filter(t => determineHostileDisposition(tokenDisposition, t.document.disposition))
-        .filter(t => getSpacesBetweenTokens(tokenCenter, tokenSize, t.getCenterPoint(), t.document.width) <= t.actor.system.threatReach)
+        .filter(t => getSpacesBetweenTokens(tokenCenter, tokenSize, t.getCenterPoint(), t.document.width) <= Math.ceil(t.actor.system.threatReach))
         .length;
 }
 
@@ -532,9 +542,15 @@ async function applyActiveSkills(actor, turnPhase) {
 
     let activeSkills = [];
     if (turnPhase === "start") {
-        activeSkills = actor.system.activeSkills.flatMap(s => actor.items.filter(i => i._id === s)).filter(s => s.system.applyTurnStart);
+        activeSkills = [
+            ...actor.system.activeSkills.flatMap(s => actor.items.filter(i => i._id === s)).filter(s => s.system.applyTurnStart),
+            ...actor.items.filter(i => i.type === "skill").filter(s => s.system.action.activationType === "standalone" && !s.system.isActivatable && s.system.applyTurnStart)
+        ];
     } else if (turnPhase === "end") {
-        activeSkills = actor.system.activeSkills.flatMap(s => actor.items.filter(i => i._id === s)).filter(s => s.system.applyTurnEnd);
+        activeSkills = [
+            ...actor.system.activeSkills.flatMap(s => actor.items.filter(i => i._id === s)).filter(s => s.system.applyTurnEnd),
+            ...actor.items.filter(i => i.type === "skill").filter(s => s.system.action.activationType === "standalone" && !s.system.isActivatable && s.system.applyTurnEnd)
+        ];
     }
 
     for (const index in activeSkills) {

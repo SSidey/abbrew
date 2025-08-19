@@ -9,7 +9,7 @@ export function getTierFromArray(array) {
     return arrayValue === Number.POSITIVE_INFINITY ? 0 : arrayValue;
 }
 
-export async function makeSkillCheck(actor, skill, allSkills, fortune, templateData, data) {
+export async function makeSkillCheck(actor, skill, allSkills, fortune, bonusSuccesses, templateData, data) {
     let skillResult = { dice: [], modifier: 0, baseDicePool: 0, result: true, isContested: false };
     if (skill.system.action.skillCheck.length > 0) {
         const combinedSkillModifier = allSkills
@@ -26,7 +26,7 @@ export async function makeSkillCheck(actor, skill, allSkills, fortune, templateD
         const rollFormula = getRollFormula(tier, critical, fortune);
         const skillRoll = new Roll(rollFormula, actor);
         const result = await skillRoll.evaluate();
-        const resultDice = getResultDice(result);
+        const resultDice = getResultDice(result, bonusSuccesses);
         skillResult.dice = resultDice;
         skillResult.modifier = combinedSkillModifier;
         skillResult.fortune = fortune;
@@ -48,7 +48,8 @@ export async function makeSkillCheckRequest(actor, skill, modifierSkills, parent
     if (skill.system.action.skillRequest.isEnabled) {
         const skillRequest = skill.system.action.skillRequest;
         let requirements = {
-            actorSource: actor._id,
+            actorSource: { _id: skill.system.grantedBy.actor ?? actor._id },
+            tokenSource: { _id: skill.system.grantedBy.token },
             modifierIds: [],
             traits: getSafeJson(skill.system.traits.raw, []),
             checkType: skillRequest.checkType,
@@ -66,9 +67,11 @@ export async function makeSkillCheckRequest(actor, skill, modifierSkills, parent
         if (skillRequest.isContested) {
             const modifierIds = getSafeJson(skillRequest.requirements.modifiers, []).map(m => m.id);
             const skill = await getSkillById(actor, modifierIds);
-            const deactivatedParent = parentSkill.toObject();
-            deactivatedParent.system.action.skillRequest.isEnabled = false;
-            skill.system.siblingSkillModifiers.push(deactivatedParent);
+            if (parentSkill) {
+                const deactivatedParent = structuredClone(parentSkill);
+                deactivatedParent.system.action.skillRequest.isEnabled = false;
+                skill.system.siblingSkillModifiers.push(deactivatedParent);
+            }
             skill.system.siblingSkillModifiers.push(...modifierSkills);
 
             if (skill) {

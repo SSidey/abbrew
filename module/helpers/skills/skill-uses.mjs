@@ -1,4 +1,4 @@
-import { rechargeSkill } from "./skill-activation.mjs";
+import { getModifiedSkillActionCost, rechargeSkill } from "./skill-activation.mjs";
 import { checkAndExpire, manualSkillExpiry } from "./skill-expiry.mjs";
 
 export async function handleSkillUsesAndCharges(actor, skill, modifierSkills) {
@@ -72,6 +72,10 @@ export function skillHasChargesRemaining(skill) {
 }
 
 export async function removeSkillStack(actor, skill) {
+    if (!await actor.canActorUseActions(getModifiedSkillActionCost(actor, skill))) {
+        return false;
+    }
+
     const stackUpdate = skill.system.action.uses.value - 1;
     await skill.update({ "system.action.uses.value": stackUpdate });
     if (stackUpdate === 0) {

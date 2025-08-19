@@ -548,7 +548,7 @@ export default class AbbrewItem extends Item {
 
     const attackSkill = getAttackSkillWithActions(null, this.name, this.system.traits.raw, actionCost, this.img, attackProfile, attackMode, this.system.handsSupplied, [], actor._id, itemTriggerIds);
 
-    await handleSkillActivate(actor, attackSkill);
+    await handleSkillActivate(actor, attackSkill, true, attackSkill.system.traits.map(t => t.key));
 
     if (attackMode === "thrown") {
       await this.update({ "system.equipState": "dropped" });
