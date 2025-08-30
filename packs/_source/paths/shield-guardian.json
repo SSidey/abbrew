@@ -1,10 +1,10 @@
 {
   "name": "Shield Guardian",
   "type": "path",
-  "_id": "NdNl96xj8we3bPWG",
+  "_id": "abbrewpshieldgua",
   "img": "icons/svg/item-bag.svg",
   "system": {
-    "description": "",
+    "description": "<div><p>@L[ABBREW.Paths.Description.shieldguardian]</p></div>",
     "traits": "",
     "abbrewId": {
       "value": "",
@@ -21,13 +21,13 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746382248779,
-    "modifiedTime": 1749990684499,
+    "modifiedTime": 1754941961651,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },
-  "_key": "!items!NdNl96xj8we3bPWG"
+  "_key": "!items!abbrewpshieldgua"
 }

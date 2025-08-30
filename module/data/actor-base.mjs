@@ -371,6 +371,8 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
         .map(ap => ap.reach)
     ) * this.meta.size.dimension;
 
+    this.meta.tier.dice = Math.max(0, Math.min(this.meta.tier.dice, this.meta.tier.value));
+
     this.hasAuras = this.parent.items.filter(i => i.type === "skill").some(s => s.system.aura.isAura && ((s.system.isActivatable && s.system.action.isActive) || !s.system.isActivatable));
   }
 

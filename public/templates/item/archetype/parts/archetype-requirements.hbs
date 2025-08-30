@@ -42,10 +42,14 @@
         </div>
         {{/gm}}
         {{#if requirement.path.isRequired}}
-        <div class="requirement-row">
+        <div class="requirement-row path-row">
             <span>Path</span>
-            <input type="text" name="system.roleRequirements.{{key}}.path.raw" value="{{requirement.path.raw}}"
-                data-dtype="string" data-requirement-id="{{key}}" />
+            <input type="text" value="{{requirement.path.name}}" data-dtype="string" data-requirement-id="{{key}}"
+                readonly />
+            <a class='item-control item-delete' data-requirement-id="{{key}}" data-action="deletePath"
+                title='{{localize "DOCUMENT.Delete" type=' Item'}}'>
+                <i class='fas fa-trash'></i>
+            </a>
         </div>
         {{#if (lt key 3)}}
         <label class="slide-toggle roboto-upper">

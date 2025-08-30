@@ -56,6 +56,7 @@ export const preloadHandlebarsTemplates = async function () {
     "systems/abbrew/templates/item/item/parts/item-reveal-skills.hbs",
     // Skill partials.
     "systems/abbrew/templates/item/skill/parts/skill-description.hbs",
+    "systems/abbrew/templates/item/skill/templates/summary-element.hbs",
     // Skill Deck partials.
     "systems/abbrew/templates/item/skill-deck/parts/skill-deck-attributes.hbs",
     "systems/abbrew/templates/item/skill/parts/skill-attributes.hbs",

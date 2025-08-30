@@ -11,11 +11,24 @@
       "uuid": ""
     },
     "roleRequirements": {
-      "1": {
+      "0": {
         "isActive": true,
         "roles": "[{\"label\":\"melee\",\"value\":\"Melee\",\"title\":\"You fight primarily in melee with your opponents.\"},{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"}]",
         "parsedRoles": [],
         "restrictedRoles": "[{\"label\":\"magic\",\"value\":\"Magic\",\"title\":\"You primarily harness magic to combat your foes.\"}]",
+        "parsedRestrictedRoles": [],
+        "isMajor": false,
+        "path": {
+          "raw": "",
+          "name": "",
+          "id": ""
+        }
+      },
+      "1": {
+        "isActive": false,
+        "roles": "",
+        "parsedRoles": [],
+        "restrictedRoles": "",
         "parsedRestrictedRoles": [],
         "isMajor": false,
         "path": {
@@ -51,19 +64,6 @@
         }
       },
       "4": {
-        "isActive": false,
-        "roles": "",
-        "parsedRoles": [],
-        "restrictedRoles": "",
-        "parsedRestrictedRoles": [],
-        "isMajor": false,
-        "path": {
-          "raw": "",
-          "name": "",
-          "id": ""
-        }
-      },
-      "5": {
         "isActive": false,
         "roles": "",
         "parsedRoles": [],

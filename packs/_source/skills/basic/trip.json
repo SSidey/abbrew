@@ -40,7 +40,7 @@
     "applyTurnStart": false,
     "applyTurnEnd": false,
     "applyOnExpiry": false,
-    "activateOnDamageAccept": true,
+    "activateOnDamageAccept": false,
     "sources": {
       "actor": "",
       "items": []
@@ -139,7 +139,7 @@
           "successes": 0,
           "result": 0
         },
-        "targetModifiers": "",
+        "targetModifiers": "[{\"id\":\"abbrewAgiCheck00\",\"value\":\"Agility Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewAgiCheck00\"}]",
         "results": {
           "success": {
             "description": ""
@@ -456,6 +456,14 @@
             "type": "numeric",
             "numerator": 1,
             "denominator": 1
+          },
+          "rage": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "fear": {
+            "operator": "add",
+            "type": "numeric"
           }
         }
       }
@@ -480,7 +488,7 @@
     "revealed": {
       "isRevealed": false,
       "revealSkills": {
-        "raw":"[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
+        "raw": "[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
         "parsed": []
       },
       "difficulty": 15,
@@ -500,7 +508,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1752698214920,
-    "modifiedTime": 1754137685369,
+    "modifiedTime": 1754434295360,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!cWdN7kjxiodhUHkX"

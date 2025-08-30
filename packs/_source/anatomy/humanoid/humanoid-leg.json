@@ -94,9 +94,16 @@
         },
         {
           "name": "Trip",
+          "skillType": "",
           "id": "cWdN7kjxiodhUHkX",
           "image": "systems/abbrew/assets/icons/skills/trip.svg",
-          "sourceId": "Compendium.abbrew.skills.Item.cWdN7kjxiodhUHkX",
+          "sourceId": "Compendium.abbrew.skills.Item.cWdN7kjxiodhUHkX"
+        },
+        {
+          "name": "Go Prone",
+          "id": "uqr3bsN5pbUUS7av",
+          "image": "systems/abbrew/assets/icons/statuses/prone.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.uqr3bsN5pbUUS7av",
           "skillType": ""
         }
       ]
@@ -120,7 +127,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075222255,
-    "modifiedTime": 1753654381211,
+    "modifiedTime": 1755107642500,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

@@ -12,7 +12,7 @@
     "meta": {
       "tier": 1
     },
-    "description": "",
+    "description": "<p>Power flowing freely for use with your Sorcerer Skills.</p><p>Many of your Sorcerer Skills will require an amount of free power for use.</p>",
     "traits": {
       "raw": "",
       "value": []
@@ -476,11 +476,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1748903700556,
-    "modifiedTime": 1749158831590,
+    "modifiedTime": 1754248267891,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

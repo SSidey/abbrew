@@ -316,18 +316,18 @@
     "siblingSkillModifiers": []
   },
   "effects": [],
-  "sort": 0,
+  "sort": 400000,
   "ownership": {
     "default": 0
   },
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746969054874,
-    "modifiedTime": 1748899364443,
+    "modifiedTime": 1754775888516,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

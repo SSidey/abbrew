@@ -22,10 +22,17 @@
         },
         {
           "name": "Elf (Species)",
+          "skillType": "background",
           "id": "0GeeApTrKhVXQLyN",
           "image": "icons/svg/item-bag.svg",
-          "sourceId": "Compendium.abbrew.skills.Item.0GeeApTrKhVXQLyN",
-          "skillType": "background"
+          "sourceId": "Compendium.abbrew.skills.Item.0GeeApTrKhVXQLyN"
+        },
+        {
+          "name": "Elven Hearing",
+          "id": "DTGxUeAyS6ERVtoj",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.DTGxUeAyS6ERVtoj",
+          "skillType": ""
         }
       ]
     },
@@ -90,7 +97,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743076678580,
-    "modifiedTime": 1752971083396,
+    "modifiedTime": 1754243417625,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

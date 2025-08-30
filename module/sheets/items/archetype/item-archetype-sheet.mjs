@@ -1,4 +1,5 @@
 import { AbbrewItemBaseSheet } from '../generic/item-base-sheet.mjs';
+import { deletePath } from './actions/archetype-actions.mjs';
 import { ArchetypeTagsMixin } from './tags/archetype-tags.mjs';
 
 export class AbbrewArchetypeSheet extends ArchetypeTagsMixin(AbbrewItemBaseSheet) {
@@ -19,6 +20,12 @@ export class AbbrewArchetypeSheet extends ArchetypeTagsMixin(AbbrewItemBaseSheet
             template: "systems/abbrew/templates/item/archetype/tabs/archetype-requirements.hbs",
             scrollable: [""]
         },
+    }
+
+    static DEFAULT_OPTIONS = {
+        actions: {
+            deletePath: deletePath
+        }
     }
 
     /** @override */

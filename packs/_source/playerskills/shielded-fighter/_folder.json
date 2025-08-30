@@ -1,0 +1,22 @@
+{
+  "type": "Item",
+  "folder": null,
+  "name": "Shielded Fighter",
+  "color": null,
+  "sorting": "a",
+  "_id": "FWJriHKC3b8TXyR7",
+  "description": "",
+  "sort": 0,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.346",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1754775530995,
+    "modifiedTime": 1754775530995,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!FWJriHKC3b8TXyR7"
+}

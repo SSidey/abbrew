@@ -1,0 +1,140 @@
+{
+  "folder": "Phat68gueYIk67lc",
+  "name": "Round Shield",
+  "type": "weapon",
+  "_id": "sfqPfP90kh4VSCJV",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "name": {
+      "base": "Round Shield",
+      "parts": []
+    },
+    "meta": {
+      "tier": 0,
+      "size": 0,
+      "quality": 0
+    },
+    "description": "",
+    "traits": {
+      "raw": "[{\"key\":\"shield\",\"value\":\"Shield\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"weapon\",\"value\":\"Weapon\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"short\",\"value\":\"Short\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[\"close\",\"standard\",\"long\"]}]",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "enhancements": [],
+    "quantity": 1,
+    "heft": 4,
+    "complexity": 0,
+    "equipType": "held",
+    "equipPoints": {
+      "required": {
+        "raw": "",
+        "parsed": []
+      },
+      "provided": {
+        "raw": "",
+        "parsed": []
+      }
+    },
+    "handsRequired": "oneHand",
+    "equipState": "readied",
+    "handsSupplied": 0,
+    "actionCost": 0,
+    "exertActionCost": 0,
+    "validEquipStates": [],
+    "nextValidEquipStates": [],
+    "skills": {
+      "granted": [
+        {
+          "name": "Raise Shield",
+          "id": "dObFAO90b3gM4IwB",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.dObFAO90b3gM4IwB",
+          "skillType": ""
+        }
+      ]
+    },
+    "availableEnhancements": 0,
+    "storage": {
+      "hasStorage": false,
+      "type": "",
+      "accessible": false,
+      "value": 0,
+      "max": 0,
+      "storedItems": [],
+      "traitFilter": {
+        "raw": "",
+        "value": []
+      }
+    },
+    "storeIn": "",
+    "revealed": {
+      "isRevealed": false,
+      "revealSkills": {
+        "raw": "[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
+        "parsed": []
+      },
+      "difficulty": 15,
+      "tier": 1
+    },
+    "grantedBy": "",
+    "defense": {
+      "guard": 0,
+      "inflexibility": 10,
+      "protection": []
+    },
+    "isSundered": false,
+    "isOverpowerTrained": false,
+    "attackProfiles": [
+      {
+        "name": "Slam",
+        "attackType": "thrust",
+        "finisherLimit": 4,
+        "hasStrongAttack": true,
+        "critical": 10,
+        "lethal": 0,
+        "reach": 1,
+        "damage": [
+          {
+            "type": "crushing",
+            "value": 4,
+            "penetration": 0,
+            "attributeModifier": "str",
+            "attributeMultiplier": 1,
+            "damageMultiplier": 1,
+            "overallMultiplier": 1
+          }
+        ],
+        "range": 0,
+        "penetration": 0,
+        "ammunition": {
+          "type": "",
+          "id": "",
+          "value": 0,
+          "max": 0,
+          "reloadType": "",
+          "reloadActionCost": 1
+        }
+      }
+    ]
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.346",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1751069603184,
+    "modifiedTime": 1754775900818,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!sfqPfP90kh4VSCJV"
+}

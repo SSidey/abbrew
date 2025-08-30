@@ -58,6 +58,9 @@ Hooks.once('init', function () {
 
   addWoundUtilities();
 
+  // Add new index fields here
+  CONFIG.Item.compendiumIndexFields = [];
+
   /**
    * Set an initiative formula for the system
    * @type {String}
@@ -252,6 +255,13 @@ function _configureStatusEffects() {
   //   addEffect(CONFIG.statusEffects, { id, ...data, hud: false });
   // }
 }
+
+// Re-index for new fields
+// Hooks.once("ready", async () => {
+//   for (const pack of game.packs.filter(p => p.documentName === "Item")) {
+//     await pack.getIndex()
+//   }
+// });
 
 /*--------------------------------------------*/
 

@@ -1,0 +1,29 @@
+<form class="abbrew" autocomplete="off">
+    <div class="browser">
+        <div class="browser-header">
+        </div>
+        <div class="browser-form">
+            <div class="browser-search">
+                <div>
+                    <h3>Paths</h3>
+                    <input type="text" name="system.roles.raw" data-dtype="String" />
+                </div>
+            </div>
+            <div class="browser-results">
+                <ol style="list-style:none; padding-left:0px">
+                    {{#each paths as |path|}}
+                    <li class="path" data-id="{{path.id}}" data-roles='{{path.jsonRoles}}'
+                        data-action="renderPathSheet">
+                        <div class="image-container"><img src="{{path.img}}" /></div>
+                        <div class="name"><span>{{path.name}}</span></div>
+                        <div class="description"><span>{{path.description}}</span></div>
+                        <a class="item-control" data-action="renderPathSheet" title="Open">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                    </li>
+                    {{/each}}
+                </ol>
+            </div>
+        </div>
+    </div>
+</form>

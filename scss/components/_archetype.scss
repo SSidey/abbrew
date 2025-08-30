@@ -45,12 +45,40 @@
 
                 .archetype-path {
                     display: grid;
-                    grid-template-columns: repeat(auto-fill, 50%);
+                    grid-template-columns: repeat(2, minmax(0, 1fr)); // repeat(auto-fill, 50%);
+                    background: rgba(0, 0, 0, 0.05);
+                    text-align: center;
+                    list-style: none;
+                    align-content: center;
 
                     .path-role {
                         align-self: center;
                         justify-self: center;
                     }
+                }
+
+                .path-chosen {
+                    border-style: outset;
+                    background-color: light-dark(rgba(0, 0, 0, 0.1), var(--color-cool-3));
+                }
+
+                .no-path {
+                    border-style: inset;
+                    background-color: rgb(255, 255, 255, 0);
+                    /* base color */
+                    background-image: repeating-linear-gradient(45deg,
+                            /* diagonal angle */
+                            light-dark(rgba(0, 0, 0, 0.1), var(--color-cool-3)),
+                            /* stripe color */
+                            light-dark(rgba(0, 0, 0, 0.1), var(--color-cool-3)) 10px,
+                            /* thickness of stripe */
+                            transparent 10px,
+                            transparent 20px);
+                }
+
+                .archetype-path>*:only-child {
+                    grid-column: 1 / -1;
+                    /* make the single item span full width */
                 }
             }
 
@@ -91,6 +119,14 @@
         tags.tagify {
             width: 100%;
         }
+    }
+
+    .requirement-row.path-row {
+        display: grid;
+        grid-template-columns: 20% 70% 10%;
+        padding-bottom: 1em;
+        align-items: center;
+        justify-items: center;
     }
 }
 

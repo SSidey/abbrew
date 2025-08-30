@@ -484,7 +484,7 @@
     "revealed": {
       "isRevealed": false,
       "revealSkills": {
-        "raw":"[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
+        "raw": "[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
         "parsed": []
       },
       "difficulty": 15,
@@ -493,7 +493,7 @@
   },
   "effects": [
     {
-      "name": "New Active Effect",
+      "name": "Warborn Orc (Heritage)",
       "img": "icons/svg/aura.svg",
       "origin": "Compendium.abbrew.skills.Item.FK4FVyHVCUZodoLw",
       "duration": {
@@ -575,7 +575,7 @@
         "systemId": "abbrew",
         "systemVersion": "0.0.2-prerelease31",
         "createdTime": 1753030628774,
-        "modifiedTime": 1753030649481,
+        "modifiedTime": 1754436625464,
         "lastModifiedBy": "abbrewpacks00000"
       },
       "_key": "!items.effects!FK4FVyHVCUZodoLw.R01PkqSYFh2Lnqg5"

@@ -10,7 +10,7 @@
       "parts": []
     },
     "meta": {
-      "tier": 1,
+      "tier": 0,
       "size": 0,
       "quality": 0
     },
@@ -86,7 +86,7 @@
     "revealed": {
       "isRevealed": false,
       "revealSkills": {
-        "raw":"[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
+        "raw": "[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
         "parsed": []
       },
       "difficulty": 15,
@@ -113,7 +113,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1754137230755,
-    "modifiedTime": 1754137352039,
+    "modifiedTime": 1754158777002,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!wqAVG2WhXIHwZ7td"

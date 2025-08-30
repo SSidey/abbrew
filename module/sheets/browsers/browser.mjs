@@ -1,10 +1,11 @@
 import Tagify from "@yaireo/tagify";
-import { getSafeJson } from "../helpers/utils.mjs";
-import { DragDropMixin } from "./helpers/drag-drop-mixin.mjs";
+import { getSafeJson } from "../../helpers/utils.mjs";
+import { DragDropMixin } from "../helpers/drag-drop-mixin.mjs";
+import { SearchMixin } from "../helpers/search-mixin.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-export class Browser extends DragDropMixin(HandlebarsApplicationMixin(ApplicationV2)) {
+export class Browser extends SearchMixin(DragDropMixin(HandlebarsApplicationMixin(ApplicationV2))) {
     static DEFAULT_OPTIONS = {
         actions: {
             renderArchetypeSheet: Browser.renderArchetypeSheet
@@ -46,7 +47,14 @@ export class Browser extends DragDropMixin(HandlebarsApplicationMixin(Applicatio
             a.id = key;
         });
 
-        context.archetypes = Array.from(archetypes.values().map(v => ({ name: v.name, img: v.img, roles: v.roles, id: v.id })));
+        const archetypePromises = Array.from(archetypes.values().map(v => ({
+            name: v.name,
+            img: v.img,
+            roles: v.roles,
+            id: v.id,
+            description: game.i18n.localize(`ABBREW.Archetypes.${v.name.replace(/\s+/g, "").toLowerCase()}`) ?? ""
+        })));
+        context.archetypes = await Promise.all(archetypePromises);
         context.roles = CONFIG.ABBREW.roles;
 
         return context;
@@ -82,7 +90,7 @@ export class Browser extends DragDropMixin(HandlebarsApplicationMixin(Applicatio
         super._onRender(context, options);
         this.bindDragDrops();
         this._activateRoles();
-        this.#search.bind(this.element);
+        this.registerSearch('input[name="system.roles.raw"]', "[data-application-part=browser]");
     }
 
     _activateRoles() {
@@ -111,11 +119,6 @@ export class Browser extends DragDropMixin(HandlebarsApplicationMixin(Applicatio
         }
     }
 
-    onChange(e) {
-        // outputs a String
-        this.#search.filter(null, e.target.value);
-    }
-
     static async renderArchetypeSheet(event, target) {
         const archetypeId = target.closest(".archetype").dataset.id;
         const fullId = `Compendium.abbrew.archetypes.Item.${archetypeId}`;
@@ -123,11 +126,10 @@ export class Browser extends DragDropMixin(HandlebarsApplicationMixin(Applicatio
         await archetype.sheet.render(true);
     }
 
-    #search = new foundry.applications.ux.SearchFilter({
-        inputSelector: 'input[name="system.roles.raw"]',
-        contentSelector: "[data-application-part=browser]",
-        callback: this._onSearchFilter.bind(this)
-    });
+    onChange(e) {
+        // outputs a String
+        this.search.filter(null, e.target.value);
+    }
 
     _onSearchFilter(event, query, rgx, html) {
         const querySet = new Set(getSafeJson(query, []).map(q => q.label));
@@ -137,10 +139,5 @@ export class Browser extends DragDropMixin(HandlebarsApplicationMixin(Applicatio
             const restrictedRoles = new Set(getSafeJson(dataset.restrictedRoles, []));
             a.hidden = (!requiredRoles.isSupersetOf(querySet) || restrictedRoles.intersection(querySet).size > 0)
         })
-    }
-
-    _tearDown(options) {
-        super._tearDown(options);
-        this.#search.unbind();
     }
 }

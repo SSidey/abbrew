@@ -1,0 +1,98 @@
+{
+  "folder": "kyKiwT5wM3bF3OZh",
+  "name": "Loincloth",
+  "type": "equipment",
+  "_id": "xyBMPVd0lIQuNrHx",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "name": {
+      "base": "",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1,
+      "size": 0,
+      "quality": 1
+    },
+    "description": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "enhancements": [],
+    "quantity": 1,
+    "heft": 1,
+    "complexity": 0,
+    "equipType": "worn",
+    "equipPoints": {
+      "required": {
+        "raw": "",
+        "parsed": []
+      },
+      "provided": {
+        "raw": "[{\"value\":\"Attachment\"},{\"value\":\"Attachment\"}]",
+        "parsed": []
+      }
+    },
+    "handsRequired": "",
+    "equipState": "readied",
+    "handsSupplied": 0,
+    "actionCost": 0,
+    "exertActionCost": 0,
+    "validEquipStates": [],
+    "nextValidEquipStates": [],
+    "skills": {
+      "granted": []
+    },
+    "availableEnhancements": 0,
+    "storage": {
+      "hasStorage": false,
+      "type": "",
+      "accessible": false,
+      "value": 0,
+      "max": 0,
+      "storedItems": [],
+      "traitFilter": {
+        "raw": "",
+        "value": []
+      }
+    },
+    "storeIn": "",
+    "revealed": {
+      "isRevealed": false,
+      "revealSkills": {
+        "raw": "[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
+        "parsed": []
+      },
+      "difficulty": 15,
+      "tier": 0
+    },
+    "grantedBy": "",
+    "defense": {
+      "guard": 0,
+      "inflexibility": 0,
+      "protection": []
+    }
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.346",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1754822905027,
+    "modifiedTime": 1754822946168,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!xyBMPVd0lIQuNrHx"
+}

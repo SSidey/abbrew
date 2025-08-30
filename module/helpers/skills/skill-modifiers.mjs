@@ -12,12 +12,15 @@ export async function handleEarlySelfModifiers(actor, allSkills) {
     const [resolveSelfUpdate, lateResolveSelfUpdate] = mergeResolveSelfModifiers(allSkills, actor);
     const mergedSelfWounds = mergeWoundSelfModifiers(allSkills, actor);
     const mergedSelfResources = mergeResourceSelfModifiers(allSkills, actor);
+    // TODO: Something is up here, no idea what the fuck changed
     const mergedConceptCosts = mergeConceptCosts(allSkills, actor);
+    const mergedTierDiceChange = mergeTierDiceChange(allSkills, actor);
     updates = {
         ...updates,
         ...applyFullyParsedModifiers(guardSelfUpdate, actor, "system.defense.guard.value"),
         ...applyFullyParsedModifiers(riskSelfUpdate, actor, "system.defense.risk.raw"),
         ...applyFullyParsedModifiers(resolveSelfUpdate, actor, "system.defense.resolve.value"),
+        ...applyFullyParsedModifiers(mergedTierDiceChange, actor, "system.meta.tier.dice"),
         ...applyConceptCosts(mergedConceptCosts, actor)
     };
 
@@ -192,6 +195,12 @@ function mergeResolveTargetModifiers(allSkills, actor) {
 function mergeResolveModifiers(allSkills, actor, target) {
     const modifierFields = allSkills.map(s => s.system.action.modifiers.resolve[target]);
     return mergeModifierFields(modifierFields, actor);
+}
+
+function mergeTierDiceChange(allSkills, actor) {
+    const modifierFields = allSkills.map(s => s.system.action.tierDiceChange);
+    const [tierDiceUpdate, _] = mergeModifierFields(modifierFields, actor);
+    return tierDiceUpdate;
 }
 
 function mergeWoundSelfModifiers(allSkills, actor) {

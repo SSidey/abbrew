@@ -2,7 +2,7 @@
   "folder": "Phat68gueYIk67lc",
   "name": "Pole Axe",
   "type": "weapon",
-  "_id": "OlOTEeVJi1rOk5Xs",
+  "_id": "OlOTEeVJi1rOk5Xd",
   "img": "icons/svg/item-bag.svg",
   "system": {
     "name": {
@@ -65,7 +65,7 @@
     "revealed": {
       "isRevealed": false,
       "revealSkills": {
-        "raw":"[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
+        "raw": "[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
         "parsed": []
       },
       "difficulty": 15,
@@ -128,5 +128,5 @@
     "modifiedTime": 1752868628532,
     "lastModifiedBy": "abbrewpacks00000"
   },
-  "_key": "!items!OlOTEeVJi1rOk5Xs"
+  "_key": "!items!OlOTEeVJi1rOk5Xd"
 }

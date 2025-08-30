@@ -1,10 +1,10 @@
 {
   "name": "Snake",
   "type": "path",
-  "_id": "ojdNHCSM8aJtEI4U",
+  "_id": "abbrewpsnake0000",
   "img": "icons/svg/item-bag.svg",
   "system": {
-    "description": "",
+    "description": "<div><p>@L[ABBREW.Paths.Description.snake]</p></div>",
     "traits": "",
     "abbrewId": {
       "value": "",
@@ -21,13 +21,13 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746270039892,
-    "modifiedTime": 1749990714199,
+    "modifiedTime": 1754941969887,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },
-  "_key": "!items!ojdNHCSM8aJtEI4U"
+  "_key": "!items!abbrewpsnake0000"
 }

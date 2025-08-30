@@ -3,7 +3,7 @@
   "name": "Fire I",
   "type": "skill",
   "_id": "v578Hmi6me0B8vcl",
-  "img": "icons/svg/item-bag.svg",
+  "img": "systems/abbrew/assets/icons/concepts/fire.svg",
   "system": {
     "name": {
       "base": "",
@@ -512,11 +512,11 @@
   "_stats": {
     "duplicateSource": null,
     "exportSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1750271698984,
-    "modifiedTime": 1750377036034,
+    "modifiedTime": 1754148370314,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!v578Hmi6me0B8vcl"

@@ -12,7 +12,7 @@
     "meta": {
       "tier": 1
     },
-    "description": "",
+    "description": "<p>Draw upon your inner power, freeing it up for use with your Sorcerer skills.</p><p></p><p>Select an amount up to your current @UUID[Compendium.abbrew.playerskills.Item.20zUDy5DT4n0bqQt]{Inner Power} and convert that into @UUID[Compendium.abbrew.playerskills.Item.vtheAYwEDEcO8a9g]{Free Power}</p>",
     "traits": {
       "raw": "",
       "value": []
@@ -538,11 +538,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1748903136734,
-    "modifiedTime": 1750272680473,
+    "modifiedTime": 1754248211953,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

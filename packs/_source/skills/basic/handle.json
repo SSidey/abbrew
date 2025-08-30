@@ -460,7 +460,7 @@
         }
       }
     },
-    "skillType": "",
+    "skillType": "basic",
     "path": {
       "raw": "",
       "value": {
@@ -480,7 +480,7 @@
     "revealed": {
       "isRevealed": false,
       "revealSkills": {
-        "raw":"[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
+        "raw": "[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
         "parsed": []
       },
       "difficulty": 15,
@@ -500,7 +500,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1752698225682,
-    "modifiedTime": 1754137548113,
+    "modifiedTime": 1754140859029,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!E1FoPANt1CjHlRvV"

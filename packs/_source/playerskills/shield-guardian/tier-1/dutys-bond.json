@@ -13,11 +13,11 @@
     },
     "skillTraits": "",
     "skillModifiers": {
-      "synergy": "",
+      "synergy": "[{\"value\":\"Designate Charge\",\"id\":\"0tyT24dLjUBztc0C\",\"sourceId\":\"Compendium.abbrew.playerskills.Item.0tyT24dLjUBztc0C\"}]",
       "discord": ""
     },
     "configurable": true,
-    "isActivatable": true,
+    "isActivatable": false,
     "activateOnCreate": false,
     "applyTurnStart": false,
     "applyTurnEnd": false,
@@ -27,7 +27,16 @@
       "granted": [],
       "paired": [],
       "grantedOnActivation": [],
-      "grantedOnAccept": []
+      "grantedOnAccept": [
+        {
+          "name": "Duty's Bond (Aura)",
+          "id": "tVpcM4Zs7FY70tOY",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.playerskills.Item.tVpcM4Zs7FY70tOY",
+          "skillType": "",
+          "grantTimes": 0
+        }
+      ]
     },
     "resource": {
       "capacity": 0,
@@ -36,8 +45,8 @@
       "fillCapacityOnCreate": false
     },
     "action": {
-      "activationType": "standalone",
-      "actionCost": "0",
+      "activationType": "synergy",
+      "actionCost": null,
       "actionImage": "0a",
       "duration": {
         "isConcentration": false,
@@ -187,14 +196,114 @@
                   "multiplier": 1
                 }
               ],
-              "type": ""
+              "type": "U3lWpCsnZ1FN3n56"
             }
           ],
           "target": []
         },
         "concepts": {
           "self": [],
-          "target": []
+          "target": [],
+          "esoteric": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "physical": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "crushing": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "piercing": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "slashing": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "fire": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "cold": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "water": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "earth": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "air": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "electricity": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "poison": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "flesh": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "blood": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "metal": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "light": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "dark": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "life": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "death": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "war": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "famine": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "pestilence": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "conquest": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "rage": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "fear": {
+            "operator": "add",
+            "type": "numeric"
+          }
         }
       }
     },
@@ -224,11 +333,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746384507959,
-    "modifiedTime": 1746384606917,
+    "modifiedTime": 1755632697747,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

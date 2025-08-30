@@ -218,10 +218,18 @@
       "disabled": false,
       "_id": "Vdwvot12l7m83CBr",
       "type": "base",
-      "system": {},
+      "system": {
+        "modifiers": [
+          {
+            "parseMode": "numeric",
+            "numerator": 1,
+            "denominator": 1
+          }
+        ]
+      },
       "changes": [
         {
-          "key": "system.defense.guard.max",
+          "key": "[{\"value\":\"Guard Max\",\"label\":\"system.defense.guard.maxMod\"}]",
           "mode": 2,
           "value": "10",
           "priority": null
@@ -250,11 +258,11 @@
       "_stats": {
         "compendiumSource": null,
         "duplicateSource": null,
-        "coreVersion": "13.345",
+        "coreVersion": "13.346",
         "systemId": "abbrew",
         "systemVersion": "0.0.2-prerelease31",
         "createdTime": 1746382634651,
-        "modifiedTime": 1746382680049,
+        "modifiedTime": 1755633827590,
         "lastModifiedBy": "abbrewpacks00000",
         "exportSource": null
       },

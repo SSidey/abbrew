@@ -77,11 +77,11 @@
           "sourceId": "Compendium.abbrew.skills.Item.CPjPE4fLiHv5T3vA"
         },
         {
-          "name": "Close Eyes",
-          "id": "qmIijqZUEPCZg5Ai",
-          "image": "systems/abbrew/assets/icons/statuses/blind.svg",
-          "sourceId": "Compendium.abbrew.skills.Item.qmIijqZUEPCZg5Ai",
-          "skillType": ""
+          "name": "Hearing",
+          "skillType": "",
+          "id": "YtLaelsNGykShpk2",
+          "image": "systems/abbrew/assets/icons/skills/hearing.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.YtLaelsNGykShpk2"
         }
       ]
     },
@@ -104,7 +104,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075185641,
-    "modifiedTime": 1753796769365,
+    "modifiedTime": 1754142234978,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

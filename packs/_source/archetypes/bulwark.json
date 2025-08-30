@@ -11,7 +11,7 @@
       "uuid": ""
     },
     "roleRequirements": {
-      "1": {
+      "0": {
         "isActive": true,
         "roles": "[{\"label\":\"melee\",\"value\":\"Melee\",\"title\":\"You fight primarily in melee with your opponents.\"},{\"label\":\"protector\",\"value\":\"Protector\",\"title\":\"Your main role in combat is in reducing the damage dealt to your allies.\"}]",
         "parsedRoles": [],
@@ -24,7 +24,7 @@
           "id": ""
         }
       },
-      "2": {
+      "1": {
         "isActive": true,
         "roles": "[{\"label\":\"professional\",\"value\":\"Professional\",\"title\":\"You are skilled in a profession.\"}]",
         "parsedRoles": [],
@@ -36,6 +36,19 @@
           "name": "",
           "id": "",
           "isRequired": false
+        }
+      },
+      "2": {
+        "isActive": false,
+        "roles": "",
+        "parsedRoles": [],
+        "restrictedRoles": "",
+        "parsedRestrictedRoles": [],
+        "isMajor": false,
+        "path": {
+          "raw": "",
+          "name": "",
+          "id": ""
         }
       },
       "3": {
@@ -52,19 +65,6 @@
         }
       },
       "4": {
-        "isActive": false,
-        "roles": "",
-        "parsedRoles": [],
-        "restrictedRoles": "",
-        "parsedRestrictedRoles": [],
-        "isMajor": false,
-        "path": {
-          "raw": "",
-          "name": "",
-          "id": ""
-        }
-      },
-      "5": {
         "isActive": false,
         "roles": "",
         "parsedRoles": [],

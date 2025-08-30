@@ -2,10 +2,10 @@
   "folder": null,
   "name": "Fencer of Lost Briarith",
   "type": "path",
-  "_id": "lxJsjeShsHFv1zP1",
+  "_id": "abbrewpfelopb000",
   "img": "icons/svg/item-bag.svg",
   "system": {
-    "description": "",
+    "description": "<div><p>@L[ABBREW.Paths.Description.fenceroflostbriarith]</p></div>",
     "traits": {
       "raw": ""
     },
@@ -23,13 +23,13 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746223314773,
-    "modifiedTime": 1749990668877,
+    "modifiedTime": 1754941949747,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },
-  "_key": "!items!lxJsjeShsHFv1zP1"
+  "_key": "!items!abbrewpfelopb000"
 }

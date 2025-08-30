@@ -47,6 +47,13 @@
     "skills": {
       "granted": [
         {
+          "name": "Close Eyes",
+          "skillType": "",
+          "id": "qmIijqZUEPCZg5Ai",
+          "image": "systems/abbrew/assets/icons/statuses/blind.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.qmIijqZUEPCZg5Ai"
+        },
+        {
           "name": "Scan",
           "id": "LRCKYIXnirM5L3mD",
           "image": "systems/abbrew/assets/icons/skills/scan.svg",
@@ -473,7 +480,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1748711746419,
-    "modifiedTime": 1753892580278,
+    "modifiedTime": 1754243201668,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

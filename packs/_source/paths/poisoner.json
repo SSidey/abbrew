@@ -1,0 +1,35 @@
+{
+  "folder": null,
+  "name": "Poisoner",
+  "type": "path",
+  "_id": "abbrewppoisoner0",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": "<div><p>@L[ABBREW.Paths.Description.poisoner]</p></div>",
+    "traits": {
+      "raw": ""
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "roles": "[{\"label\":\"melee\",\"value\":\"Melee\",\"title\":\"You fight primarily in melee with your opponents.\"},{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"},{\"label\":\"vanguard\",\"value\":\"Vanguard\",\"title\":\"Your main role in combat is to bring down your enemies as quickly as possible.\"}]"
+  },
+  "effects": [],
+  "sort": 100000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "13.346",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1746223314773,
+    "modifiedTime": 1754941949747,
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
+  },
+  "_key": "!items!abbrewppoisoner0"
+}

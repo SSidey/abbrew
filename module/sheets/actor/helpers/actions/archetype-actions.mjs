@@ -11,3 +11,9 @@ export async function _onDeleteArchetype(event, target) {
     const skill = this.actor.items.get(li.dataset.itemId);
     skill.delete();
 }
+
+export async function displayArchetype(event, target) {
+    const li = target.closest(".archetype");
+    const skill = this.actor.items.get(li.dataset.itemId);
+    skill.sheet.render(true);
+}

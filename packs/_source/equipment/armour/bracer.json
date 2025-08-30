@@ -10,7 +10,7 @@
       "parts": []
     },
     "meta": {
-      "tier": 1,
+      "tier": 0,
       "size": 0,
       "quality": 0
     },
@@ -88,11 +88,11 @@
   "_stats": {
     "duplicateSource": null,
     "exportSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1751321743995,
-    "modifiedTime": 1751321792877,
+    "modifiedTime": 1754158770544,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!hsBTr7S5ThgdIVy3"

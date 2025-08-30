@@ -183,6 +183,7 @@ export const SkillTagsMixin = superclass => class extends superclass {
 
     _activatePath() {
         const path = this.element.querySelector('input[name="system.path.raw"]');
+        const packIndex = game.packs.get("abbrew.paths").index;
         const settings = {
             dropdown: {
                 maxItems: 20,               // <- mixumum allowed rendered suggestions
@@ -196,13 +197,11 @@ export const SkillTagsMixin = superclass => class extends superclass {
             maxTags: 1,
             whitelist: [
                 CONFIG.ABBREW.universalPath,
-                ...CONFIG.ABBREW.paths
+                ...packIndex.contents
             ].map(path => ({
-                label: path.value,
-                value: game.i18n.localize(path.label),
-                roles: path.roles,
-                title: game.i18n.localize(path.description),
-                id: path.id
+                label: path._id,
+                value: game.i18n.localize(path.name),
+                id: path._id
             }))
         };
         if (path) {

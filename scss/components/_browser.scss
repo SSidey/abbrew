@@ -20,7 +20,25 @@
         .browser-results {
             .archetype {
                 display: grid;
-                grid-template-columns: 10% 85% 5%;
+                grid-template-columns: 10% 20% 60% 10%;
+                grid-column-gap: 1em;
+                align-items: center;
+
+                .description {
+                    all: unset;
+                }
+            }
+
+            .path {
+                display: grid;
+                grid-template-columns: 10% 20% 60% 10%;
+                grid-column-gap: 1em;
+                align-items: center;
+            }
+
+            .skill {
+                display: grid;
+                grid-template-columns: 10% 20% 60% 10%;
                 grid-column-gap: 1em;
                 align-items: center;
             }

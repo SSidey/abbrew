@@ -1,4 +1,4 @@
-import { isASupersetOfB, onlyUnique } from "../../../../helpers/utils.mjs";
+import { getSafeJson, isASupersetOfB, onlyUnique } from "../../../../helpers/utils.mjs";
 
 const { TextEditor } = foundry.applications.ux;
 
@@ -38,12 +38,13 @@ export async function _onArchetypeSkillDrop(event) {
     const item = await fromUuid(data.uuid);
 
     if (item.type === "skill") {
-        const target = event.currentTarget;
         const archetype = this.actor.items.find(i => i._id === event.target.closest(".archetype").dataset.itemId);
         const archetypeRequirements = Object.values(archetype.system.roleRequirements);
         const archetypePaths = archetypeRequirements.map(r => r.path.id).filter(id => id !== "");
         const validPaths = new Set(archetypePaths);
-        const validRoles = new Set(archetypePaths.flatMap(vp => CONFIG.ABBREW.paths.find(p => p.id === vp).roles));
+        const pathPromises = archetypePaths.map(p => game.packs.get("abbrew.paths").getDocument(p));
+        const paths = await Promise.all(pathPromises);
+        const validRoles = new Set(paths.flatMap(p => getSafeJson(p.system.roles, []).map(r => r.label)));
         const itemPath = new Set([item.system.path.value.id]);
         const itemRoles = new Set(item.system.path.value.id === "abbrewpuniversal" ? item.system.roles.parsed : []);
         if ((validPaths.intersection(itemPath).size > 0) || (validRoles.intersection(itemRoles).size > 0)) {
@@ -54,6 +55,38 @@ export async function _onArchetypeSkillDrop(event) {
         } else {
             // TODO: Stop the item from creating?
             ui.notifications.warn(`That skill isn't valid for the archetype ${archetype.name}`);
+        }
+    }
+}
+
+export async function _onArchetypePathDrop(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!this.actor.testUserPermission(game.user, 'OWNER')) {
+        return;
+    }
+
+    const data = TextEditor.getDragEventData(event);
+    if (!(data.type === "Item" && data.uuid)) {
+        return;
+    }
+
+    const item = await fromUuid(data.uuid);
+
+    if (item.type === "path") {
+        const archetype = this.actor.items.find(i => i._id === event.target.closest(".archetype").dataset.itemId);
+        const requirementId = event.target.closest(".archetype-path").dataset.id;
+        const archetypeRequirements = Object.values(archetype.system.roleRequirements);
+        const validRoles = new Set(archetypeRequirements[requirementId].parsedRoles.map(r => r.label));
+        const restrictedRoles = new Set(archetypeRequirements[requirementId].parsedRestrictedRoles.map(r => r.label));
+        const itemRoles = new Set(getSafeJson(item.system.roles, []).map(r => r.label));
+        if ((validRoles.intersection(itemRoles).size > 0) && restrictedRoles.intersection(itemRoles).size === 0) {
+            archetype.system.roleRequirements[requirementId].path.raw = JSON.stringify([{ value: item.name, id: item._id }]);
+            const updateData = archetype.system.roleRequirements;
+            await archetype.update({ "system.roleRequirements": updateData });
+        } else {
+            ui.notifications.warn(`That path isn't valid for the archetype ${archetype.name}`);
         }
     }
 }

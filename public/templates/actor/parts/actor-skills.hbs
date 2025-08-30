@@ -34,11 +34,27 @@
     data-skill-section="archetypes">
     {{#each archetypes as |archetype id|}}
     <li class="archetype" data-id="{{id}}" data-item-id="{{archetype._id}}" data-source-id="{{archetype._sourceId}}">
-      <div class="archetype-header">
+      <div class="archetype-header" data-action="displayArchetype">
         <div class="image-container"><img src="{{archetype.img}}" /></div>
         <div class="name"><span>{{archetype.name}}</span></div>
         <div class="archetype-paths">
-
+          {{#each archetype.system.roleRequirements as |requirement requirementId|}}
+          {{#if requirement.isActive}}
+          <div {{#if requirement.path.id}}class="archetype-path path-chosen" {{else}}class="archetype-path no-path"
+            data-roles='{{requirement.roles}}' data-restrictions='{{requirement.restrictedRoles}}' data-action="openPathBrowser" {{/if}} data-id="{{requirementId}}" {{#if
+            requirement.path.id}}data-source-id="{{path.id}}" data-action="displayPath" {{/if}}>
+            {{#if requirement.path.id}}
+            <label>{{path.name}}</label>
+            {{else}}
+            {{#each requirement.parsedRoles as |role r|}}
+            <div class="role">
+              <label>{{role.value}}</label>
+            </div>
+            {{/each}}
+            {{/if}}
+          </div>
+          {{/if}}
+          {{/each}}
         </div>
         <div class='item-controls'>
           <a class='item-control archetype-edit' data-action="editArchetype" title='{{localize "DOCUMENT.Edit" type='

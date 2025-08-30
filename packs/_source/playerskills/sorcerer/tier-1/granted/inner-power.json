@@ -12,7 +12,7 @@
     "meta": {
       "tier": 1
     },
-    "description": "",
+    "description": "<p>Inner reserves of magical power.</p><p>You must free this energy for use using @UUID[Compendium.abbrew.playerskills.Item.yj5Y6cGCJozG619M]{Draw Power} first before use with your Sorcerer Skills.</p>",
     "traits": {
       "raw": "",
       "value": []
@@ -475,11 +475,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1748903114540,
-    "modifiedTime": 1749159195084,
+    "modifiedTime": 1754248323891,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

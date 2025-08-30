@@ -463,7 +463,7 @@
         }
       }
     },
-    "skillType": "",
+    "skillType": "temporary",
     "path": {
       "raw": "",
       "value": {
@@ -483,14 +483,70 @@
     "revealed": {
       "isRevealed": false,
       "revealSkills": {
-        "raw":"[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
+        "raw": "[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
         "parsed": []
       },
       "difficulty": 15,
       "tier": 1
     }
   },
-  "effects": [],
+  "effects": [
+    {
+      "name": "Staggered",
+      "img": "systems/abbrew/assets/icons/statuses/staggered.svg",
+      "origin": "Compendium.abbrew.conditions.Item.abbrewCStaggered",
+      "duration": {
+        "startTime": null,
+        "combat": null,
+        "seconds": null,
+        "rounds": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "disabled": false,
+      "_id": "vVoHkcxCRaJuheCW",
+      "type": "base",
+      "system": {
+        "modifiers": []
+      },
+      "changes": [],
+      "description": "",
+      "tint": "#ffffff",
+      "transfer": true,
+      "statuses": [
+        "staggered"
+      ],
+      "sort": 0,
+      "flags": {
+        "statuscounter": {
+          "config": {
+            "dataSource": "flags.abbrew.skill.stacks",
+            "type": "default"
+          },
+          "visible": false,
+          "value": 1
+        },
+        "abbrew": {
+          "skill": {
+            "stacks": 1
+          }
+        }
+      },
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.346",
+        "systemId": "abbrew",
+        "systemVersion": "0.0.2-prerelease31",
+        "createdTime": 1754149708624,
+        "modifiedTime": 1754149734061,
+        "lastModifiedBy": "abbrewpacks00000"
+      },
+      "_key": "!items.effects!abbrewCStaggered.vVoHkcxCRaJuheCW"
+    }
+  ],
   "folder": null,
   "sort": 0,
   "ownership": {
@@ -504,7 +560,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1753642931195,
-    "modifiedTime": 1753643669683,
+    "modifiedTime": 1754149693853,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!abbrewCStaggered"

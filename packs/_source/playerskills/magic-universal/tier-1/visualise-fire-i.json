@@ -3,7 +3,7 @@
   "name": "Visualise Fire I",
   "type": "skill",
   "_id": "A078zSZttcK62fYN",
-  "img": "icons/svg/item-bag.svg",
+  "img": "systems/abbrew/assets/icons/concepts/fire.svg",
   "system": {
     "name": {
       "base": "",
@@ -49,7 +49,15 @@
       "item": ""
     },
     "skills": {
-      "granted": [],
+      "granted": [
+        {
+          "name": "Fire I",
+          "id": "v578Hmi6me0B8vcl",
+          "image": "systems/abbrew/assets/icons/concepts/fire.svg",
+          "sourceId": "Compendium.abbrew.playerskills.Item.v578Hmi6me0B8vcl",
+          "skillType": ""
+        }
+      ],
       "paired": [],
       "grantedOnActivation": [],
       "grantedOnAccept": []
@@ -436,6 +444,10 @@
             "type": "numeric",
             "numerator": 1,
             "denominator": 1
+          },
+          "esoteric": {
+            "operator": "add",
+            "type": "numeric"
           }
         }
       }
@@ -454,7 +466,7 @@
     "archetype": "",
     "attributeIncrease": "",
     "attributeIncreaseLong": "",
-    "attributeRankIncrease": "",
+    "attributeRankIncrease": "wil",
     "isProxied": false,
     "siblingSkillModifiers": [],
     "revealed": {
@@ -475,11 +487,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1748902414284,
-    "modifiedTime": 1750371544635,
+    "modifiedTime": 1754148379216,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

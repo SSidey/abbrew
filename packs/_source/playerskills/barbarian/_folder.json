@@ -1,0 +1,22 @@
+{
+  "type": "Item",
+  "folder": null,
+  "name": "Barbarian",
+  "color": null,
+  "sorting": "a",
+  "_id": "YScF6OcL8OEhh1g8",
+  "description": "",
+  "sort": 0,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.346",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1754331462477,
+    "modifiedTime": 1754331462477,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!YScF6OcL8OEhh1g8"
+}

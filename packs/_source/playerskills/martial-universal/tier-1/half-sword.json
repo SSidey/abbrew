@@ -65,7 +65,7 @@
         "isEnabled": false,
         "isContested": false,
         "selfCheck": false,
-        "checkType": "",
+        "checkType": "successes",
         "requirements": {
           "modifiers": "",
           "successes": 0,
@@ -146,7 +146,8 @@
               "attributeMultiplier": 1,
               "penetration": 3
             }
-          ]
+          ],
+          "isEnabled": true
         },
         "guard": {
           "self": {
@@ -277,6 +278,18 @@
           "conquest": {
             "operator": "add",
             "type": "numeric"
+          },
+          "esoteric": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "rage": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "fear": {
+            "operator": "add",
+            "type": "numeric"
           }
         }
       }
@@ -306,11 +319,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746223937926,
-    "modifiedTime": 1750117125772,
+    "modifiedTime": 1755293669194,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

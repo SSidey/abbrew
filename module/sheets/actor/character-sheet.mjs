@@ -1,22 +1,23 @@
 import { _onCreateItem, _onDeleteItem, _onEditItem, _onEquipStateChange, _onItemToggleRevealed, _onStudyItem } from './helpers/actions/item-actions.mjs';
 import { _onAttackDamageAction, _onAttackPickUpAction, _onAttackReloadAction } from './helpers/actions/attack-actions.mjs';
 import { _onAttributeSkill, _onDeleteSkill, _onEditSkill, _onSkillActivate, _onSkillConcentrate, _onSkillDeactivate, _onSkillStackRemove, _toggleFavourited } from './helpers/actions/skill-actions.mjs';
-import { _onDeleteArchetype, _onEditArchetype } from './helpers/actions/archetype-actions.mjs';
+import { _onDeleteArchetype, _onEditArchetype, displayArchetype } from './helpers/actions/archetype-actions.mjs';
 import { _onAnatomyToggleBroken, _onAnatomyToggleDismembered } from './helpers/actions/anatomy-actions.mjs';
 import { _onArmourToggleSundered } from './helpers/actions/armour-actions.mjs';
 import { _onEffectControl } from './helpers/actions/effect-actions.mjs';
 import { _onToggleSkillHeader } from './helpers/actions/ui-actions.mjs';
 import { _onRoll } from './helpers/actions/rollable-actions.mjs';
 import { _onChangeWoundValue } from './helpers/actions/wound-actions.mjs';
-import { _onArchetypeDrop, _onArchetypeSkillDrop, _onContainerDrop, handleActorOnDrop } from './helpers/drag-drops/drops.mjs';
+import { _onArchetypeDrop, _onArchetypePathDrop, _onArchetypeSkillDrop, _onContainerDrop, handleActorOnDrop } from './helpers/drag-drops/drops.mjs';
 import { ActorTagsMixin } from './helpers/tags/actor-tags-mixin.mjs';
 import { _onItemChange } from './helpers/selects/item-select.mjs';
 import { _onAmmunitionSelect } from './helpers/selects/ammunition-select.mjs';
 import { bindAllChange } from '../helpers/utility.mjs';
 import { DragDropMixin } from '../helpers/drag-drop-mixin.mjs';
 import { ActorContextMixin } from './helpers/context/prepare-context.mjs';
-import { openBrowser } from '../helpers/browser-actions.mjs';
+import { openBrowser, openPathBrowser } from '../helpers/browser-actions.mjs';
 import { changeConceptValue } from './helpers/actions/concept-actions.mjs';
+import { _onDisplayPathAction, displayPath } from './helpers/actions/path-actions.mjs';
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
 
@@ -48,6 +49,7 @@ export class AbbrewCharacterSheet extends DragDropMixin(ActorTagsMixin(ActorCont
     dragDrop: [
       { dragSelector: null, dropSelector: "[data-drop-type='archetype']", callbacks: { drop: _onArchetypeDrop } },
       { dragSelector: null, dropSelector: ".archetype", callbacks: { drop: _onArchetypeSkillDrop } },
+      { dragSelector: null, dropSelector: ".archetype-path.no-path", callbacks: { drop: _onArchetypePathDrop } },
       { dragSelector: "li.item", dropSelector: ".container", callbacks: { drop: _onContainerDrop } }
     ],
     actions: {
@@ -76,9 +78,12 @@ export class AbbrewCharacterSheet extends DragDropMixin(ActorTagsMixin(ActorCont
       toggleRevealed: _onItemToggleRevealed,
       toggleSundered: _onArmourToggleSundered,
       openBrowser: openBrowser,
+      openPathBrowser: openPathBrowser,
       rollable: _onRoll,
       toggleFavourited: _toggleFavourited,
-      changeConceptValue: changeConceptValue
+      changeConceptValue: changeConceptValue,
+      displayArchetype: displayArchetype,
+      displayPath: { handler: _onDisplayPathAction, buttons: [0, 2] },
     }
   }
 

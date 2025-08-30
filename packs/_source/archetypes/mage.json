@@ -22,9 +22,23 @@
     },
     "enhancements": [],
     "roleRequirements": {
-      "1": {
+      "0": {
         "isActive": true,
         "roles": "[{\"label\":\"magic\",\"value\":\"Magic\",\"title\":\"You primarily harness magic to combat your foes.\"},{\"label\":\"ranged\",\"value\":\"Ranged\",\"title\":\"You prefer to fight at a distance from your opponents.\"}]",
+        "parsedRoles": [],
+        "restrictedRoles": "",
+        "parsedRestrictedRoles": [],
+        "isMajor": false,
+        "path": {
+          "isRequired": true,
+          "raw": "",
+          "name": "",
+          "id": ""
+        }
+      },
+      "1": {
+        "isActive": false,
+        "roles": "",
         "parsedRoles": [],
         "restrictedRoles": "",
         "parsedRestrictedRoles": [],
@@ -65,20 +79,6 @@
         }
       },
       "4": {
-        "isActive": false,
-        "roles": "",
-        "parsedRoles": [],
-        "restrictedRoles": "",
-        "parsedRestrictedRoles": [],
-        "isMajor": false,
-        "path": {
-          "isRequired": true,
-          "raw": "",
-          "name": "",
-          "id": ""
-        }
-      },
-      "5": {
         "isActive": false,
         "roles": "",
         "parsedRoles": [],

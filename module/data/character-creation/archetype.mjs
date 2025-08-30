@@ -7,7 +7,7 @@ export default class AbbrewArchetype extends AbbrewItemBase {
         const fields = foundry.data.fields;
         const schema = super.defineSchema();
 
-        schema.roleRequirements = new fields.SchemaField(Array.from({ length: 5 }, (_, i) => i + 1).reduce((obj, requirement) => {
+        schema.roleRequirements = new fields.SchemaField(Array.from({ length: 5 }, (_, i) => i).reduce((obj, requirement) => {
             obj[requirement] = new fields.SchemaField({
                 isActive: new fields.BooleanField({ required: true, initial: false }),
                 roles: new fields.StringField({ required: true, blank: true }),

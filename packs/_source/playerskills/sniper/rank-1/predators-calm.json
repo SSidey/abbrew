@@ -1,0 +1,343 @@
+{
+  "folder": "fnFyhwPu74Hsk4XI",
+  "name": "Predator's Calm",
+  "type": "skill",
+  "_id": "zu34dr84ovmpgxI4",
+  "img": "systems/abbrew/assets/icons/skills/aimed-shot.svg",
+  "system": {
+    "name": {
+      "base": "",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1
+    },
+    "description": "<p>No twitch, no breath, only focus.</p><p>If you haven't moved yet since the start of your turn, reduce the cost of your first @UUID[Compendium.abbrew.skills.Item.1gQmHvrgMSyzDAmX]{Aimed Shot} by 1.</p>",
+    "traits": {
+      "raw": "[{\"key\":\"ranged\",\"value\":\"Ranged\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "abbrew.skill.unseenthreat.zu34dr84ovmpgxI3",
+      "uuid": "zu34dr84ovmpgxI3"
+    },
+    "enhancements": [],
+    "skillModifiers": {
+      "synergy": "[{\"id\":\"abbrewAimedShot0\",\"value\":\"Aimed Shot\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewAimedShot0\"}]",
+      "discord": "",
+      "isActorGrantTriggerRequired": false,
+      "isItemGrantTriggerRequired": false
+    },
+    "isFavourited": false,
+    "configurable": false,
+    "isActivatable": true,
+    "activateOnCreate": false,
+    "applyTurnStart": false,
+    "applyTurnEnd": false,
+    "applyOnExpiry": false,
+    "activateOnDamageAccept": false,
+    "sources": {
+      "actor": "",
+      "items": []
+    },
+    "grantedBy": {
+      "actor": "",
+      "item": ""
+    },
+    "skills": {
+      "granted": [],
+      "paired": [],
+      "grantedOnActivation": [],
+      "grantedOnAccept": []
+    },
+    "resource": {
+      "capacity": 0,
+      "operator": "",
+      "relatedResource": null,
+      "fillCapacityOnCreate": false
+    },
+    "action": {
+      "activationType": "synergy",
+      "actionCost": "0",
+      "actionImage": "",
+      "duration": {
+        "isConcentration": false,
+        "precision": "0",
+        "value": 0,
+        "expireOnStartOfTurn": true
+      },
+      "uses": {
+        "hasUses": true,
+        "asStacks": false,
+        "removeStackOnUse": true,
+        "value": 1,
+        "max": 1,
+        "period": "turn",
+        "stackRemovalActivation": false,
+        "removeWhenNoUsesRemain": false
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "asyncValues": [],
+      "skillCheck": [],
+      "skillRequest": {
+        "isEnabled": false,
+        "isContested": false,
+        "selfCheck": false,
+        "checkType": "",
+        "requirements": {
+          "modifiers": "",
+          "successes": 0,
+          "result": 0
+        },
+        "targetModifiers": "",
+        "results": {
+          "success": {
+            "description": ""
+          },
+          "failure": {
+            "description": ""
+          }
+        }
+      },
+      "attackProfile": {
+        "isEnabled": false,
+        "name": "",
+        "attackType": "",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": null,
+        "attackMode": "",
+        "finisher": {
+          "type": "",
+          "cost": null,
+          "description": "",
+          "wounds": []
+        },
+        "damage": [],
+        "finisherLimit": 10
+      },
+      "modifiers": {
+        "fortune": 0,
+        "actionCost": {
+          "value": 1,
+          "operator": "minus"
+        },
+        "attackProfile": {
+          "isEnabled": false,
+          "combineAttacks": {
+            "isEnabled": false,
+            "value": null
+          },
+          "attackType": "",
+          "attackMode": "",
+          "handsSupplied": null,
+          "finisherLimit": {
+            "value": 10,
+            "operator": ""
+          },
+          "lethal": {
+            "value": 0,
+            "operator": ""
+          },
+          "critical": {
+            "value": 10,
+            "operator": ""
+          },
+          "penetration": {
+            "value": 10,
+            "operator": ""
+          },
+          "finisher": {
+            "type": "",
+            "cost": null,
+            "description": "",
+            "wounds": []
+          },
+          "damage": []
+        },
+        "guard": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": "",
+            "lateParse": false
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "self": [],
+          "target": [],
+          "esoteric": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "physical": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "crushing": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "piercing": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "slashing": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "fire": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "cold": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "water": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "earth": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "air": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "electricity": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "poison": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "flesh": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "blood": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "metal": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "light": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "dark": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "life": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "death": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "war": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "famine": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "pestilence": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "conquest": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "rage": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "fear": {
+            "operator": "add",
+            "type": "numeric"
+          }
+        }
+      }
+    },
+    "skillType": "path",
+    "path": {
+      "raw": "[{\"label\":\"snake\",\"value\":\"Sniper\",\"roles\":[\"martial\",\"ranged\",\"vanguard\",\"scout\"],\"title\":\"Snipers are the unseen predators of the battlefield, patiently waiting for the moment to strike. They excel in precision shooting, taking down high-value targets, and keeping their location hidden even after an attack. In addition to their deadly aim, Snipers can gather information from afar, guiding their allies with vital intel.\",\"id\":\"abbrewpsnake0000\"}]",
+      "value": {
+        "id": ""
+      }
+    },
+    "roles": {
+      "raw": "",
+      "parsed": []
+    },
+    "archetype": "",
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": "",
+    "isProxied": false,
+    "siblingSkillModifiers": []
+  },
+  "effects": [],
+  "sort": 100000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "13.346",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1748385483143,
+    "modifiedTime": 1755112970517,
+    "lastModifiedBy": "abbrewpacks00000",
+    "exportSource": null
+  },
+  "_key": "!items!zu34dr84ovmpgxI4"
+}

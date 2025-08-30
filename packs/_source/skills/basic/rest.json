@@ -53,9 +53,16 @@
       "paired": [
         {
           "name": "Tired",
+          "skillType": "",
           "id": "fLWPcJR7GdxGPIck",
           "image": "systems/abbrew/assets/icons/skills/tired.svg",
-          "sourceId": "Compendium.abbrew.conditions.Item.eYkgMLSsRDTxgm3I",
+          "sourceId": "Compendium.abbrew.conditions.Item.eYkgMLSsRDTxgm3I"
+        },
+        {
+          "name": "Can Rest",
+          "id": "6f76mNmx9kyzwAO7",
+          "image": "systems/abbrew/assets/icons/skills/rest.svg",
+          "sourceId": "Compendium.abbrew.conditions.Item.6f76mNmx9kyzwAO7",
           "skillType": ""
         }
       ],
@@ -457,8 +464,20 @@
           "esoteric": {
             "operator": "add",
             "type": "numeric"
+          },
+          "rage": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "fear": {
+            "operator": "add",
+            "type": "numeric"
           }
         }
+      },
+      "tierDiceChange": {
+        "value": [],
+        "operator": ""
       }
     },
     "skillType": "basic",
@@ -501,7 +520,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1749070766182,
-    "modifiedTime": 1754137644426,
+    "modifiedTime": 1756252003328,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

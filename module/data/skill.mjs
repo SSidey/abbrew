@@ -209,7 +209,10 @@ export default class AbbrewSkill extends AbbrewItemBase {
         schema.action = new fields.SchemaField({
             activationType: new fields.StringField({ ...blankString }),
             actionCost: new fields.StringField({ ...blankString, nullable: true }),
-            tierDiceChange: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+            tierDiceChange: new fields.SchemaField({
+                value: this.getModifierBuilderField(),
+                operator: new fields.StringField({ ...blankString })
+            }),
             actionImage: new fields.StringField({ ...blankString }),
             duration: new fields.SchemaField({
                 isConcentration: new fields.BooleanField({ required: true, initial: false }),

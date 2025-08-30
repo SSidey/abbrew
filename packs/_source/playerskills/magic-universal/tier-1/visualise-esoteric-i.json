@@ -3,7 +3,7 @@
   "name": "Visualise Esoteric I",
   "type": "skill",
   "_id": "3HtigzdGbhxRkHVm",
-  "img": "icons/svg/item-bag.svg",
+  "img": "systems/abbrew/assets/icons/concepts/esoteric.svg",
   "system": {
     "name": {
       "base": "",
@@ -473,7 +473,7 @@
     "archetype": "",
     "attributeIncrease": "",
     "attributeIncreaseLong": "",
-    "attributeRankIncrease": "",
+    "attributeRankIncrease": "wil",
     "isProxied": false,
     "siblingSkillModifiers": [],
     "revealed": {
@@ -495,11 +495,11 @@
   "_stats": {
     "duplicateSource": null,
     "exportSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1750271989388,
-    "modifiedTime": 1750371544635,
+    "modifiedTime": 1754148290249,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!3HtigzdGbhxRkHVm"

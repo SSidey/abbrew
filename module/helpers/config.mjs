@@ -765,6 +765,7 @@ const itemTraits = [
 ]
 
 const skillTraits = [
+  { key: "initiate", value: "ABBREW.Traits.Skill.initiate", feature: "skill", subFeature: "progression", effect: "", data: "", exclude: [] },
   { key: "specialisation", value: "ABBREW.Traits.Skill.specialisation", feature: "skill", subFeature: "progression", effect: "", data: "", exclude: [] },
   { key: "mastery", value: "ABBREW.Traits.Skill.mastery", feature: "skill", subFeature: "progression", effect: "", data: "", exclude: [] },
   { key: "disease", value: "ABBREW.Traits.Skill.disease", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
@@ -795,6 +796,9 @@ const skillTraits = [
   { key: "auditory", value: "ABBREW.Traits.Skill.auditory", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
   { key: "fortune", value: "ABBREW.Traits.Skill.fortune", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
   { key: "misfortune", value: "ABBREW.Traits.Skill.misfortune", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "offense", value: "ABBREW.Traits.Skill.offense", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "defense", value: "ABBREW.Traits.Skill.defense", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "fear", value: "ABBREW.Traits.Skill.fear", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
 ]
 
 const materialTraits = [
@@ -1023,19 +1027,7 @@ ABBREW.roles = {
   scout: { label: "ABBREW.Roles.Name.scout", value: "scout", description: "ABBREW.Roles.Description.scout" },
 }
 
-ABBREW.universalPath = { label: "ABBREW.Paths.Name.universal", id: "abbrewpuniversal", value: "universal", roles: [], description: "ABBREW.Paths.Description.universal" };
-
-ABBREW.paths = [
-  { label: "ABBREW.Paths.Name.barbarian", id: "abbrewpbarbarian", value: "barbarian", roles: ["melee", "martial", "vanguard"], description: "ABBREW.Paths.Description.barbarian" },
-  { label: "ABBREW.Paths.Name.fenceroflostbriarith", id: "abbrewpfelopb000", value: "fenceroflostbriarith", roles: ["melee", "martial", "vanguard"], description: "ABBREW.Paths.Description.fenceroflostbriarith" },
-  { label: "ABBREW.Paths.Name.divineadherent", id: "abbrewpdivadh000", value: "divineadherent", roles: ["acolyte", "magic", "melee", "ranged"], description: "ABBREW.Paths.Description.divineadherent" },
-  { label: "ABBREW.Paths.Name.poisoner", id: "abbrewppoisoner0", value: "poisoner", roles: ["professional", "scoundrel"], description: "ABBREW.Paths.Description.poisoner" },
-  { label: "ABBREW.Paths.Name.shieldedfighter", id: "abbrewpshieldedf", value: "shieldedfighter", roles: ["martial", "melee", "durable"], description: "ABBREW.Paths.Description.shieldedfighter" },
-  { label: "ABBREW.Paths.Name.shieldguardian", id: "abbrewpshieldgua", value: "shieldguardian", roles: ["martial", "melee", "protector", "durable"], description: "ABBREW.Paths.Description.shieldguardian" },
-  { label: "ABBREW.Paths.Name.snake", id: "abbrewpsnake0000", value: "snake", roles: ["martial", "melee", "ranged", "scoundrel"], description: "ABBREW.Paths.Description.snake" },
-  { label: "ABBREW.Paths.Name.sniper", id: "abbrewpsnake0000", value: "snake", roles: ["martial", "ranged", "vanguard", "scout"], description: "ABBREW.Paths.Description.sniper" },
-  { label: "ABBREW.Paths.Name.sorcerer", id: "abbrewpsorcerer0", value: "sorcerer", roles: ["magic", "ranged"], description: "ABBREW.Paths.Description.sorcerer" },
-]
+ABBREW.universalPath = { name: "ABBREW.Paths.universal.name", _id: "abbrewpuniversal", value: "universal", roles: [], description: "ABBREW.Paths.universal.description" };
 
 ABBREW.skillTraining = [
   "attack",

@@ -223,35 +223,22 @@
       }
     },
     "Paths": {
-      "Name": {
-        "universal": "Universal",
-        "barbarian": "Barbarian",
-        "fenceroflostbriarith": "Fencer Of Lost Briarith",
-        "divineadherent": "Divine Adherent",
-        "poisoner": "Poisoner",
-        "shieldedfighter": "Shielded Fighter",
-        "shieldguardian": "Shield Guardian",
-        "snake": "Snake",
-        "sniper": "Sniper",
-        "sorcerer": "Sorcerer"
+      "universal": {
+        "name": "Universal",
+        "description": "A universal path, skills with this path can be selected if it has roles matching thosee of your paths"
       },
-      "Description": {
-        "universal": "A universal path, skills with this path can be selected if it has roles matching thosee of your paths",
-        "barbarian": "A barbarian is a fierce, untamed warrior who channels raw emotion and primal fury into devastating combat prowess, thriving where instinct matters more than discipline.",
-        "fenceroflostbriarith": "A fighting style that relies on specialised weapon techniques and swapping between stances.",
-        "divineadherent": "You worship a deity and derive your powers from prayer and devotion to that deity.",
-        "poisoner": "Adept at the production and the usage of poisons.",
-        "shieldedfighter": "A shielded fighter blends offense and defense, using weapon and shield in perfect balance.",
-        "shieldguardian": "A selfless fighting style, one where you put yourself in harm's way to shield your allies and prevent your enemies from reaching them.",
-        "snake": "A style employing the use of two short weapons and relies on rapid speed and dodges.",
-        "sniper": "Snipers are the unseen predators of the battlefield, patiently waiting for the moment to strike. They excel in precision shooting, taking down high-value targets, and keeping their location hidden even after an attack. In addition to their deadly aim, Snipers can gather information from afar, guiding their allies with vital intel.",
-        "sorcerer": "A magician that draws on internal powers to manifest spells."
-      }
+      "barbarian": "A barbarian is a fierce, untamed warrior who channels raw emotion and primal fury into devastating combat prowess, thriving where instinct matters more than discipline.",
+      "fenceroflostbriarith": "A fighting style that relies on specialised weapon techniques and swapping between stances.",
+      "divineadherent": "You worship a deity and derive your powers from prayer and devotion to that deity.",
+      "poisoner": "Adept at the production and the usage of poisons.",
+      "shieldedfighter": "A shielded fighter blends offense and defense, using weapon and shield in perfect balance.",
+      "shieldguardian": "A selfless fighting style, one where you put yourself in harm's way to shield your allies and prevent your enemies from reaching them.",
+      "snake": "A style employing the use of two short weapons and relies on rapid speed and dodges.",
+      "sniper": "Snipers are the unseen predators of the battlefield, patiently waiting for the moment to strike. They excel in precision shooting, taking down high-value targets, and keeping their location hidden even after an attack. In addition to their deadly aim, Snipers can gather information from afar, guiding their allies with vital intel.",
+      "sorcerer": "A magician that draws on internal powers to manifest spells."
     },
     "Archetypes": {
-      "Ranger": {
-        "description": "Masters of the wild and patient hunters, Rangers live for the open air and the satisfaction of a well-placed shot. Whether stalking prey through dense forest or shadowing an enemy force from a ridgeline, Rangers are built for striking from afar and surviving in hostile terrain. In a party, Rangers excel at reconnaissance, harrying enemies from distance, and controlling the battlefield’s range. Their craft blends precision marksmanship with tactical movement — keeping foes off-balance and allies well-informed."
-      }
+      "ranger": "Masters of the wild and patient hunters, Rangers live for the open air and the satisfaction of a well-placed shot. Whether stalking prey through dense forest or shadowing an enemy force from a ridgeline, Rangers are built for striking from afar and surviving in hostile terrain. In a party, Rangers excel at reconnaissance, harrying enemies from distance, and controlling the battlefield’s range. Their craft blends precision marksmanship with tactical movement — keeping foes off-balance and allies well-informed."
     },
     "EnhancementTargetTypes": {
       "weapon": "Weapon",
@@ -714,6 +701,7 @@
         "wood": "Wood"
       },
       "Skill": {
+        "initiate": "Initiate",
         "specialisation": "Specialisation",
         "mastery": "Mastery",
         "poison": "Poison",
@@ -743,7 +731,10 @@
         "auditory": "Auditory",
         "visual": "Visual",
         "fortune": "Fortune",
-        "misfortune": "Misfortune"
+        "misfortune": "Misfortune",
+        "offense": "Offense",
+        "defense": "Defense",
+        "fear": "Fear"
       },
       "stance": "Stance",
       "Spell": {
@@ -1096,8 +1087,14 @@
         }
       },
       "grantedBy": {
+        "actor": {
+          "label": "Granted By Actor"
+        },
         "token": {
-          "label": "Token"
+          "label": "Granted By Token"
+        },
+        "item": {
+          "label": "Granted By Item"
         }
       },
       "activation": {
@@ -1130,7 +1127,9 @@
       },
       "action": {
         "tierDiceChange": {
-          "label": "Tier Dice Cost"
+          "value": {
+            "label": "Tier Dice Cost"
+          }
         },
         "charges": {
           "hasCharges": {

@@ -1,0 +1,78 @@
+{
+  "name": "Barbarian",
+  "type": "path",
+  "_id": "abbrewpbarbarian",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "name": {
+      "base": "",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1
+    },
+    "description": "<div><p>@L[ABBREW.Paths.Description.barbarian]</p></div>",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "enhancements": [],
+    "roles": "[{\"label\":\"melee\",\"value\":\"Melee\",\"title\":\"You fight primarily in melee with your opponents.\"},{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"},{\"label\":\"vanguard\",\"value\":\"Vanguard\",\"title\":\"Your main role in combat is to bring down your enemies as quickly as possible.\"}]",
+    "skills": {
+      "initiate": [
+        {
+          "name": "Rage",
+          "id": "Tc8d1Yx2F0bVXnoE",
+          "image": "systems/abbrew/assets/icons/wounds/rage.webp",
+          "sourceId": "Compendium.abbrew.playerskills.Item.Tc8d1Yx2F0bVXnoE"
+        },
+        {
+          "name": "Bloodrush",
+          "id": "GVdQwyUKZq8kUkyJ",
+          "image": "systems/abbrew/assets/icons/wounds/rage.webp",
+          "sourceId": "Compendium.abbrew.playerskills.Item.GVdQwyUKZq8kUkyJ"
+        },
+        {
+          "name": "Savage Reprisal",
+          "id": "Iz2ZJ8xNtO22caRn",
+          "image": "systems/abbrew/assets/icons/wounds/rage.webp",
+          "sourceId": "Compendium.abbrew.playerskills.Item.Iz2ZJ8xNtO22caRn"
+        }
+      ],
+      "specialisation": {
+        "name": "Apply Pressure",
+        "id": "CvI0LhIFyMYsBwxx",
+        "image": "systems/abbrew/assets/icons/actions/1a.webp",
+        "sourceId": "Compendium.abbrew.skills.Item.CvI0LhIFyMYsBwxx"
+      },
+      "mastery": {
+        "name": "Climb",
+        "id": "MdEjJXPBEVBhBgfC",
+        "image": "systems/abbrew/assets/icons/actions/0a.webp",
+        "sourceId": "Compendium.abbrew.skills.Item.MdEjJXPBEVBhBgfC"
+      }
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.346",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1754680709486,
+    "modifiedTime": 1756253280215,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!abbrewpbarbarian"
+}

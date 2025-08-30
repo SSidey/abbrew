@@ -4,7 +4,6 @@ export const ArchetypeTagsMixin = superclass => class extends superclass {
 
     _activateArchetypeTags() {
         this._activateRoles();
-        this._activateArchetypePaths();
     }
 
     _activateRoles() {

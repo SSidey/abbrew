@@ -66,16 +66,16 @@
         "denominator": 1
       },
       {
-        "operator": "add",
-        "path": "",
+        "operator": "merge",
+        "path": "system.traits.raw",
         "filterPath": "",
         "filterValue": "",
         "subPath": "",
         "subPathFilter": "",
         "subPathFilterValue": "",
         "field": "",
-        "type": "numeric",
-        "value": "",
+        "type": "trait",
+        "value": "wood",
         "numerator": 1,
         "denominator": 1
       },
@@ -115,7 +115,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1752871168507,
-    "modifiedTime": 1752871559581,
+    "modifiedTime": 1754152124739,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!GgPKu8tva7LYnDOT"

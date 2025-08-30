@@ -13,9 +13,10 @@
                 <ol style="list-style:none; padding-left:0px">
                     {{#each archetypes as |archetype|}}
                     <li class="archetype" data-id="{{archetype.id}}" data-required-roles="{{archetype.roles.required}}"
-                        data-restricted-roles="{{archetype.roles.restricted}}">
+                        data-restricted-roles="{{archetype.roles.restricted}}" data-action="renderArchetypeSheet">
                         <div class="image-container"><img src="{{archetype.img}}" /></div>
                         <div class="name"><span>{{archetype.name}}</span></div>
+                        <div class="description">{{archetype.description}}</div>
                         <a class="item-control" data-action="renderArchetypeSheet" title="Open">
                             <i class="fa-solid fa-arrow-up-right-from-square"></i>
                         </a>

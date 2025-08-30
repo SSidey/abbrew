@@ -72,14 +72,14 @@
       "modifiesSenses": true,
       "sight": {
         "enabled": true,
-        "range": null,
+        "range": 0,
         "angle": 360,
         "visionMode": "hearing"
       },
       "detectionModes": [
         {
-          "id": "",
-          "range": 10
+          "id": "hearing",
+          "range": 5
         }
       ],
       "threatened": {
@@ -494,7 +494,7 @@
     "revealed": {
       "isRevealed": false,
       "revealSkills": {
-        "raw":"[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
+        "raw": "[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
         "parsed": []
       },
       "difficulty": 15,
@@ -514,7 +514,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1753799083381,
-    "modifiedTime": 1754137553004,
+    "modifiedTime": 1754243144446,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!YtLaelsNGykShpk2"

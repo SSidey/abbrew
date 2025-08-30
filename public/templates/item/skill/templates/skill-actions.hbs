@@ -139,7 +139,17 @@
     </div>
 </div>
 {{#if (eq system.skillType "tier")}}
-{{formGroup system.schema.fields.action.fields.tierDiceChange value=system.action.tierDiceChange localize=true}}
+<div>
+    <h3>Tier Dice Change</h3>
+    <label>Operator</label>
+    <select name="system.action.tierDiceChange.operator">
+        {{selectOptions config.operators selected=system.action.tierDiceChange.operator blank=""
+        localize=true}}
+    </select>
+    {{> "systems/abbrew/templates/item/skill/templates/modifier-builder-field.hbs"
+    modifierList=system.action.tierDiceChange.value
+    modifierListName="system.action.tierDiceChange.value" config=config}}
+</div>
 {{/if}}
 <div class="item action">
     <div class="form-group">

@@ -3,7 +3,7 @@
   "name": "Empowered Visualise Esoteric",
   "type": "skill",
   "_id": "9jlnJsQSaY3fUFnk",
-  "img": "icons/svg/item-bag.svg",
+  "img": "systems/abbrew/assets/icons/concepts/esoteric.svg",
   "system": {
     "name": {
       "base": "",
@@ -50,7 +50,15 @@
     },
     "handleExpiryEffects": true,
     "skills": {
-      "granted": [],
+      "granted": [
+        {
+          "name": "Visualise Esoteric I",
+          "id": "3HtigzdGbhxRkHVm",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.playerskills.Item.3HtigzdGbhxRkHVm",
+          "skillType": ""
+        }
+      ],
       "paired": [],
       "grantedOnActivation": [],
       "grantedOnAccept": [],
@@ -476,7 +484,7 @@
     },
     "skillType": "path",
     "path": {
-      "raw": "",
+      "raw": "[{\"label\":\"sorcerer\",\"value\":\"Sorcerer\",\"roles\":[\"magic\",\"ranged\"],\"title\":\"A magician that draws on internal powers to manifest spells.\",\"id\":\"abbrewpsorcerer0\"}]",
       "value": {
         "id": ""
       }
@@ -510,11 +518,11 @@
   "_stats": {
     "duplicateSource": null,
     "exportSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1750608123043,
-    "modifiedTime": 1750608248038,
+    "modifiedTime": 1754148260086,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!9jlnJsQSaY3fUFnk"

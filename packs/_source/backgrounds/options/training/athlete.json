@@ -1,0 +1,60 @@
+{
+  "folder": "g9lLoljSavATN0TJ",
+  "name": "Athlete",
+  "type": "background",
+  "_id": "xvghT5zpcoCaISK7",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "name": {
+      "base": "",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1
+    },
+    "description": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "enhancements": [],
+    "skills": {
+      "granted": [
+        {
+          "name": "Athlete (Training)",
+          "id": "f9JGPtCP3rucahWO",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.f9JGPtCP3rucahWO",
+          "skillType": ""
+        }
+      ]
+    },
+    "creatureForm": {
+      "name": "",
+      "id": "",
+      "image": "",
+      "sourceId": ""
+    }
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.346",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1754244694116,
+    "modifiedTime": 1754244750319,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!xvghT5zpcoCaISK7"
+}

@@ -1,0 +1,20 @@
+{
+  "type": "Item",
+  "folder": "FWJriHKC3b8TXyR7",
+  "name": "Rank 1",
+  "color": null,
+  "sorting": "a",
+  "_id": "tKdjLcQ302BQLO9H",
+  "description": "",
+  "sort": 0,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.346",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "lastModifiedBy": null
+  },
+  "_key": "!folders!tKdjLcQ302BQLO9H"
+}

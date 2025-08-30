@@ -1,0 +1,140 @@
+{
+  "folder": "Phat68gueYIk67lc",
+  "name": "Torch",
+  "type": "weapon",
+  "_id": "NsGlbNCctj4iJQJz",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "name": {
+      "base": "Torch",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1,
+      "size": 0,
+      "quality": 0
+    },
+    "description": "",
+    "traits": {
+      "raw": "[{\"key\":\"wood\",\"value\":\"Wood\",\"feature\":\"material\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "enhancements": [],
+    "quantity": 1,
+    "heft": 1,
+    "complexity": 0,
+    "equipType": "held",
+    "equipPoints": {
+      "required": {
+        "raw": "",
+        "parsed": []
+      },
+      "provided": {
+        "raw": "",
+        "parsed": []
+      }
+    },
+    "handsRequired": "oneHand",
+    "equipState": "readied",
+    "handsSupplied": 0,
+    "actionCost": 0,
+    "exertActionCost": 0,
+    "validEquipStates": [],
+    "nextValidEquipStates": [],
+    "skills": {
+      "granted": [
+        {
+          "name": "Light Torch",
+          "id": "GymQw6lJLEd90gu0",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.GymQw6lJLEd90gu0",
+          "skillType": ""
+        }
+      ]
+    },
+    "availableEnhancements": 0,
+    "storage": {
+      "hasStorage": false,
+      "type": "",
+      "accessible": false,
+      "value": 0,
+      "max": 0,
+      "storedItems": [],
+      "traitFilter": {
+        "raw": "",
+        "value": []
+      }
+    },
+    "storeIn": "",
+    "revealed": {
+      "isRevealed": false,
+      "revealSkills": {
+        "raw": "[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
+        "parsed": []
+      },
+      "difficulty": 15,
+      "tier": 0
+    },
+    "grantedBy": "",
+    "defense": {
+      "guard": 0,
+      "inflexibility": 0,
+      "protection": []
+    },
+    "isSundered": false,
+    "isOverpowerTrained": false,
+    "attackProfiles": [
+      {
+        "name": "Whack",
+        "attackType": "arc",
+        "finisherLimit": 2,
+        "hasStrongAttack": false,
+        "critical": 10,
+        "lethal": 0,
+        "reach": 0,
+        "damage": [
+          {
+            "type": "crushing",
+            "value": 2,
+            "penetration": 0,
+            "attributeModifier": "str",
+            "attributeMultiplier": 1,
+            "damageMultiplier": 1,
+            "overallMultiplier": 1
+          }
+        ],
+        "range": 0,
+        "penetration": 0,
+        "ammunition": {
+          "type": "",
+          "id": "",
+          "value": 0,
+          "max": 0,
+          "reloadType": "",
+          "reloadActionCost": 1
+        }
+      }
+    ]
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.346",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1754158713814,
+    "modifiedTime": 1754160133412,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!NsGlbNCctj4iJQJz"
+}

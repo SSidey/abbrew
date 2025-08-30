@@ -187,8 +187,13 @@ export const ActorContextMixin = superclass => class extends superclass {
                         break;
                     case 'item':
                         skills.item.push(i);
+                        break;
+                    case 'tier':
+                        skills.tier.push(i);
+                        break;
                     default:
                         skills.untyped.push(i);
+                        break;
                 }
             }
             else if (i.type === "anatomy") {

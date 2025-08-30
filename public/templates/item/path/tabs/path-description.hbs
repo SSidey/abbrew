@@ -2,5 +2,11 @@
 <section class="tab scrollable {{tab.cssClass}}" data-group="primary" data-tab="description">
     <section>
         {{> "systems/abbrew/templates/item/path/parts/path-description.hbs"}}
+        {{> "systems/abbrew/templates/item/skill/templates/summary-element.hbs" header="Initiate"
+        collection="initiate" collectionSkills=system.skills.initiate editable=editable}}
+        {{> "systems/abbrew/templates/item/skill/templates/summary-element.hbs" header="Specialisation"
+        collection="specialisation" collectionSkills=system.skills.specialisation editable=editable}}
+        {{> "systems/abbrew/templates/item/skill/templates/summary-element.hbs" header="Mastery"
+        collection="mastery" collectionSkills=system.skills.mastery editable=editable}}
     </section>
 </section>

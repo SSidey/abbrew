@@ -3,7 +3,7 @@
   "name": "Empowered Visualise Fire",
   "type": "skill",
   "_id": "F630viTCiNrvIx0l",
-  "img": "icons/svg/item-bag.svg",
+  "img": "systems/abbrew/assets/icons/concepts/fire.svg",
   "system": {
     "name": {
       "base": "",
@@ -49,7 +49,15 @@
       "item": ""
     },
     "skills": {
-      "granted": [],
+      "granted": [
+        {
+          "name": "Visualise Fire I",
+          "id": "A078zSZttcK62fYN",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.playerskills.Item.A078zSZttcK62fYN",
+          "skillType": ""
+        }
+      ],
       "paired": [],
       "grantedOnActivation": [],
       "grantedOnAccept": []
@@ -494,11 +502,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1748903203011,
-    "modifiedTime": 1750607818109,
+    "modifiedTime": 1754148221503,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

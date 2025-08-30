@@ -41,7 +41,7 @@ async function applyRest(actor) {
     const skillsToEmpty = skills
         .filter(s => s.system.resource.emptyPeriod);
 
-    await actor.update({ "system.defense.resolve.value": actor.system.defense.resolve.max });
+    await actor.update({ "system.defense.resolve.value": actor.system.defense.resolve.max, "system.meta.tier.dice": actor.system.meta.tier.value });
     return await applyUseAndResourceRecharge(actor, skillsToRecharge, skillsToEmpty);
 }
 

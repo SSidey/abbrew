@@ -1,0 +1,21 @@
+{
+  "type": "Item",
+  "folder": "YScF6OcL8OEhh1g8",
+  "name": "Tier",
+  "color": null,
+  "sorting": "m",
+  "_id": "w3HcEkLIXJukSlhA",
+  "description": "",
+  "sort": 0,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.346",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "lastModifiedBy": "abbrewpacks00000",
+    "modifiedTime": 1756252117348
+  },
+  "_key": "!folders!w3HcEkLIXJukSlhA"
+}

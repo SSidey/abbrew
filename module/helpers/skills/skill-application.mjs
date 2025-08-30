@@ -103,7 +103,7 @@ async function handleAsyncModifierTypes(actor, skill, mainModifierSkills, siblin
     skillsList.forEach(skills => {
         skills.filter(s =>
             s.system.action.modifiers.attackProfile.damage.some(d => d.value.split('.').slice(0, 1).shift() === "async") || s.system.action.skillCheck.some(x => x.type === "async") || s.system.action.modifiers.guard.self.value.some(x => x.type === "async") || s.system.action.modifiers.risk.self.value.some(x => x.type === "async") || s.system.action.modifiers.resolve.self.value.some(x => x.type === "async") || s.system.action.modifiers.wounds.self.some(w => w.value.some(x => x.type === "async")) || s.system.action.modifiers.resources.self.some(w => w.value.some(x => x.type === "async"))
-            || s.system.action.modifiers.guard.target.value.some(x => x.type === "async") || s.system.action.modifiers.risk.target.value.some(x => x.type === "async") || s.system.action.modifiers.resolve.target.value.some(x => x.type === "async") || s.system.action.modifiers.wounds.target.some(w => w.value.some(x => x.type === "async")) || s.system.action.modifiers.resources.target.some(w => w.value.some(x => x.type === "async"))
+            || s.system.action.modifiers.guard.target.value.some(x => x.type === "async") || s.system.action.modifiers.risk.target.value.some(x => x.type === "async") || s.system.action.modifiers.resolve.target.value.some(x => x.type === "async") || s.system.action.modifiers.wounds.target.some(w => w.value.some(x => x.type === "async")) || s.system.action.modifiers.resources.target.some(w => w.value.some(x => x.type === "async") || s.system.action.tierDiceChange.value.some(x => x.type === "async"))
         ).forEach(s => {
             s.system.action.skillCheck.filter(x => x.type === "async").forEach(v => {
                 handleAsyncResults(s, v);
@@ -137,6 +137,9 @@ async function handleAsyncModifierTypes(actor, skill, mainModifierSkills, siblin
                 handleAsyncResults(s, v);
             });
             s.system.action.modifiers.resolve.target.value.filter(x => x.type === "async").forEach(v => {
+                handleAsyncResults(s, v);
+            });
+            s.system.action.tierDiceChange.value.filter(x => x.type === "async").forEach(v => {
                 handleAsyncResults(s, v);
             });
             s.system.action.modifiers.wounds.target.filter(w => w.value.filter(x => x.type === "async")).forEach(v => {
