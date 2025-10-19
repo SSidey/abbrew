@@ -1,0 +1,20 @@
+{
+  "type": "Item",
+  "folder": "uTeS8UYDafUHvN77",
+  "name": "Mastery",
+  "color": null,
+  "sorting": "a",
+  "_id": "yyQCG22WJiWG0uZo",
+  "description": "",
+  "sort": 0,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.346",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "lastModifiedBy": null
+  },
+  "_key": "!folders!yyQCG22WJiWG0uZo"
+}

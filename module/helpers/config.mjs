@@ -159,7 +159,9 @@ ABBREW.concepts = {
   pestilence: "ABBREW.Concepts.pestilence",
   conquest: "ABBREW.Concepts.conquest",
   rage: "ABBREW.Concepts.rage",
-  fear: "ABBREW.Concepts.fear"
+  fear: "ABBREW.Concepts.fear",
+  sin: "ABBREW.Concepts.sin",
+  virtue: "ABBREW.Concepts.virtue"
 }
 
 ABBREW.facing = {
@@ -336,12 +338,12 @@ ABBREW.wounds = {
   sin: {
     name: "ABBREW.Wounds.sin",
     lingeringWounds: ["corruption"],
-    concepts: ["corruption"]
+    concepts: ["sin"]
   },
   corruption: {
     name: "ABBREW.Wounds.corruption",
     lingeringWounds: [],
-    concepts: ["corruption"]
+    concepts: ["sin"]
   },
   suffering: {
     name: "ABBREW.Wounds.suffering",
@@ -382,6 +384,16 @@ ABBREW.wounds = {
     name: "ABBREW.Wounds.starvation",
     lingeringWounds: [],
     concepts: ["famine"]
+  },
+  virtue: {
+    name: "ABBREW.Wounds.virtue",
+    lingeringWounds: ["exaltation"],
+    concepts: ["virtue"]
+  },
+  exaltation: {
+    name: "ABBREW.Wounds.exaltation",
+    lingeringWounds: [],
+    concepts: ["virtue"]
   }
 }
 
@@ -799,6 +811,8 @@ const skillTraits = [
   { key: "offense", value: "ABBREW.Traits.Skill.offense", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
   { key: "defense", value: "ABBREW.Traits.Skill.defense", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
   { key: "fear", value: "ABBREW.Traits.Skill.fear", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "move", value: "ABBREW.Traits.Skill.move", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "attack", value: "ABBREW.Traits.Skill.attack", feature: "skill", subFeature: "identifiers", effect: "", data: "", exclude: [] },
 ]
 
 const materialTraits = [
@@ -846,6 +860,11 @@ ABBREW.traits = [
   ...ABBREW.innateConcepts
 ]
 
+ABBREW.flaggedTraits = [
+  "attack",
+  "move"
+]
+
 ABBREW.attackModes = {
   "attack": "ABBREW.AttackModes.attack",
   "feint": "ABBREW.AttackModes.feint",
@@ -880,7 +899,8 @@ ABBREW.fundamentalAttributeSkillIds = [
   "abbrewIntCheck00",
   "abbrewWitCheck00",
   "abbrewVisCheck00",
-  "abbrewWilCheck00"
+  "abbrewWilCheck00",
+  "abbrewTierCheck0"
 ]
 
 ABBREW.fundamentalAttributeSkillMap = {
@@ -892,6 +912,7 @@ ABBREW.fundamentalAttributeSkillMap = {
   "wit": { id: "abbrewWitCheck00", name: "Wits Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "wit" },
   "vis": { id: "abbrewVisCheck00", name: "Visualisation Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "vis" },
   "wil": { id: "abbrewWilCheck00", name: "Will Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "wil" },
+  "tier": { id: "abbrewTierCheck0", name: "Tier Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "" },
 }
 
 ABBREW.fundamentalAttributeSkills = {
@@ -903,6 +924,7 @@ ABBREW.fundamentalAttributeSkills = {
   "abbrewWitCheck00": { id: "abbrewWitCheck00", name: "Wits Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "wit" },
   "abbrewVisCheck00": { id: "abbrewVisCheck00", name: "Visualisation Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "vis" },
   "abbrewWilCheck00": { id: "abbrewWilCheck00", name: "Will Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "wil" },
+  "abbrewTierCheck0": { id: "abbrewTierCheck0", name: "Tier Check", image: "systems/abbrew/assets/icons/skills/attribute.svg", attribute: "" },
 }
 
 ABBREW.fundamentalAttributeSkillSummaries = [
@@ -913,7 +935,8 @@ ABBREW.fundamentalAttributeSkillSummaries = [
   { id: "abbrewIntCheck00", value: "Intelligence Check", sourceId: "Compendium.abbrew.skills.Item.abbrewIntCheck00" },
   { id: "abbrewWitCheck00", value: "Wits Check", sourceId: "Compendium.abbrew.skills.Item.abbrewWitCheck00" },
   { id: "abbrewVisCheck00", value: "Visualisation Check", sourceId: "Compendium.abbrew.skills.Item.abbrewVisCheck00" },
-  { id: "abbrewWilCheck00", value: "Will Check", sourceId: "Compendium.abbrew.skills.Item.abbrewWilCheck00" }
+  { id: "abbrewWilCheck00", value: "Will Check", sourceId: "Compendium.abbrew.skills.Item.abbrewWilCheck00" },
+  { id: "abbrewTierCheck0", value: "Tier Check", sourceId: "Compendium.abbrew.skills.Item.abbrewTierCheck0" }
 ]
 
 ABBREW.fundamentalAttackSkillSummaries = [
@@ -1072,7 +1095,8 @@ ABBREW.activeEffectKeys = [
   { value: "system.defense.threatened.multiplier", label: "ABBREW.Threatened.threatenedMultiplier" },
   { value: "system.defense.resolve.maxMod", label: "ABBREW.Defense.Resolve.max" },
   { value: "system.defense.resolve.maxMult", label: "ABBREW.Defense.Resolve.maxMult" },
-  { value: "system.defense.adjacentAllies", label: "ABBREW.ActiveEffectKeys.adjacentAllies" }
+  { value: "system.defense.adjacentAllies", label: "ABBREW.ActiveEffectKeys.adjacentAllies" },
+  { value: "system.magic.conceptCapacityBonus", label: "ABBREW.ActiveEffectKeys.conceptCapacityBonus" }
 ]
 
 ABBREW.speeds = {
@@ -1082,6 +1106,11 @@ ABBREW.speeds = {
   climb: { label: "ABBREW.Speeds.climb", },
   fly: { label: "ABBREW.Speeds.fly", },
   teleport: { label: "ABBREW.Speeds.teleport", }
+}
+
+ABBREW.skillIds = {
+  step: "jv5DDww4KxR8YbQK",
+  move: "ttDyhN1XtKKSjkXk"
 }
 
 ABBREW.visionModes = CONFIG.Canvas.visionModes;

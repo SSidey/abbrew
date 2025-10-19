@@ -8,6 +8,7 @@ import { trackEnhancementDuration } from "./ehancement-duration.mjs";
 export function shouldHandleEnhancement(targetItem, enhancementItem) {
     if ((targetItem.system.availableEnhancements < enhancementItem.system.cost) && !(["material", "form"].includes(enhancementItem.system.enhancementType))) {
         ui.notifications.info("You need to improve the quality of your item before adding more enhancements.");
+        return;
     }
 
     return enhancementItem.type === "enhancement" &&
@@ -33,7 +34,9 @@ export async function handleEnhancement(targetItem, actor, enhancementItem) {
 
         if (isEquipped(targetItem)) {
             const createdSkills = await handleSkillGrantOnCreation(enhancementItem, actor, targetItem);
-            await enhancement[0].update({ "system.grantedIds": createdSkills.map(s => s._id) });
+            if (createdSkills) {
+                await enhancement[0].update({ "system.grantedIds": createdSkills.map(s => s._id) });
+            }
         }
     } else {
         enhancement = [enhancementItem];
@@ -79,7 +82,7 @@ export function applyEnhancement(enhancement, actor, baseObject, isInverted) {
 
     const itemEnhancement = ({
         name: enhancement.name,
-        enhancementType: enhancement.system.type,
+        enhancementType: enhancement.system.enhancementType,
         id: enhancement._id,
         image: enhancement.img,
         uuid: enhancement.uuid,

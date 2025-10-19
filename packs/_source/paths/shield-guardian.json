@@ -10,7 +10,29 @@
       "value": "",
       "uuid": ""
     },
-    "roles": "[{\"label\":\"melee\",\"value\":\"Melee\",\"title\":\"You fight primarily in melee with your opponents.\"},{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"},{\"label\":\"protector\",\"value\":\"Protector\",\"title\":\"Your main role in combat is in reducing the damage dealt to your allies.\"},{\"label\":\"durable\",\"value\":\"Durable\",\"title\":\"You are capable of withstanding more abuse than most.\"}]"
+    "roles": "[{\"label\":\"melee\",\"value\":\"Melee\",\"title\":\"You fight primarily in melee with your opponents.\"},{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"},{\"label\":\"protector\",\"value\":\"Protector\",\"title\":\"Your main role in combat is in reducing the damage dealt to your allies.\"},{\"label\":\"durable\",\"value\":\"Durable\",\"title\":\"You are capable of withstanding more abuse than most.\"}]",
+    "skills": {
+      "initiate": [
+        {
+          "name": "Designate Charge",
+          "id": "0tyT24dLjUBztc0C",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.playerskills.Item.0tyT24dLjUBztc0C"
+        },
+        {
+          "name": "Stand Firm",
+          "id": "r3bnscx0aQjTUt47",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.playerskills.Item.r3bnscx0aQjTUt47"
+        },
+        {
+          "name": "Duty",
+          "id": "U3lWpCsnZ1FN3n56",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.playerskills.Item.U3lWpCsnZ1FN3n56"
+        }
+      ]
+    }
   },
   "effects": [],
   "folder": null,
@@ -25,7 +47,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746382248779,
-    "modifiedTime": 1754941961651,
+    "modifiedTime": 1756334107070,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

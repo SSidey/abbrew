@@ -11,7 +11,7 @@
     "meta": {
       "tier": 1
     },
-    "description": "<div><p>@L[ABBREW.Paths.Description.barbarian]</p></div>",
+    "description": "<div><p>@L[ABBREW.Paths.barbarian]</p></div>",
     "traits": {
       "raw": "",
       "value": []
@@ -67,11 +67,11 @@
   "_stats": {
     "duplicateSource": null,
     "exportSource": null,
-    "coreVersion": "13.346",
+    "coreVersion": "13.348",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1754680709486,
-    "modifiedTime": 1756253280215,
+    "modifiedTime": 1756581970586,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!abbrewpbarbarian"

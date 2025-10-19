@@ -1,8 +1,8 @@
-import { AbbrewItemBaseSheet } from '../generic/item-base-sheet.mjs';
+import { AbbrewPathSheet } from '../path/item-path-sheet.mjs';
 import { deletePath } from './actions/archetype-actions.mjs';
 import { ArchetypeTagsMixin } from './tags/archetype-tags.mjs';
 
-export class AbbrewArchetypeSheet extends ArchetypeTagsMixin(AbbrewItemBaseSheet) {
+export class AbbrewArchetypeSheet extends ArchetypeTagsMixin(AbbrewPathSheet) {
 
     static PARTS = {
         header: {
@@ -13,7 +13,7 @@ export class AbbrewArchetypeSheet extends ArchetypeTagsMixin(AbbrewItemBaseSheet
             template: "templates/generic/tab-navigation.hbs",
         },
         description: {
-            template: "systems/abbrew/templates/item/item/tabs/item-description.hbs",
+            template: "systems/abbrew/templates/item/path/tabs/path-description.hbs",
             scrollable: [""]
         },
         requirements: {

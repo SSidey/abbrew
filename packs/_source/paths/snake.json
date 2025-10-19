@@ -10,7 +10,7 @@
       "value": "",
       "uuid": ""
     },
-    "roles": "[{\"label\":\"melee\",\"value\":\"Melee\",\"title\":\"You fight primarily in melee with your opponents.\"},{\"label\":\"ranged\",\"value\":\"Ranged\",\"title\":\"You prefer to fight at a distance from your opponents.\"},{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"},{\"label\":\"scoundrel\",\"value\":\"Scoundrel\",\"title\":\"You are proficient in illicit skills, engaging in underhanded tactics.\"},{\"label\":\"vanguard\",\"value\":\"Vanguard\",\"title\":\"Your main role in combat is to bring down your enemies as quickly as possible.\"}]"
+    "roles": "[{\"label\":\"melee\",\"value\":\"Melee\",\"title\":\"You fight primarily in melee with your opponents.\"},{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"},{\"label\":\"scoundrel\",\"value\":\"Scoundrel\",\"title\":\"You are proficient in illicit skills, engaging in underhanded tactics.\"},{\"label\":\"vanguard\",\"value\":\"Vanguard\",\"title\":\"Your main role in combat is to bring down your enemies as quickly as possible.\"}]"
   },
   "effects": [],
   "folder": null,
@@ -25,7 +25,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746270039892,
-    "modifiedTime": 1754941969887,
+    "modifiedTime": 1756416314114,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

@@ -18,8 +18,9 @@
         <h3>Requirement {{key}}</h3>
         <div class="requirement-row">
             <span>Roles</span>
-            <input type="text" name="system.roleRequirements.{{key}}.roles" value="{{requirement.roles}}"
-                data-dtype="string" data-requirement-id="{{key}}" {{#unless (isGM)}}readonly{{/unless}} />
+            <input type="text" name="system.roleRequirements.{{key}}.roles" class="requirement"
+                value="{{requirement.roles}}" data-dtype="string" data-requirement-id="{{key}}" {{#unless
+                (isGM)}}readonly{{/unless}} />
         </div>
         <div class="requirement-row">
             <span>Restrictions</span>

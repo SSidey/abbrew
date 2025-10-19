@@ -13,7 +13,7 @@
       "value": "",
       "uuid": ""
     },
-    "roles": "[{\"label\":\"melee\",\"value\":\"Melee\",\"title\":\"You fight primarily in melee with your opponents.\"},{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"},{\"label\":\"vanguard\",\"value\":\"Vanguard\",\"title\":\"Your main role in combat is to bring down your enemies as quickly as possible.\"}]"
+    "roles": "[{\"label\":\"professional\",\"value\":\"Professional\",\"title\":\"You are skilled in a profession.\"},{\"label\":\"scoundrel\",\"value\":\"Scoundrel\",\"title\":\"You are proficient in illicit skills, engaging in underhanded tactics.\"}]"
   },
   "effects": [],
   "sort": 100000,
@@ -27,7 +27,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746223314773,
-    "modifiedTime": 1754941949747,
+    "modifiedTime": 1756416199870,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

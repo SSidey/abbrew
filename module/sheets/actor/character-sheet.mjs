@@ -18,6 +18,7 @@ import { ActorContextMixin } from './helpers/context/prepare-context.mjs';
 import { openBrowser, openPathBrowser } from '../helpers/browser-actions.mjs';
 import { changeConceptValue } from './helpers/actions/concept-actions.mjs';
 import { _onDisplayPathAction, displayPath } from './helpers/actions/path-actions.mjs';
+import { handleMove, handleStep } from './helpers/actions/header-actions.mjs';
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
 
@@ -84,6 +85,8 @@ export class AbbrewCharacterSheet extends DragDropMixin(ActorTagsMixin(ActorCont
       changeConceptValue: changeConceptValue,
       displayArchetype: displayArchetype,
       displayPath: { handler: _onDisplayPathAction, buttons: [0, 2] },
+      headerStep: handleStep,
+      headerMove: handleMove,
     }
   }
 

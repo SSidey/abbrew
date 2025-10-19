@@ -174,7 +174,8 @@
         "parryCounter": "Parry Counter Training",
         "feintCounter": "Feint Counter Training"
       },
-      "adjacentAllies": "Adjacent Allies"
+      "adjacentAllies": "Adjacent Allies",
+      "conceptCapacityBonus": "Concept Capacity Bonus"
     },
     "Roles": {
       "Name": {
@@ -393,7 +394,9 @@
       "pestilence": "Pestilence",
       "conquest": "Conquest",
       "rage": "Rage",
-      "fear": "Fear"
+      "fear": "Fear",
+      "sin": "Sin",
+      "virtue": "Virtue"
     },
     "Facing": {
       "front": "front",
@@ -520,7 +523,9 @@
       "torment": "Torment",
       "anguish": "Anguish",
       "hunger": "Hunger",
-      "starvation": "Starvation"
+      "starvation": "Starvation",
+      "virtue": "Virtue",
+      "exaltation": "Exaltation"
     },
     "EFFECT": {
       "Status": {
@@ -734,7 +739,9 @@
         "misfortune": "Misfortune",
         "offense": "Offense",
         "defense": "Defense",
-        "fear": "Fear"
+        "fear": "Fear",
+        "move": "Move",
+        "attack": "Attack"
       },
       "stance": "Stance",
       "Spell": {
@@ -1106,7 +1113,48 @@
         },
         "andDeactivateWith": {
           "label": "And Deactivate With"
+        },
+        "deactivateWith": {
+          "label": "Deactivate With"
         }
+      },
+      "activateIfFlaggedTrait": {
+        "current": {
+          "label": "Activatable if skill with trait has been used this turn"
+        },
+        "restrictedCurrent": {
+          "label": "Can not be activated if skill with trait has been used this turn"
+        },
+        "last": {
+          "label": "Activatable if skill with trait was used last turn"
+        },
+        "restrictedLast": {
+          "label": "Can not be activated if skill with trait was used last turn"
+        }
+      },
+      "isActivatable": {
+        "label": "Activatable"
+      },
+      "activateOnCreate": {
+        "label": "Activate on Create"
+      },
+      "activateTurnStart": {
+        "label": "Activate at Turn Start"
+      },
+      "activateTurnEnd": {
+        "label": "Activate at Turn End"
+      },
+      "applyTurnStart": {
+        "label": "Apply Start of Turn"
+      },
+      "applyTurnEnd": {
+        "label": "Apply End of Turn"
+      },
+      "applyOnExpiry": {
+        "label": "Apply On Expiry"
+      },
+      "activateOnDamageAccept": {
+        "label": "Activate On Damage Accept"
       },
       "aura": {
         "isAura": {

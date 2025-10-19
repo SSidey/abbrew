@@ -13,7 +13,7 @@
       "value": "",
       "uuid": ""
     },
-    "roles": "[{\"label\":\"melee\",\"value\":\"Melee\",\"title\":\"You fight primarily in melee with your opponents.\"},{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"},{\"label\":\"vanguard\",\"value\":\"Vanguard\",\"title\":\"Your main role in combat is to bring down your enemies as quickly as possible.\"}]"
+    "roles": "[{\"label\":\"acolyte\",\"value\":\"Acolyte\",\"title\":\"You derive your abilities from a higher power.\"},{\"label\":\"ranged\",\"value\":\"Ranged\",\"title\":\"You prefer to fight at a distance from your opponents.\"},{\"label\":\"magic\",\"value\":\"Magic\",\"title\":\"You primarily harness magic to combat your foes.\"},{\"label\":\"healer\",\"value\":\"Healer\",\"title\":\"You are well acquainted with fixing up the party after a fight.\"}]"
   },
   "effects": [],
   "sort": 100000,
@@ -27,7 +27,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746223314773,
-    "modifiedTime": 1754941949747,
+    "modifiedTime": 1756416182991,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

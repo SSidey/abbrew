@@ -130,7 +130,7 @@ export default class AbbrewPhysicalItem extends AbbrewItemBase {
             this.storage.traitFilter.value = [];
         }
         // 1 (Material) + Bonus from quality
-        this.availableEnhancements = this.meta.quality - this.enhancements.reduce((result, enhancement) => result += enhancement.cost, 0);
+        this.availableEnhancements = this.meta.quality - this.enhancements.filter(e => !["material", "form"].includes(e.enhancementType)).reduce((result, enhancement) => result += enhancement.cost, 0);
         this.prepareStorageValue();
 
         if (this.revealed.revealSkills.raw) {

@@ -1,6 +1,7 @@
 # Abbrew System
 
 # TODO
+Skill drop that grants enhancements when items are created?
 
 Check requests with success / failure section for granted skills?
 

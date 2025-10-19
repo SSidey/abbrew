@@ -16,6 +16,12 @@ export function getAttackSkillWithActions(id, name, traits, actionCost, image, a
 
     const system = AbbrewSkill.schema.getInitialValue();
     system.traits = getSafeJson(traits, []);
+    const attackTrait = CONFIG.ABBREW.traits.find(t => t.key === "attack");
+    attackTrait.value = game.i18n.localize(attackTrait.value);
+    const offenseTrait = CONFIG.ABBREW.traits.find(t => t.key === "offense");
+    offenseTrait.value = game.i18n.localize(offenseTrait.value);
+    system.traits.push(attackTrait);
+    system.traits.push(offenseTrait);
     system.abbrewId = { uuid: id ?? skill.id };
     system.siblingSkillModifiers = siblingSkillModifiers;
     system.isActivatable = true;
@@ -43,6 +49,9 @@ export function getParrySkillWithActions(actionCost, siblingSkillModifiers = [])
     system.action.activationType = "standalone";
     system.action.actionCost = Math.max(1, actionCost);
     system.action.actionImage = skill.image;
+    const defenseTrait = CONFIG.ABBREW.traits.find(t => t.key === "defense");
+    defenseTrait.value = game.i18n.localize(defenseTrait.value);
+    system.traits = [defenseTrait]
 
     return ({
         _id: skill.id,

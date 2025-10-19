@@ -13,7 +13,7 @@
       "value": "",
       "uuid": ""
     },
-    "roles": "[{\"label\":\"melee\",\"value\":\"Melee\",\"title\":\"You fight primarily in melee with your opponents.\"},{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"},{\"label\":\"vanguard\",\"value\":\"Vanguard\",\"title\":\"Your main role in combat is to bring down your enemies as quickly as possible.\"}]"
+    "roles": "[{\"label\":\"melee\",\"value\":\"Melee\",\"title\":\"You fight primarily in melee with your opponents.\"},{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"},{\"label\":\"durable\",\"value\":\"Durable\",\"title\":\"You are capable of withstanding more abuse than most.\"},{\"label\":\"vanguard\",\"value\":\"Vanguard\",\"title\":\"Your main role in combat is to bring down your enemies as quickly as possible.\"}]"
   },
   "effects": [],
   "sort": 100000,
@@ -27,7 +27,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746223314773,
-    "modifiedTime": 1754941949747,
+    "modifiedTime": 1756416344027,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

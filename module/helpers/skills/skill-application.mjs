@@ -232,6 +232,8 @@ export async function applySkillEffects(actor, skill, includeTraits = []) {
     const [mainSummary, modifierSummaries] = getSkillSummaries(skill, modifierSkills);
     const skillTraits = getSkillTraits(skill, modifierSkills);
 
+    await handleFlaggedTraits(actor, skillTraits);
+
     templateData = {
         ...templateData,
         sources: skill.system.sources,
@@ -276,4 +278,14 @@ export async function applySkillEffects(actor, skill, includeTraits = []) {
     await checkForTemporarySkillExpiry(skill, actor);
 
     return skillResult;
+}
+
+async function handleFlaggedTraits(actor, traits) {
+    if (!(game.combat && game.combat.isActive)) {
+        return;
+    }
+
+    const flaggedTraits = traits.map(t => t.key);
+    const flagPromises = flaggedTraits.map(t => actor.setFlag("abbrew", `combat.traits.current.${t}`, true));
+    await Promise.all(flagPromises);
 }

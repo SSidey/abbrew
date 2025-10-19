@@ -18,9 +18,4 @@ export default class AbbrewPath extends AbbrewItemBase {
 
         return schema;
     }
-
-    // Post Active Effects
-    prepareDerivedData() {
-        super.prepareDerivedData();
-    }
 }

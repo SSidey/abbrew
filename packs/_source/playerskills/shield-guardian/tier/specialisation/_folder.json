@@ -1,0 +1,20 @@
+{
+  "type": "Item",
+  "folder": "uTeS8UYDafUHvN77",
+  "name": "Specialisation",
+  "color": null,
+  "sorting": "a",
+  "_id": "vxMXQWV43obY35yE",
+  "description": "",
+  "sort": 0,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.346",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "lastModifiedBy": null
+  },
+  "_key": "!folders!vxMXQWV43obY35yE"
+}

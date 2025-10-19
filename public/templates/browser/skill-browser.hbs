@@ -6,29 +6,47 @@
             <div class="browser-search">
                 <div>
                     <h3>Skills</h3>
-                    <h4>Traits</h4>
-                    <input type="text" class="search-filter" name="traits" data-dtype="String" />
-                    <h4>Min Rank</h4>
-                    <input type="number" min="1" max="10" step="1">
-                    <h4>Max Rank</h4>
-                    <input type="number" min="1" max="10" step="1">
+                    <div class="flexrow">
+                        <h4>Path Only</h4>
+                        <input type="checkbox" class="search-filter" name="path">
+                    </div>
+                    <div class="flexrow">
+                        <h4>Roles</h4>
+                        <input type="text" class="search-filter" name="roles" data-dtype="String" />
+                    </div>
+                    <div class="flexrow">
+                        <h4>Traits</h4>
+                        <input type="text" class="search-filter" name="traits" data-dtype="String" />
+                    </div>
+                    <div class="flexrow">
+                        <h4>Min Rank</h4>
+                        <input type="number" class="search-filter" name="min-rank" value={{searchValues.minRank}}
+                            min="1" max="10" step="1">
+                    </div>
+                    <div class="flexrow">
+                        <h4>Max Rank</h4>
+                        <input type="number" class="search-filter" name="max-rank" value={{searchValues.maxRank}}
+                            min="1" max="10" step="1">
+                    </div>
                 </div>
             </div>
-            <div class="browser-results">
-                <ol style="list-style:none; padding-left:0px; overflow:scroll">
-                    {{#each skills as |skill|}}
-                    <li class="skill" data-id="{{skill.id}}" data-roles='{{skill.jsonRoles}}'
-                        data-action="renderSkillSheet">
-                        <div class="image-container"><img src="{{skill.img}}" /></div>
-                        <div class="name"><span>{{skill.name}}</span></div>
-                        <div class="description"><span>{{skill.description}}</span></div>
-                        <a class="item-control" data-action="renderSkillSheet" title="Open">
-                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                        </a>
-                    </li>
-                    {{/each}}
-                </ol>
-            </div>
+            <section class="result-scroll scrollable" style="max-height:65vh;">
+                <div class="browser-results">
+                    <ol style="list-style:none; padding-left:0px;">
+                        {{#each skills as |skill|}}
+                        <li class="skill" data-id="{{skill.id}}" data-roles='{{skill.jsonRoles}}'
+                            data-rank="{{skill.rank}}" data-traits='{{skill.traits}}' data-action="renderSkillSheet">
+                            <div class="image-container"><img src="{{skill.img}}" /></div>
+                            <div class="name"><span>{{skill.name}}</span></div>
+                            <div class="description"><span>{{skill.description}}</span></div>
+                            <a class="item-control" data-action="renderSkillSheet" title="Open">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </a>
+                        </li>
+                        {{/each}}
+                    </ol>
+                </div>
+            </section>
         </div>
     </div>
 </form>

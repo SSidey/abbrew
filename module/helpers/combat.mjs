@@ -1,5 +1,6 @@
 import { mergeModifierFields, parseModifierFieldValue } from "./modifierBuilderFieldHelpers.mjs";
 import { applyOperator, getOrderForOperator } from "./operators.mjs";
+import { handleSkillActivate } from "./skills/skill-activation.mjs";
 import { applySkillEffects } from "./skills/skill-application.mjs";
 import { checkAndExpire } from "./skills/skill-expiry.mjs";
 import { handleSkillsGrantedByAura } from "./skills/skill-grants.mjs";
@@ -12,7 +13,8 @@ export async function handleCombatStart(actors) {
 }
 
 export async function handleCombatEnd(actors) {
-    actors.forEach(a => {
+    // TODO: Check here if async wonkiness
+    actors.forEach(async a => {
         const actorSkills = a.items.filter(i => i.type === "skill");
         const combatDurationSkills = actorSkills.filter(s => s.system.action.isActive && s.system.action.duration.precision === "-2").map(s => s._id);
         const effects = a.effects.filter(e => e.flags.abbrew?.skill?.trackDuration && combatDurationSkills.includes(e.flags.abbrew.skill.trackDuration));
@@ -22,6 +24,8 @@ export async function handleCombatEnd(actors) {
             const update = s.system.action.uses.max;
             await s.update({ "system.action.uses.value": update });
         });
+        await actor.unsetFlag("abbrew", "combat.traits.last");
+        await actor.unsetFlag("abbrew", "combat.traits.current");
     });
 }
 
@@ -188,9 +192,10 @@ export function getTokenCenter(x, y, elevation, { width, height }, size) {
 }
 
 export async function handleThreat(document, tokenPosition, tokenCenter) {
-    await handleThreatForActor(document, tokenCenter, canvas.tokens.placeables);
-    await handleAdjacentAlliesForActor(document, tokenCenter, canvas.tokens.placeables);
-    await handleAurasForActor(document, tokenCenter, canvas.tokens.placeables);
+    const otherTokens = canvas.tokens.placeables.filter(t => t.id !== document.object.id);
+    await handleThreatForActor(document, tokenCenter, otherTokens);
+    await handleAdjacentAlliesForActor(document, tokenCenter, otherTokens);
+    await handleAurasForActor(document, tokenCenter, otherTokens);
     const otherTokensForAdjustment = canvas.tokens.placeables.filter(t => t.document !== document);
     const movedDocument = new AbbrewMovedToken(document.actor, tokenCenter, document.disposition, document.width, document._id);
     movedDocument.x = tokenPosition.x;
@@ -250,7 +255,7 @@ async function handleAurasForActor(document, tokenCenter, otherTokens) {
         return;
     }
 
-    const fullTokenArray = [document, ...otherTokens];
+    const fullTokenArray = [document.object, ...otherTokens];
 
     const auras = document.actor.items.filter(i => i.type === "skill").filter(s => s.system.aura.isAura);
     const aurasWithTargets = auras.map(a => ({ aura: a, targets: doesEmanationAffectToken(a, document, tokenCenter, otherTokens) }));
@@ -270,7 +275,7 @@ async function handleAurasForActor(document, tokenCenter, otherTokens) {
         for (const unaffectedIndex in unaffectedTokens) {
             const actor = unaffectedTokens[unaffectedIndex].actor;
             if (actor) {
-                const skills = actor.items.filter(i => i.type === "skill").filter(s => s.system.grantedBy.item === aura._id && s.system.grantedBy.actor === document.actor._id && s.system.grantedBy.token === document._id);
+                const skills = actor.items.filter(i => i.type === "skill").filter(s => s.system.grantedBy.item === aura._id && s.system.grantedBy.actor === document.actor._id && s.system.grantedBy.token === document.object.id);
                 if (skills.length > 0) {
                     skills.forEach(s => promises.push(checkAndExpire(actor, s)));
                 }
@@ -283,10 +288,19 @@ async function handleAurasForActor(document, tokenCenter, otherTokens) {
 
 function doesEmanationAffectToken(aura, document, tokenCenter, otherTokens) {
     const auraAffects = aura.system.aura.affects;
-    const auraGrantedBy = aura.system.grantedBy.token ?? document._id;
+    const auraSkillGrantedBy = aura.system.grantedBy.token;
+    const auraGrantedBy = auraSkillGrantedBy.length > 0 ? auraSkillGrantedBy : document.object.id;
     const availableTargets = filterAuraTargets(auraAffects, auraGrantedBy, document, otherTokens);
-    const targetsInEmanation = availableTargets.filter(t => isTokenWithinEmanation(tokenCenter, document.height, t.getCenterPoint(), t.document.width, aura.system.aura.emanationSize))
+    const targetsInEmanation = availableTargets.filter(t => isTokenAffectedByOwnAura(t, auraAffects, auraGrantedBy) || isTokenWithinEmanation(tokenCenter, document.height, t.getCenterPoint(), t.document.width, aura.system.aura.emanationSize))
     return targetsInEmanation;
+}
+
+function isTokenAffectedByOwnAura(token, auraAffects, auraGrantedBy) {
+    if (![3, 4].includes(auraAffects)) {
+        return false;
+    }
+
+    return token.id === auraGrantedBy;
 }
 
 function filterAuraTargets(auraAffects, auraGrantedBy, document, otherTokens) {
@@ -299,9 +313,9 @@ function filterAuraTargets(auraAffects, auraGrantedBy, document, otherTokens) {
         case 2:
             return otherTokens.filter(t => t.document.disposition === sourceDisposition);
         case 3:
-            return [...otherTokens.filter(t => t.document.disposition === sourceDisposition), document.token];
+            return [...otherTokens.filter(t => t.document.disposition === sourceDisposition), document.object];
         case 4:
-            return [document.token, ...otherTokens];
+            return [document.object, ...otherTokens];
         case 5:
             return [otherTokens.find(t => t.document._id === auraGrantedBy)];
         default:
@@ -335,7 +349,14 @@ async function setActorToOffGuard(actor) {
 async function turnEnd(actor) {
     // TODO: Conditions could modify this?
     await actor.unsetFlag("abbrew", "combat.damage.lastRoundReceived")
+    await actor.unsetFlag("abbrew", "combat.traits.last");
+    const currentFlaggedTraits = actor.flags.abbrew?.combat?.traits?.current ?? {};
+    await actor.unsetFlag("abbrew", "combat.traits.current");
+    if (Object.keys(currentFlaggedTraits).length > 0) {
+        await actor.setFlag("abbrew", "combat.traits.last", currentFlaggedTraits);
+    }
     await applyActiveSkills(actor, "end");
+    await activateSkillsForTurnPhase(actor, "end");
     // TODO: Determine if we can remove this, time should handle it.
     // await handleSkillExpiry("end", actor);
     await checkForDistraction(actor);
@@ -437,6 +458,7 @@ async function turnStart(actor) {
 
     await handleSkillToRounds(actor);
     await applyActiveSkills(actor, "start");
+    await activateSkillsForTurnPhase(actor, "start");
     // TODO: Determine if we can remove this, time should handle it.
     // await handleSkillExpiry("start", actor);
     await updateTurnStartWounds(actor);
@@ -555,6 +577,27 @@ async function applyActiveSkills(actor, turnPhase) {
 
     for (const index in activeSkills) {
         await applySkillEffects(actor, activeSkills[index]);
+    }
+}
+
+async function activateSkillsForTurnPhase(actor, turnPhase) {
+    if (!(turnPhase && ["start", "end"].includes(turnPhase))) {
+        return;
+    }
+
+    let activeSkills = [];
+    if (turnPhase === "start") {
+        activeSkills = [
+            ...actor.items.filter(i => i.type === "skill").filter(s => s.system.isActivatable && s.system.activateTurnStart)
+        ];
+    } else if (turnPhase === "end") {
+        activeSkills = [
+            ...actor.items.filter(i => i.type === "skill").filter(s => s.system.isActivatable && s.system.activateTurnEnd)
+        ];
+    }
+
+    for (const index in activeSkills) {
+        await handleSkillActivate(actor, activeSkills[index], false);
     }
 }
 

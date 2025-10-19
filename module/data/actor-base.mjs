@@ -281,7 +281,8 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     schema.momentum = new fields.NumberField({ ...requiredInteger, initial: 0 });
 
     schema.magic = new fields.SchemaField({
-      conceptCapacity: new fields.NumberField({ ...requiredInteger, initial: 0 })
+      conceptCapacity: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+      conceptCapacityBonus: new fields.NumberField({ ...requiredInteger, initial: 0 })
     });
 
     schema.modifiers = new fields.SchemaField({
@@ -356,7 +357,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     const mappedTraining = Object.entries(skillTraining).map(e => ({ type: e[0], value: e[1] }));
     this.skillTraining = foundry.utils.mergeObject(this.skillTraining, mappedTraining);
 
-    this.magic.conceptCapacity = this.attributes.vis.value;
+    this.magic.conceptCapacity = 1 + this.attributes.vis.value + this.magic.conceptCapacityBonus;
 
     this._limitResourceValues();
 

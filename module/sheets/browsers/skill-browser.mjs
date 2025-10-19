@@ -2,11 +2,17 @@ import Tagify from "@yaireo/tagify";
 // import { getSafeJson } from "../../helpers/utils.mjs";
 import { DragDropMixin } from "../helpers/drag-drop-mixin.mjs";
 import { SearchMixin } from "../helpers/search-mixin.mjs";
+import { getSafeJson } from "../../helpers/utils.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-export class SkillBrowser extends SearchMixin(DragDropMixin(HandlebarsApplicationMixin(ApplicationV2))) {
+export class SkillBrowser extends DragDropMixin(HandlebarsApplicationMixin(ApplicationV2)) {
     static DEFAULT_OPTIONS = {
+        tag: "form",
+        form: {
+            submitOnChange: false,
+            closeOnSubmit: false
+        },
         actions: {
             renderSkillSheet: SkillBrowser.renderSkillSheet
         },
@@ -21,13 +27,16 @@ export class SkillBrowser extends SearchMixin(DragDropMixin(HandlebarsApplicatio
 
     static PARTS = {
         browser: {
-            template: "systems/abbrew/templates/browser/skill-browser.hbs"
+            template: "systems/abbrew/templates/browser/skill-browser.hbs",
+            scrollable: [".result-scroll"]
         }
     }
 
-    constructor(validSkills) {
+    constructor(validSkills, validRoles, pathId) {
         super();
         this.validSkills = validSkills;
+        this.pathId = pathId;
+        this.validRoles = validRoles
     }
 
     async _prepareContext(options) {
@@ -38,11 +47,18 @@ export class SkillBrowser extends SearchMixin(DragDropMixin(HandlebarsApplicatio
                 name: v.name,
                 img: v.img,
                 id: v.id,
-                description: game.i18n.localize(`ABBREW.Skills.${v.name.replace(/\s+/g, "").toLowerCase()}`) ?? ""
+                description: game.i18n.localize(`ABBREW.Skills.${v.name.replace(/\s+/g, "").toLowerCase()}`) ?? "",
+                rank: v.system.rank,
+                traits: JSON.stringify(getSafeJson(v.system.traits.raw, []).map(t => t.key))
             })
         }))
 
         context.traits = CONFIG.ABBREW.traits;
+        context.roles = CONFIG.ABBREW.roles;
+        context.searchValues = {
+            minRank: 1,
+            maxRank: 1
+        }
 
         return context;
     }
@@ -76,8 +92,14 @@ export class SkillBrowser extends SearchMixin(DragDropMixin(HandlebarsApplicatio
     _onRender(context, options) {
         super._onRender(context, options);
         this.bindDragDrops();
+        this.bindSearchValues();
         this._activateTraits(context.traits);
-        // this.registerSearch('input[name="system.roles.raw"]', "[data-application-part=browser]");
+        this._activateRoles(context.roles);
+    }
+
+    bindSearchValues() {
+        const searchFilters = this.element.querySelectorAll('input.search-filter');
+        searchFilters.forEach(sf => sf.addEventListener('change', this._onSearchFilter.bind(this)));
     }
 
     _activateTraits() {
@@ -96,18 +118,37 @@ export class SkillBrowser extends SearchMixin(DragDropMixin(HandlebarsApplicatio
                 ...trait,
                 value: game.i18n.localize(trait.value)
             }))],
-            enforceWhitelist: true,
-            onChange: this.onChange
+            enforceWhitelist: true
         };
         if (traits) {
             var taggedTraits = new Tagify(traits, settings);
-            traits.addEventListener('change', this.onChange.bind(this));
         }
     }
 
-    onChange(e) {
-        // outputs a String
-        // this.search.filter(null, e.target.value);
+    _activateRoles() {
+        const roles = this.element.querySelector('input[name="roles"]');
+        const settings = {
+            dropdown: {
+                maxItems: 20,               // <- mixumum allowed rendered suggestions
+                classname: "tags-look",     // <- custom classname for this dropdown, so it could be targeted
+                enabled: 0,                 // <- show suggestions on focus
+                closeOnSelect: false,       // <- do not hide the suggestions dropdown once an item has been selected
+                includeSelectedTags: false   // <- Should the suggestions list Include already-selected tags (after filtering)
+            },
+            userInput: true,             // <- Disable manually typing/pasting/editing tags (tags may only be added from the whitelist). Can also use the disabled attribute on the original input element. To update this after initialization use the setter tagify.userInput
+            duplicates: true,             // <- Should duplicate tags be allowed or not
+            whitelist: [...Object.values(CONFIG.ABBREW.roles).filter(r => this.validRoles.includes(r.value)).map(role => ({
+                label: role.value,
+                value: game.i18n.localize(role.label),
+                title: game.i18n.localize(role.description)
+            }))],
+            enforceWhitelist: true,
+            onChange: this.onChange
+        };
+        if (roles) {
+            var taggedRoles = new Tagify(roles, settings);
+            roles.addEventListener('change', this._onSearchFilter.bind(this));
+        }
     }
 
     static async renderSkillSheet(event, target) {
@@ -117,12 +158,28 @@ export class SkillBrowser extends SearchMixin(DragDropMixin(HandlebarsApplicatio
         await skill.sheet.render(true);
     }
 
-    // _onSearchFilter(event, query, rgx, html) {
-    //     const querySet = new Set(getSafeJson(query, []).map(q => q.label));
-    //     html.querySelectorAll("li.skill").forEach(a => {
-    //         const dataset = a.dataset;
-    //         const requiredRoles = new Set(getSafeJson(dataset.jsonRoles, []));
-    //         a.hidden = (!requiredRoles.isSupersetOf(querySet))
-    //     })
-    // }
+    _onSearchFilter() {
+        const traitsRaw = getSafeJson(this.element.querySelector("input[name=traits]").value, []);
+        const traits = traitsRaw.length === 0 ? new Set() : new Set(traitsRaw.map(t => t.key));
+        const rolesRaw = getSafeJson(this.element.querySelector("input[name=roles]").value, []);
+        const roles = rolesRaw.length === 0 ? new Set() : new Set(rolesRaw.map(t => t.label));
+        const minRankRaw = this.element.querySelector("input[name=min-rank]").value;
+        const minRank = minRankRaw.length === 0 ? 1 : parseInt(minRankRaw);
+        const maxRankRaw = this.element.querySelector("input[name=max-rank]").value;
+        const maxRank = maxRankRaw.length === 0 ? 1 : parseInt(maxRankRaw);
+        const pathFilter = this.element.querySelector("input[name=path]").checked;
+        const filteredSkills = this.validSkills
+            .filter(s => !pathFilter || s.system.path.value.id === this.pathId)
+            .filter(s => new Set(s.system.roles.parsed).isSupersetOf(roles))
+            .filter(s => new Set(s.system.traits.value.map(v => v.key)).isSupersetOf(traits))
+            .filter(s => s.system.rank >= minRank)
+            .filter(s => s.system.rank <= maxRank)
+            .map(s => s._id);
+
+        this.element.querySelectorAll("li.skill").forEach(a => {
+            const dataset = a.dataset;
+            const id = dataset.id;
+            a.hidden = !filteredSkills.includes(id);
+        })
+    }
 }

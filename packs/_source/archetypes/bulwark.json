@@ -4,7 +4,7 @@
   "_id": "TVO0gpc8AY5WBpY8",
   "img": "icons/svg/item-bag.svg",
   "system": {
-    "description": "<p><span style=\"font-family: Arial,sans-serif\">A selfless fighting style, one where you put yourself in harm's way to shield your allies and prevent your enemies from reaching them.</span></p>",
+    "description": "<p>A selfless fighting style, one where you put yourself in harm's way to shield your allies and prevent your enemies from reaching them.</p>",
     "traits": "",
     "abbrewId": {
       "value": "",
@@ -89,11 +89,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.346",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746215931168,
-    "modifiedTime": 1746381422956,
+    "modifiedTime": 1756504498908,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

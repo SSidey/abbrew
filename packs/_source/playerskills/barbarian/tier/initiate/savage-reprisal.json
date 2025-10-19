@@ -14,7 +14,7 @@
     },
     "description": "<p>Trigger: You are targeted by an attack</p><hr><p>Every blow you take stokes the fire inside you, and every insult is answered with steel.</p><hr><p>Spend 1 Tier Die as a reaction when you are targeted by an attack.</p><p>Immediately make a free melee attack against the attacker.</p><p>Usable once per round.</p>",
     "traits": {
-      "raw": "",
+      "raw": "[{\"key\":\"offense\",\"value\":\"Offense\",\"feature\":\"skill\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]",
       "value": []
     },
     "abbrewId": {
@@ -557,11 +557,11 @@
   "_stats": {
     "duplicateSource": null,
     "exportSource": null,
-    "coreVersion": "13.346",
+    "coreVersion": "13.348",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1756252862910,
-    "modifiedTime": 1756253896458,
+    "modifiedTime": 1756582028583,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!Iz2ZJ8xNtO22caRn"

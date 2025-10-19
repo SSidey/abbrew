@@ -25,6 +25,6 @@ export const SearchMixin = superclass => class extends superclass {
 
     _tearDown(options) {
         super._tearDown(options);
-        this.search.unbind();
+        this.search?.unbind();
     }
 }

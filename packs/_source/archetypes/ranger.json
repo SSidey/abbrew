@@ -11,7 +11,7 @@
     "meta": {
       "tier": 1
     },
-    "description": "<p>@L[ABBREW.Archetypes.Ranger]</p>",
+    "description": "<p>@L[ABBREW.Archetypes.ranger]</p>",
     "traits": {
       "raw": "",
       "value": []
@@ -109,7 +109,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1755042852336,
-    "modifiedTime": 1755042936559,
+    "modifiedTime": 1756506841328,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!spfpJBnVvkhwab6B"

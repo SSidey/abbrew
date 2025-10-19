@@ -17,6 +17,7 @@ export async function handleSkillsGrantedOnAccept(data, actor, source) {
     await handleSkillGrants(data.skillsGrantedOnAccept, actor, source, actor, token);
 }
 
+// skillUpdates includes e.g. asyncValues for use in granted skills successes/failures
 export async function handleSkillsGrantedOnCheck(skills, actor, source, sourceActor, sourceToken, skillUpdates) {
     await handleSkillGrants(skills, actor, source, sourceActor, sourceToken, skillUpdates);
 }

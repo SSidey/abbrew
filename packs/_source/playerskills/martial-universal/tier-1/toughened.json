@@ -217,10 +217,18 @@
       "disabled": false,
       "_id": "37KoTgQsZ8nn4AqJ",
       "type": "base",
-      "system": {},
+      "system": {
+        "modifiers": [
+          {
+            "parseMode": "numeric",
+            "numerator": null,
+            "denominator": null
+          }
+        ]
+      },
       "changes": [
         {
-          "key": "system.defense.resolve.max",
+          "key": "[{\"value\":\"Maximum Resolve\",\"label\":\"system.defense.resolve.maxMod\"}]",
           "mode": 1,
           "value": "1.5",
           "priority": null
@@ -254,12 +262,12 @@
       "_stats": {
         "compendiumSource": null,
         "duplicateSource": null,
-        "coreVersion": "13.345",
+        "coreVersion": "13.346",
         "systemId": "abbrew",
         "systemVersion": "0.0.2-prerelease31",
         "createdTime": null,
-        "modifiedTime": null,
-        "lastModifiedBy": null,
+        "modifiedTime": 1756334290222,
+        "lastModifiedBy": "abbrewpacks00000",
         "exportSource": null
       },
       "_key": "!items.effects!TeyM5fQxVSTbqKCI.37KoTgQsZ8nn4AqJ"

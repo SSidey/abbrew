@@ -1,0 +1,21 @@
+{
+  "type": "Item",
+  "folder": "V8yHC5vGtMPjyhy7",
+  "name": "Mastery",
+  "color": null,
+  "sorting": "a",
+  "_id": "arGnQKQQ5tyqTOv1",
+  "description": "",
+  "sort": 0,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.348",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "lastModifiedBy": "abbrewpacks00000",
+    "modifiedTime": 1756584766483
+  },
+  "_key": "!folders!arGnQKQQ5tyqTOv1"
+}

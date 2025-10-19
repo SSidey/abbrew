@@ -8,7 +8,7 @@ export const ArchetypeTagsMixin = superclass => class extends superclass {
 
     _activateRoles() {
         // TODO: Add to collection as with resources input[name^="system.roleRequirements."].
-        const roles = this.element.querySelectorAll('input[name$=".roles"]');
+        const roles = this.element.querySelectorAll('input[name$=".roles"].requirement');
         const restrictedRoles = this.element.querySelectorAll('input[name$=".restrictedRoles"]');
         const allRoles = [...Object.values(CONFIG.ABBREW.roles).map(role => ({
             label: role.value,

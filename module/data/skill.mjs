@@ -35,7 +35,8 @@ export default class AbbrewSkill extends AbbrewItemBase {
             requiredActiveSkills: new fields.StringField({ ...blankString }),
             requiredTraits: new fields.StringField({ ...blankString }),
             activateWith: new fields.StringField({ ...blankString }),
-            andDeactivateWith: new fields.BooleanField({ required: true, initial: false })
+            andDeactivateWith: new fields.BooleanField({ required: true, initial: false }),
+            deactivateWith: new fields.StringField({ ...blankString }),
         });
         schema.skillModifiers = new fields.SchemaField({
             synergy: new fields.StringField({ ...blankString }),
@@ -72,10 +73,18 @@ export default class AbbrewSkill extends AbbrewItemBase {
         schema.renderUnique = new fields.BooleanField({ required: true, initial: false });
         schema.isFavourited = new fields.BooleanField({ required: true, initial: false });
         schema.isActivatable = new fields.BooleanField({ required: true, initial: false, label: "ABBREW.IsActivatable" });
+        schema.activateTurnStart = new fields.BooleanField({ required: true, initial: false });
+        schema.activateTurnEnd = new fields.BooleanField({ required: true, initial: false });
         schema.activateOnCreate = new fields.BooleanField({ required: true, initial: false });
         schema.applyTurnStart = new fields.BooleanField({ required: true, initial: false });
         schema.applyTurnEnd = new fields.BooleanField({ required: true, initial: false });
         schema.applyOnExpiry = new fields.BooleanField({ required: true, initial: false });
+        schema.activateIfFlaggedTrait = new fields.SchemaField({
+            current: new fields.StringField({ ...blankString }), // If the trait was present on a skill just used, this can be activated.})
+            restrictedCurrent: new fields.StringField({ ...blankString }), // If the trait was not present on a skill used this turn, this can be activated.
+            last: new fields.StringField({ ...blankString }), // If the trait was present on a skill used last turn, this can be activated.})
+            restrictedLast: new fields.StringField({ ...blankString }) // If the trait was not present on a skill used last turn, this can be activated.
+        });
         schema.activateOnDamageAccept = new fields.BooleanField({ required: true, initial: false });
         // Who is sending the skill e.g. this will be tha attacker and their weapon's id on an attack
         schema.sources = new fields.SchemaField({

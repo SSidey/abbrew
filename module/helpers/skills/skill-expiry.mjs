@@ -1,4 +1,4 @@
-import { getActivateWithSkills, handlePairedSkills } from "./skill-activation.mjs";
+import { getActivateWithSkills, getDeactivateWithSkills, handlePairedSkills } from "./skill-activation.mjs";
 import { applySkillEffects } from "./skill-application.mjs";
 
 export async function handleInstantModifierExpiry(actor, modifierSkills) {
@@ -34,7 +34,7 @@ export async function checkAndExpire(actor, skill) {
 }
 
 async function expireActivateAndDeactivateWithSkills(actor, skill) {
-    const activateWithSkills = getActivateWithSkills(skill, actor).filter(s => s.system.activation.andDeactivateWith);
+    const activateWithSkills = [...getActivateWithSkills(skill, actor).filter(s => s.system.activation.andDeactivateWith), ...getDeactivateWithSkills(skill, actor)];
     if (activateWithSkills) {
         const deactivateWithPromises = activateWithSkills.map(s => checkAndExpire(actor, s));
         await Promise.all(deactivateWithPromises);

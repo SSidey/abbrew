@@ -1,7 +1,7 @@
 import { getSafeJson } from "../../helpers/utils.mjs";
-import AbbrewItemBase from "../item-base.mjs";
+import AbbrewPath from "./path.mjs";
 
-export default class AbbrewArchetype extends AbbrewItemBase {
+export default class AbbrewArchetype extends AbbrewPath {
 
     static defineSchema() {
         const fields = foundry.data.fields;
@@ -46,6 +46,8 @@ export default class AbbrewArchetype extends AbbrewItemBase {
 
     // Pre Active Effects
     prepareBaseData() {
+        super.prepareBaseData();
+
         Object.values(this.roleRequirements).forEach(requirement => {
             requirement.parsedRoles = getSafeJson(requirement.roles, []);
             requirement.parsedRestrictedRoles = getSafeJson(requirement.restrictedRoles, []);

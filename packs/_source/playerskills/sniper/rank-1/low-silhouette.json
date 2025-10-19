@@ -519,7 +519,7 @@
     },
     "skillType": "path",
     "path": {
-      "raw": "[{\"label\":\"snake\",\"value\":\"Sniper\",\"roles\":[\"martial\",\"ranged\",\"vanguard\",\"scout\"],\"title\":\"Snipers are the unseen predators of the battlefield, patiently waiting for the moment to strike. They excel in precision shooting, taking down high-value targets, and keeping their location hidden even after an attack. In addition to their deadly aim, Snipers can gather information from afar, guiding their allies with vital intel.\",\"id\":\"abbrewpsnake0000\"}]",
+      "raw": "[{\"label\":\"abbrewpsniper000\",\"value\":\"Sniper\",\"id\":\"abbrewpsniper000\"}]",
       "value": {
         "id": ""
       }
@@ -651,7 +651,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1755113946434,
-    "modifiedTime": 1755114190564,
+    "modifiedTime": 1756512223436,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!N2WICRx61iUnYFlh"

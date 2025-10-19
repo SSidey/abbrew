@@ -1,4 +1,4 @@
-import { applyFullyParsedComplexModifiers } from "../modifierBuilderFieldHelpers.mjs";
+import { applyFullyParsedComplexModifiers, applyFullyParsedModifiers } from "../modifierBuilderFieldHelpers.mjs";
 import { applyOperator } from "../operators.mjs";
 import { getSafeJson, isASupersetOfB } from "../utils.mjs";
 import { applySkillEffects, getModifierSkills } from "./skill-application.mjs";
@@ -6,7 +6,7 @@ import { addSkillToActiveSkills, addSkillToQueuedSkills, trackSkillDuration } fr
 import { checkAndExpire } from "./skill-expiry.mjs";
 import { applySystemFundamentalSkill } from "./skill-fundamental-system-application.mjs";
 import { handleSkillGrantOnActivation } from "./skill-grants.mjs";
-import { mergeConceptCosts, mergeResourceSelfModifiers } from "./skill-modifiers.mjs";
+import { mergeConceptCosts, mergeResourceSelfModifiers, mergeTierDiceChange } from "./skill-modifiers.mjs";
 
 export async function handleSkillActivate(actor, skill, checkActions = true, includeSkillTraits = []) {
     const isSkillProxied = skill.system.isProxied;
@@ -120,6 +120,13 @@ export function getActivateWithSkills(skill, actor) {
         .filter(i => getSafeJson(i.system.activation.activateWith, []).map(a => a.id).includes(skill.system.abbrewId.uuid));
 }
 
+export function getDeactivateWithSkills(skill, actor) {
+    return actor.items
+        .filter(i => i.type === "skill")
+        .filter(i => i.system.activation.deactivateWith)
+        .filter(i => getSafeJson(i.system.activation.deactivateWith, []).map(a => a.id).includes(skill.system.abbrewId.uuid));
+}
+
 export async function rechargeSkill(actor, skill) {
     const item = actor.items.find(i => i._id === skill._id);
     if (!item) {
@@ -142,12 +149,74 @@ export async function rechargeSkill(actor, skill) {
 }
 
 function doesActorMeetSkillRequirements(actor, skill) {
+    if (!doesActorMeetFlaggedTraitRequirements(actor, skill)) {
+        return false;
+    }
+
     const modifierSkills = getModifierSkills(actor, skill);
+
+    if (!doesActorMeetTierDiceRequirements(actor, skill, modifierSkills)) {
+        return false;
+    }
+
     if (!doesActorMeetResourceRequirements(actor, skill)) {
         return false;
     }
 
     if (!doesActorMeetConceptRequirements(actor, skill, modifierSkills)) {
+        return false;
+    }
+
+    return true;
+}
+
+function doesActorMeetFlaggedTraitRequirements(actor, skill) {
+    const requiredTraitsCurrent = new Set(getSafeJson(skill.system.activateIfFlaggedTrait.current, []).map(t => t.key));
+    const restrictedTraitsCurrent = new Set(getSafeJson(skill.system.activateIfFlaggedTrait.restrictedCurrent, []).map(t => t.key));
+    const requiredTraitsLast = new Set(getSafeJson(skill.system.activateIfFlaggedTrait.last, []).map(t => t.key));
+    const restrictedTraitsLast = new Set(getSafeJson(skill.system.activateIfFlaggedTrait.restrictedLast, []).map(t => t.key));
+
+
+    if (requiredTraitsCurrent.size > 0 || restrictedTraitsCurrent.size > 0) {
+        const actorFlags = actor.flags.abbrew?.combat?.traits?.current ?? {};
+        const flaggedTraits = new Set(Object.keys(actorFlags));
+        if (flaggedTraits.size < requiredTraitsCurrent.size) {
+            return false;
+        }
+
+        if (!flaggedTraits.isSupersetOf(requiredTraitsCurrent)) {
+            return false;
+        }
+
+        if (flaggedTraits.intersection(restrictedTraitsCurrent).size > 0) {
+            return false;
+        }
+    }
+
+    if (requiredTraitsLast.size > 0 || restrictedTraitsLast.size > 0) {
+        const actorFlags = actor.flags.abbrew?.combat?.traits?.last ?? {};
+        const flaggedTraits = new Set(Object.keys(actorFlags));
+        if (flaggedTraits.size < requiredTraitsLast.size) {
+            return false;
+        }
+
+        if (!flaggedTraits.isSupersetOf(requiredTraitsLast)) {
+            return false;
+        }
+
+        if (flaggedTraits.intersection(restrictedTraitsLast).size > 0) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function doesActorMeetTierDiceRequirements(actor, skill, modifierSkills) {
+    const mergedTierCosts = mergeTierDiceChange([skill, ...modifierSkills], actor);
+    const result = applyFullyParsedModifiers(mergedTierCosts, actor, "system.meta.tier.dice");
+    if (result["system.meta.tier.dice"] < 0) {
+        ui.notifications.info(`You do not have enough tier dice to use ${skill.name}`);
         return false;
     }
 
@@ -215,6 +284,7 @@ export async function activateSkill(actor, skill, includeSkillTraits = []) {
         });
 
         await handleSkillGrantOnActivation(skill, actor, skill);
+        await handleActivateWithSkills(skill, actor);
         return true;
     }
 

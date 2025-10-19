@@ -25,5 +25,5 @@ export async function openSkillBrowser(event, target) {
     const roles = getSafeJson(path.system.roles, []).map(r => r.label);
     const skills = await game.packs.get("abbrew.playerskills").getDocuments();
     const validSkills = skills.filter(s => s.system.path.value.id === pathId || (s.system.path.value.id === "abbrewpuniversal" && new Set(roles).isSupersetOf(new Set(s.system.roles.parsed))));
-    const browser = await new SkillBrowser(validSkills).render(true);
+    const browser = await new SkillBrowser(validSkills, roles, pathId).render(true);
 }

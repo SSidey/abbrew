@@ -5,7 +5,7 @@
   "_id": "abbrewpsorcerer0",
   "img": "icons/svg/item-bag.svg",
   "system": {
-    "description": "<div><p>@L[ABBREW.Paths.Description.sorcerer]</p></div>",
+    "description": "<div><p>@L[ABBREW.Paths.sorcerer]</p></div>",
     "traits": {
       "raw": ""
     },
@@ -13,7 +13,23 @@
       "value": "",
       "uuid": ""
     },
-    "roles": "[{\"label\":\"melee\",\"value\":\"Melee\",\"title\":\"You fight primarily in melee with your opponents.\"},{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"},{\"label\":\"vanguard\",\"value\":\"Vanguard\",\"title\":\"Your main role in combat is to bring down your enemies as quickly as possible.\"}]"
+    "roles": "[{\"label\":\"magic\",\"value\":\"Magic\",\"title\":\"You primarily harness magic to combat your foes.\"},{\"label\":\"ranged\",\"value\":\"Ranged\",\"title\":\"You prefer to fight at a distance from your opponents.\"},{\"label\":\"vanguard\",\"value\":\"Vanguard\",\"title\":\"Your main role in combat is to bring down your enemies as quickly as possible.\"}]",
+    "skills": {
+      "initiate": [
+        {
+          "name": "Draw Power",
+          "id": "yj5Y6cGCJozG619M",
+          "image": "systems/abbrew/assets/icons/concepts/esoteric.svg",
+          "sourceId": "Compendium.abbrew.playerskills.Item.yj5Y6cGCJozG619M"
+        },
+        {
+          "name": "Manifest Spell",
+          "id": "FHlzdMgd3ev9deDa",
+          "image": "systems/abbrew/assets/icons/concepts/esoteric.svg",
+          "sourceId": "Compendium.abbrew.playerskills.Item.FHlzdMgd3ev9deDa"
+        }
+      ]
+    }
   },
   "effects": [],
   "sort": 100000,
@@ -23,11 +39,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.346",
+    "coreVersion": "13.348",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746223314773,
-    "modifiedTime": 1754941949747,
+    "modifiedTime": 1756583156205,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

@@ -197,7 +197,7 @@ function mergeResolveModifiers(allSkills, actor, target) {
     return mergeModifierFields(modifierFields, actor);
 }
 
-function mergeTierDiceChange(allSkills, actor) {
+export function mergeTierDiceChange(allSkills, actor) {
     const modifierFields = allSkills.map(s => s.system.action.tierDiceChange);
     const [tierDiceUpdate, _] = mergeModifierFields(modifierFields, actor);
     return tierDiceUpdate;

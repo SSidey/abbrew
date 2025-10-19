@@ -2,11 +2,12 @@ import { getFundamentalAttributeSkill } from "../fundamental-skills.mjs";
 import { parseModifierFieldValue, reduceParsedModifiers } from "../modifierBuilderFieldHelpers.mjs";
 import { getObjectValueByStringPath, getSafeJson } from "../utils.mjs";
 import { handleSkillActivate } from "./skill-activation.mjs";
+import { handleSkillsGrantedOnCheck } from "./skill-grants.mjs";
 import { getDiceCount, getResultDice, getRollFormula } from "./skill-roll.mjs";
 
-export function getTierFromArray(array) {
+function getTierFromArray(actor, array) {
     const arrayValue = Math.min(...array);
-    return arrayValue === Number.POSITIVE_INFINITY ? 0 : arrayValue;
+    return isNaN(arrayValue) ? actor.system.meta.tier.value : arrayValue;
 }
 
 export async function makeSkillCheck(actor, skill, allSkills, fortune, bonusSuccesses, templateData, data) {
@@ -21,7 +22,7 @@ export async function makeSkillCheck(actor, skill, allSkills, fortune, bonusSucc
 
         const attributeTiers = allSkills.flatMap(s => s.system.action.skillCheck.filter(c => c.type === "actor" && c.path.includes("system.attributes") && c.path.includes("value")).map(a => getObjectValueByStringPath(actor, a.path.replace(".value", ".tier"))));
 
-        const tier = getTierFromArray(attributeTiers);
+        const tier = getTierFromArray(actor, attributeTiers);
         const critical = 10;
         const rollFormula = getRollFormula(tier, critical, fortune);
         const skillRoll = new Roll(rollFormula, actor);
@@ -94,6 +95,7 @@ export async function makeSkillCheckRequest(actor, skill, modifierSkills, parent
             const selfResult = await acceptSkillCheck(actor, requirements);
             skillResult = selfResult.skillResult;
             skillResult.result = selfResult.result;
+            await handleGrantOnCheckSkills(actor, selfResult, requirements);
         } else {
             data.skillCheckRequest = requirements;
             templateData = {
@@ -111,6 +113,34 @@ export async function makeSkillCheckRequest(actor, skill, modifierSkills, parent
     }
 
     return [skillResult, templateData, data];
+}
+
+async function handleGrantOnCheckSkills(actor, result, requirements) {
+    const totalSuccesses = result.totalSuccesses;
+    if (totalSuccesses > 0) {
+        const successes = totalSuccesses;
+        const successSkills = requirements.outcomeGrants.success;
+        const actorSource = requirements.actorSource;
+        const tokenSource = requirements.tokenSource;
+        const updates = {};
+        updates["system.passedValuesForAsync"] = [{ name: "successes", value: successes }, { name: "result", value: result.totalValue }];
+        handleSkillsGrantedOnCheck(successSkills, actor, null, actorSource, tokenSource, updates);
+    } else if (totalSuccesses <= 0) {
+        const failures = 1 + totalSuccesses;
+        const failureSkills = requirements.outcomeGrants.failure;
+        const actorSource = requirements.actorSource;
+        const tokenSource = requirements.tokenSource;
+        const updates = {};
+        updates["system.passedValuesForAsync"] = [{ name: "failures", value: failures }, { name: "result", value: result.totalValue }];
+        handleSkillsGrantedOnCheck(failureSkills, actor, null, actorSource, tokenSource, updates);
+    } else {
+        const skills = requirements.outcomeGrants.success;
+        const actorSource = requirements.actorSource;
+        const tokenSource = requirements.tokenSource;
+        const updates = {};
+        updates["system.passedValuesForAsync"] = [{ name: "result", value: result.totalValue }];
+        handleSkillsGrantedOnCheck(skills, actor, null, actorSource, tokenSource, updates);
+    }
 }
 
 function mutateArrayForFortune(array) {
