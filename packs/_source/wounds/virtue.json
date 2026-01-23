@@ -1,0 +1,47 @@
+{
+  "name": "Virtue",
+  "type": "wound",
+  "_id": "es9dd39qI7UhvdeX",
+  "img": "systems/abbrew/assets/icons/wounds/virtue.webp",
+  "system": {
+    "name": {
+      "base": "",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1
+    },
+    "description": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "enhancements": [],
+    "wound": {
+      "type": "virtue",
+      "value": 1
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.348",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1760905585766,
+    "modifiedTime": 1760905692318,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!es9dd39qI7UhvdeX"
+}

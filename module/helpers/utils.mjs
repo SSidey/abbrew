@@ -200,7 +200,7 @@ export function getTokenForActor(actor) {
 
     const activeTokens = game.actors.get(actor._id).getActiveTokens();
     if (activeTokens.length === 1) {
-        return [0].document;
+        return activeTokens[0].document;
     }
 
     console.log(`No token for this actor ${actor._id}`);

@@ -68,22 +68,24 @@ export default class AbbrewChatLog extends (foundry.applications?.sidebar?.tabs?
         const html = await foundry.applications.handlebars.renderTemplate("systems/abbrew/templates/chat/skill-card.hbs", templateData);
         emitForAll("system.abbrew", new SocketMessage(game.user.id, "updateMessageForCheck", { messageId, html, templateData }));
         const totalSuccesses = result.totalSuccesses;
-        if (totalSuccesses > 0) {
-            const successes = totalSuccesses;
-            const successSkills = data.skillCheckRequest.outcomeGrants.success;
-            const actorSource = data.skillCheckRequest.actorSource;
-            const tokenSource = data.skillCheckRequest.tokenSource;
-            const updates = {};
-            updates["system.passedValuesForAsync"] = [{ name: "successes", value: successes }, { name: "result", value: result.skillResult.simpleResult }];
-            handleSkillsGrantedOnCheck(successSkills, actor, null, actorSource, tokenSource, updates);
-        } else if (totalSuccesses <= 0) {
-            const failures = 1 + totalSuccesses;
-            const failureSkills = data.skillCheckRequest.outcomeGrants.failure;
-            const actorSource = data.skillCheckRequest.actorSource;
-            const tokenSource = data.skillCheckRequest.tokenSource;
-            const updates = {};
-            updates["system.passedValuesForAsync"] = [{ name: "failures", value: failures }, { name: "result", value: result.skillResult.simpleResult }];
-            handleSkillsGrantedOnCheck(failureSkills, actor, null, actorSource, tokenSource, updates);
+        if (data.skillCheckRequest.outcomeGrants) {
+            if (totalSuccesses > 0) {
+                const successes = totalSuccesses;
+                const successSkills = data.skillCheckRequest.outcomeGrants.success;
+                const actorSource = data.skillCheckRequest.actorSource;
+                const tokenSource = data.skillCheckRequest.tokenSource;
+                const updates = {};
+                updates["system.passedValuesForAsync"] = [{ name: "successes", value: successes }, { name: "result", value: result.skillResult.simpleResult }];
+                handleSkillsGrantedOnCheck(successSkills, actor, null, actorSource, tokenSource, updates);
+            } else if (totalSuccesses <= 0) {
+                const failures = 1 + totalSuccesses;
+                const failureSkills = data.skillCheckRequest.outcomeGrants.failure;
+                const actorSource = data.skillCheckRequest.actorSource;
+                const tokenSource = data.skillCheckRequest.tokenSource;
+                const updates = {};
+                updates["system.passedValuesForAsync"] = [{ name: "failures", value: failures }, { name: "result", value: result.skillResult.simpleResult }];
+                handleSkillsGrantedOnCheck(failureSkills, actor, null, actorSource, tokenSource, updates);
+            }
         }
     }
 

@@ -1,0 +1,21 @@
+{
+  "type": "Item",
+  "folder": "HCBAlbYucH6ht6qA",
+  "name": "Bloodline",
+  "color": null,
+  "sorting": "a",
+  "_id": "79D6SUPNKQnM4kZt",
+  "description": "",
+  "sort": 100000,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.348",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "lastModifiedBy": "abbrewpacks00000",
+    "modifiedTime": 1764289156432
+  },
+  "_key": "!folders!79D6SUPNKQnM4kZt"
+}

@@ -1,0 +1,21 @@
+{
+  "type": "Item",
+  "folder": "tKrN1W94qiYmzAxJ",
+  "name": "Specialisation",
+  "color": null,
+  "sorting": "a",
+  "_id": "kL4dlALPXgu7OJHf",
+  "description": "",
+  "sort": -50000,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.348",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "lastModifiedBy": "abbrewpacks00000",
+    "modifiedTime": 1756932236191
+  },
+  "_key": "!folders!kL4dlALPXgu7OJHf"
+}

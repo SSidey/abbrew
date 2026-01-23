@@ -639,7 +639,7 @@
       "_key": "!items.effects!N2WICRx61iUnYFlh.RMbG9D42ihHVOJSZ"
     }
   ],
-  "sort": 0,
+  "sort": 100000,
   "ownership": {
     "default": 0
   },
@@ -647,11 +647,11 @@
   "_stats": {
     "duplicateSource": null,
     "exportSource": null,
-    "coreVersion": "13.346",
+    "coreVersion": "13.348",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1755113946434,
-    "modifiedTime": 1756512223436,
+    "modifiedTime": 1756658495897,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!N2WICRx61iUnYFlh"

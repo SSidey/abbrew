@@ -12,7 +12,7 @@
     "meta": {
       "tier": 1
     },
-    "description": "<p>The power inside you bursts outward, reshaping your spells.</p><hr><p>Roll 1 Tier Die, gain that much in magical capacity bonus as well as instant free power, gain half as much Instability Wounds.</p>",
+    "description": "<p>The power inside you bursts outward, reshaping your spells.</p><hr><p>Spend 1 Tier Die, gain a number of esoteric concepts equal to your visualisation rank and gain 1 @UUID[Compendium.abbrew.playerskills.Item.vtheAYwEDEcO8a9g]{Free Power}</p>",
     "traits": {
       "raw": "",
       "value": []
@@ -47,7 +47,7 @@
     "rank": 1,
     "renderUnique": false,
     "isFavourited": false,
-    "isActivatable": false,
+    "isActivatable": true,
     "activateOnCreate": false,
     "applyTurnStart": false,
     "applyTurnEnd": false,
@@ -144,7 +144,7 @@
         ],
         "operator": "minus"
       },
-      "actionImage": "",
+      "actionImage": "0a",
       "duration": {
         "isConcentration": false,
         "precision": "0",
@@ -181,7 +181,7 @@
           "successes": 0,
           "result": 0
         },
-        "targetModifiers": "",
+        "targetModifiers": "[{\"id\":\"abbrewTierCheck0\",\"value\":\"Tier Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewTierCheck0\"}]",
         "results": {
           "success": {
             "description": ""
@@ -289,16 +289,31 @@
           }
         },
         "resources": {
-          "self": [],
+          "self": [
+            {
+              "summary": "[{\"value\":\"Free Power\",\"id\":\"vtheAYwEDEcO8a9g\",\"sourceId\":\"Compendium.abbrew.playerskills.Item.vtheAYwEDEcO8a9g\"}]",
+              "type": "vtheAYwEDEcO8a9g",
+              "value": [
+                {
+                  "operator": "add",
+                  "type": "numeric",
+                  "path": "1",
+                  "multiplier": 1,
+                  "lateParse": false
+                }
+              ],
+              "operator": "add"
+            }
+          ],
           "target": []
         },
         "concepts": {
           "esoteric": {
             "name": "esoteric",
             "label": "ABBREW.Concepts.esoteric",
-            "value": "",
+            "value": "system.attributes.vis.value",
             "operator": "add",
-            "type": "numeric",
+            "type": "actor",
             "numerator": 1,
             "denominator": 1
           },
@@ -517,6 +532,22 @@
             "type": "numeric",
             "numerator": 1,
             "denominator": 1
+          },
+          "sin": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "virtue": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "entropy": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "disarray": {
+            "operator": "add",
+            "type": "numeric"
           }
         }
       }
@@ -561,7 +592,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1756584818443,
-    "modifiedTime": 1756590476729,
+    "modifiedTime": 1764629125972,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!BnXqf1pfAhvmAPbN"

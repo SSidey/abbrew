@@ -15,6 +15,10 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     return this.mapAnatomy();
   }
 
+  get spellPhrase() {
+    return this.magic.spellComponents.join(" ");
+  }
+
   static defineSchema() {
     const fields = foundry.data.fields;
     const requiredInteger = { required: true, nullable: false, integer: true };
@@ -281,8 +285,12 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     schema.momentum = new fields.NumberField({ ...requiredInteger, initial: 0 });
 
     schema.magic = new fields.SchemaField({
-      conceptCapacity: new fields.NumberField({ ...requiredInteger, initial: 0 }),
-      conceptCapacityBonus: new fields.NumberField({ ...requiredInteger, initial: 0 })
+      spellComponents: new fields.ArrayField(
+        new fields.StringField({ ...blankString })
+      ),
+      essentia: new fields.ArrayField(
+        new fields.StringField({ ...blankString })
+      )
     });
 
     schema.modifiers = new fields.SchemaField({
@@ -356,8 +364,6 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     this.concepts.innate.value = getSafeJson(this.concepts.innate.raw, []);
     const mappedTraining = Object.entries(skillTraining).map(e => ({ type: e[0], value: e[1] }));
     this.skillTraining = foundry.utils.mergeObject(this.skillTraining, mappedTraining);
-
-    this.magic.conceptCapacity = 1 + this.attributes.vis.value + this.magic.conceptCapacityBonus;
 
     this._limitResourceValues();
 

@@ -16,7 +16,7 @@
             <ol style="list-style:none;padding-left:0px;">
                 {{#each wounds as |wound|}}
                 <span><img class="wound-image" src="systems/abbrew/assets/icons/wounds/{{wound.type}}.webp"
-                        alt="{{wound.type}} {{wound.value}}"> {{wound.name}} {{wound.value}}</span>
+                        alt="{{wound.type}} {{wound.value}}"> {{localize wound.name}} {{wound.value}}</span>
                 {{/each}}
             </ol>
         </div>

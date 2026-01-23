@@ -1,0 +1,22 @@
+{
+  "type": "Item",
+  "folder": null,
+  "name": "Spider",
+  "color": null,
+  "sorting": "a",
+  "_id": "WsIfPkO39t1GTnDY",
+  "description": "",
+  "sort": 0,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.348",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1761500859236,
+    "modifiedTime": 1761500859236,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!WsIfPkO39t1GTnDY"
+}

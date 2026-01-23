@@ -25,7 +25,13 @@ export const FINISHERS = {
     "fire": {
         1: { "type": "fire", "wounds": [{ "type": "burn", "value": 1 }], "traits": ["fire"], "text": "Target is burned" },
         2: { "type": "fire", "wounds": [{ "type": "burn", "value": 2 }], "traits": ["fire"], "text": "Target is burned" },
-        4: { "type": "fire", "wounds": [{ "type": "burn", "value": 3 }], "traits": ["fire", "break"], "text": "Target is greatly burned" },
+        4: { "type": "fire", "wounds": [{ "type": "burn", "value": 3 }], "traits": ["fire", "break"], "text": "Target is greatly burned, the targeted limb is broken" },
         8: { "type": "fire", "wounds": [{ "type": "burning", "value": 2 }, { "type": "burn", "value": 2 }], "traits": ["fire", "dismember", "destroy"], "text": "Target is burned and continues to smoulder" }
+    },
+    "poison": {
+        1: { "type": "poison", "wounds": [{ "type": "decay", "value": 1 }, { "type": "necrotic", "value": 1 }], "traits": ["poison", "death"], "text": "Target wound festers with Poison" },
+        2: { "type": "poison", "wounds": [{ "type": "decay", "value": 2 }, { "type": "necrotic", "value": 1 }], "traits": ["poison", "death"], "text": "Target wound festers with Poison" },
+        4: { "type": "poison", "wounds": [{ "type": "decay", "value": 3 }, { "type": "necrotic", "value": 1 }], "traits": ["poison", "death", "break"], "text": "Target wound festers severely with Poison, the body part becoming broken" },
+        8: { "type": "poison", "wounds": [{ "type": "decay", "value": 4 }, { "type": "necrotic", "value": 1 }], "traits": ["poison", "dismember", "death"], "text": "Target wound festers with Poison, necrotising and sloughing from their body" }
     }
 }

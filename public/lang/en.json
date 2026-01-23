@@ -174,8 +174,7 @@
         "parryCounter": "Parry Counter Training",
         "feintCounter": "Feint Counter Training"
       },
-      "adjacentAllies": "Adjacent Allies",
-      "conceptCapacityBonus": "Concept Capacity Bonus"
+      "adjacentAllies": "Adjacent Allies"
     },
     "Roles": {
       "Name": {
@@ -396,7 +395,9 @@
       "rage": "Rage",
       "fear": "Fear",
       "sin": "Sin",
-      "virtue": "Virtue"
+      "virtue": "Virtue",
+      "entropy": "Entropy",
+      "disarray": "Disarray"
     },
     "Facing": {
       "front": "front",
@@ -441,7 +442,7 @@
       "feint": "Feint",
       "overpower": "Overpower",
       "finisher": "Finisher",
-      "spell": "Spell"
+      "effect": "Effect"
     },
     "ReloadType": {
       "draw": "Draw",
@@ -746,7 +747,7 @@
       "stance": "Stance",
       "Spell": {
         "spellcomponent": "Spell Component",
-        "concept": "Concept",
+        "essentia": "Essentia",
         "spellform": "Spellform",
         "spellamp": "Spell Amp"
       },
@@ -766,7 +767,9 @@
         "goblin": "Goblin",
         "orc": "Orc",
         "lizardfolk": "Lizardfolk",
-        "serpentfolk": "Serpentfolk"
+        "serpentfolk": "Serpentfolk",
+        "evil": "Evil",
+        "good": "Good"
       }
     },
     "Durations": {

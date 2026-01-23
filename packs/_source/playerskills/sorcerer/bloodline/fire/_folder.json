@@ -1,0 +1,20 @@
+{
+  "type": "Item",
+  "folder": "79D6SUPNKQnM4kZt",
+  "name": "Fire",
+  "color": null,
+  "sorting": "a",
+  "_id": "KbElEvJ8ug3HhvaZ",
+  "description": "",
+  "sort": 0,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.348",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "lastModifiedBy": null
+  },
+  "_key": "!folders!KbElEvJ8ug3HhvaZ"
+}

@@ -1,0 +1,22 @@
+{
+  "type": "Item",
+  "folder": null,
+  "name": "Bulwark",
+  "color": null,
+  "sorting": "m",
+  "_id": "drlPxMEDXG0YM8nR",
+  "description": "",
+  "sort": 0,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.348",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1765235282082,
+    "modifiedTime": 1765235316952,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!drlPxMEDXG0YM8nR"
+}

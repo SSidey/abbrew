@@ -1,0 +1,21 @@
+{
+  "type": "Item",
+  "folder": "RQ599ZatFy8spErg",
+  "name": "Tier",
+  "color": null,
+  "sorting": "m",
+  "_id": "jBq78fC8USKOpP92",
+  "description": "",
+  "sort": 0,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.348",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "lastModifiedBy": "abbrewpacks00000",
+    "modifiedTime": 1756930902132
+  },
+  "_key": "!folders!jBq78fC8USKOpP92"
+}

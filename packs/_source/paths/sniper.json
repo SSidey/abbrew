@@ -11,7 +11,7 @@
     "meta": {
       "tier": 1
     },
-    "description": "<p>@L[ABBREW.Paths.Description.sniper]</p>",
+    "description": "<p>@L[ABBREW.Paths.sniper]</p>",
     "traits": {
       "raw": "",
       "value": []
@@ -21,7 +21,29 @@
       "uuid": ""
     },
     "enhancements": [],
-    "roles": "[{\"label\":\"ranged\",\"value\":\"Ranged\",\"title\":\"You prefer to fight at a distance from your opponents.\"},{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"},{\"label\":\"scout\",\"value\":\"Scout\",\"title\":\"You head in first, attampting to remain undetected to scope out the situation and provide your party with foresight.\"},{\"label\":\"vanguard\",\"value\":\"Vanguard\",\"title\":\"Your main role in combat is to bring down your enemies as quickly as possible.\"}]"
+    "roles": "[{\"label\":\"ranged\",\"value\":\"Ranged\",\"title\":\"You prefer to fight at a distance from your opponents.\"},{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"},{\"label\":\"scout\",\"value\":\"Scout\",\"title\":\"You head in first, attampting to remain undetected to scope out the situation and provide your party with foresight.\"},{\"label\":\"vanguard\",\"value\":\"Vanguard\",\"title\":\"Your main role in combat is to bring down your enemies as quickly as possible.\"}]",
+    "skills": {
+      "initiate": [
+        {
+          "name": "Deadeye's Patience",
+          "id": "QZK1H7MA92syt8Z4",
+          "image": "systems/abbrew/assets/icons/skills/aimed-shot.svg",
+          "sourceId": "Compendium.abbrew.playerskills.Item.QZK1H7MA92syt8Z4"
+        },
+        {
+          "name": "Patience",
+          "id": "7JEfpNFDtfhx4NZy",
+          "image": "systems/abbrew/assets/icons/skills/aimed-shot.svg",
+          "sourceId": "Compendium.abbrew.playerskills.Item.7JEfpNFDtfhx4NZy"
+        },
+        {
+          "name": "Focus",
+          "id": "rev6jKXhYBdAxKJW",
+          "image": "systems/abbrew/assets/icons/skills/aimed-shot.svg",
+          "sourceId": "Compendium.abbrew.playerskills.Item.rev6jKXhYBdAxKJW"
+        }
+      ]
+    }
   },
   "effects": [],
   "folder": null,
@@ -33,11 +55,11 @@
   "_stats": {
     "duplicateSource": null,
     "exportSource": null,
-    "coreVersion": "13.346",
+    "coreVersion": "13.348",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1755101745449,
-    "modifiedTime": 1755102206669,
+    "modifiedTime": 1756660204787,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!abbrewpsniper000"

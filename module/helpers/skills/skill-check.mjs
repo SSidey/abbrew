@@ -186,7 +186,7 @@ export async function acceptSkillCheck(actor, requirements) {
                 const requiredValue = Math.max(...requirements.contestedResult.dice.map(d => d.result)) + requirements.contestedResult.modifier;
                 const filteredSkillResult = mutateArrayForFortune(skillResult.dice);
                 const totalValue = Math.max(...filteredSkillResult.map(d => d.result)) + skillResult.modifier;
-                return ({ actor: actor, result: totalValue > requiredValue, totalValue: totalValue, requiredValue: requiredValue, skillResult: skillResult, contestedResult: requirements.contestedResult });
+                return ({ actor: actor, result: totalValue > requiredValue, totalSuccesses: totalValue >= requiredValue ? 1 : 0, totalValue: totalValue, requiredValue: requiredValue, skillResult: skillResult, contestedResult: requirements.contestedResult });
             }
         } else {
             if (requirements.checkType === "successes") {
@@ -207,7 +207,7 @@ export async function acceptSkillCheck(actor, requirements) {
                 const requiredValue = requirements.result.requiredValue;
                 const filteredSkillResult = mutateArrayForFortune(skillResult.dice);
                 const totalValue = Math.max(...filteredSkillResult.map(d => d.result)) + skillResult.modifier;
-                return ({ actor: actor, result: totalValue >= requiredValue, totalValue: totalValue, requiredValue: requiredValue, skillResult: skillResult });
+                return ({ actor: actor, result: totalValue >= requiredValue, totalSuccesses: totalValue >= requiredValue ? 1 : 0, totalValue: totalValue, requiredValue: requiredValue, skillResult: skillResult });
             }
         }
     }

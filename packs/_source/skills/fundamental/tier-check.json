@@ -12,7 +12,7 @@
     "meta": {
       "tier": 1
     },
-    "description": "",
+    "description": "<p>Roll a number of Tier Dice, any explosions do not contribute to the total but refund the die spent (maximum refunded dice equal to your Tier)</p>",
     "traits": {
       "raw": "",
       "value": []
@@ -553,7 +553,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1756591887492,
-    "modifiedTime": 1756591903747,
+    "modifiedTime": 1756927702957,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!abbrewTierCheck0"

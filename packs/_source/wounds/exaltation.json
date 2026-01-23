@@ -1,0 +1,47 @@
+{
+  "name": "Exaltation",
+  "type": "wound",
+  "_id": "WYJcFGtAD8vCP30F",
+  "img": "systems/abbrew/assets/icons/wounds/exaltation.webp",
+  "system": {
+    "name": {
+      "base": "",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1
+    },
+    "description": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "enhancements": [],
+    "wound": {
+      "type": "exaltation",
+      "value": 1
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.348",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1760905596202,
+    "modifiedTime": 1760905681324,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!WYJcFGtAD8vCP30F"
+}

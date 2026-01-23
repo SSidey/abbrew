@@ -29,7 +29,16 @@
       "granted": [],
       "paired": [],
       "grantedOnActivation": [],
-      "grantedOnAccept": []
+      "grantedOnAccept": [],
+      "grantOnFailure": [
+        {
+          "name": "Grabbed",
+          "id": "Xxtpste8muvmSWNQ",
+          "image": "systems/abbrew/assets/icons/statuses/grabbed.svg",
+          "sourceId": "Compendium.abbrew.conditions.Item.Xxtpste8muvmSWNQ",
+          "skillType": ""
+        }
+      ]
     },
     "resource": {
       "capacity": 0,
@@ -82,7 +91,7 @@
         }
       },
       "attackProfile": {
-        "isEnabled": true,
+        "isEnabled": false,
         "name": "",
         "attackType": "",
         "lethal": 0,
@@ -263,6 +272,30 @@
           "conquest": {
             "operator": "add",
             "type": "numeric"
+          },
+          "rage": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "fear": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "sin": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "virtue": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "entropy": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "disarray": {
+            "operator": "add",
+            "type": "numeric"
           }
         }
       }
@@ -285,11 +318,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.346",
+    "coreVersion": "13.348",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1744980474409,
-    "modifiedTime": 1753653349321,
+    "modifiedTime": 1764363713410,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

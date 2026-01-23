@@ -46,7 +46,7 @@ export default class AbbrewItem extends Item {
       }
     }
 
-    if (doesNestedFieldExist(changed, "system.equipState") && this.system.equipType === "held") {
+    if (doesNestedFieldExist(changed, "system.equipState")/*  && this.system.equipType === "held" */) {
       if (changed.system.equipState.startsWith('held')) {
         if (!this.isHeldEquipStateChangePossible(changed.system.equipState)) {
           ui.notifications.info("You are already holding too many items, try stowing some");
@@ -548,7 +548,7 @@ export default class AbbrewItem extends Item {
 
     const attackSkill = getAttackSkillWithActions(null, this.name, this.system.traits.raw, actionCost, this.img, attackProfile, attackMode, this.system.handsSupplied, [], actor._id, itemTriggerIds);
 
-    await handleSkillActivate(actor, attackSkill, true, attackSkill.system.traits.map(t => t.key));
+    await handleSkillActivate(actor, attackSkill, true, attackSkill.system.traits.value.map(t => t.key));
 
     if (attackMode === "thrown") {
       await this.update({ "system.equipState": "dropped" });

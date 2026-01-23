@@ -12,7 +12,7 @@
     "meta": {
       "tier": 1
     },
-    "description": "<p>When you use the Rage Skill, gain a number of Rage concepts up to  your available concept capacity.</p>",
+    "description": "<p>When you use the Rage Skill, gain a number of Rage concepts up to your Will score.</p>",
     "traits": {
       "raw": "[{\"key\":\"emotion\",\"value\":\"Emotion\",\"feature\":\"skill\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]",
       "value": []
@@ -476,7 +476,7 @@
           "rage": {
             "name": "rage",
             "label": "ABBREW.Concepts.rage",
-            "value": "system.magic.conceptCapacity",
+            "value": "system.attributes.wil.value",
             "operator": "add",
             "type": "actor",
             "numerator": 1,
@@ -490,6 +490,22 @@
             "type": "numeric",
             "numerator": 1,
             "denominator": 1
+          },
+          "sin": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "virtue": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "entropy": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "disarray": {
+            "operator": "add",
+            "type": "numeric"
           }
         }
       }
@@ -530,11 +546,11 @@
   "_stats": {
     "duplicateSource": null,
     "exportSource": null,
-    "coreVersion": "13.346",
+    "coreVersion": "13.348",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1754762147298,
-    "modifiedTime": 1754762368113,
+    "modifiedTime": 1764630477672,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!L5CyKeAcN9Kk9A37"

@@ -1,13 +1,15 @@
 # Abbrew System
 
 # TODO
+Grapple score based on size, larger creature (2) is only partially grappled by a smaller creature e.g. slow and impaired but not immobilised ?
+
+Skill section to grant enhancement to equipment when added?
+
 Skill drop that grants enhancements when items are created?
 
 Check requests with success / failure section for granted skills?
 
 Look into risk cap vs guard gained, everyone could lose it all in one
-
-Chat message order is wrong, whyyyyyy (Foundry version lol)
 
 show concepts on cards
 show reaction vs action
@@ -19,7 +21,7 @@ Redo action icons, hard to see now that v2 has <1 alpha
 move background to description
 active to effects
 
-![Foundry v12](https://img.shields.io/badge/foundry-v12-green)
+![Foundry v13](https://img.shields.io/badge/foundry-v13-green)
 
 This system is a abbrew system that you can use as a starting point for building your own custom systems. It's similar to Simple World-building, but has examples of creating attributes in code rather than dynamically through the UI.
 

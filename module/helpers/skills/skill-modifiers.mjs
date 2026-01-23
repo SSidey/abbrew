@@ -245,7 +245,8 @@ export function mergeModifiers(modifiers, value) {
 }
 
 export function mergeConceptCosts(allSkills, actor) {
-    return allSkills.reduce((conceptCosts, skill) => {
+    const disarray = actor.system.concepts.available.disarray.value;
+    const costs = allSkills.reduce((conceptCosts, skill) => {
         if (Object.values(skill.system.action.modifiers.concepts).some(c => c.value)) {
             Object.keys(CONFIG.ABBREW.concepts).forEach(key => {
                 const concept = skill.system.action.modifiers.concepts[key];
@@ -261,7 +262,13 @@ export function mergeConceptCosts(allSkills, actor) {
         }
 
         return conceptCosts;
-    }, {})
+    }, {});
+
+    if (costs.esoteric > 0) {
+        costs.esoteric = costs.esoteric - disarray;
+    }
+
+    return costs;
 }
 
 export function filterSynergiesWithInsufficientResources(skill, modifierSkills, actor) {

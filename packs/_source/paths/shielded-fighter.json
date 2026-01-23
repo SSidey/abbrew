@@ -13,7 +13,29 @@
       "value": "",
       "uuid": ""
     },
-    "roles": "[{\"label\":\"melee\",\"value\":\"Melee\",\"title\":\"You fight primarily in melee with your opponents.\"},{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"},{\"label\":\"durable\",\"value\":\"Durable\",\"title\":\"You are capable of withstanding more abuse than most.\"},{\"label\":\"vanguard\",\"value\":\"Vanguard\",\"title\":\"Your main role in combat is to bring down your enemies as quickly as possible.\"}]"
+    "roles": "[{\"label\":\"melee\",\"value\":\"Melee\",\"title\":\"You fight primarily in melee with your opponents.\"},{\"label\":\"martial\",\"value\":\"Martial\",\"title\":\"Your primary tools in combat are your weapons.\"},{\"label\":\"durable\",\"value\":\"Durable\",\"title\":\"You are capable of withstanding more abuse than most.\"},{\"label\":\"vanguard\",\"value\":\"Vanguard\",\"title\":\"Your main role in combat is to bring down your enemies as quickly as possible.\"}]",
+    "skills": {
+      "initiate": [
+        {
+          "name": "Wall and Edge",
+          "id": "YynWKG1jnjRM8q2j",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.playerskills.Item.YynWKG1jnjRM8q2j"
+        },
+        {
+          "name": "Versatile Armaments (Defense)",
+          "id": "ESY5ZRGbkbyEswa8",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.playerskills.Item.ESY5ZRGbkbyEswa8"
+        },
+        {
+          "name": "Versatile Armaments (Offense)",
+          "id": "Hygdg1PrgppBcyRw",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.playerskills.Item.Hygdg1PrgppBcyRw"
+        }
+      ]
+    }
   },
   "effects": [],
   "sort": 100000,
@@ -23,11 +45,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.346",
+    "coreVersion": "13.348",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746223314773,
-    "modifiedTime": 1756416344027,
+    "modifiedTime": 1756853363566,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

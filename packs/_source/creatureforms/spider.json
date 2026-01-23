@@ -1,0 +1,105 @@
+{
+  "name": "Spider",
+  "type": "creatureForm",
+  "_id": "Rda5PG8MOOWoaKlG",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "name": {
+      "base": "",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1
+    },
+    "description": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "enhancements": [],
+    "anatomy": [
+      {
+        "name": "Spider Cephalothorax",
+        "id": "l1hyGcZ8rYRzLpvh",
+        "image": "icons/svg/item-bag.svg",
+        "sourceId": "Compendium.abbrew.anatomy.Item.l1hyGcZ8rYRzLpvh"
+      },
+      {
+        "name": "Spider Leg",
+        "id": "nXxsFBArnx72WKHE",
+        "image": "icons/svg/item-bag.svg",
+        "sourceId": "Compendium.abbrew.anatomy.Item.nXxsFBArnx72WKHE"
+      },
+      {
+        "name": "Spider Leg",
+        "id": "nXxsFBArnx72WKHE",
+        "image": "icons/svg/item-bag.svg",
+        "sourceId": "Compendium.abbrew.anatomy.Item.nXxsFBArnx72WKHE"
+      },
+      {
+        "name": "Spider Leg",
+        "id": "nXxsFBArnx72WKHE",
+        "image": "icons/svg/item-bag.svg",
+        "sourceId": "Compendium.abbrew.anatomy.Item.nXxsFBArnx72WKHE"
+      },
+      {
+        "name": "Spider Leg",
+        "id": "nXxsFBArnx72WKHE",
+        "image": "icons/svg/item-bag.svg",
+        "sourceId": "Compendium.abbrew.anatomy.Item.nXxsFBArnx72WKHE"
+      },
+      {
+        "name": "Spider Leg",
+        "id": "nXxsFBArnx72WKHE",
+        "image": "icons/svg/item-bag.svg",
+        "sourceId": "Compendium.abbrew.anatomy.Item.nXxsFBArnx72WKHE"
+      },
+      {
+        "name": "Spider Leg",
+        "id": "nXxsFBArnx72WKHE",
+        "image": "icons/svg/item-bag.svg",
+        "sourceId": "Compendium.abbrew.anatomy.Item.nXxsFBArnx72WKHE"
+      },
+      {
+        "name": "Spider Leg",
+        "id": "nXxsFBArnx72WKHE",
+        "image": "icons/svg/item-bag.svg",
+        "sourceId": "Compendium.abbrew.anatomy.Item.nXxsFBArnx72WKHE"
+      },
+      {
+        "name": "Spider Leg",
+        "id": "nXxsFBArnx72WKHE",
+        "image": "icons/svg/item-bag.svg",
+        "sourceId": "Compendium.abbrew.anatomy.Item.nXxsFBArnx72WKHE"
+      },
+      {
+        "name": "Spider Abdomen",
+        "id": "tPuI4JbLZwL6NA7b",
+        "image": "icons/svg/item-bag.svg",
+        "sourceId": "Compendium.abbrew.anatomy.Item.tPuI4JbLZwL6NA7b"
+      }
+    ]
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.348",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1761500807097,
+    "modifiedTime": 1761507794355,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!Rda5PG8MOOWoaKlG"
+}

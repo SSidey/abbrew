@@ -12,9 +12,10 @@ export async function handleSkillGrantOnExpiry(skill, actor, source) {
     await handleSkillGrants(skill.system.skills.grantedOnExpiry, actor, source);
 }
 
-export async function handleSkillsGrantedOnAccept(data, actor, source) {
+export async function handleSkillsGrantedOnAccept(data, actor) {
     const token = { _id: data.sources.token };
-    await handleSkillGrants(data.skillsGrantedOnAccept, actor, source, actor, token);
+    const actorSource = { _id: data.sources.actor };
+    await handleSkillGrants(data.skillsGrantedOnAccept, actor, null, actorSource, token);
 }
 
 // skillUpdates includes e.g. asyncValues for use in granted skills successes/failures

@@ -49,6 +49,9 @@
     },
     "meta": {
       "quality": 0
+    },
+    "skills": {
+      "granted": []
     }
   },
   "effects": [],
@@ -59,11 +62,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.346",
+    "coreVersion": "13.348",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743075214426,
-    "modifiedTime": 1752874683680,
+    "modifiedTime": 1761501071461,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

@@ -90,19 +90,6 @@ export default class AbbrewActor extends Actor {
       }
     }
 
-    if (doesNestedFieldExist(changed, "system.concepts.available")) {
-      // const actorConcepts = structuredClone(actor.system.concepts.available);
-      const fullConceptSet = foundry.utils.mergeObject(this.system.concepts.available, changed.system.concepts.available, { inplace: false, overwrite: true, recursive: true });
-      const totalConcepts = Object.values(fullConceptSet).map(c => c.value).reduce((total, value) => total += value, 0);
-      if (totalConcepts > this.system.magic.conceptCapacity) {
-        delete changed.system.concepts.available;
-      }
-
-      if (Object.keys(changed).length === 3 && Object.keys(changed.system).length === 1 && Object.keys(changed.system.concepts).length === 0) {
-        return false;
-      }
-    }
-
     if (doesNestedFieldExist(changed, "system.senses")) {
       const actorSenses = changed.system.senses;
       if (this.type === "character") {

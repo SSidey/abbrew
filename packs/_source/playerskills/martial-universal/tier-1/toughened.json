@@ -221,14 +221,14 @@
         "modifiers": [
           {
             "parseMode": "numeric",
-            "numerator": null,
-            "denominator": null
+            "numerator": 1,
+            "denominator": 1
           }
         ]
       },
       "changes": [
         {
-          "key": "[{\"value\":\"Maximum Resolve\",\"label\":\"system.defense.resolve.maxMod\"}]",
+          "key": "[{\"value\":\"Maximum Resolve Multiplier\",\"label\":\"system.defense.resolve.maxMult\"}]",
           "mode": 1,
           "value": "1.5",
           "priority": null
@@ -262,11 +262,11 @@
       "_stats": {
         "compendiumSource": null,
         "duplicateSource": null,
-        "coreVersion": "13.346",
+        "coreVersion": "13.348",
         "systemId": "abbrew",
         "systemVersion": "0.0.2-prerelease31",
         "createdTime": null,
-        "modifiedTime": 1756334290222,
+        "modifiedTime": 1765235756694,
         "lastModifiedBy": "abbrewpacks00000",
         "exportSource": null
       },

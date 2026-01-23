@@ -161,7 +161,9 @@ ABBREW.concepts = {
   rage: "ABBREW.Concepts.rage",
   fear: "ABBREW.Concepts.fear",
   sin: "ABBREW.Concepts.sin",
-  virtue: "ABBREW.Concepts.virtue"
+  virtue: "ABBREW.Concepts.virtue",
+  entropy: "ABBREW.Concepts.entropy",
+  disarray: "ABBREW.Concepts.disarray"
 }
 
 ABBREW.facing = {
@@ -824,7 +826,7 @@ const materialTraits = [
 
 const spellTraits = [
   { key: "spellcomponent", value: "ABBREW.Traits.Spell.spellcomponent", feature: "spell", subFeature: "identifiers", effect: "", data: "", exclude: [] },
-  { key: "concept", value: "ABBREW.Traits.Spell.concept", feature: "spell", subFeature: "identifiers", effect: "", data: "", exclude: [] },
+  { key: "essentia", value: "ABBREW.Traits.Spell.essentia", feature: "spell", subFeature: "identifiers", effect: "", data: "", exclude: [] },
   { key: "spellform", value: "ABBREW.Traits.Spell.spellform", feature: "spell", subFeature: "identifiers", effect: "", data: "", exclude: [] },
   { key: "spellamp", value: "ABBREW.Traits.Spell.spellamp", feature: "spell", subFeature: "identifiers", effect: "", data: "", exclude: [] }
 ]
@@ -846,6 +848,8 @@ ABBREW.innateConcepts = [
   { key: "orc", value: "ABBREW.Traits.InnateConcepts.orc", feature: "innateConcepts", subFeature: "species", effect: "", data: "", exclude: [] },
   { key: "lizardfolk", value: "ABBREW.Traits.InnateConcepts.lizardfolk", feature: "innateConcepts", subFeature: "species", effect: "", data: "", exclude: [] },
   { key: "serpentfolk", value: "ABBREW.Traits.InnateConcepts.serpentfolk", feature: "innateConcepts", subFeature: "species", effect: "", data: "", exclude: [] },
+  { key: "evil", value: "ABBREW.Traits.InnateConcepts.evil", feature: "innateConcepts", subFeature: "aligned", effect: "", data: "", exclude: [] },
+  { key: "good", value: "ABBREW.Traits.InnateConcepts.good", feature: "innateConcepts", subFeature: "aligned", effect: "", data: "", exclude: [] },
 ]
 
 ABBREW.traits = [
@@ -870,7 +874,7 @@ ABBREW.attackModes = {
   "feint": "ABBREW.AttackModes.feint",
   "overpower": "ABBREW.AttackModes.overpower",
   "finisher": "ABBREW.AttackModes.finisher",
-  "spell": "ABBREW.AttackModes.spell"
+  "effect": "ABBREW.AttackModes.effect"
 }
 
 ABBREW.modify = {
@@ -958,6 +962,8 @@ ABBREW.fundamentalSkillSummaries = [
 ABBREW.fundamentalSystemSkillIds = [
   "abbrewRest000000",
   "abbrewRecover000",
+  // "abbrewVisualise0",
+  "abbrewCastSpell0"
 ]
 
 
@@ -1096,7 +1102,6 @@ ABBREW.activeEffectKeys = [
   { value: "system.defense.resolve.maxMod", label: "ABBREW.Defense.Resolve.max" },
   { value: "system.defense.resolve.maxMult", label: "ABBREW.Defense.Resolve.maxMult" },
   { value: "system.defense.adjacentAllies", label: "ABBREW.ActiveEffectKeys.adjacentAllies" },
-  { value: "system.magic.conceptCapacityBonus", label: "ABBREW.ActiveEffectKeys.conceptCapacityBonus" }
 ]
 
 ABBREW.speeds = {
@@ -1110,7 +1115,8 @@ ABBREW.speeds = {
 
 ABBREW.skillIds = {
   step: "jv5DDww4KxR8YbQK",
-  move: "ttDyhN1XtKKSjkXk"
+  move: "ttDyhN1XtKKSjkXk",
+  completeSpellPhrase: "FHlzdMgd3ev9deDa"
 }
 
 ABBREW.visionModes = CONFIG.Canvas.visionModes;

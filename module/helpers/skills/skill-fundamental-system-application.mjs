@@ -1,4 +1,6 @@
+import { getTokenForActor } from "../utils.mjs";
 import { handlePairedSkills } from "./skill-activation.mjs";
+import { applySkillEffects } from "./skill-application.mjs";
 import { renderChatMessage } from "./skill-chat.mjs";
 
 export async function applySystemFundamentalSkill(actor, skill) {
@@ -9,6 +11,9 @@ export async function applySystemFundamentalSkill(actor, skill) {
             break;
         case "abbrewRecover000":
             skillResult = await applyRecover(actor)
+            break;
+        case "abbrewCastSpell0":
+            await castSpell(actor);
             break;
     }
 
@@ -104,4 +109,45 @@ async function applyUseAndResourceRecharge(actor, skillsToRecharge, skillsToEmpt
     const updates = skillUsesToRecharge.map(s => ({ _id: s._id, "system.action.uses.value": s.system.action.uses.max }));
     await Item.implementation.updateDocuments(updates, { parent: actor });
     return true;
+}
+
+async function castSpell(actor) {
+    const spellPhrase = actor.system.magic.spellComponents.length > 0 ? actor.system.spellPhrase : "Nothing Happened";
+    const initialConcepts = structuredClone(actor.system.concepts.available);
+    const modifiedConcepts = Object.keys(initialConcepts).reduce((concepts, key) => {
+        if (key === "disarray") {
+            concepts[key] = initialConcepts[key];
+        }
+        else if (initialConcepts[key].value > 0) {
+            concepts[key] = { ...initialConcepts[key], value: 0 };
+        }
+
+        return concepts;
+    }, {});
+
+    const essentiaPending = actor.system.magic.essentia;
+    const essentiaSkills = actor.items.filter(i => i.type === "skill").filter(s => essentiaPending.includes(s._id));
+    const essentiaPromises = essentiaSkills.map(async s => await applySkillEffects(actor, s, [], false));
+    await Promise.all(essentiaPromises);
+
+    await actor.update({ "system.concepts.available": modifiedConcepts, "system.magic.spellComponents": [], "system.magic.essentia": [] });
+
+    const skillsToRecharge = actor.items.filter(i => i.type === "skill").filter(s => s.system.abbrewId.uuid === "abbrewVisualise0");
+    await applyUseAndResourceRecharge(actor, skillsToRecharge, []);
+    const templateData = {
+        actor: actor,
+        user: game.user,
+        skillCheck: { attempts: [] },
+        actorSize: actor.system.meta.size.value,
+        actorTier: actor.system.meta.tier,
+        mainSummary: {
+            name: "Spell Phrase",
+            description: spellPhrase
+        }
+    };
+    const data = {
+        actor: actor, actorSize: actor.system.meta.size.value, actorTier: actor.system.meta.tier.value, traits: [], sources: { token: getTokenForActor(actor)?._id }
+    };
+    await renderChatMessage(true, actor, { name: "Spell Phrase", system: { skillType: "Fundamental" } }, templateData, data);
+
 }

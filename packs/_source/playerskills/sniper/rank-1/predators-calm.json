@@ -59,7 +59,7 @@
     "action": {
       "activationType": "synergy",
       "actionCost": "0",
-      "actionImage": "",
+      "actionImage": "0a",
       "duration": {
         "isConcentration": false,
         "precision": "0",
@@ -324,18 +324,18 @@
     "siblingSkillModifiers": []
   },
   "effects": [],
-  "sort": 100000,
+  "sort": 400000,
   "ownership": {
     "default": 0
   },
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.346",
+    "coreVersion": "13.348",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1748385483143,
-    "modifiedTime": 1756513812699,
+    "modifiedTime": 1756658756662,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

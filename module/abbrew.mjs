@@ -515,6 +515,10 @@ Hooks.on("updateItem", async (document, changed, options, userId) => {
 Hooks.on("preUpdateItem", () => { })
 
 Hooks.on("deleteActiveEffect", async (effect, options, userId) => {
+  if (!game.user.isActiveGM) {
+    return;
+  }
+
   const parent = effect.parent;
   await parent.handleDeleteActiveEffect(effect);
 });
@@ -881,7 +885,7 @@ async function requestSkillCheckMacro() {
   console.log(JSON.stringify(result));
   if (result.selectId) {
     const fundamentalSkill = CONFIG.ABBREW.fundamentalAttributeSkillMap[result.selectId];
-    await requestSkillCheck(fundamentalSkill.name, [fundamentalSkill.id], result.checkType, result.difficulty, result.successes);
+    await requestSkillCheck(result.skillName, [fundamentalSkill.id], result.checkType, result.difficulty, result.successes);
   } else if (result.skillId) {
     await requestSkillCheck(result.skillName, [result.skillId], result.checkType, result.difficulty, result.successes);
   } else {

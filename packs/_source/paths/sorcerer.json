@@ -17,16 +17,16 @@
     "skills": {
       "initiate": [
         {
-          "name": "Draw Power",
-          "id": "yj5Y6cGCJozG619M",
-          "image": "systems/abbrew/assets/icons/concepts/esoteric.svg",
-          "sourceId": "Compendium.abbrew.playerskills.Item.yj5Y6cGCJozG619M"
+          "name": "Bloodline",
+          "id": "fNpiV6f2TnvBfKl0",
+          "image": "systems/abbrew/assets/icons/concepts/blood.svg",
+          "sourceId": "Compendium.abbrew.playerskills.Item.fNpiV6f2TnvBfKl0"
         },
         {
-          "name": "Manifest Spell",
-          "id": "FHlzdMgd3ev9deDa",
-          "image": "systems/abbrew/assets/icons/concepts/esoteric.svg",
-          "sourceId": "Compendium.abbrew.playerskills.Item.FHlzdMgd3ev9deDa"
+          "name": "Overflowing Font",
+          "id": "BnXqf1pfAhvmAPbN",
+          "image": "systems/abbrew/assets/icons/wounds/instability.webp",
+          "sourceId": "Compendium.abbrew.playerskills.Item.BnXqf1pfAhvmAPbN"
         }
       ]
     }
@@ -43,7 +43,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746223314773,
-    "modifiedTime": 1756583156205,
+    "modifiedTime": 1764627730058,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

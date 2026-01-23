@@ -1,0 +1,21 @@
+{
+  "type": "Item",
+  "folder": "tKrN1W94qiYmzAxJ",
+  "name": "Initiate",
+  "color": null,
+  "sorting": "a",
+  "_id": "gYlgYFbhgj4s3htD",
+  "description": "",
+  "sort": -100000,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.348",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "lastModifiedBy": "abbrewpacks00000",
+    "modifiedTime": 1756932234922
+  },
+  "_key": "!folders!gYlgYFbhgj4s3htD"
+}

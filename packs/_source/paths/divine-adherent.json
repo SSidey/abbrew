@@ -13,7 +13,23 @@
       "value": "",
       "uuid": ""
     },
-    "roles": "[{\"label\":\"acolyte\",\"value\":\"Acolyte\",\"title\":\"You derive your abilities from a higher power.\"},{\"label\":\"ranged\",\"value\":\"Ranged\",\"title\":\"You prefer to fight at a distance from your opponents.\"},{\"label\":\"magic\",\"value\":\"Magic\",\"title\":\"You primarily harness magic to combat your foes.\"},{\"label\":\"healer\",\"value\":\"Healer\",\"title\":\"You are well acquainted with fixing up the party after a fight.\"}]"
+    "roles": "[{\"label\":\"acolyte\",\"value\":\"Acolyte\",\"title\":\"You derive your abilities from a higher power.\"},{\"label\":\"ranged\",\"value\":\"Ranged\",\"title\":\"You prefer to fight at a distance from your opponents.\"},{\"label\":\"magic\",\"value\":\"Magic\",\"title\":\"You primarily harness magic to combat your foes.\"},{\"label\":\"healer\",\"value\":\"Healer\",\"title\":\"You are well acquainted with fixing up the party after a fight.\"}]",
+    "skills": {
+      "initiate": [
+        {
+          "name": "Channel Divinity (Harm)",
+          "id": "dtSTwl6ifXSvMzZM",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.playerskills.Item.dtSTwl6ifXSvMzZM"
+        },
+        {
+          "name": "Channel Divinity (Heal)",
+          "id": "RB45FsJE7GPd19g8",
+          "image": "icons/svg/item-bag.svg",
+          "sourceId": "Compendium.abbrew.playerskills.Item.RB45FsJE7GPd19g8"
+        }
+      ]
+    }
   },
   "effects": [],
   "sort": 100000,
@@ -23,11 +39,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.346",
+    "coreVersion": "13.348",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1746223314773,
-    "modifiedTime": 1756416182991,
+    "modifiedTime": 1756927533637,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

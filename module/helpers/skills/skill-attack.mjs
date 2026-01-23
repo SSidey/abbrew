@@ -11,18 +11,16 @@ export async function applyAttackProfiles(actor, skill, modifierSkills, fortune,
         const roll = new Roll(rollFormula, skill.system.actor);
         const result = await roll.evaluate();
         const attackMode = attackProfile.attackMode;
-        const attributeMultiplier = getAttributeModifier(attackMode, attackProfile);
+        const attackModeAttributeMultiplier = getAttributeModifier(attackMode, attackProfile);
         const damage = Object.entries(attackProfile.damage.map(d => {
             if (!d || d.type === "") {
                 return null;
             }
 
-            let attributeModifier = 0;
-            if (d.attributeModifier) {
-                attributeModifier = Math.floor(attributeMultiplier * actor.system.attributes[d.attributeModifier].value);
-            }
+            let attributeModifier = d.attributeModifier ? actor.system.attributes[d.attributeModifier].value : 0;
+            const finalAttributeModifier = Math.floor(attackModeAttributeMultiplier * d.attributeMultiplier * attributeModifier);
 
-            const finalDamage = Math.floor(d.overallMultiplier * (attributeModifier + (d.damageMultiplier * parsePathSync(d.value, actor, actor))));
+            const finalDamage = Math.floor(d.overallMultiplier * (finalAttributeModifier + (d.damageMultiplier * parsePathSync(d.value, actor, actor))));
 
             return { damageType: d.type, value: finalDamage, penetration: d.penetration };
         }).filter(d => d)
@@ -52,7 +50,7 @@ export async function applyAttackProfiles(actor, skill, modifierSkills, fortune,
         const isStrongAttack = ['overpower', 'ranged', 'aimedshot', 'thrown'].includes(attackMode);
         const showFinisher = attackMode === 'finisher' || totalSuccesses > 0;
         const isFinisher = attackMode === 'finisher';
-        const showAcceptButton = attackMode === "spell";
+        const showAcceptButton = attackMode === "effect";
 
         templateData = {
             ...templateData,

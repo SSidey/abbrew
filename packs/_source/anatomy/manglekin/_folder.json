@@ -1,0 +1,22 @@
+{
+  "type": "Item",
+  "folder": null,
+  "name": "Manglekin",
+  "color": null,
+  "sorting": "a",
+  "_id": "8KbQ2QEv7fiGsXIq",
+  "description": "",
+  "sort": 0,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.348",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1764356291714,
+    "modifiedTime": 1764356291714,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!8KbQ2QEv7fiGsXIq"
+}

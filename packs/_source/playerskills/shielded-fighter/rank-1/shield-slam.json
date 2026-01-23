@@ -47,7 +47,7 @@
     "rank": 1,
     "renderUnique": false,
     "isFavourited": false,
-    "isActivatable": false,
+    "isActivatable": true,
     "activateOnCreate": false,
     "applyTurnStart": false,
     "applyTurnEnd": false,
@@ -139,7 +139,7 @@
     },
     "action": {
       "activationType": "synergy",
-      "actionCost": null,
+      "actionCost": "1",
       "tierDiceChange": 0,
       "actionImage": "",
       "duration": {
@@ -554,11 +554,11 @@
   "_stats": {
     "duplicateSource": null,
     "exportSource": null,
-    "coreVersion": "13.346",
+    "coreVersion": "13.348",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1755644504173,
-    "modifiedTime": 1755644597296,
+    "modifiedTime": 1756927236256,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!NrXav6k4VrAA4Ckb"

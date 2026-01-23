@@ -1,0 +1,186 @@
+{
+  "folder": "GKnPsP0dkjknbZyU",
+  "name": "Manglekin Grasping Claws",
+  "type": "anatomy",
+  "_id": "XZLRTQHtXZdZRZ4e",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "name": {
+      "base": "Manglekin Grasping Claws",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1,
+      "size": 0,
+      "quality": 0
+    },
+    "description": "",
+    "traits": {
+      "raw": "[{\"key\":\"arm\",\"value\":\"Arm\",\"feature\":\"item\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "enhancements": [],
+    "quantity": 1,
+    "heft": 0,
+    "complexity": 0,
+    "equipType": "",
+    "equipPoints": {
+      "required": {
+        "raw": "",
+        "parsed": []
+      },
+      "provided": {
+        "raw": "",
+        "parsed": []
+      }
+    },
+    "handsRequired": "",
+    "equipState": "readied",
+    "handsSupplied": 0,
+    "actionCost": 0,
+    "exertActionCost": 0,
+    "validEquipStates": [],
+    "nextValidEquipStates": [],
+    "skills": {
+      "granted": [
+        {
+          "name": "Climb",
+          "skillType": "",
+          "id": "MdEjJXPBEVBhBgfC",
+          "image": "systems/abbrew/assets/icons/actions/0a.webp",
+          "sourceId": "Compendium.abbrew.skills.Item.MdEjJXPBEVBhBgfC"
+        },
+        {
+          "name": "Disarm",
+          "skillType": "",
+          "id": "iIibvIpO1Fz3BkvT",
+          "image": "systems/abbrew/assets/icons/skills/disarm.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.iIibvIpO1Fz3BkvT"
+        },
+        {
+          "name": "Grab",
+          "skillType": "",
+          "id": "nU042uDuvcVY0Bnm",
+          "image": "systems/abbrew/assets/icons/skills/grab.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.nU042uDuvcVY0Bnm"
+        },
+        {
+          "name": "Handle",
+          "skillType": "",
+          "id": "E1FoPANt1CjHlRvV",
+          "image": "systems/abbrew/assets/icons/actions/1a.webp",
+          "sourceId": "Compendium.abbrew.skills.Item.E1FoPANt1CjHlRvV"
+        },
+        {
+          "name": "Trip",
+          "skillType": "",
+          "id": "cWdN7kjxiodhUHkX",
+          "image": "systems/abbrew/assets/icons/skills/trip.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.cWdN7kjxiodhUHkX"
+        },
+        {
+          "name": "Shove",
+          "skillType": "",
+          "id": "1stLJNCnkgVA0ceT",
+          "image": "systems/abbrew/assets/icons/skills/shove.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.1stLJNCnkgVA0ceT"
+        },
+        {
+          "name": "Reposition",
+          "skillType": "",
+          "id": "U2cK5wpOqnCHHTLu",
+          "image": "systems/abbrew/assets/icons/skills/reposition.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.U2cK5wpOqnCHHTLu"
+        }
+      ]
+    },
+    "availableEnhancements": 0,
+    "storage": {
+      "hasStorage": false,
+      "type": "",
+      "accessible": false,
+      "value": 0,
+      "max": 0,
+      "storedItems": [],
+      "traitFilter": {
+        "raw": "",
+        "value": []
+      }
+    },
+    "storeIn": "",
+    "revealed": {
+      "isRevealed": false,
+      "revealSkills": {
+        "raw": "[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
+        "parsed": []
+      },
+      "difficulty": 10,
+      "tier": 0
+    },
+    "grantedBy": "",
+    "parts": "[{\"value\":\"Arm\"}]",
+    "isBroken": false,
+    "isDismembered": false,
+    "hands": 1,
+    "speed": {
+      "land": {
+        "label": "",
+        "value": null
+      },
+      "burrow": {
+        "label": "",
+        "value": null
+      },
+      "swim": {
+        "label": "",
+        "value": null
+      },
+      "climb": {
+        "label": "",
+        "value": null
+      },
+      "fly": {
+        "label": "",
+        "value": null
+      },
+      "teleport": {
+        "label": "",
+        "value": null
+      }
+    },
+    "defense": {
+      "guard": 4,
+      "inflexibility": 0,
+      "protection": []
+    },
+    "naturalWeapons": [
+      {
+        "name": "Grasping Claws",
+        "id": "s5J9wQps9EFotm1P",
+        "image": "icons/svg/item-bag.svg",
+        "sourceId": "Compendium.world.natural-weapons.Item.s5J9wQps9EFotm1P"
+      }
+    ]
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.348",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1764356694360,
+    "modifiedTime": 1764362862725,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!XZLRTQHtXZdZRZ4e"
+}

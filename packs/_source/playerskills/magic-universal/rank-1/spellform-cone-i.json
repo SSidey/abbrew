@@ -99,8 +99,8 @@
       }
     },
     "action": {
-      "activationType": "synergy",
-      "actionCost": "0",
+      "activationType": "standalone",
+      "actionCost": "1",
       "actionImage": "",
       "duration": {
         "isConcentration": false,
@@ -463,6 +463,14 @@
           "fear": {
             "operator": "add",
             "type": "numeric"
+          },
+          "sin": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "virtue": {
+            "operator": "add",
+            "type": "numeric"
           }
         }
       }
@@ -503,11 +511,11 @@
   "_stats": {
     "duplicateSource": null,
     "exportSource": null,
-    "coreVersion": "13.346",
+    "coreVersion": "13.348",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1750369321535,
-    "modifiedTime": 1754952179737,
+    "modifiedTime": 1763919515074,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!M1jYSI8SGCa4uTY0"

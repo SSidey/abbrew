@@ -1,0 +1,235 @@
+{
+  "folder": "WsIfPkO39t1GTnDY",
+  "name": "Spider Leg",
+  "type": "anatomy",
+  "_id": "nXxsFBArnx72WKHE",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "name": {
+      "base": "",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1,
+      "size": 0,
+      "quality": 0
+    },
+    "description": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "enhancements": [],
+    "quantity": 1,
+    "heft": 0,
+    "complexity": 0,
+    "equipType": "",
+    "equipPoints": {
+      "required": {
+        "raw": "",
+        "parsed": []
+      },
+      "provided": {
+        "raw": "",
+        "parsed": []
+      }
+    },
+    "handsRequired": "",
+    "equipState": "readied",
+    "handsSupplied": 0,
+    "actionCost": 0,
+    "exertActionCost": 0,
+    "validEquipStates": [],
+    "nextValidEquipStates": [],
+    "skills": {
+      "granted": [
+        {
+          "name": "Apply Pressure",
+          "skillType": "",
+          "id": "CvI0LhIFyMYsBwxx",
+          "image": "systems/abbrew/assets/icons/actions/1a.webp",
+          "sourceId": "Compendium.abbrew.skills.Item.CvI0LhIFyMYsBwxx"
+        },
+        {
+          "name": "Climb",
+          "skillType": "",
+          "id": "MdEjJXPBEVBhBgfC",
+          "image": "systems/abbrew/assets/icons/actions/0a.webp",
+          "sourceId": "Compendium.abbrew.skills.Item.MdEjJXPBEVBhBgfC"
+        },
+        {
+          "name": "Disarm",
+          "skillType": "",
+          "id": "iIibvIpO1Fz3BkvT",
+          "image": "systems/abbrew/assets/icons/skills/disarm.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.iIibvIpO1Fz3BkvT"
+        },
+        {
+          "name": "Grab",
+          "skillType": "",
+          "id": "nU042uDuvcVY0Bnm",
+          "image": "systems/abbrew/assets/icons/skills/grab.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.nU042uDuvcVY0Bnm"
+        },
+        {
+          "name": "Handle",
+          "skillType": "",
+          "id": "E1FoPANt1CjHlRvV",
+          "image": "systems/abbrew/assets/icons/actions/1a.webp",
+          "sourceId": "Compendium.abbrew.skills.Item.E1FoPANt1CjHlRvV"
+        },
+        {
+          "name": "Reposition",
+          "skillType": "",
+          "id": "U2cK5wpOqnCHHTLu",
+          "image": "systems/abbrew/assets/icons/skills/reposition.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.U2cK5wpOqnCHHTLu"
+        },
+        {
+          "name": "Shove",
+          "skillType": "",
+          "id": "1stLJNCnkgVA0ceT",
+          "image": "systems/abbrew/assets/icons/skills/shove.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.1stLJNCnkgVA0ceT"
+        },
+        {
+          "name": "Dodge",
+          "skillType": "",
+          "id": "ocw9C57R2vHbR9gc",
+          "image": "systems/abbrew/assets/icons/skills/dodge.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.ocw9C57R2vHbR9gc"
+        },
+        {
+          "name": "Hide",
+          "skillType": "",
+          "id": "dSFJ7IWr2RsGF288",
+          "image": "systems/abbrew/assets/icons/actions/1a.webp",
+          "sourceId": "Compendium.abbrew.skills.Item.dSFJ7IWr2RsGF288"
+        },
+        {
+          "name": "Jump",
+          "skillType": "",
+          "id": "JcYV8gQi0h9AyxxA",
+          "image": "systems/abbrew/assets/icons/skills/jump.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.JcYV8gQi0h9AyxxA"
+        },
+        {
+          "name": "Move",
+          "skillType": "",
+          "id": "ttDyhN1XtKKSjkXk",
+          "image": "systems/abbrew/assets/icons/actions/2a.webp",
+          "sourceId": "Compendium.abbrew.skills.Item.ttDyhN1XtKKSjkXk"
+        },
+        {
+          "name": "Step",
+          "skillType": "",
+          "id": "jv5DDww4KxR8YbQK",
+          "image": "systems/abbrew/assets/icons/actions/1a.webp",
+          "sourceId": "Compendium.abbrew.skills.Item.jv5DDww4KxR8YbQK"
+        },
+        {
+          "name": "Swim",
+          "skillType": "",
+          "id": "HiSRr2vw5BHNGwkl",
+          "image": "systems/abbrew/assets/icons/skills/swim.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.HiSRr2vw5BHNGwkl"
+        },
+        {
+          "name": "Trip",
+          "skillType": "",
+          "id": "cWdN7kjxiodhUHkX",
+          "image": "systems/abbrew/assets/icons/skills/trip.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.cWdN7kjxiodhUHkX"
+        },
+        {
+          "name": "Go Prone",
+          "id": "uqr3bsN5pbUUS7av",
+          "image": "systems/abbrew/assets/icons/statuses/prone.svg",
+          "sourceId": "Compendium.abbrew.skills.Item.uqr3bsN5pbUUS7av",
+          "skillType": ""
+        }
+      ]
+    },
+    "availableEnhancements": 0,
+    "storage": {
+      "hasStorage": false,
+      "type": "",
+      "accessible": false,
+      "value": 0,
+      "max": 0,
+      "storedItems": [],
+      "traitFilter": {
+        "raw": "",
+        "value": []
+      }
+    },
+    "storeIn": "",
+    "revealed": {
+      "isRevealed": false,
+      "revealSkills": {
+        "raw": "[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
+        "parsed": []
+      },
+      "difficulty": 10,
+      "tier": 0
+    },
+    "grantedBy": "",
+    "parts": "[{\"value\":\"Leg\"},{\"value\":\"Arm\"}]",
+    "isBroken": false,
+    "isDismembered": false,
+    "hands": 1,
+    "speed": {
+      "land": {
+        "label": "",
+        "value": 1
+      },
+      "burrow": {
+        "label": "",
+        "value": null
+      },
+      "swim": {
+        "label": "",
+        "value": null
+      },
+      "climb": {
+        "label": "",
+        "value": 1
+      },
+      "fly": {
+        "label": "",
+        "value": null
+      },
+      "teleport": {
+        "label": "",
+        "value": null
+      }
+    },
+    "defense": {
+      "guard": 0,
+      "inflexibility": 0,
+      "protection": []
+    },
+    "naturalWeapons": []
+  },
+  "effects": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.348",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1761500875371,
+    "modifiedTime": 1761501235966,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!nXxsFBArnx72WKHE"
+}

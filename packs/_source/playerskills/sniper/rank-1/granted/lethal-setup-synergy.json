@@ -12,7 +12,7 @@
     "meta": {
       "tier": 1
     },
-    "description": "",
+    "description": "<p>Time your shot for maximum devastation.</p><p>You spend your entire turn aiming, your next @UUID[Compendium.abbrew.skills.Item.1gQmHvrgMSyzDAmX]{Aimed Shot} has 1 bonus success.</p>",
     "traits": {
       "raw": "",
       "value": []
@@ -491,6 +491,22 @@
             "type": "numeric",
             "numerator": 1,
             "denominator": 1
+          },
+          "sin": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "virtue": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "entropy": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "disarray": {
+            "operator": "add",
+            "type": "numeric"
           }
         }
       }
@@ -531,11 +547,11 @@
   "_stats": {
     "duplicateSource": null,
     "exportSource": null,
-    "coreVersion": "13.346",
+    "coreVersion": "13.348",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1755108372245,
-    "modifiedTime": 1755643800826,
+    "modifiedTime": 1764629819485,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!93q9J4nbrM0A3evO"

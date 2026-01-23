@@ -55,7 +55,7 @@
       "grantedOnAccept": []
     },
     "resource": {
-      "capacity": 10,
+      "capacity": 1,
       "operator": "",
       "relatedResource": "",
       "fillCapacityOnCreate": false,
@@ -480,7 +480,7 @@
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1748903700556,
-    "modifiedTime": 1756582925661,
+    "modifiedTime": 1764628421290,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

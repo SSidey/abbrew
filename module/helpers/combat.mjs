@@ -24,8 +24,8 @@ export async function handleCombatEnd(actors) {
             const update = s.system.action.uses.max;
             await s.update({ "system.action.uses.value": update });
         });
-        await actor.unsetFlag("abbrew", "combat.traits.last");
-        await actor.unsetFlag("abbrew", "combat.traits.current");
+        await a.unsetFlag("abbrew", "combat.traits.last");
+        await a.unsetFlag("abbrew", "combat.traits.current");
     });
 }
 

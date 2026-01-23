@@ -9,7 +9,7 @@
     "configurable": true,
     "action": {
       "activationType": "standalone",
-      "actionCost": "0",
+      "actionCost": "1",
       "modifiers": {
         "guard": {
           "self": {
@@ -148,6 +148,14 @@
           "conquest": {
             "operator": "add",
             "type": "numeric"
+          },
+          "rage": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "fear": {
+            "operator": "add",
+            "type": "numeric"
           }
         },
         "attackProfile": {
@@ -228,11 +236,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.346",
+    "coreVersion": "13.348",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1743073036669,
-    "modifiedTime": 1753654487656,
+    "modifiedTime": 1756665203407,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

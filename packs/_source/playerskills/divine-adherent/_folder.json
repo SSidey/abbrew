@@ -1,0 +1,22 @@
+{
+  "type": "Item",
+  "folder": null,
+  "name": "Divine Adherent",
+  "color": null,
+  "sorting": "a",
+  "_id": "NnLsG0tSmBlG8Y3E",
+  "description": "",
+  "sort": 0,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.348",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1756927220630,
+    "modifiedTime": 1756927220630,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!NnLsG0tSmBlG8Y3E"
+}

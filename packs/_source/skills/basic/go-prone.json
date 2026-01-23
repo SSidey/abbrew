@@ -43,7 +43,7 @@
       "isItemGrantTriggerRequired": false
     },
     "rank": 1,
-    "renderUnique": false,
+    "renderUnique": true,
     "isFavourited": false,
     "isActivatable": true,
     "activateOnCreate": false,
@@ -491,6 +491,14 @@
             "type": "numeric",
             "numerator": 1,
             "denominator": 1
+          },
+          "sin": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "virtue": {
+            "operator": "add",
+            "type": "numeric"
           }
         }
       }
@@ -592,11 +600,11 @@
   "_stats": {
     "duplicateSource": null,
     "exportSource": null,
-    "coreVersion": "13.346",
+    "coreVersion": "13.348",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1755082681987,
-    "modifiedTime": 1755082828278,
+    "modifiedTime": 1761509663724,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!uqr3bsN5pbUUS7av"

@@ -1,0 +1,555 @@
+{
+  "folder": "IZmnbSVaeveIobGK",
+  "name": "Essence of Fire I",
+  "type": "skill",
+  "_id": "v578Hmi6me0B8vcl",
+  "img": "systems/abbrew/assets/icons/concepts/fire.svg",
+  "system": {
+    "name": {
+      "base": "",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1
+    },
+    "description": "<p>You have knowledge of Fire, allowing you to use it as a component of spells.</p><hr><p>Fire I acts as 1 Fire damage.</p>",
+    "traits": {
+      "raw": "[{\"key\":\"fire\",\"value\":\"Fire\",\"feature\":\"skill\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"spellcomponent\",\"value\":\"Spell Component\",\"feature\":\"spell\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]},{\"key\":\"essentia\",\"value\":\"Essentia\",\"feature\":\"spell\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "abbrew.skill.firei.v578Hmi6me0B8vcl",
+      "uuid": "v578Hmi6me0B8vcl"
+    },
+    "enhancements": [],
+    "skillModifiers": {
+      "synergy": "",
+      "synergyTraitFilter": {
+        "raw": "",
+        "value": []
+      },
+      "discord": "",
+      "isActorGrantTriggerRequired": false,
+      "isItemGrantTriggerRequired": false
+    },
+    "rank": 1,
+    "isFavourited": false,
+    "isActivatable": true,
+    "activateOnCreate": false,
+    "applyTurnStart": false,
+    "applyTurnEnd": false,
+    "applyOnExpiry": false,
+    "activateOnDamageAccept": false,
+    "sources": {
+      "actor": "",
+      "items": []
+    },
+    "grantedBy": {
+      "actor": "",
+      "item": ""
+    },
+    "handleExpiryEffects": true,
+    "skills": {
+      "granted": [
+        {
+          "name": "Align Thought: Fire I",
+          "id": "cBkc8zDNWzOUUtRW",
+          "image": "systems/abbrew/assets/icons/concepts/fire.svg",
+          "sourceId": "Compendium.abbrew.playerskills.Item.cBkc8zDNWzOUUtRW",
+          "skillType": ""
+        }
+      ],
+      "paired": [],
+      "grantedOnActivation": [],
+      "grantedOnAccept": [],
+      "grantedOnExpiry": []
+    },
+    "resource": {
+      "capacity": 0,
+      "operator": "",
+      "relatedResource": null,
+      "fillCapacityOnCreate": false,
+      "emptyPeriod": ""
+    },
+    "senses": {
+      "modifiesSenses": false,
+      "sight": {
+        "enabled": false,
+        "range": 0,
+        "angle": 360,
+        "visionMode": "basic"
+      },
+      "detectionModes": []
+    },
+    "light": {
+      "negative": false,
+      "priority": 0,
+      "alpha": 0.5,
+      "angle": 360,
+      "bright": 0,
+      "color": null,
+      "coloration": 1,
+      "dim": 0,
+      "attenuation": 0.5,
+      "luminosity": 0.5,
+      "saturation": 0,
+      "contrast": 0,
+      "shadows": 0,
+      "animation": {
+        "type": null,
+        "speed": 5,
+        "intensity": 5,
+        "reverse": false
+      },
+      "darkness": {
+        "min": 0,
+        "max": 1
+      }
+    },
+    "action": {
+      "activationType": "standalone",
+      "actionCost": "1",
+      "actionImage": "",
+      "duration": {
+        "isConcentration": false,
+        "precision": "0",
+        "value": 0,
+        "expireOnStartOfTurn": true
+      },
+      "uses": {
+        "hasUses": false,
+        "asStacks": false,
+        "removeStackOnUse": true,
+        "value": 0,
+        "max": 0,
+        "period": "",
+        "stackRemovalActivation": false,
+        "removeWhenNoUsesRemain": false
+      },
+      "charges": {
+        "hasCharges": false,
+        "value": 0,
+        "max": 0
+      },
+      "isActive": false,
+      "removeOnPairedApply": false,
+      "handleRemovedSkillExpiry": true,
+      "asyncValues": [],
+      "skillCheck": [],
+      "skillRequest": {
+        "isEnabled": false,
+        "isContested": false,
+        "selfCheck": false,
+        "checkType": "",
+        "requirements": {
+          "modifiers": "",
+          "successes": 0,
+          "result": 0
+        },
+        "targetModifiers": "",
+        "results": {
+          "success": {
+            "description": ""
+          },
+          "failure": {
+            "description": ""
+          }
+        }
+      },
+      "attackProfile": {
+        "isEnabled": true,
+        "name": "",
+        "attackType": "static",
+        "lethal": 0,
+        "critical": 10,
+        "handsSupplied": null,
+        "attackMode": "overpower",
+        "finisher": {
+          "type": "",
+          "description": "",
+          "wounds": []
+        },
+        "damage": [
+          {
+            "overallMultiplier": 1,
+            "value": "1",
+            "type": "fire",
+            "damageMultiplier": 1,
+            "attributeModifier": "wil",
+            "attributeMultiplier": 1,
+            "penetration": 0
+          }
+        ],
+        "finisherLimit": 10
+      },
+      "modifiers": {
+        "fortune": 0,
+        "actionCost": {
+          "value": 0,
+          "operator": ""
+        },
+        "duration": {
+          "valueSteps": 0,
+          "setOrStep": false,
+          "intervalSteps": 0,
+          "intervalSet": ""
+        },
+        "attackProfile": {
+          "isEnabled": true,
+          "combineAttacks": {
+            "isEnabled": false,
+            "value": null
+          },
+          "attackType": "static",
+          "attackMode": "",
+          "handsSupplied": null,
+          "finisherLimit": {
+            "value": 10,
+            "operator": "equal"
+          },
+          "lethal": {
+            "value": 0,
+            "operator": "equal"
+          },
+          "critical": {
+            "value": 10,
+            "operator": "equal"
+          },
+          "penetration": {
+            "value": 10,
+            "operator": ""
+          },
+          "finisher": {
+            "type": "",
+            "description": "",
+            "wounds": []
+          },
+          "damage": [
+            {
+              "modify": "add",
+              "modifyType": "",
+              "overallMultiplier": 1,
+              "value": "0",
+              "type": "fire",
+              "damageMultiplier": 1,
+              "attributeModifier": "wil",
+              "attributeMultiplier": 1,
+              "penetration": 0
+            }
+          ]
+        },
+        "protection": [],
+        "guard": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "risk": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": "",
+            "lateParse": false
+          }
+        },
+        "wounds": {
+          "self": [],
+          "target": []
+        },
+        "resolve": {
+          "self": {
+            "value": [],
+            "operator": ""
+          },
+          "target": {
+            "value": [],
+            "operator": ""
+          }
+        },
+        "resources": {
+          "self": [],
+          "target": []
+        },
+        "concepts": {
+          "physical": {
+            "name": "physical",
+            "label": "ABBREW.Concepts.physical",
+            "value": "",
+            "operator": "add",
+            "type": "numeric",
+            "numerator": 1,
+            "denominator": 1
+          },
+          "crushing": {
+            "name": "crushing",
+            "label": "ABBREW.Concepts.crushing",
+            "value": "",
+            "operator": "add",
+            "type": "numeric",
+            "numerator": 1,
+            "denominator": 1
+          },
+          "piercing": {
+            "name": "piercing",
+            "label": "ABBREW.Concepts.piercing",
+            "value": "",
+            "operator": "add",
+            "type": "numeric",
+            "numerator": 1,
+            "denominator": 1
+          },
+          "slashing": {
+            "name": "slashing",
+            "label": "ABBREW.Concepts.slashing",
+            "value": "",
+            "operator": "add",
+            "type": "numeric",
+            "numerator": 1,
+            "denominator": 1
+          },
+          "fire": {
+            "name": "fire",
+            "label": "ABBREW.Concepts.fire",
+            "value": "",
+            "operator": "add",
+            "type": "numeric",
+            "numerator": 1,
+            "denominator": 1
+          },
+          "cold": {
+            "name": "cold",
+            "label": "ABBREW.Concepts.cold",
+            "value": "",
+            "operator": "add",
+            "type": "numeric",
+            "numerator": 1,
+            "denominator": 1
+          },
+          "water": {
+            "name": "water",
+            "label": "ABBREW.Concepts.water",
+            "value": "",
+            "operator": "add",
+            "type": "numeric",
+            "numerator": 1,
+            "denominator": 1
+          },
+          "earth": {
+            "name": "earth",
+            "label": "ABBREW.Concepts.earth",
+            "value": "",
+            "operator": "add",
+            "type": "numeric",
+            "numerator": 1,
+            "denominator": 1
+          },
+          "air": {
+            "name": "air",
+            "label": "ABBREW.Concepts.air",
+            "value": "",
+            "operator": "add",
+            "type": "numeric",
+            "numerator": 1,
+            "denominator": 1
+          },
+          "electricity": {
+            "name": "electricity",
+            "label": "ABBREW.Concepts.electricity",
+            "value": "",
+            "operator": "add",
+            "type": "numeric",
+            "numerator": 1,
+            "denominator": 1
+          },
+          "poison": {
+            "name": "poison",
+            "label": "ABBREW.Concepts.poison",
+            "value": "",
+            "operator": "add",
+            "type": "numeric",
+            "numerator": 1,
+            "denominator": 1
+          },
+          "flesh": {
+            "name": "flesh",
+            "label": "ABBREW.Concepts.flesh",
+            "value": "",
+            "operator": "add",
+            "type": "numeric",
+            "numerator": 1,
+            "denominator": 1
+          },
+          "blood": {
+            "name": "blood",
+            "label": "ABBREW.Concepts.blood",
+            "value": "",
+            "operator": "add",
+            "type": "numeric",
+            "numerator": 1,
+            "denominator": 1
+          },
+          "metal": {
+            "name": "metal",
+            "label": "ABBREW.Concepts.metal",
+            "value": "",
+            "operator": "add",
+            "type": "numeric",
+            "numerator": 1,
+            "denominator": 1
+          },
+          "light": {
+            "name": "light",
+            "label": "ABBREW.Concepts.light",
+            "value": "",
+            "operator": "add",
+            "type": "numeric",
+            "numerator": 1,
+            "denominator": 1
+          },
+          "dark": {
+            "name": "dark",
+            "label": "ABBREW.Concepts.dark",
+            "value": "",
+            "operator": "add",
+            "type": "numeric",
+            "numerator": 1,
+            "denominator": 1
+          },
+          "life": {
+            "name": "life",
+            "label": "ABBREW.Concepts.life",
+            "value": "",
+            "operator": "add",
+            "type": "numeric",
+            "numerator": 1,
+            "denominator": 1
+          },
+          "death": {
+            "name": "death",
+            "label": "ABBREW.Concepts.death",
+            "value": "",
+            "operator": "add",
+            "type": "numeric",
+            "numerator": 1,
+            "denominator": 1
+          },
+          "war": {
+            "name": "war",
+            "label": "ABBREW.Concepts.war",
+            "value": "",
+            "operator": "add",
+            "type": "numeric",
+            "numerator": 1,
+            "denominator": 1
+          },
+          "famine": {
+            "name": "famine",
+            "label": "ABBREW.Concepts.famine",
+            "value": "",
+            "operator": "add",
+            "type": "numeric",
+            "numerator": 1,
+            "denominator": 1
+          },
+          "pestilence": {
+            "name": "pestilence",
+            "label": "ABBREW.Concepts.pestilence",
+            "value": "",
+            "operator": "add",
+            "type": "numeric",
+            "numerator": 1,
+            "denominator": 1
+          },
+          "conquest": {
+            "name": "conquest",
+            "label": "ABBREW.Concepts.conquest",
+            "value": "",
+            "operator": "add",
+            "type": "numeric",
+            "numerator": 1,
+            "denominator": 1
+          },
+          "esoteric": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "rage": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "fear": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "sin": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "virtue": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "entropy": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "disarray": {
+            "operator": "add",
+            "type": "numeric"
+          }
+        }
+      }
+    },
+    "skillType": "path",
+    "path": {
+      "raw": "[{\"label\":\"universal\",\"value\":\"Universal\",\"roles\":[],\"title\":\"A universal path, skills with this path can be selected if it has roles matching thosee of your paths\",\"id\":\"abbrewpuniversal\"}]",
+      "value": {
+        "id": ""
+      }
+    },
+    "roles": {
+      "raw": "[{\"label\":\"magic\",\"value\":\"Magic\",\"title\":\"You primarily harness magic to combat your foes.\"}]",
+      "parsed": []
+    },
+    "archetype": "",
+    "attributeIncrease": "",
+    "attributeIncreaseLong": "",
+    "attributeRankIncrease": "",
+    "isProxied": false,
+    "siblingSkillModifiers": [],
+    "revealed": {
+      "isRevealed": false,
+      "revealSkills": {
+        "raw": "[{\"id\":\"abbrewIntCheck00\",\"value\":\"Intelligence Check\",\"sourceId\":\"Compendium.abbrew.skills.Item.abbrewIntCheck00\"}]",
+        "parsed": []
+      },
+      "difficulty": 15,
+      "tier": 1
+    }
+  },
+  "effects": [],
+  "sort": 1100000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.348",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1750271698984,
+    "modifiedTime": 1764625951684,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!v578Hmi6me0B8vcl"
+}

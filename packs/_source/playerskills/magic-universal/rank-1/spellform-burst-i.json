@@ -23,7 +23,7 @@
     },
     "enhancements": [],
     "skillModifiers": {
-      "synergy": "[{\"value\":\"Manifest Spell\",\"id\":\"FHlzdMgd3ev9deDa\",\"sourceId\":\"Compendium.abbrew.playerskills.Item.FHlzdMgd3ev9deDa\"}]",
+      "synergy": "",
       "synergyTraitFilter": {
         "raw": "",
         "value": []
@@ -99,8 +99,8 @@
       }
     },
     "action": {
-      "activationType": "synergy",
-      "actionCost": "0",
+      "activationType": "standalone",
+      "actionCost": "1",
       "actionImage": "",
       "duration": {
         "isConcentration": false,
@@ -252,8 +252,8 @@
           "esoteric": {
             "name": "esoteric",
             "label": "ABBREW.Concepts.esoteric",
-            "value": "",
-            "operator": "add",
+            "value": "1",
+            "operator": "minus",
             "type": "numeric",
             "numerator": 1,
             "denominator": 1
@@ -463,6 +463,14 @@
           "fear": {
             "operator": "add",
             "type": "numeric"
+          },
+          "sin": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "virtue": {
+            "operator": "add",
+            "type": "numeric"
           }
         }
       }
@@ -503,11 +511,11 @@
   "_stats": {
     "duplicateSource": null,
     "exportSource": null,
-    "coreVersion": "13.346",
+    "coreVersion": "13.348",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1750374477989,
-    "modifiedTime": 1754952160241,
+    "modifiedTime": 1763919503582,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!Fi3it8rP94o3T6o6"

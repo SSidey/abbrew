@@ -177,7 +177,8 @@
           "self": [],
           "target": []
         }
-      }
+      },
+      "skillCheck": []
     },
     "skillType": "",
     "path": {
@@ -196,11 +197,11 @@
   "flags": {},
   "_stats": {
     "duplicateSource": null,
-    "coreVersion": "13.345",
+    "coreVersion": "13.348",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1744236348769,
-    "modifiedTime": 1744236348769,
+    "modifiedTime": 1756592468585,
     "lastModifiedBy": "abbrewpacks00000",
     "exportSource": null
   },

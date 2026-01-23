@@ -1,0 +1,87 @@
+{
+  "name": "Manglekin",
+  "type": "creatureForm",
+  "_id": "2PeDTgFRvD8s2RlU",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "name": {
+      "base": "",
+      "parts": []
+    },
+    "meta": {
+      "tier": 1
+    },
+    "description": "",
+    "traits": {
+      "raw": "",
+      "value": []
+    },
+    "abbrewId": {
+      "value": "",
+      "uuid": ""
+    },
+    "enhancements": [],
+    "anatomy": [
+      {
+        "name": "Manglekin Grasping Claws",
+        "id": "XZLRTQHtXZdZRZ4e",
+        "image": "icons/svg/item-bag.svg",
+        "sourceId": "Compendium.abbrew.anatomy.Item.XZLRTQHtXZdZRZ4e"
+      },
+      {
+        "name": "Manglekin Grasping Claws",
+        "id": "XZLRTQHtXZdZRZ4e",
+        "image": "icons/svg/item-bag.svg",
+        "sourceId": "Compendium.abbrew.anatomy.Item.XZLRTQHtXZdZRZ4e"
+      },
+      {
+        "name": "Manglekin Leg",
+        "id": "1L1yLYA1PXkQEP38",
+        "image": "icons/svg/item-bag.svg",
+        "sourceId": "Compendium.abbrew.anatomy.Item.1L1yLYA1PXkQEP38"
+      },
+      {
+        "name": "Manglekin Leg",
+        "id": "1L1yLYA1PXkQEP38",
+        "image": "icons/svg/item-bag.svg",
+        "sourceId": "Compendium.abbrew.anatomy.Item.1L1yLYA1PXkQEP38"
+      },
+      {
+        "name": "Manglekin Scythe Claws",
+        "id": "lo1e79x2Qettm0Rd",
+        "image": "icons/svg/item-bag.svg",
+        "sourceId": "Compendium.abbrew.anatomy.Item.lo1e79x2Qettm0Rd"
+      },
+      {
+        "name": "Manglekin Scythe Claws",
+        "id": "lo1e79x2Qettm0Rd",
+        "image": "icons/svg/item-bag.svg",
+        "sourceId": "Compendium.abbrew.anatomy.Item.lo1e79x2Qettm0Rd"
+      },
+      {
+        "name": "Manglekin Torso",
+        "id": "M1vcAHzRn4xAULxQ",
+        "image": "icons/svg/item-bag.svg",
+        "sourceId": "Compendium.abbrew.anatomy.Item.M1vcAHzRn4xAULxQ"
+      }
+    ]
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.348",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1764356240978,
+    "modifiedTime": 1764359850383,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!items!2PeDTgFRvD8s2RlU"
+}

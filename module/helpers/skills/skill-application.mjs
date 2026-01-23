@@ -4,7 +4,7 @@ import { checkForTemporarySkillExpiry, handleSkillUsesAndCharges, skillDoesNotUs
 import { areSkillActivationRequirementsMet, handleActivateWithSkills, handlePairedSkills, isSkillBlocked } from "./skill-activation.mjs";
 import { filterSynergiesWithInsufficientResources, handleEarlySelfModifiers, handleLateSelfModifiers, handleTargetUpdates } from "./skill-modifiers.mjs";
 import { applyAttackProfiles } from "./skill-attack.mjs";
-import { renderChatMessage } from "./skill-chat.mjs";
+import { isSpellComponent, renderChatMessage } from "./skill-chat.mjs";
 import { getDialogValue } from "../modifierBuilderFieldHelpers.mjs";
 import { getSafeJson, getTokenForActor } from "../utils.mjs";
 
@@ -195,9 +195,9 @@ function getSkillTraits(skill, modifierSkills) {
         .flatMap(t => {
             if (t.raw) {
                 return getSafeJson(t.raw, [])
+            } else {
+                return t.value;
             }
-
-            return t;
         });
 
     return traits.reduce((uniqueTraits, trait) => {
@@ -217,7 +217,7 @@ function mergeSuccesses(allSkills) {
     return allSkills.reduce((result, s) => result += s.system.action.modifiers.successes, 0);
 }
 
-export async function applySkillEffects(actor, skill, includeTraits = []) {
+export async function applySkillEffects(actor, skill, includeTraits = [], checkSpellComponent = true) {
     if (isSkillBlocked(actor, skill)) {
         ui.notifications.info(`You are blocked from using ${skill.name}`);
         return;
@@ -262,12 +262,14 @@ export async function applySkillEffects(actor, skill, includeTraits = []) {
         await renderChatMessage(true, actor, s, modTemplate, modData);
     });
 
-    [templateData, data] = await applyAttackProfiles(actor, asyncParsedSkill, modifierSkills, fortune, bonusSuccesses, templateData, data);
+    if (!checkSpellComponent || !isSpellComponent(skill)) {
+        [templateData, data] = await applyAttackProfiles(actor, asyncParsedSkill, modifierSkills, fortune, bonusSuccesses, templateData, data);
+    }
 
     // Target updates
     [templateData, data] = await handleTargetUpdates(actor, allSkills, templateData, data);
 
-    await renderChatMessage(shouldRenderChatMessage, actor, asyncParsedSkill, templateData, data);
+    await renderChatMessage(shouldRenderChatMessage, actor, asyncParsedSkill, templateData, data, checkSpellComponent);
 
     await handleLateSelfModifiers(actor, lateSelfUpdates);
 

@@ -12,7 +12,7 @@
     "meta": {
       "tier": 1
     },
-    "description": "<p>When you gain the effects of @UUID[Compendium.abbrew.playerskills.Item.KXxGJGvTZ9faGpbv]{Raging}, increase your current and maximum Resolve by your Constitution modifier [[@attributes.con.value]].</p>",
+    "description": "<p>When you gain the effects of @UUID[Compendium.abbrew.playerskills.Item.KXxGJGvTZ9faGpbv]{Raging}, increase your current and maximum Resolve by your Constitution modifier [[@actor.attributes.con.value]].</p>",
     "traits": {
       "raw": "[{\"key\":\"emotion\",\"value\":\"Emotion\",\"feature\":\"skill\",\"subFeature\":\"identifiers\",\"effect\":\"\",\"data\":\"\",\"exclude\":[]}]",
       "value": []
@@ -507,6 +507,22 @@
             "type": "numeric",
             "numerator": 1,
             "denominator": 1
+          },
+          "sin": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "virtue": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "entropy": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "disarray": {
+            "operator": "add",
+            "type": "numeric"
           }
         }
       }
@@ -547,11 +563,11 @@
   "_stats": {
     "duplicateSource": null,
     "exportSource": null,
-    "coreVersion": "13.346",
+    "coreVersion": "13.348",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1754761487889,
-    "modifiedTime": 1754765606119,
+    "modifiedTime": 1764630532456,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_key": "!items!y5TLDYMbRxp5oIYI"

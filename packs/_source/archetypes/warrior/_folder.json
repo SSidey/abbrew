@@ -1,0 +1,22 @@
+{
+  "type": "Item",
+  "folder": null,
+  "name": "Warrior",
+  "color": null,
+  "sorting": "a",
+  "_id": "y8Osb8XxoS6dkU4Z",
+  "description": "",
+  "sort": 0,
+  "flags": {},
+  "_stats": {
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.348",
+    "systemId": "abbrew",
+    "systemVersion": "0.0.2-prerelease31",
+    "createdTime": 1756931476318,
+    "modifiedTime": 1756931476318,
+    "lastModifiedBy": "abbrewpacks00000"
+  },
+  "_key": "!folders!y8Osb8XxoS6dkU4Z"
+}

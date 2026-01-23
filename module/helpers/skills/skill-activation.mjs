@@ -2,6 +2,7 @@ import { applyFullyParsedComplexModifiers, applyFullyParsedModifiers } from "../
 import { applyOperator } from "../operators.mjs";
 import { getSafeJson, isASupersetOfB } from "../utils.mjs";
 import { applySkillEffects, getModifierSkills } from "./skill-application.mjs";
+import { isSpellComponent, isSpellComponentEssentia } from "./skill-chat.mjs";
 import { addSkillToActiveSkills, addSkillToQueuedSkills, trackSkillDuration } from "./skill-duration.mjs";
 import { checkAndExpire } from "./skill-expiry.mjs";
 import { applySystemFundamentalSkill } from "./skill-fundamental-system-application.mjs";
@@ -300,7 +301,21 @@ export async function activateSkill(actor, skill, includeSkillTraits = []) {
     }
     await handleSkillGrantOnActivation(skill, actor, skill);
     await handleConsumables(skill, actor);
+    await handleSpellComponents(skill, actor);
     return skillResult;
+}
+
+async function handleSpellComponents(skill, actor) {
+    if (isSpellComponent(skill)) {
+        const components = actor.system.magic.spellComponents;
+        const updateComponents = [...components, skill.name];
+        const essentia = actor.system.magic.essentia;
+        let updateEssentia = essentia;
+        if (isSpellComponentEssentia(skill)) {
+            updateEssentia = [...essentia, skill._id];
+        }
+        await actor.update({ "system.magic.spellComponents": updateComponents, "system.magic.essentia": updateEssentia });
+    }
 }
 
 // TODO: Split stack option so they could dual wield consumables?

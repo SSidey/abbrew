@@ -11,7 +11,7 @@
     "meta": {
       "tier": 1
     },
-    "description": "",
+    "description": "<p>Restore Guard equal to the guard bonus of this shield.</p>",
     "traits": {
       "raw": "",
       "value": []
@@ -497,11 +497,27 @@
             "type": "numeric",
             "numerator": 1,
             "denominator": 1
+          },
+          "sin": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "virtue": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "entropy": {
+            "operator": "add",
+            "type": "numeric"
+          },
+          "disarray": {
+            "operator": "add",
+            "type": "numeric"
           }
         }
       }
     },
-    "skillType": "basic",
+    "skillType": "item",
     "path": {
       "raw": "",
       "value": {
@@ -603,11 +619,11 @@
   "_stats": {
     "duplicateSource": null,
     "exportSource": null,
-    "coreVersion": "13.346",
+    "coreVersion": "13.348",
     "systemId": "abbrew",
     "systemVersion": "0.0.2-prerelease31",
     "createdTime": 1754775888496,
-    "modifiedTime": 1754869747089,
+    "modifiedTime": 1765235613211,
     "lastModifiedBy": "abbrewpacks00000"
   },
   "_id": "dObFAO90b3gM4IwB",
