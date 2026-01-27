@@ -1,5 +1,6 @@
 import { parsePathSync } from "../modifierBuilderFieldHelpers.mjs";
 import { applyOperator } from "../operators.mjs";
+import { getSafeTraits } from "../utils.mjs";
 import { getResultDice, getRollFormula, getTotalSuccessesForResult } from "./skill-roll.mjs";
 
 export async function applyAttackProfiles(actor, skill, modifierSkills, fortune, bonusSuccesses, templateData, data) {
@@ -48,7 +49,7 @@ export async function applyAttackProfiles(actor, skill, modifierSkills, fortune,
         const showAttack = ['attack', 'feint', 'finisher'].includes(attackMode);
         const isFeint = attackMode === 'feint';
         const isStrongAttack = ['overpower', 'ranged', 'aimedshot', 'thrown'].includes(attackMode);
-        const showFinisher = attackMode === 'finisher' || totalSuccesses > 0;
+        const showFinisher = attackMode === 'finisher' || totalSuccesses > 0 || getSafeTraits(skill).map(t => t.key).includes("essentia");
         const isFinisher = attackMode === 'finisher';
         const showAcceptButton = attackMode === "effect";
 

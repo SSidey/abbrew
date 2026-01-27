@@ -11,7 +11,7 @@ function getTierFromArray(actor, array) {
 }
 
 export async function makeSkillCheck(actor, skill, allSkills, fortune, bonusSuccesses, templateData, data) {
-    let skillResult = { dice: [], modifier: 0, baseDicePool: 0, result: true, isContested: false };
+    let skillResult = { dice: [], skill: skill, modifier: 0, baseDicePool: 0, result: true, isContested: false };
     if (skill.system.action.skillCheck.length > 0) {
         const combinedSkillModifier = allSkills
             .flatMap(s => parseModifierFieldValue(s.system.action.skillCheck, actor, s))
@@ -52,12 +52,14 @@ export async function makeSkillCheckRequest(actor, skill, modifierSkills, parent
             actorSource: { _id: skill.system.grantedBy.actor ?? actor._id },
             tokenSource: { _id: skill.system.grantedBy.token },
             modifierIds: [],
+            skill: skill,
             traits: getSafeJson(skill.system.traits.raw, []),
             checkType: skillRequest.checkType,
             isContested: skillRequest.isContested,
             successes: { total: 0, requiredValue: 0 },
             result: { requiredValue: 0 },
             contestedResult: { dice: [], modifier: 0 },
+            isHiddenContest: skill.system.action.skillRequest.isHiddenContest,
             outcomeGrants: {
                 success: [...skill.system.skills.grantOnSuccess, ...modifierSkills.flatMap(s => s.system.skills.grantOnSuccess)],
                 failure: [...skill.system.skills.grantOnFailure, ...modifierSkills.flatMap(s => s.system.skills.grantOnFailure)]
@@ -181,12 +183,12 @@ export async function acceptSkillCheck(actor, requirements) {
                     }
                 }
 
-                return ({ actor: actor, result: providedSuccesses > requiredSuccesses, totalSuccesses: providedSuccesses, requiredSuccesses: requiredSuccesses, skillResult: skillResult, contestedResult: requirements.contestedResult });
+                return ({ actor: actor, result: providedSuccesses > requiredSuccesses, totalSuccesses: providedSuccesses, requiredSuccesses: requiredSuccesses, skillResult: skillResult, contestedResult: requirements.contestedResult, isHiddenContest: requirements.isHiddenContest });
             } else if (requirements.checkType === "result") {
                 const requiredValue = Math.max(...requirements.contestedResult.dice.map(d => d.result)) + requirements.contestedResult.modifier;
                 const filteredSkillResult = mutateArrayForFortune(skillResult.dice);
                 const totalValue = Math.max(...filteredSkillResult.map(d => d.result)) + skillResult.modifier;
-                return ({ actor: actor, result: totalValue > requiredValue, totalSuccesses: totalValue >= requiredValue ? 1 : 0, totalValue: totalValue, requiredValue: requiredValue, skillResult: skillResult, contestedResult: requirements.contestedResult });
+                return ({ actor: actor, result: totalValue > requiredValue, totalSuccesses: totalValue >= requiredValue ? 1 : 0, totalValue: totalValue, requiredValue: requiredValue, skillResult: skillResult, contestedResult: requirements.contestedResult, isHiddenContest: requirements.isHiddenContest });
             }
         } else {
             if (requirements.checkType === "successes") {

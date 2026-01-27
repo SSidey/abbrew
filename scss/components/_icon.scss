@@ -74,6 +74,25 @@ span.icon.icon-anatomy-severed-u::before {
     background-image: url("../../abbrew/assets/icons/icons/anatomy-severed_u.svg")
 }
 
+input[type="checkbox"].anatomy-transmuted {
+    /* Add if not using autoprefixer */
+    -webkit-appearance: none;
+    appearance: none;
+    display: none;
+    /* For iOS < 15 to remove gradient background */
+    background-color: #fff;
+    /* Not removed via appearance */
+    margin: 0;
+}
+
+span.icon.icon-anatomy-transmuted-c::before {
+    background-image: url("../../abbrew/assets/icons/icons/anatomy-transmuted_c.svg")
+}
+
+span.icon.icon-anatomy-transmuted-u::before {
+    background-image: url("../../abbrew/assets/icons/icons/anatomy-transmuted_u.svg")
+}
+
 input[type="checkbox"].anatomy-revealed {
     /* Add if not using autoprefixer */
     -webkit-appearance: none;

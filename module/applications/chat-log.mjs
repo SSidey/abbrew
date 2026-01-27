@@ -3,6 +3,7 @@ import { emitForAll, SocketMessage } from '../socket.mjs';
 import { acceptSkillCheck } from '../helpers/skills/skill-check.mjs';
 import { getModifiedSkillActionCost } from "../helpers/skills/skill-activation.mjs";
 import { handleSkillsGrantedOnCheck } from '../helpers/skills/skill-grants.mjs';
+import { renderHiddenSkillCheck } from '../helpers/skills/skill-chat.mjs';
 
 export default class AbbrewChatLog extends (foundry.applications?.sidebar?.tabs?.ChatLog ?? ChatLog) {
 
@@ -57,16 +58,20 @@ export default class AbbrewChatLog extends (foundry.applications?.sidebar?.tabs?
             return;
         }
 
-        const parsedResult = ({ name: result.actor.name, result: result.result, totalValue: result.totalValue, requiredValue: result.requiredValue, totalSuccesses: result.totalSuccesses, requiredSuccesses: result.requiredSuccesses, skillResult: result.skillResult, contestedResult: result.contestedResult })
+        const parsedResult = ({ name: result.actor.name, owner: result.actor._id, result: result.result, totalValue: result.totalValue, requiredValue: result.requiredValue, totalSuccesses: result.totalSuccesses, requiredSuccesses: result.requiredSuccesses, skillResult: result.skillResult, contestedResult: result.contestedResult, isHiddenContest: result.isHiddenContest });
 
         let templateData = message.flags.abbrew.messasgeData.templateData;
 
         templateData.skillCheck = templateData.skillCheck ? templateData.skillCheck : ({ attempts: [] });
-        templateData.skillCheck.attempts = [...templateData.skillCheck.attempts, parsedResult];
         templateData.skillCheck.checkType = data.skillCheckRequest.checkType;
-
-        const html = await foundry.applications.handlebars.renderTemplate("systems/abbrew/templates/chat/skill-card.hbs", templateData);
-        emitForAll("system.abbrew", new SocketMessage(game.user.id, "updateMessageForCheck", { messageId, html, templateData }));
+        if (result.isHiddenContest) {
+            templateData.skillCheck.attempts = [parsedResult];
+            await renderHiddenSkillCheck(actor, data, templateData, true);
+        } else {
+            templateData.skillCheck.attempts = [...templateData.skillCheck.attempts, parsedResult];
+            const html = await foundry.applications.handlebars.renderTemplate("systems/abbrew/templates/chat/skill-card.hbs", templateData);
+            emitForAll("system.abbrew", new SocketMessage(game.user.id, "updateMessageForCheck", { messageId, html, templateData }));
+        }
         const totalSuccesses = result.totalSuccesses;
         if (data.skillCheckRequest.outcomeGrants) {
             if (totalSuccesses > 0) {

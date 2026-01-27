@@ -148,7 +148,7 @@ ol li.damage-reduction {
   .item-name {
     display: grid;
     // grid-column: 1 / 6;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(6, 1fr);
 
     >div.item-image {
       grid-column: 1 / 2;
@@ -174,6 +174,10 @@ ol li.damage-reduction {
 
   .icon-label-3 {
     grid-column: span 3;
+  }
+
+  .icon-label-4 {
+    grid-column: span 4;
   }
 
   .item-controls {

@@ -125,8 +125,8 @@ export default class AbbrewItem extends Item {
       }
     }
 
-    if (doesNestedFieldExist(changed, "system.isDismembered") && this.actor) {
-      if (changed.system.isDismembered) {
+    if ((doesNestedFieldExist(changed, "system.isDismembered") || doesNestedFieldExist(changed, "system.isTransmuted")) && this.actor) {
+      if (changed.system.isDismembered || changed.system.isTransmuted) {
         const weaponPromises = this.actor.items.filter(i => i.type === "weapon").filter(i => i.system.grantedBy === this._id).map(i => i.delete());
         const skillPromises = this.actor.items.filter(i => i.type === "skill").filter(i => i.system.grantedBy.item === this._id).map(i => i.delete());
 

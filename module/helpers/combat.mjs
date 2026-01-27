@@ -192,32 +192,60 @@ export function getTokenCenter(x, y, elevation, { width, height }, size) {
 }
 
 export async function handleThreat(document, tokenPosition, tokenCenter) {
+    let promises = [];
     const otherTokens = canvas.tokens.placeables.filter(t => t.id !== document.object.id);
-    await handleThreatForActor(document, tokenCenter, otherTokens);
-    await handleAdjacentAlliesForActor(document, tokenCenter, otherTokens);
-    await handleAurasForActor(document, tokenCenter, otherTokens);
-    const otherTokensForAdjustment = canvas.tokens.placeables.filter(t => t.document !== document);
-    const movedDocument = new AbbrewMovedToken(document.actor, tokenCenter, document.disposition, document.width, document._id);
+    promises = [handlePositionBasedEffectsForDocument(document, tokenCenter, otherTokens)];
+
+    const movedDocument = new AbbrewMovedToken(document.actor, document.id, tokenCenter, document.disposition, document.width, document._id);
     movedDocument.x = tokenPosition.x;
     movedDocument.y = tokenPosition.y;
     movedDocument.elevation = tokenPosition.elevation;
-    const otherPromises = game.canvas.tokens.placeables.map(t => t.document).filter(d => d !== document).flatMap(d =>
-        [
-            handleThreatForActor(d, d.getCenterPoint(), [...otherTokensForAdjustment, movedDocument]),
-            handleAdjacentAlliesForActor(d, d.getCenterPoint(), [...otherTokensForAdjustment, movedDocument]),
-            handleAurasForActor(d, d.getCenterPoint(), [...otherTokensForAdjustment, movedDocument])
-        ]
-    );
-    await Promise.all(otherPromises);
+
+    const fullTokenSet = [...otherTokens, movedDocument];
+
+    const otherPromises = filterForActiveTokensInCombat(otherTokens).flatMap(d => handlePositionBasedEffectsForDocument(d?.document ?? d, d.getCenterPoint(), filterOutDocument(fullTokenSet, d)));
+
+    promises = [...promises, ...otherPromises];
+    await Promise.all(promises);
+}
+
+async function handlePositionBasedEffectsForDocument(document, tokenCenter, otherTokens) {
+    const otherActiveCombatTokens = filterForActiveTokensInCombat(otherTokens);
+    const otherCombatTokens = filterForTokensInCombat(otherTokens);
+    handleThreatForActor(document, tokenCenter, otherActiveCombatTokens);
+    handleAdjacentAlliesForActor(document, tokenCenter, otherActiveCombatTokens);
+    handleAurasForActor(document, tokenCenter, otherCombatTokens);
+}
+
+function filterForActiveTokensInCombat(tokens) {
+    return tokens
+        .filter(t =>
+            game.combat.turns.filter(c => !c.isDefeated)
+                .map(t => t.tokenId)
+                .includes(t.document.id)
+        )
+}
+
+function filterForTokensInCombat(tokens) {
+    return tokens
+        .filter(t =>
+            game.combat.turns
+                .map(t => t.tokenId)
+                .includes(t.document.id)
+        )
+}
+
+function filterOutDocument(tokens, filterOut) {
+    return tokens.filter(t => (t.document.id) != (filterOut.document.id));
 }
 
 class AbbrewMovedToken {
-    constructor(actor, tokenCenter, disposition, width, id) {
+    constructor(actor, documentId, tokenCenter, disposition, width, id) {
         this.tokenCenter = tokenCenter;
         this.document = {};
+        this.document.id = documentId;
         this.document.disposition = disposition;
         this.document.width = width;
-        this.document._id = id;
         this.actor = actor;
     }
 
@@ -289,7 +317,7 @@ async function handleAurasForActor(document, tokenCenter, otherTokens) {
 function doesEmanationAffectToken(aura, document, tokenCenter, otherTokens) {
     const auraAffects = aura.system.aura.affects;
     const auraSkillGrantedBy = aura.system.grantedBy.token;
-    const auraGrantedBy = auraSkillGrantedBy.length > 0 ? auraSkillGrantedBy : document.object.id;
+    const auraGrantedBy = auraSkillGrantedBy.length > 0 ? auraSkillGrantedBy : document.id;
     const availableTargets = filterAuraTargets(auraAffects, auraGrantedBy, document, otherTokens);
     const targetsInEmanation = availableTargets.filter(t => isTokenAffectedByOwnAura(t, auraAffects, auraGrantedBy) || isTokenWithinEmanation(tokenCenter, document.height, t.getCenterPoint(), t.document.width, aura.system.aura.emanationSize))
     return targetsInEmanation;

@@ -1,0 +1,39 @@
+<div class="abbrew chat-message chat-card flexcol " data-actor-id="{{actor._id}}" data-item-id="{{item._id}}"
+    data-token-id="{{tokenId}}" data-message-id="{{messageId}}">
+    <div>
+        {{#each traits as |trait|}}
+        {{#if trait.value}}
+        <span class="chat-message-trait">{{trait.value}}</span>
+        {{/if}}
+        {{/each}}
+    </div>
+    <header>
+        <h3 class="item-name">{{item.name}}</h3>
+    </header>
+
+    <div class="message-content">
+        <h4>
+            <ol class="skill-check-results">
+                {{#each skillCheck.attempts as |attempt id|}}
+                <div class="skill-check-result">
+                    <label class="skill-check-actor-name">{{attempt.name}}</label>
+                    {{#if attempt.result}}
+                    <i class="fa-regular fa-circle-check" style="color: #176951;"></i>
+                    {{else}}
+                    <i class="fa-regular fa-circle-xmark" style="color: #6f0003;"></i>
+                    {{/if}}
+                    {{#if (eq ../skillCheck.checkType "successes")}}
+                    <span>{{attempt.totalSuccesses}}</span>
+                    <span>/</span>
+                    <span>{{attempt.requiredSuccesses}}</span>
+                    {{else}}
+                    <span>{{attempt.totalValue}}</span>
+                    <span>/</span>
+                    <span>{{attempt.requiredValue}}</span>
+                    {{/if}}
+                </div>
+                {{/each}}
+            </ol>
+        </h4>
+    </div>
+</div>

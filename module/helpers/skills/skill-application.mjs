@@ -6,9 +6,13 @@ import { filterSynergiesWithInsufficientResources, handleEarlySelfModifiers, han
 import { applyAttackProfiles } from "./skill-attack.mjs";
 import { isSpellComponent, renderChatMessage } from "./skill-chat.mjs";
 import { getDialogValue } from "../modifierBuilderFieldHelpers.mjs";
-import { getSafeJson, getTokenForActor } from "../utils.mjs";
+import { getSafeJson, getSafeTraits, getTokenForActor } from "../utils.mjs";
 
 export function getModifierSkills(actor, skill, includeTraits = []) {
+    if (includeTraits.length === 0) {
+        includeTraits = getSafeTraits(skill).map(t => t.key);
+    }
+
     // Get all queued synergy skills (Only include filter out those with charges but 0 remaining)
     const queuedSkills = actor.items.toObject().filter(i => actor.system.queuedSkills.includes(i._id)).filter(s => skillHasChargesRemaining(s) || skillDoesNotUseCharges(s));
     // Get all synergies that apply to the main skill

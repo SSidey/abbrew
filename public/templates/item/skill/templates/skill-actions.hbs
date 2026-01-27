@@ -485,6 +485,18 @@ value=system.activateIfFlaggedTrait.restrictedLast localize=true }}
                 <i class="fa fa-toggle-off"></i>
                 {{/if}}
             </label>
+            {{#if system.action.skillRequest.isContested}}
+            <label class="slide-toggle roboto-upper">
+                <input type="checkbox" name="system.action.skillRequest.isHiddenContest" {{ checked
+                    system.action.skillRequest.isHiddenContest }}>
+                <span>Is Hidden Contest?</span>
+                {{#if system.action.skillRequest.isHiddenContest}}
+                <i class="fa fa-toggle-on"></i>
+                {{else}}
+                <i class="fa fa-toggle-off"></i>
+                {{/if}}
+            </label>
+            {{/if}}
             {{#unless system.action.skillRequest.isContested}}
             <label class="slide-toggle roboto-upper">
                 <input type="checkbox" name="system.action.skillRequest.selfCheck" {{ checked

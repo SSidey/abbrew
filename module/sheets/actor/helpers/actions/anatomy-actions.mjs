@@ -9,3 +9,9 @@ export async function _onAnatomyToggleDismembered(event, target) {
     const item = this.actor.items.find(i => i._id === itemId);
     await item.update({ "system.isDismembered": !item.system.isDismembered });
 }
+
+export async function _onAnatomyToggleTransmuted(event, target) {
+    const itemId = target.closest(".item").dataset.itemId;
+    const item = this.actor.items.find(i => i._id === itemId);
+    await item.update({ "system.isTransmuted": !item.system.isTransmuted });
+}

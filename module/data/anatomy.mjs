@@ -11,6 +11,7 @@ export default class AbbrewAnatomy extends AbbrewPhysicalItem {
     schema.parts = new fields.StringField({ required: true, blank: true });
     schema.isBroken = new fields.BooleanField({ required: true, nullable: false, initial: false });
     schema.isDismembered = new fields.BooleanField({ required: true, nullable: false, initial: false });
+    schema.isTransmuted = new fields.BooleanField({ required: true, nullable: false, initial: false });
     schema.hands = new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 });
     schema.speed = new fields.SchemaField(Object.keys(CONFIG.ABBREW.speeds).reduce((obj, speed) => {
       obj[speed] = new fields.SchemaField({

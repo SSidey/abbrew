@@ -102,7 +102,7 @@ async function applyUseAndResourceRecharge(actor, skillsToRecharge, skillsToEmpt
         await actor.update({ "system.resources.values": resourceValues });
     }
 
-    await actor.update({ "system.defense.guard.value": actor.system.defense.guard.max, "system.defense.risk.raw": 0 });
+    await actor.update({ "system.defense.guard.value": actor.system.defense.guard.max, "system.defense.risk.raw": 0, "system.meta.tier.dice": actor.system.meta.tier.value });
 
     const skillUsesToRecharge = skillsToRecharge.filter(s => s.system.type !== "resource");
 

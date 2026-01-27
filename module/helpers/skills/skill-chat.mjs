@@ -19,6 +19,23 @@ export async function renderChatMessage(shouldRenderChatMessage, actor, skill, t
     }
 }
 
+export async function renderHiddenSkillCheck(actor, data, templateData, whisper) {
+    const html = await foundry.applications.handlebars.renderTemplate("systems/abbrew/templates/chat/hidden-skill-check.hbs", templateData);
+    const speaker = ChatMessage.getSpeaker({ actor: actor });
+    const rollMode = game.settings.get('core', 'rollMode');
+    const label = `[${data.skillCheckRequest.skill.system.skillType}] ${data.skillCheckRequest.skill.name}`;
+    const whisperRecipients = whisper ? ChatMessage.getWhisperRecipients('GM') : [];
+
+    ChatMessage.create({
+        speaker: speaker,
+        rollMode: rollMode,
+        flavor: label,
+        content: html,
+        whisper: whisperRecipients,
+        flags: { data: data, abbrew: { messasgeData: { speaker: speaker, rollMode: rollMode, flavor: label, templateData: templateData } } }
+    });
+}
+
 export function isSpellComponent(skill) {
     if (!skill.system.traits) {
         return false;

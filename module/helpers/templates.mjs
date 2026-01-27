@@ -72,6 +72,7 @@ export const preloadHandlebarsTemplates = async function () {
     "systems/abbrew/templates/item/wound/parts/wound-attributes.hbs",
     // Chat Cards.
     "systems/abbrew/templates/chat/skill-card.hbs",
+    "systems/abbrew/templates/chat/hidden-skill-check.hbs",
     "systems/abbrew/templates/chat/finisher-card.hbs",
     "systems/abbrew/templates/chat/lost-resolve-card.hbs",
     "systems/abbrew/templates/chat/attack-result-card.hbs",

@@ -267,6 +267,7 @@ export default class AbbrewSkill extends AbbrewItemBase {
             skillRequest: new fields.SchemaField({
                 isEnabled: new fields.BooleanField({ required: true, initial: false }),
                 isContested: new fields.BooleanField({ required: true, initial: false }),
+                isHiddenContest: new fields.BooleanField({ required: true, initial: false }),
                 selfCheck: new fields.BooleanField({ required: true, initial: false }),
                 checkType: new fields.StringField({ ...blankString }),
                 requirements: new fields.SchemaField({

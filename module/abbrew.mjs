@@ -410,6 +410,10 @@ Hooks.on("combatTurnChange", async (combat, prior, current) => {
 })
 
 Hooks.on("deleteCombat", async (document, options, userId) => {
+  if (!game.user.isActiveGM) {
+    return;
+  }
+
   const actors = document.combatants.toObject().map(c => canvas.tokens.get(c.tokenId).actor);
   togglePassingTime(game.paused, false);
   await handleCombatEnd(actors);

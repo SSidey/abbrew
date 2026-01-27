@@ -205,3 +205,16 @@ export function getTokenForActor(actor) {
 
     console.log(`No token for this actor ${actor._id}`);
 }
+
+export function getSafeTraits(obj) {
+    if (obj.system?.traits === undefined) {
+        return [];
+    }
+
+    let values = obj.system.traits?.value ?? [];
+    if (values.length === 0) {
+        values = getSafeJson(obj.system.traits.raw, []);
+    }
+
+    return values;
+}

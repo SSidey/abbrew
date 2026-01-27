@@ -372,7 +372,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
     this.threatReach = Math.max(
       0,
       ...this.parent.items.filter(i => i.type === "weapon")
-        .filter(w => ["held1H", "held2H", "activated"].includes(w.system.equipState))
+        .filter(w => ["held1H", "held2H", "active"].includes(w.system.equipState))
         .flatMap(w => w.system.attackProfiles)
         .filter(ap => ["arc", "thrust", "static"].includes(ap.attackType))
         .map(ap => ap.reach)
@@ -473,7 +473,7 @@ export default class AbbrewActorBase extends foundry.abstract.TypeDataModel {
 
   mapAnatomy() {
     const wornItemsWithEquipPoints = this.mapWornEquipPoints();
-    const res = this.parent.items.filter(i => i.type == "anatomy").filter(a => !(a.system.isBroken || a.system.isDismembered)).reduce((result, a) => {
+    const res = this.parent.items.filter(i => i.type == "anatomy").filter(a => !(a.system.isBroken || a.system.isDismembered || a.system.isTransmuted)).reduce((result, a) => {
       const values = a.system;
       result.hands += values.hands;
       result.speed = Object.entries(values.speed).filter(e => e[1].value).reduce((speedResult, [key, value]) => {

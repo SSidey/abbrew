@@ -88,7 +88,13 @@ export function areSkillActivationRequirementsMet(actor, skill) {
 
 export function getModifiedSkillActionCost(actor, skill) {
     const minActions = 0;
-    return Math.max(minActions, getModifierSkills(actor, skill).filter(s => s.system.action.modifiers.actionCost.operator).map(s => s.system.action.modifiers.actionCost).reduce((result, actionCost) => { result = applyOperator(result, actionCost.value, actionCost.operator); return result; }, parseInt(skill.system.action.actionCost ?? 0)));
+    const modifierSkills = getModifierSkills(actor, skill);
+    const modifierSkillsWithActionCostOperator = modifierSkills.filter(s => s.system.action.modifiers.actionCost.operator);
+    const modifierSkillActionCosts = modifierSkillsWithActionCostOperator.map(s => s.system.action.modifiers.actionCost)
+    return Math.max(minActions, modifierSkillActionCosts.reduce((result, actionCost) => {
+        result = applyOperator(result, actionCost.value, actionCost.operator);
+        return result;
+    }, parseInt(skill.system.action.actionCost ?? 0)));
 }
 
 export async function handlePairedSkills(skill, actor) {
@@ -154,7 +160,7 @@ function doesActorMeetSkillRequirements(actor, skill) {
         return false;
     }
 
-    const modifierSkills = getModifierSkills(actor, skill);
+    const modifierSkills = getModifierSkills(actor, skill, skill.system.traits?.value.map(t => t.key));
 
     if (!doesActorMeetTierDiceRequirements(actor, skill, modifierSkills)) {
         return false;

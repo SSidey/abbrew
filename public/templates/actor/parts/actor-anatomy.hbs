@@ -26,7 +26,7 @@
       <h4 class="item-label">{{item.name}}</h4>
     </div>
     {{#gm}}
-    <div class="icon-label-3">
+    <div class="icon-label-4">
       <label>
         <input type="checkbox" class="anatomy-broken" name="system.isBroken" data-action="toggleBroken" {{ checked
           item.system.isBroken }}>
@@ -43,6 +43,15 @@
         <span class="icon icon-anatomy-severed-c" />
         {{else}}
         <span class="icon icon-anatomy-severed-u" />
+        {{/if}}
+      </label>
+      <label>
+        <input type="checkbox" class="anatomy-transmuted" name="system.isTransmuted" data-action="toggleTransmuted" {{
+          checked item.system.isTransmuted }}>
+        {{#if item.system.isTransmuted}}
+        <span class="icon icon-anatomy-transmuted-c" />
+        {{else}}
+        <span class="icon icon-anatomy-transmuted-u" />
         {{/if}}
       </label>
       <label>

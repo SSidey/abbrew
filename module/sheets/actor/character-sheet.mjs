@@ -2,7 +2,7 @@ import { _onCreateItem, _onDeleteItem, _onEditItem, _onEquipStateChange, _onItem
 import { _onAttackDamageAction, _onAttackPickUpAction, _onAttackReloadAction } from './helpers/actions/attack-actions.mjs';
 import { _onAttributeSkill, _onDeleteSkill, _onEditSkill, _onSkillActivate, _onSkillConcentrate, _onSkillDeactivate, _onSkillStackRemove, _toggleFavourited } from './helpers/actions/skill-actions.mjs';
 import { _onDeleteArchetype, _onEditArchetype, displayArchetype } from './helpers/actions/archetype-actions.mjs';
-import { _onAnatomyToggleBroken, _onAnatomyToggleDismembered } from './helpers/actions/anatomy-actions.mjs';
+import { _onAnatomyToggleBroken, _onAnatomyToggleDismembered, _onAnatomyToggleTransmuted } from './helpers/actions/anatomy-actions.mjs';
 import { _onArmourToggleSundered } from './helpers/actions/armour-actions.mjs';
 import { _onEffectControl } from './helpers/actions/effect-actions.mjs';
 import { _onToggleSkillHeader } from './helpers/actions/ui-actions.mjs';
@@ -76,6 +76,7 @@ export class AbbrewCharacterSheet extends DragDropMixin(ActorTagsMixin(ActorCont
       handlePickup: _onAttackPickUpAction,
       toggleBroken: _onAnatomyToggleBroken,
       toggleDismembered: _onAnatomyToggleDismembered,
+      toggleTransmuted: _onAnatomyToggleTransmuted,
       toggleRevealed: _onItemToggleRevealed,
       toggleSundered: _onArmourToggleSundered,
       openBrowser: openBrowser,
